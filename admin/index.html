@@ -1,1 +1,40 @@
 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gửi thử Webhook dạng GET</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+input, button { padding: 8px; margin: 5px 0; width: 100%; max-width: 300px; }
+label { font-weight: bold; display: block; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Gửi thử Webhook (GET)</h1>
+
+<form id="webhookForm" method="GET" action="https://veonline-emwq97wmk-thanhduy.vercel.app/api/a">
+  <label for="name">Tên:</label>
+  <input type="text" id="name" name="name" placeholder="Nhập tên" required>
+
+  <label for="phone">Số điện thoại:</label>
+  <input type="text" id="phone" name="phone" placeholder="Nhập số điện thoại" required>
+
+  <label for="ticketNumber">Số vé:</label>
+  <input type="text" id="ticketNumber" name="ticketNumber" placeholder="Nhập số vé" required>
+
+  <label for="totalPrice">Tổng tiền:</label>
+  <input type="text" id="totalPrice" name="totalPrice" placeholder="Nhập tổng tiền" required>
+
+  <label for="secret">Secret:</label>
+  <input type="text" id="secret" name="secret" placeholder="Nhập secret" required>
+
+  <button type="submit">Gửi webhook</button>
+</form>
+
+<p>Nhấn gửi → trình duyệt sẽ mở link GET trực tiếp (giống webhook ngân hàng gửi request).</p>
+
+</body>
+</html>
