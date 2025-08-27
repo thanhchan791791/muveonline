@@ -1,1 +1,792 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mua vé CherryPet Coffee</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff8c94; /* Sắc hồng dâu mới */
+            --secondary-color: #ffb6c1; /* Hồng nhạt */
+            --bg-color: #fcebeb; /* Nền kem hồng */
+            --text-color: #555;
+            --card-bg: #fff;
+            --border-radius: 25px;
+            --shadow-soft: rgba(255, 140, 148, 0.2) 0px 8px 24px;
+            --shadow-pink: rgba(255, 140, 148, 0.4);
+            --shadow-vibrant: rgba(255, 140, 148, 0.6);
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(to bottom right, #fcebeb, #fff0f5);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        body::before, body::after {
+            content: '🐾';
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.1;
+            z-index: 0;
+            animation: float 10s ease-in-out infinite;
+        }
+
+        body::before {
+            top: 10%;
+            left: 5%;
+            animation-delay: 1s;
+        }
+        
+        body::after {
+            bottom: 15%;
+            right: 8%;
+            content: '🦴';
+            animation-delay: 3s;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            animation: fadeIn 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000);
+            position: relative;
+            z-index: 1;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-soft);
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: transform 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000), box-shadow 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: rgba(255, 140, 148, 0.25) 0px 15px 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: popIn 0.6s ease-out;
+        }
+
+        .header h1 {
+            font-family: 'Dancing Script', cursive;
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 3rem;
+            margin-bottom: 5px;
+            animation: shake 2s ease-in-out infinite;
+            display: inline-block;
+        }
+        
+        .header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+        
+        .input-group.animate {
+            animation: slideInUp 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+        }
+
+        .input-group:nth-of-type(1) { animation-delay: 0.2s; }
+        .input-group:nth-of-type(2) { animation-delay: 0.3s; }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .input-group input {
+            width: calc(100% - 24px);
+            padding: 15px;
+            border: 2px solid #ffdde1;
+            border-radius: 15px;
+            font-size: 1rem;
+            color: var(--text-color);
+            background-color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(255, 140, 148, 0.2);
+        }
+        
+        .ticket-options {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-bottom: 28px;
+            animation: fadeIn 0.8s ease-in-out 0.5s both;
+        }
+
+        .ticket-option {
+            background-color: #fff5f8;
+            border-radius: 20px;
+            padding: 22px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: rgba(255, 140, 148, 0.1) 0px 4px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .ticket-option:hover {
+            transform: translateY(-5px);
+            box-shadow: rgba(255, 140, 148, 0.3) 0px 8px 20px;
+        }
+        
+        .ticket-option.selected {
+            border-color: var(--primary-color);
+            box-shadow: rgba(255, 140, 148, 0.4) 0px 6px 15px;
+            transform: translateY(-3px) scale(1.02);
+            animation: popIn 0.3s ease;
+        }
+        
+        .ticket-option .icon-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .ticket-option .icon {
+            font-size: 2.8rem;
+            line-height: 1;
+            color: var(--primary-color);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .ticket-option:hover .icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .ticket-option .details h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .ticket-option .details p {
+            margin: 5px 0 0;
+            font-size: 1rem;
+        }
+
+        .ticket-option .price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 10px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .quantity-btn {
+            background-color: #ffe4e6;
+            color: var(--primary-color);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .quantity-btn:hover {
+            background-color: #ffc2c9;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(255, 140, 148, 0.3);
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.95);
+        }
+        
+        #quantity {
+            width: 50px;
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .total-price {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 28px;
+            animation: slideInUp 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.7s both;
+        }
+
+        .total-price span {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #888;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: var(--shadow-pink) 0px 8px 16px;
+            animation: slideInUp 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.9s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit:before {
+            content: '🦴';
+            position: absolute;
+            top: 50%;
+            left: -30px;
+            transform: translateY(-50%) rotate(-20deg);
+            transition: all 0.4s ease-out;
+            font-size: 1.5rem;
+        }
+        
+        .btn-submit:after {
+            content: '🐾';
+            position: absolute;
+            top: 50%;
+            right: -30px;
+            transform: translateY(-50%) rotate(20deg);
+            transition: all 0.4s ease-out;
+            font-size: 1.5rem;
+        }
+
+        .btn-submit:hover:before {
+            left: 15px;
+        }
+
+        .btn-submit:hover:after {
+            right: 15px;
+        }
+        
+        .btn-submit:hover {
+            background-color: #ff7f8a;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-vibrant) 0px 12px 20px;
+        }
+
+        .btn-submit:active {
+            transform: translateY(1px);
+        }
+
+        .hidden {
+            display: none;
+        }
+        
+        .reveal {
+            display: block !important;
+            animation: fadeIn 0.6s ease-in;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s 0.3s;
+        }
+
+        .modal.open {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0s 0s;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            transform: translateY(-100px);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.320, 1.275);
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 20px;
+        }
+        
+        .modal.open .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-content h2 {
+            font-family: 'Dancing Script', cursive;
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 2.2rem;
+        }
+
+        .qr-code img {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            border: 5px solid var(--secondary-color);
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+            margin-top: 20px;
+            box-shadow: rgba(0,0,0,0.1) 0px 5px 15px;
+        }
+        
+        .qr-code img:hover {
+            transform: scale(1.05);
+        }
+        
+        .payment-message {
+            background-color: var(--secondary-color);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #fff;
+            font-weight: 500;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            animation: fadeIn 0.6s ease-in;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            border: 2px dashed #fff;
+        }
+
+        .payment-info {
+            background-color: #fff3f3;
+            padding: 25px;
+            border-radius: 20px;
+            margin-top: 25px;
+            text-align: left;
+            border: 2px dashed var(--secondary-color);
+        }
+
+        .payment-info p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .payment-info strong {
+            color: var(--primary-color);
+        }
+        
+        .highlight-message {
+            background-color: var(--secondary-color);
+            border-radius: 20px;
+            padding: 25px;
+            animation: fadeIn 0.8s ease-in;
+            box-shadow: rgba(255, 182, 193, 0.4) 0px 8px 24px;
+        }
+
+        .highlight-message h3 {
+            margin: 0 0 10px;
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .highlight-message p {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2.5rem;
+            color: #ccc;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .close-btn:hover {
+            color: var(--primary-color);
+            transform: rotate(90deg) scale(1.1);
+        }
+        
+        /* Modal riêng cho thông báo */
+        #info-modal .modal-content {
+            background: linear-gradient(to top right, var(--primary-color), var(--secondary-color));
+            color: #fff;
+            transform: translateY(-200px);
+            box-shadow: var(--shadow-vibrant) 0px 12px 20px;
+        }
+
+        #info-modal.open .modal-content {
+            transform: translateY(0);
+        }
+
+        #info-modal h2 {
+            font-family: 'Dancing Script', cursive;
+            color: #fff;
+            margin: 0 0 15px;
+            font-size: 2.5rem;
+        }
+
+        #info-modal p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+        
+        #info-modal .btn-confirm {
+            width: 100%;
+            padding: 18px;
+            border-radius: 15px;
+            background-color: #fff;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 25px;
+            box-shadow: rgba(0,0,0,0.1) 0px 5px 15px;
+        }
+
+        #info-modal .btn-confirm:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            20% { transform: rotate(-5deg); }
+            40% { transform: rotate(5deg); }
+            60% { transform: rotate(-5deg); }
+            80% { transform: rotate(5deg); }
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <h1>🌸 CherryPet Coffee 🌸</h1>
+            <p>Chọn vé để trải nghiệm không gian đáng yêu!</p>
+        </div>
+
+        <div class="input-group animate">
+            <label for="name">Tên bạn là gì?</label>
+            <input type="text" id="name" placeholder="Nhập họ và tên của bạn" required>
+        </div>
+
+        <div class="input-group animate">
+            <label for="phone">Số điện thoại liên lạc</label>
+            <input type="tel" id="phone" placeholder="Nhập số điện thoại" required>
+        </div>
+
+        <div id="ticket-section" class="hidden">
+            <div class="ticket-options">
+                <div class="ticket-option" data-price="65000" data-name="Trải nghiệm full combo">
+                    <div class="icon-container">
+                        <span class="icon">🐶</span>
+                        <span class="icon">🐱</span>
+                        <span class="icon">🐹</span>
+                        <span class="icon">🦝</span>
+                        <span class="icon">🥤</span>
+                    </div>
+                    <div class="details">
+                        <h3>Trải nghiệm full combo</h3>
+                        <p>Vé vào tất cả khu vực thú cưng + 1 ly nước tự chọn</p>
+                    </div>
+                    <span class="price">65.000 VNĐ</span>
+                </div>
+            </div>
+
+            <div class="quantity-control">
+                <button class="quantity-btn" id="decrement-btn">-</button>
+                <span id="quantity">1</span>
+                <button class="quantity-btn" id="increment-btn">+</button>
+            </div>
+
+            <div class="total-price">
+                <span>Tổng số tiền:</span> <span id="total-amount">0 VNĐ</span>
+            </div>
+
+            <button class="btn-submit" id="checkout-btn">Thanh toán ngay</button>
+        </div>
+    </div>
+</div>
+
+<div id="info-modal" class="modal">
+    <div class="modal-content">
+        <h2>Xin chào!</h2>
+        <p>
+            Bạn sắp hoàn tất việc mua vé. Vui lòng kiểm tra lại thông tin và **chuyển khoản đúng số tiền**, **đúng nội dung** là **Tên và SĐT** để nhận vé tại quầy nhé!
+        </p>
+        <button class="btn-confirm" id="confirm-btn">Đã hiểu</button>
+    </div>
+</div>
+
+<div id="payment-modal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" id="close-modal-btn">&times;</button>
+        
+        <h2>Quét mã để thanh toán</h2>
+        <div class="qr-code">
+            <img id="qr-image" src="" alt="QR Code thanh toán">
+        </div>
+        
+        <div class="payment-message">
+            Sau khi thanh toán, bạn chỉ cần tới quầy và **đọc Tên + SĐT** để nhận vé. 🥰
+        </div>
+        
+        <div class="payment-info">
+            <p><strong>Ngân hàng:</strong> MB Bank (Ngân hàng Quân đội)</p>
+            <p><strong>Số tài khoản:</strong> 0909650816</p>
+            <p><strong>Chủ tài khoản:</strong> Trần Vũ Ngọc Thành</p>
+            <p><strong>Nội dung chuyển khoản:</strong> <span id="transfer-content"></span></p>
+            <p><strong>Tổng số tiền:</strong> <span id="modal-total-amount"></span></p>
+        </div>
+
+        <button class="btn-return" id="return-btn" style="
+            width: 100%;
+            padding: 12px;
+            background-color: #f0f0f0;
+            color: var(--primary-color);
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        ">
+            Quay lại trang đặt vé
+        </button>
+    </div>
+</div>
+
+<script>
+    const bankInfo = {
+        accountNumber: '0909650816',
+        accountName: 'Trần Vũ Ngọc Thành',
+        bankName: 'MB Bank',
+        bankShortName: 'MB',
+    };
+
+    const nameInput = document.getElementById('name');
+    const phoneInput = document.getElementById('phone');
+    const ticketSection = document.getElementById('ticket-section');
+    const ticketOptions = document.querySelectorAll('.ticket-option');
+    const quantityControl = document.querySelector('.quantity-control');
+
+    const quantitySpan = document.getElementById('quantity');
+    const totalAmountSpan = document.getElementById('total-amount');
+    const decrementBtn = document.getElementById('decrement-btn');
+    const incrementBtn = document.getElementById('increment-btn');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    
+    const infoModal = document.getElementById('info-modal');
+    const confirmBtn = document.getElementById('confirm-btn');
+    const paymentModal = document.getElementById('payment-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+
+    const transferContentSpan = document.getElementById('transfer-content');
+    const modalTotalAmountSpan = document.getElementById('modal-total-amount');
+    const qrImage = document.getElementById('qr-image');
+    const returnBtn = document.getElementById('return-btn');
+
+    let selectedTicketPrice = 0;
+    let selectedTicketName = '';
+    let quantity = 1;
+
+    function formatCurrency(amount) {
+        return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    }
+
+    function updateTotal() {
+        const total = quantity * selectedTicketPrice;
+        totalAmountSpan.textContent = formatCurrency(total);
+        modalTotalAmountSpan.textContent = formatCurrency(total);
+    }
+
+    function checkInputs() {
+        if (nameInput.value.trim() !== '' && phoneInput.value.trim() !== '') {
+            if (ticketSection.classList.contains('hidden')) {
+                ticketSection.classList.add('reveal');
+                ticketSection.classList.remove('hidden');
+            }
+        } else {
+            if (!ticketSection.classList.contains('hidden')) {
+                ticketSection.classList.add('hidden');
+                ticketSection.classList.remove('reveal');
+            }
+        }
+    }
+
+    nameInput.addEventListener('input', checkInputs);
+    phoneInput.addEventListener('input', checkInputs);
+
+    ticketOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            ticketOptions.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            
+            selectedTicketPrice = parseInt(option.dataset.price);
+            selectedTicketName = option.dataset.name;
+            
+            quantityControl.classList.remove('hidden');
+            
+            quantity = 1;
+            quantitySpan.textContent = quantity;
+            
+            updateTotal();
+        });
+    });
+
+    window.addEventListener('load', () => {
+        const defaultOption = document.querySelector('.ticket-option');
+        if (defaultOption) {
+            defaultOption.classList.add('selected');
+            selectedTicketPrice = parseInt(defaultOption.dataset.price);
+            selectedTicketName = defaultOption.dataset.name;
+            updateTotal();
+        }
+    });
+
+    decrementBtn.addEventListener('click', () => {
+        if (quantity > 1) {
+            quantity--;
+            quantitySpan.textContent = quantity;
+            updateTotal();
+        }
+    });
+
+    incrementBtn.addEventListener('click', () => {
+        quantity++;
+        quantitySpan.textContent = quantity;
+        updateTotal();
+    });
+
+    checkoutBtn.addEventListener('click', () => {
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        
+        if (!name || !phone || selectedTicketPrice === 0) {
+            alert('Vui lòng nhập đầy đủ thông tin và chọn loại vé để thanh toán!');
+            return;
+        }
+        
+        infoModal.classList.add('open');
+    });
+
+    confirmBtn.addEventListener('click', () => {
+        infoModal.classList.remove('open');
+        
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const total = quantity * selectedTicketPrice;
+        const transferContent = `${name} - ${phone}`;
+
+        transferContentSpan.textContent = transferContent;
+        modalTotalAmountSpan.textContent = formatCurrency(total);
+        
+        const qrCodeData = `https://api.vietqr.io/image/MB-${bankInfo.accountNumber}-print.png?amount=${total}&addInfo=${encodeURIComponent(transferContent)}`;
+        qrImage.src = qrCodeData;
+        
+        setTimeout(() => {
+            paymentModal.classList.add('open');
+        }, 500); 
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        paymentModal.classList.remove('open');
+    });
+
+    paymentModal.addEventListener('click', (e) => {
+        if (e.target === paymentModal) {
+            paymentModal.classList.remove('open');
+        }
+    });
+
+    returnBtn.addEventListener('click', () => {
+        location.reload(); 
+    });
+</script>
+
+</body>
+</html>
 
