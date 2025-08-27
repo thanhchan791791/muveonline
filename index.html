@@ -1,65 +1,266 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gửi vé lêsdsdsdn Firebase</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    input, button { padding: 8px; margin: 5px 0; width: 100%; max-width: 300px; }
-    label { font-weight: bold; display: block; margin-top: 10px; }
-    pre { background: #f4f4f4; padding: 10px; border-radius: 5px; margin-top: 10px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mua Vé Thăm Quán</title>
+<style>
+    /* ----------------- Body ----------------- */
+    body { 
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #ffe6f0, #fff1e6);
+        display: flex; justify-content: center; align-items: center;
+        min-height: 100vh; margin: 0; color: #333;
+        overflow: hidden;
+    }
+
+    /* ----------------- Container ----------------- */
+    .container {
+        background-color: #fff;
+        padding: 40px 30px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        width: 100%;
+        max-width: 450px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    h1, h2, h3 { color: #d81b60; margin-bottom: 15px; }
+    label { font-weight: 600; display: block; margin-top: 12px; color: #880e4f; }
+
+    input, button {
+        width: 100%;
+        padding: 12px 15px;
+        margin-top: 8px;
+        border-radius: 10px;
+        border: 2px solid #ff99aa;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    input:focus { border-color: #d81b60; outline: none; box-shadow: 0 0 8px rgba(216,27,96,0.3); }
+
+    button {
+        background-color: #ff3366;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 6px 15px rgba(255,51,102,0.3);
+        transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    button:hover { background-color: #d81b60; transform: translateY(-3px); }
+
+    /* ----------------- Step Animation ----------------- */
+    .step {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.5s ease;
+        pointer-events: none;
+    }
+
+    .step.active {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: all;
+        position: relative;
+    }
+
+    /* ----------------- Ticket Info ----------------- */
+    #ticket-info { text-align: left; margin-bottom: 20px; }
+    #total-price { font-weight: bold; font-size: 1.4em; color: #e74c3c; text-align: right; }
+
+    /* ----------------- QR Code ----------------- */
+    #qr-code {
+        width: 250px; height: 250px;
+        border-radius: 15px;
+        margin: 20px auto;
+        padding: 10px;
+        background-color: #fff;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    /* ----------------- Message ----------------- */
+    #message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        padding: 25px 35px;
+        border-radius: 15px;
+        font-weight: bold;
+        font-size: 1.2em;
+        text-align: center;
+        z-index: 9999;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .message-active { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
+    .message-pending { background-color: #eaf6ff; color: #3498db; }
+    .message-error { background-color: #ffe8e8; color: #e74c3c; }
+    .message-success { background-color: #e8f8f0; color: #2ecc71; }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
-<h1>Gửi vé lên Firebase</h1>
+<div class="container">
+    <h1>Vé Thăm Quan & Trải Nghiệm</h1>
 
-<form id="ticketForm">
-  <label for="name">Tên:</label>
-  <input type="text" id="name" name="name" placeholder="Nhập tên" required>
+    <!-- Step 1: Info -->
+    <div id="info-section" class="step active">
+        <form id="infoForm">
+            <label for="name">Tên của bạn:</label>
+            <input type="text" id="name" placeholder="Nhập tên" required>
 
-  <label for="phone">Số điện thoại:</label>
-  <input type="text" id="phone" name="phone" placeholder="Nhập số điện thoại" required>
+            <label for="phone">Số điện thoại:</label>
+            <input type="tel" id="phone" placeholder="Nhập số điện thoại" required>
 
-  <label for="amount">Số tiền:</label>
-  <input type="number" id="amount" name="amount" placeholder="Nhập số tiền" required>
+            <button type="submit">Tiếp Tục</button>
+        </form>
+    </div>
 
-  <label for="note">Ghi chú:</label>
-  <input type="text" id="note" name="note" placeholder="Ghi chú (không bắt buộc)">
+    <!-- Step 2: Ticket -->
+    <div id="ticket-section" class="step">
+        <h2>Chọn số lượng vé</h2>
+        <div id="ticket-info">
+            <h3>Giá vé: 65.000 VNĐ / người</h3>
+            <p>Bao gồm: Chó, mèo, capybara, gấu mèo & 1 ly nước.</p>
+            <label for="ticketNumber">Số lượng vé:</label>
+            <input type="number" id="ticketNumber" value="1" min="1" required>
+            <div id="total-price">Tổng cộng: 65.000 VNĐ</div>
+        </div>
+        <button id="checkoutBtn">Thanh Toán</button>
+    </div>
 
-  <button type="submit">Gửi dữ liệu</button>
-</form>
+    <!-- Step 3: Payment -->
+    <div id="payment-section" class="step">
+        <h2>Thông Tin Thanh Toán</h2>
+        <p>Vui lòng quét mã QR để chuyển khoản. Sau khi thanh toán, hệ thống sẽ tự động xác nhận.</p>
+        <div id="qr-code"></div>
+        <p><strong>Ngân hàng:</strong> MB Bank</p>
+        <p><strong>Số tài khoản:</strong> 0909650816</p>
+        <p><strong>Tên tài khoản:</strong> Trần Vũ Ngọc Thành</p>
+        <p><strong>Nội dung:</strong> <span id="payment-content-display">...</span></p>
+    </div>
 
-<h2>Kết quả trả về:</h2>
-<pre id="result">Chưa có dữ liệu</pre>
+    <!-- Message -->
+    <div id="message"></div>
+</div>
 
 <script>
-const form = document.getElementById('ticketForm');
-const result = document.getElementById('result');
+const firebaseConfig = {
+    apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
+    authDomain: "muveonline-919a8.firebaseapp.com",
+    databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
+    projectId: "muveonline-919a8",
+    storageBucket: "muveonline-919a8.firebasestorage.app",
+    messagingSenderId: "399933853156",
+    appId: "1:399933853156:web:982c1da02117606a994bf1"
+};
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-  const formData = new FormData(form);
-  const params = new URLSearchParams();
-  for (const [key, value] of formData.entries()) {
-    params.append(key, value);
-  }
+const steps = {
+    info: document.getElementById('info-section'),
+    ticket: document.getElementById('ticket-section'),
+    payment: document.getElementById('payment-section')
+};
+const infoForm = document.getElementById('infoForm');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const ticketNumberInput = document.getElementById('ticketNumber');
+const totalPriceDiv = document.getElementById('total-price');
+const qrCodeDiv = document.getElementById('qr-code');
+const messageDiv = document.getElementById('message');
+const paymentContentDisplay = document.getElementById('payment-content-display');
 
-  try {
-    const response = await fetch('https://veonline-iruh0ipsv-thanhduy.vercel.app/api/a', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString()
-    });
+let userInfo = {};
+let ticketNumberValue = 1;
+const TICKET_PRICE = 65000;
 
-    const data = await response.json();
-    result.textContent = JSON.stringify(data, null, 2);
-  } catch (err) {
-    result.textContent = 'Lỗi gửi dữ liệu: ' + err.message;
-  }
+function goToStep(next) {
+    Object.values(steps).forEach(s => s.classList.remove('active'));
+    next.classList.add('active');
+}
+
+ticketNumberInput.addEventListener('input', () => {
+    const count = parseInt(ticketNumberInput.value);
+    ticketNumberValue = count >= 1 ? count : 0;
+    totalPriceDiv.textContent = `Tổng cộng: ${formatCurrency(ticketNumberValue * TICKET_PRICE)}`;
 });
+
+infoForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    if(!name || !phone){ showMessage('Vui lòng nhập đầy đủ thông tin','error'); return; }
+    userInfo = {name, phone};
+    goToStep(steps.ticket);
+    hideMessage();
+});
+
+checkoutBtn.addEventListener('click', () => {
+    if(ticketNumberValue < 1){ showMessage('Số lượng vé phải lớn hơn 0','error'); return; }
+    const totalPrice = ticketNumberValue * TICKET_PRICE;
+    const ticketsRef = db.ref("tickets");
+    const newTicketRef = ticketsRef.push({
+        name: userInfo.name,
+        phone: userInfo.phone,
+        ticketNumber: ticketNumberValue,
+        totalPrice: totalPrice,
+        status: "pending",
+        createdAt: new Date().toISOString()
+    });
+    const ticketId = newTicketRef.key;
+    paymentContentDisplay.textContent = `${userInfo.name}-${userInfo.phone}-${ticketNumberValue}-${totalPrice}`;
+    qrCodeDiv.innerHTML = '';
+    new QRCode(qrCodeDiv,{
+        text: `https://api.vietqr.io/v2/generate?acqId=970422&accountNo=0909650816&amount=${totalPrice}&addInfo=${encodeURIComponent(ticketId)}&template=qr_only`,
+        width:250, height:250
+    });
+    goToStep(steps.payment);
+    showMessage('Thông tin đã gửi. Vui lòng thanh toán...','pending');
+
+    // Lắng nghe trạng thái
+  newTicketRef.child('status').on('value', snapshot => {
+    const status = snapshot.val();
+    if (status === 'paid') {
+        showMessage(
+            'Thanh toán thành công! Chúc mừng bạn, vé của bạn đã được xác nhận.',
+            'success'
+        );
+        messageDiv.style.zIndex = 9999; // đảm bảo hiển thị trên step khác
+        newTicketRef.child('status').off();
+    }
+});
+
+});
+
+function formatCurrency(n){ return new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(n); }
+function showMessage(msg, type) {
+    messageDiv.textContent = msg;
+    messageDiv.className = 'message-active ' + 
+        (type === 'pending' ? 'message-pending' :
+         type === 'success' ? 'message-success' :
+         'message-error');
+    messageDiv.style.display = 'block';
+}
+
+function hideMessage(){ messageDiv.classList.remove('message-active'); }
 </script>
 
 </body>
