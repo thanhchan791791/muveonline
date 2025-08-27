@@ -3,114 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mua Vé Thăm Quán</title>
+<title>Mua Vé Cherry Pet Coffee</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* ----------------- Body ----------------- */
-    body { 
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #ffe6f0, #fff1e6);
-        display: flex; justify-content: center; align-items: center;
-        min-height: 100vh; margin: 0; color: #333;
-        overflow: hidden;
+    /* ----------------- Cài đặt chung & Body ----------------- */
+    :root {
+        --primary-pink: #FF85A2;
+        --secondary-pink: #FCE4EC;
+        --dark-text: #4A4A4A;
+        --light-text: #FFFFFF;
+        --card-bg: #FFFFFF;
+        --shadow-elevation-1: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-elevation-2: 0 10px 15px rgba(0, 0, 0, 0.15);
     }
-
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #FFE6F0, #E0F7FA);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        color: var(--dark-text);
+        position: relative;
+    }
+    
     /* ----------------- Container ----------------- */
     .container {
-        background-color: #fff;
-        padding: 40px 30px;
+        background: var(--card-bg);
         border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        box-shadow: var(--shadow-elevation-2);
+        padding: 30px;
+        box-sizing: border-box;
         width: 100%;
         max-width: 450px;
         position: relative;
-        overflow: hidden;
     }
-
-    h1, h2, h3 { color: #d81b60; margin-bottom: 15px; }
-    label { font-weight: 600; display: block; margin-top: 12px; color: #880e4f; }
-
-    input, button {
+    
+    /* ----------------- Tiêu đề & Chữ ----------------- */
+    h1, h2 {
+        text-align: center;
+        color: var(--primary-pink);
+    }
+    h1 { font-size: 2.2em; margin-bottom: 5px; }
+    .subtitle {
+        font-size: 1.1em;
+        color: #888;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    
+    /* ----------------- Form & Nút bấm ----------------- */
+    .input-group { margin-bottom: 18px; }
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    input[type="text"], input[type="tel"], input[type="number"] {
         width: 100%;
         padding: 12px 15px;
-        margin-top: 8px;
+        border: 2px solid #ccc;
         border-radius: 10px;
-        border: 2px solid #ff99aa;
-        font-size: 16px;
-        box-sizing: border-box;
+        font-size: 1em;
         transition: all 0.3s ease;
+        box-sizing: border-box;
     }
-
-    input:focus { border-color: #d81b60; outline: none; box-shadow: 0 0 8px rgba(216,27,96,0.3); }
-
+    input:focus {
+        border-color: var(--primary-pink);
+        outline: none;
+        box-shadow: 0 0 0 3px var(--secondary-pink);
+    }
+    .price-display {
+        font-size: 1.5em;
+        font-weight: 700;
+        color: var(--primary-pink);
+        text-align: right;
+        margin-top: 20px;
+    }
     button {
-        background-color: #ff3366;
-        color: #fff;
-        font-weight: bold;
-        cursor: pointer;
+        width: 100%;
+        padding: 14px;
+        background-color: var(--primary-pink);
+        color: var(--light-text);
         border: none;
-        box-shadow: 0 6px 15px rgba(255,51,102,0.3);
-        transition: transform 0.2s ease, background-color 0.3s ease;
+        border-radius: 10px;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, background-color 0.3s;
+        box-shadow: var(--shadow-elevation-1);
     }
-
-    button:hover { background-color: #d81b60; transform: translateY(-3px); }
-
-    /* ----------------- Step Animation ----------------- */
+    button:hover { transform: translateY(-2px); background-color: #E5718A; }
+    
+    /* ----------------- Chuyển bước & QR code ----------------- */
     .step {
-        position: absolute;
+        display: none;
+        opacity: 0;
+        animation: fadeIn 0.5s ease-in-out forwards;
+    }
+    .step.active { display: block; }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .qr-section { text-align: center; }
+    #qr-code {
+        padding: 10px;
+        background-color: var(--card-bg);
+        border-radius: 15px;
+        box-shadow: var(--shadow-elevation-1);
+        margin: 25px auto;
+        display: inline-block;
+        animation: bounceIn 0.8s;
+    }
+    @keyframes bounceIn {
+      0%, 20%, 40%, 60%, 80%, 100% {
+        transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+      }
+      0% { transform: scale3d(.3, .3, .3); }
+      20% { transform: scale3d(1.1, 1.1, 1.1); }
+      40% { transform: scale3d(.9, .9, .9); }
+      60% { transform: scale3d(1.03, 1.03, 1.03); }
+      80% { transform: scale3d(.97, .97, .97); }
+      100% { transform: scale3d(1, 1, 1); }
+    }
+    
+    /* ----------------- Overlay thông báo ----------------- */
+    .message-overlay {
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.5s ease;
-        pointer-events: none;
-    }
-
-    .step.active {
-        opacity: 1;
-        transform: translateX(0);
-        pointer-events: all;
-        position: relative;
-    }
-
-    /* ----------------- Ticket Info ----------------- */
-    #ticket-info { text-align: left; margin-bottom: 20px; }
-    #total-price { font-weight: bold; font-size: 1.4em; color: #e74c3c; text-align: right; }
-
-    /* ----------------- QR Code ----------------- */
-    #qr-code {
-        width: 250px; height: 250px;
-        border-radius: 15px;
-        margin: 20px auto;
-        padding: 10px;
-        background-color: #fff;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    }
-
-    /* ----------------- Message ----------------- */
-    #message {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.8);
-        padding: 25px 35px;
-        border-radius: 15px;
-        font-weight: bold;
-        font-size: 1.2em;
-        text-align: center;
-        z-index: 9999;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
         opacity: 0;
         visibility: hidden;
-        transition: all 0.3s ease;
+        transition: all 0.5s ease;
     }
-
-    .message-active { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
-    .message-pending { background-color: #eaf6ff; color: #3498db; }
-    .message-error { background-color: #ffe8e8; color: #e74c3c; }
-    .message-success { background-color: #e8f8f0; color: #2ecc71; }
+    .message-overlay.visible { opacity: 1; visibility: visible; }
+    .message-card {
+        background: var(--card-bg);
+        padding: 40px 30px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-elevation-2);
+        max-width: 380px;
+        text-align: center;
+        transform: translateY(-50px);
+        transition: transform 0.5s ease;
+        animation: scaleIn 0.5s ease-out;
+    }
+    @keyframes scaleIn {
+        from { transform: scale(0); }
+        to { transform: scale(1); }
+    }
+    .message-card .icon { font-size: 3.5em; margin-bottom: 15px; }
+    .message-card h2 { font-size: 1.8em; margin-bottom: 10px; font-weight: 700; }
+    .message-card p { font-size: 1.1em; margin-bottom: 25px; }
+    
+    .message-card.success h2, .message-card.success .icon { color: #2ecc71; }
+    .message-card.error h2, .message-card.error .icon { color: #e74c3c; }
+    
+    /* ----------------- Loader & Nút bấm ----------------- */
+    .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--primary-pink);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    #close-message-btn {
+        background-color: var(--primary-pink);
+        color: var(--light-text);
+        font-weight: 600;
+    }
+    #close-message-btn:hover {
+        background-color: #E5718A;
+    }
 </style>
-
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -118,47 +198,54 @@
 <body>
 
 <div class="container">
-    <h1>Vé Thăm Quan & Trải Nghiệm</h1>
-
-    <!-- Step 1: Info -->
-    <div id="info-section" class="step active">
+    <div id="step-info" class="step active">
+        <h1>Cherry Pet Coffee</h1>
+        <p class="subtitle">Mua vé tham quan & trải nghiệm</p>
         <form id="infoForm">
-            <label for="name">Tên của bạn:</label>
-            <input type="text" id="name" placeholder="Nhập tên" required>
-
-            <label for="phone">Số điện thoại:</label>
-            <input type="tel" id="phone" placeholder="Nhập số điện thoại" required>
-
+            <div class="input-group">
+                <label for="name">Tên của bạn:</label>
+                <input type="text" id="name" placeholder="Nhập tên" required>
+            </div>
+            <div class="input-group">
+                <label for="phone">Số điện thoại:</label>
+                <input type="tel" id="phone" placeholder="Nhập số điện thoại" required>
+            </div>
             <button type="submit">Tiếp Tục</button>
         </form>
     </div>
 
-    <!-- Step 2: Ticket -->
-    <div id="ticket-section" class="step">
+    <div id="step-ticket" class="step">
         <h2>Chọn số lượng vé</h2>
-        <div id="ticket-info">
-            <h3>Giá vé: 65.000 VNĐ / người</h3>
-            <p>Bao gồm: Chó, mèo, capybara, gấu mèo & 1 ly nước.</p>
+        <div class="input-group">
+            <p>Giá vé: 65.000 VNĐ / người (Bao gồm: Chó, mèo, capybara, gấu mèo & 1 ly nước)</p>
             <label for="ticketNumber">Số lượng vé:</label>
             <input type="number" id="ticketNumber" value="1" min="1" required>
-            <div id="total-price">Tổng cộng: 65.000 VNĐ</div>
+            <div class="price-display" id="total-price">Tổng cộng: 65.000 VNĐ</div>
         </div>
         <button id="checkoutBtn">Thanh Toán</button>
     </div>
 
-    <!-- Step 3: Payment -->
-    <div id="payment-section" class="step">
-        <h2>Thông Tin Thanh Toán</h2>
-        <p>Vui lòng quét mã QR để chuyển khoản. Sau khi thanh toán, hệ thống sẽ tự động xác nhận.</p>
-        <div id="qr-code"></div>
-        <p><strong>Ngân hàng:</strong> MB Bank</p>
-        <p><strong>Số tài khoản:</strong> 0909650816</p>
-        <p><strong>Tên tài khoản:</strong> Trần Vũ Ngọc Thành</p>
-        <p><strong>Nội dung:</strong> <span id="payment-content-display">...</span></p>
+    <div id="step-payment" class="step">
+        <div class="qr-section">
+            <h2>Thông tin Thanh Toán</h2>
+            <p>Vui lòng quét mã QR để chuyển khoản. Sau khi thanh toán, hệ thống sẽ tự động xác nhận.</p>
+            <div id="qr-code"></div>
+            <p><strong>Ngân hàng:</strong> MB Bank</p>
+            <p><strong>Số tài khoản:</strong> 0909650816</p>
+            <p><strong>Tên tài khoản:</strong> Trần Vũ Ngọc Thành</p>
+            <p><strong>Nội dung:</strong> <span id="payment-content-display">...</span></p>
+        </div>
     </div>
+</div>
 
-    <!-- Message -->
-    <div id="message"></div>
+<div id="message-overlay" class="message-overlay">
+    <div id="message-card" class="message-card">
+        <div id="message-icon" class="icon"></div>
+        <div id="message-loader" class="loader"></div>
+        <h2 id="message-title"></h2>
+        <p id="message-text"></p>
+        <button id="close-message-btn">Xong</button>
+    </div>
 </div>
 
 <script>
@@ -176,45 +263,103 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const steps = {
-    info: document.getElementById('info-section'),
-    ticket: document.getElementById('ticket-section'),
-    payment: document.getElementById('payment-section')
+    info: document.getElementById('step-info'),
+    ticket: document.getElementById('step-ticket'),
+    payment: document.getElementById('step-payment')
 };
 const infoForm = document.getElementById('infoForm');
 const checkoutBtn = document.getElementById('checkoutBtn');
 const ticketNumberInput = document.getElementById('ticketNumber');
 const totalPriceDiv = document.getElementById('total-price');
 const qrCodeDiv = document.getElementById('qr-code');
-const messageDiv = document.getElementById('message');
+
+const messageOverlay = document.getElementById('message-overlay');
+const messageCard = document.getElementById('message-card');
+const messageIcon = document.getElementById('message-icon');
+const messageLoader = document.getElementById('message-loader');
+const messageTitle = document.getElementById('message-title');
+const messageText = document.getElementById('message-text');
+const closeMessageBtn = document.getElementById('close-message-btn');
 const paymentContentDisplay = document.getElementById('payment-content-display');
 
 let userInfo = {};
 let ticketNumberValue = 1;
 const TICKET_PRICE = 65000;
+let statusListener = null;
 
-function goToStep(next) {
+// Hàm chuyển bước giao diện
+function goToStep(nextStep) {
     Object.values(steps).forEach(s => s.classList.remove('active'));
-    next.classList.add('active');
+    nextStep.classList.add('active');
 }
 
+// Hàm định dạng tiền tệ
+function formatCurrency(n) { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n); }
+
+// Hàm hiển thị thông báo
+function showMessage(type, title, text) {
+    messageCard.className = `message-card ${type}`;
+    messageTitle.textContent = title;
+    messageText.textContent = text;
+    messageLoader.style.display = 'none';
+    closeMessageBtn.style.display = 'block';
+
+    if (type === 'success') {
+        messageIcon.innerHTML = '&#x2705;'; // Biểu tượng checkmark
+    } else if (type === 'error') {
+        messageIcon.innerHTML = '&#x274C;'; // Biểu tượng X
+    } else if (type === 'pending') {
+        messageLoader.style.display = 'block';
+        messageIcon.innerHTML = '';
+        closeMessageBtn.style.display = 'none';
+    }
+    
+    messageOverlay.classList.add('visible');
+}
+
+// Hàm đóng thông báo và reset form
+function closeMessage() {
+    messageOverlay.classList.remove('visible');
+    ticketNumberInput.value = 1;
+    totalPriceDiv.textContent = `Tổng cộng: ${formatCurrency(TICKET_PRICE)}`;
+    document.getElementById('name').value = '';
+    document.getElementById('phone').value = '';
+    goToStep(steps.info);
+    if (statusListener) {
+        // Hủy lắng nghe để tránh rò rỉ bộ nhớ
+        db.ref().child('tickets').child(statusListener).off('value');
+        statusListener = null;
+    }
+}
+
+closeMessageBtn.addEventListener('click', closeMessage);
+
+// Cập nhật giá khi thay đổi số lượng vé
 ticketNumberInput.addEventListener('input', () => {
     const count = parseInt(ticketNumberInput.value);
-    ticketNumberValue = count >= 1 ? count : 0;
+    ticketNumberValue = count >= 1 ? count : 1;
     totalPriceDiv.textContent = `Tổng cộng: ${formatCurrency(ticketNumberValue * TICKET_PRICE)}`;
 });
 
+// Xử lý form thông tin
 infoForm.addEventListener('submit', e => {
     e.preventDefault();
     const name = document.getElementById('name').value.trim();
     const phone = document.getElementById('phone').value.trim();
-    if(!name || !phone){ showMessage('Vui lòng nhập đầy đủ thông tin','error'); return; }
-    userInfo = {name, phone};
+    if (!name || !phone) {
+        showMessage('error', 'Lỗi', 'Vui lòng nhập đầy đủ thông tin!');
+        return;
+    }
+    userInfo = { name, phone };
     goToStep(steps.ticket);
-    hideMessage();
 });
 
+// Xử lý thanh toán
 checkoutBtn.addEventListener('click', () => {
-    if(ticketNumberValue < 1){ showMessage('Số lượng vé phải lớn hơn 0','error'); return; }
+    if (ticketNumberValue < 1) {
+        showMessage('error', 'Lỗi', 'Số lượng vé phải lớn hơn 0!');
+        return;
+    }
     const totalPrice = ticketNumberValue * TICKET_PRICE;
     const ticketsRef = db.ref("tickets");
     const newTicketRef = ticketsRef.push({
@@ -226,41 +371,35 @@ checkoutBtn.addEventListener('click', () => {
         createdAt: new Date().toISOString()
     });
     const ticketId = newTicketRef.key;
-    paymentContentDisplay.textContent = `${userInfo.name}-${userInfo.phone}-${ticketNumberValue}-${totalPrice}`;
+    
+    // Tạo nội dung chuyển khoản mới với đầy đủ thông tin
+    const paymentContent = `${userInfo.name}-${userInfo.phone}-${ticketNumberValue}-${totalPrice}`;
+
+    paymentContentDisplay.textContent = paymentContent;
     qrCodeDiv.innerHTML = '';
-    new QRCode(qrCodeDiv,{
-        text: `https://api.vietqr.io/v2/generate?acqId=970422&accountNo=0909650816&amount=${totalPrice}&addInfo=${encodeURIComponent(ticketId)}&template=qr_only`,
-        width:250, height:250
+    new QRCode(qrCodeDiv, {
+        text: `https://api.vietqr.io/v2/generate?acqId=970422&accountNo=0909650816&amount=${totalPrice}&addInfo=${encodeURIComponent(paymentContent)}&template=qr_only`,
+        width: 250,
+        height: 250
     });
+    
     goToStep(steps.payment);
-    showMessage('Thông tin đã gửi. Vui lòng thanh toán...','pending');
 
-    // Lắng nghe trạng thái
-  newTicketRef.child('status').on('value', snapshot => {
-    const status = snapshot.val();
-    if (status === 'paid') {
-        showMessage(
-            'Thanh toán thành công! Chúc mừng bạn, vé của bạn đã được xác nhận.',
-            'success'
-        );
-        messageDiv.style.zIndex = 9999; // đảm bảo hiển thị trên step khác
-        newTicketRef.child('status').off();
+    // Bắt đầu lắng nghe trạng thái thanh toán từ Firebase
+    if (statusListener) {
+        newTicketRef.child('status').off('value', statusListener);
     }
+    statusListener = newTicketRef.child('status').on('value', snapshot => {
+        const status = snapshot.val();
+        if (status === 'paid') {
+            showMessage('success', 'Thanh toán thành công!', 'Vé của bạn đã được xác nhận. Vui lòng đến quầy cung cấp tên và số điện thoại để nhận vé.');
+            newTicketRef.child('status').off('value', statusListener);
+        } else if (status === 'failed') {
+            showMessage('error', 'Thanh toán thất bại', 'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ hỗ trợ.');
+            newTicketRef.child('status').off('value', statusListener);
+        }
+    });
 });
-
-});
-
-function formatCurrency(n){ return new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(n); }
-function showMessage(msg, type) {
-    messageDiv.textContent = msg;
-    messageDiv.className = 'message-active ' + 
-        (type === 'pending' ? 'message-pending' :
-         type === 'success' ? 'message-success' :
-         'message-error');
-    messageDiv.style.display = 'block';
-}
-
-function hideMessage(){ messageDiv.classList.remove('message-active'); }
 </script>
 
 </body>
