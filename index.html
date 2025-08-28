@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mua Vé Cherry Pet Coffee</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ96j2y0zL0rLw0Rz1k+D4R4e2d3W4e2S/c6F5k2y+oFw/R0R9z2p4wG3j3y5A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
     /* ----------------- Cài đặt chung & Body ----------------- */
     :root {
@@ -305,9 +306,9 @@ function showMessage(type, title, text) {
     closeMessageBtn.style.display = 'block';
 
     if (type === 'success') {
-        messageIcon.innerHTML = '&#x2705;'; // Biểu tượng checkmark
+        messageIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>'; // Sử dụng icon của Font Awesome
     } else if (type === 'error') {
-        messageIcon.innerHTML = '&#x274C;'; // Biểu tượng X
+        messageIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>'; // Sử dụng icon của Font Awesome
     } else if (type === 'pending') {
         messageLoader.style.display = 'block';
         messageIcon.innerHTML = '';
@@ -355,44 +356,71 @@ infoForm.addEventListener('submit', e => {
 });
 
 // Xử lý thanh toán
+// Xử lý thanh toán
 checkoutBtn.addEventListener('click', () => {
     if (ticketNumberValue < 1) {
         showMessage('error', 'Lỗi', 'Số lượng vé phải lớn hơn 0!');
         return;
     }
     const totalPrice = ticketNumberValue * TICKET_PRICE;
+
+    // Tạo mã đơn hàng CHERRY + 6 số ngẫu nhiên
+    const orderCode = "CHERRY" + Math.floor(100000 + Math.random() * 900000);
+
+    // Lưu vé mới vào Firebase kèm mã đơn hàng
     const ticketsRef = db.ref("tickets");
     const newTicketRef = ticketsRef.push({
         name: userInfo.name,
         phone: userInfo.phone,
         ticketNumber: ticketNumberValue,
         totalPrice: totalPrice,
+        orderCode: orderCode,  // Lưu mã đơn hàng vào DB
         status: "pending",
         createdAt: new Date().toISOString()
     });
     const ticketId = newTicketRef.key;
     
-    // Tạo nội dung chuyển khoản mới với đầy đủ thông tin
-    const paymentContent = `${userInfo.name}-${userInfo.phone}-${ticketNumberValue}-${totalPrice}`;
+    // **Chỉ lấy mã đơn hàng làm nội dung chuyển khoản**
+    const paymentContent = orderCode;
 
-    paymentContentDisplay.textContent = paymentContent;
-    qrCodeDiv.innerHTML = '';
-    new QRCode(qrCodeDiv, {
-        text: `https://api.vietqr.io/v2/generate?acqId=970422&accountNo=0909650816&amount=${totalPrice}&addInfo=${encodeURIComponent(paymentContent)}&template=qr_only`,
-        width: 250,
-        height: 250
-    });
+   // Hiển thị nội dung + tạo QR
+paymentContentDisplay.textContent = paymentContent;
+qrCodeDiv.innerHTML = '';
+new QRCode(qrCodeDiv, {
+    text: `https://api.vietqr.io/v2/generate?acqId=970422&accountNo=0909650816&amount=${totalPrice}&addInfo=${encodeURIComponent(paymentContent)}&template=qr_only`,
+    width: 250,
+    height: 250
+});
+
+// --- Thêm dòng hiển thị tổng tiền dưới QR ---
+let totalPriceDivQR = document.getElementById('total-price-qr');
+if (!totalPriceDivQR) {
+    totalPriceDivQR = document.createElement('div');
+    totalPriceDivQR.id = 'total-price-qr';
+    totalPriceDivQR.style.textAlign = 'center';
+    totalPriceDivQR.style.marginTop = '15px';
+    totalPriceDivQR.style.fontSize = '1.2em';
+    totalPriceDivQR.style.fontWeight = '600';
+    qrCodeDiv.parentNode.appendChild(totalPriceDivQR);
+}
+totalPriceDivQR.textContent = `Tổng tiền: ${totalPrice.toLocaleString('vi-VN')} VNĐ`;
+
     
     goToStep(steps.payment);
 
-    // Bắt đầu lắng nghe trạng thái thanh toán từ Firebase
+    // Lắng nghe trạng thái thanh toán từ Firebase
     if (statusListener) {
         newTicketRef.child('status').off('value', statusListener);
     }
     statusListener = newTicketRef.child('status').on('value', snapshot => {
         const status = snapshot.val();
         if (status === 'paid') {
-            showMessage('success', 'Thanh toán thành công!', 'Vé của bạn đã được xác nhận. Vui lòng đến quầy cung cấp tên và số điện thoại để nhận vé.');
+            // **Chỉ thông báo tên + số điện thoại để nhận vé**
+            showMessage(
+                'success', 
+                'Thanh toán thành công!', 
+                `Vui lòng đến quầy cung cấp tên: ${userInfo.name} và SĐT: ${userInfo.phone} để nhận vé.`
+            );
             newTicketRef.child('status').off('value', statusListener);
         } else if (status === 'failed') {
             showMessage('error', 'Thanh toán thất bại', 'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ hỗ trợ.');
@@ -400,6 +428,7 @@ checkoutBtn.addEventListener('click', () => {
         }
     });
 });
+
 </script>
 
 </body>
