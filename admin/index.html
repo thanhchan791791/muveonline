@@ -569,22 +569,21 @@
             const ticketDate = new Date(createdAt);
 
             totalRevenue += ticketPrice;
-            totalTicketsRevenue += 1; // mỗi vé tính 1 giao dịch
+          const ticketNumber = Math.floor(ticketPrice / TICKET_PRICE); // số vé thực tế
 
-            if (createdAt >= startOfDay) {
-                dailyRevenue += ticketPrice;
-                dailyTickets += 1;
-            }
+totalTicketsRevenue += ticketNumber;
 
-            if (createdAt >= startOfWeek) {
-                weeklyRevenue += ticketPrice;
-                weeklyTickets += 1;
-            }
+if (createdAt >= startOfDay) {
+    dailyTickets += ticketNumber;
+}
 
-            if (createdAt >= startOfMonth) {
-                monthlyRevenue += ticketPrice;
-                monthlyTickets += 1;
-            }
+if (createdAt >= startOfWeek) {
+    weeklyTickets += ticketNumber;
+}
+
+if (createdAt >= startOfMonth) {
+    monthlyTickets += ticketNumber;
+}
 
             // Biểu đồ ngày
             const dailyKey = ticketDate.toLocaleDateString('vi-VN');
