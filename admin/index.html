@@ -1,525 +1,526 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Vé Admin - MuveOnline</title>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --primary-color: #007bff;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --bg-color: #f4f4f9;
-            --card-bg: #fff;
-            --border-color: #ddd;
-            --text-color: #333;
-            --subtle-text-color: #888;
-        }
-
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        h1, h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .search-box, .auth-container {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #phoneInput {
-            flex-grow: 1;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            transition: border-color 0.3s;
-        }
-
-        #phoneInput:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .ticket-summary {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        #ticketList {
-            list-style: none;
-            padding: 0;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        #ticketList li {
-            background: #eef;
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease-in-out;
-        }
-
-        #ticketList li:hover {
-            transform: translateY(-3px);
-        }
-
-        .ticket-info {
-            flex-grow: 1;
-            font-size: 0.9em;
-        }
-
-        .update-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .update-section input[type="number"] {
-            width: 70px;
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .update-section button, .auth-button, .statistic-button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            background-color: var(--primary-color);
-            color: #fff;
-            font-weight: bold;
-            transition: background-color 0.3s, transform 0.1s;
-        }
-        .statistic-button {
-            background-color: #6c757d;
-        }
-        .statistic-button:hover {
-            background-color: #5a6268;
-        }
-
-        .update-section button:active, .auth-button:active, .statistic-button:active {
-            transform: scale(0.98);
-        }
-
-        .update-section button:hover, .auth-button:hover {
-            background-color: #0056b3;
-        }
-        
-        #no-tickets-message {
-            text-align: center;
-            color: var(--subtle-text-color);
-            font-style: italic;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 25px;
-            border-radius: 8px;
-            color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-        }
-        .notification.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        .notification.success { background-color: var(--success-color); }
-        .notification.error { background-color: var(--danger-color); }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Modal for statistics */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1001;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-            animation: fadeInModal 0.3s;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 700px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close-button:hover, .close-button:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .stats p {
-            font-size: 1.1em;
-            margin: 10px 0;
-            display: flex;
-            justify-content: space-between;
-        }
-        .stats p strong {
-            color: var(--primary-color);
-        }
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-        @keyframes fadeInModal {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        .tab-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .tab-button {
-            padding: 10px 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background-color: #f0f0f0;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.2s;
-        }
-        .tab-button.active {
-            background-color: var(--primary-color);
-            color: #fff;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Mobile-specific adjustments */
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Quản lý Vé Admin - MuveOnline</title>
+      <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+      <style>
+            :root {
+                  --primary-color: #007bff;
+                  --success-color: #28a745;
+                  --danger-color: #dc3545;
+                  --bg-color: #f4f4f9;
+                  --card-bg: #fff;
+                  --border-color: #ddd;
+                  --text-color: #333;
+                  --subtle-text-color: #888;
             }
+
+            body {
+                  font-family: 'Segoe UI', Arial, sans-serif;
+                  margin: 0;
+                  padding: 20px;
+                  background-color: var(--bg-color);
+                  color: var(--text-color);
+                  line-height: 1.6;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  min-height: 100vh;
+            }
+
+            .container {
+                  width: 100%;
+                  max-width: 800px;
+                  background: var(--card-bg);
+                  padding: 20px;
+                  border-radius: 12px;
+                  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            }
+
+            h1, h2 {
+                  text-align: center;
+                  margin-bottom: 20px;
+            }
+
+            .search-box, .auth-container {
+                  margin-bottom: 20px;
+                  padding: 15px;
+                  border: 1px solid var(--border-color);
+                  border-radius: 8px;
+            }
+
             .search-box {
-                flex-direction: column;
-                align-items: stretch;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+            }
+
+            #phoneInput {
+                  flex-grow: 1;
+                  padding: 12px;
+                  font-size: 16px;
+                  border: 1px solid #ccc;
+                  border-radius: 6px;
+                  transition: border-color 0.3s;
+            }
+
+            #phoneInput:focus {
+                  outline: none;
+                  border-color: var(--primary-color);
+            }
+
+            .ticket-summary {
+                  font-size: 1.1em;
+                  font-weight: bold;
+                  color: var(--primary-color);
+                  margin-bottom: 15px;
+                  text-align: center;
+            }
+
+            #ticketList {
+                  list-style: none;
+                  padding: 0;
+                  animation: fadeIn 0.5s ease-in-out;
+            }
+
+            #ticketList li {
+                  background: #eef;
+                  border: 1px solid var(--border-color);
+                  padding: 15px;
+                  margin-bottom: 10px;
+                  border-radius: 8px;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  gap: 10px;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  transition: transform 0.2s ease-in-out;
+            }
+
+            #ticketList li:hover {
+                  transform: translateY(-3px);
+            }
+
+            .ticket-info {
+                  flex-grow: 1;
+                  font-size: 0.9em;
+            }
+
+            .update-section {
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+            }
+
+            .update-section input[type="number"] {
+                  width: 70px;
+                  padding: 8px;
+                  font-size: 14px;
+                  border: 1px solid #ccc;
+                  border-radius: 4px;
+            }
+
+            .update-section button, .auth-button, .statistic-button {
+                  padding: 10px 15px;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  background-color: var(--primary-color);
+                  color: #fff;
+                  font-weight: bold;
+                  transition: background-color 0.3s, transform 0.1s;
+            }
+            .statistic-button {
+                  background-color: #6c757d;
+            }
+            .statistic-button:hover {
+                  background-color: #5a6268;
+            }
+
+            .update-section button:active, .auth-button:active, .statistic-button:active {
+                  transform: scale(0.98);
+            }
+
+            .update-section button:hover, .auth-button:hover {
+                  background-color: #0056b3;
+            }
+             
+            #no-tickets-message {
+                  text-align: center;
+                  color: var(--subtle-text-color);
+                  font-style: italic;
+            }
+
+            .notification {
+                  position: fixed;
+                  top: 20px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  padding: 15px 25px;
+                  border-radius: 8px;
+                  color: #fff;
+                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                  z-index: 1000;
+                  opacity: 0;
+                  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+            }
+            .notification.show {
+                  opacity: 1;
+                  transform: translateX(-50%) translateY(0);
+            }
+            .notification.success { background-color: var(--success-color); }
+            .notification.error { background-color: var(--danger-color); }
+
+            @keyframes fadeIn {
+                  from { opacity: 0; transform: translateY(10px); }
+                  to { opacity: 1; transform: translateY(0); }
+            }
+
+            /* Modal for statistics */
+            .modal {
+                  display: none;
+                  position: fixed;
+                  z-index: 1001;
+                  left: 0;
+                  top: 0;
+                  width: 100%;
+                  height: 100%;
+                  overflow: auto;
+                  background-color: rgba(0,0,0,0.4);
+                  animation: fadeInModal 0.3s;
             }
             .modal-content {
-                width: 90%;
+                  background-color: #fefefe;
+                  margin: 5% auto;
+                  padding: 20px;
+                  border: 1px solid #888;
+                  width: 80%;
+                  max-width: 700px;
+                  border-radius: 12px;
+                  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             }
-        }
+            .close-button {
+                  color: #aaa;
+                  float: right;
+                  font-size: 28px;
+                  font-weight: bold;
+            }
+            .close-button:hover, .close-button:focus {
+                  color: #000;
+                  text-decoration: none;
+                  cursor: pointer;
+            }
+            .stats p {
+                  font-size: 1.1em;
+                  margin: 10px 0;
+                  display: flex;
+                  justify-content: space-between;
+            }
+            .stats p strong {
+                  color: var(--primary-color);
+            }
+            .chart-container {
+                  position: relative;
+                  height: 300px;
+                  width: 100%;
+            }
+            @keyframes fadeInModal {
+                  from { opacity: 0; transform: scale(0.95); }
+                  to { opacity: 1; transform: scale(1); }
+            }
+             
+            .tab-buttons {
+                  display: flex;
+                  justify-content: center;
+                  gap: 10px;
+                  margin-bottom: 20px;
+            }
+            .tab-button {
+                  padding: 10px 20px;
+                  border: 1px solid var(--border-color);
+                  border-radius: 6px;
+                  background-color: #f0f0f0;
+                  cursor: pointer;
+                  font-weight: bold;
+                  transition: background-color 0.2s;
+            }
+            .tab-button.active {
+                  background-color: var(--primary-color);
+                  color: #fff;
+            }
+            .tab-content {
+                  display: none;
+            }
+            .tab-content.active {
+                  display: block;
+            }
 
-        #adminPanel {
-            display: none;
-        }
-        .auth-container input {
-            padding: 10px;
-            margin: 5px 0;
-            width: calc(100% - 20px);
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .auth-button {
-            width: 100%;
-            margin-top: 10px;
-        }
-    </style>
+            /* Mobile-specific adjustments */
+            @media (max-width: 600px) {
+                  .container {
+                        padding: 15px;
+                  }
+                  .search-box {
+                        flex-direction: column;
+                        align-items: stretch;
+                  }
+                  .modal-content {
+                        width: 90%;
+                  }
+            }
+
+            #adminPanel {
+                  display: none;
+            }
+            .auth-container input {
+                  padding: 10px;
+                  margin: 5px 0;
+                  width: calc(100% - 20px);
+                  box-sizing: border-box;
+                  border: 1px solid #ccc;
+                  border-radius: 5px;
+            }
+            .auth-button {
+                  width: 100%;
+                  margin-top: 10px;
+            }
+      </style>
 </head>
 <body>
-    <div class="container">
-        <div id="authSection">
-            <h2>Đăng nhập Admin</h2>
-            <div class="auth-container">
-                <input type="email" id="email" placeholder="Email">
-                <input type="password" id="password" placeholder="Mật khẩu">
-                <button class="auth-button" onclick="login()">Đăng nhập</button>
-            </div>
-        </div>
-
-        <div id="adminPanel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h1>Quản lý Vé Khách Hàng</h1>
-                <div style="display: flex; gap: 10px;">
-                    <button class="statistic-button" onclick="showStatistics()">Thống kê Doanh thu</button>
-                    <button class="auth-button" onclick="logout()">Đăng xuất</button>
-                </div>
-            </div>
-            
-            <div class="search-box">
-                <label for="phoneInput">Nhập SĐT:</label>
-                <input type="tel" id="phoneInput" placeholder="Ví dụ: 0912345678">
+      <div class="container">
+            <div id="authSection">
+                  <h2>Đăng nhập Admin</h2>
+                  <div class="auth-container">
+                        <input type="email" id="email" placeholder="Email">
+                        <input type="password" id="password" placeholder="Mật khẩu">
+                        <button class="auth-button" onclick="login()">Đăng nhập</button>
+                  </div>
             </div>
 
-            <div class="ticket-summary">
-                Tổng số vé: <span id="totalTickets">0</span>
-            </div>
-
-            <ul id="ticketList"></ul>
-            <p id="no-tickets-message" style="display: none;">Không tìm thấy vé đã thanh toán cho SĐT này.</p>
-        </div>
-    </div>
-
-    <div id="statsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal()">&times;</span>
-            <h2>Thống kê Doanh thu</h2>
-            <div class="stats">
-                <p>Tổng doanh thu: <strong id="totalRevenue">0 VND</strong></p>
-                <p>Tổng số vé: <strong id="totalRevenueTickets">0 vé</strong></p>
-                <p>Doanh thu hôm nay: <strong id="dailyRevenue">0 VND</strong> - Số vé: <strong id="dailyTickets">0 vé</strong></p>
-                <p>Doanh thu tuần này: <strong id="weeklyRevenue">0 VND</strong> - Số vé: <strong id="weeklyTickets">0 vé</strong></p>
-                <p>Doanh thu tháng này: <strong id="monthlyRevenue">0 VND</strong> - Số vé: <strong id="monthlyTickets">0 vé</strong></p>
-            </div>
-            <div class="tab-buttons">
-                <button class="tab-button active" onclick="openTab(event, 'daily')">Ngày</button>
-                <button class="tab-button" onclick="openTab(event, 'weekly')">Tuần</button>
-                <button class="tab-button" onclick="openTab(event, 'monthly')">Tháng</button>
-            </div>
-            
-            <div id="daily" class="tab-content active">
-                <div class="chart-container">
-                    <canvas id="dailyChart"></canvas>
-                </div>
-            </div>
-            <div id="weekly" class="tab-content">
-                <div class="chart-container">
-                    <canvas id="weeklyChart"></canvas>
-                </div>
-            </div>
-            <div id="monthly" class="tab-content">
-                <div class="chart-container">
-                    <canvas id="monthlyChart"></canvas>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div id="notification" class="notification"></div>
-
-    <script>
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
-            authDomain: "muveonline-919a8.firebaseapp.com",
-            databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
-            projectId: "muveonline-919a8",
-            storageBucket: "muveonline-919a8.appspot.com",
-            messagingSenderId: "399933853156",
-            appId: "1:399933853156:web:982c1da02117606a994bf1"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
-        const ticketsRef = db.ref('tickets');
-        const TICKET_PRICE = 65000;
-
-        const authSection = document.getElementById('authSection');
-        const adminPanel = document.getElementById('adminPanel');
-        const phoneInput = document.getElementById('phoneInput');
-        const ticketList = document.getElementById('ticketList');
-        const totalTicketsSpan = document.getElementById('totalTickets');
-        const noTicketsMessage = document.getElementById('no-tickets-message');
-        const notificationElement = document.getElementById('notification');
-        const statsModal = document.getElementById('statsModal');
-        let dailyChart = null;
-        let weeklyChart = null;
-        let monthlyChart = null;
-        
-        let allTickets = {};
-
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-        }
-
-        function showNotification(message, type) {
-            notificationElement.textContent = message;
-            notificationElement.className = `notification show ${type}`;
-            setTimeout(() => {
-                notificationElement.className = 'notification';
-            }, 3000);
-        }
-
-        async function checkAdmin(uid) {
-            const snapshot = await db.ref("admins/" + uid).once('value');
-            return snapshot.exists();
-        }
-
-        window.login = function() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    showNotification('Đăng nhập thành công!', 'success');
-                })
-                .catch(err => {
-                    showNotification('Lỗi đăng nhập: ' + err.message, 'error');
-                });
-        };
-
-        window.logout = function() {
-            auth.signOut().then(() => {
-                showNotification('Đã đăng xuất.', 'success');
-            }).catch(err => {
-                showNotification('Lỗi đăng xuất: ' + err.message, 'error');
-            });
-        };
-
-        function filterTickets() {
-            const searchTerm = phoneInput.value.trim();
-            const filteredTickets = [];
-            let totalTicketCount = 0;
-
-            if (searchTerm.length > 0) {
-                for (const ticketId in allTickets) {
-                    const ticket = allTickets[ticketId];
-                    if (ticket.phone && ticket.phone.includes(searchTerm) && ticket.status === 'paid') {
-                        filteredTickets.push({ id: ticketId, ...ticket });
-                        totalTicketCount += (ticket.ticketNumber || 0);
-                    }
-                }
-            }
-
-            displayTickets(filteredTickets);
-            totalTicketsSpan.textContent = totalTicketCount;
-        }
-
-        function displayTickets(tickets) {
-            ticketList.innerHTML = '';
-            if (tickets.length === 0) {
-                noTicketsMessage.style.display = 'block';
-            } else {
-                noTicketsMessage.style.display = 'none';
-                tickets.forEach(ticket => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <div class="ticket-info">
-                            <strong>Tên:</strong> ${ticket.name} | <strong>Số vé:</strong> ${ticket.ticketNumber || 0}
+            <div id="adminPanel">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h1>Quản lý Vé Khách Hàng</h1>
+                        <div style="display: flex; gap: 10px;">
+                              <button class="statistic-button" onclick="showStatistics()">Thống kê Doanh thu</button>
+                              <button class="auth-button" onclick="logout()">Đăng xuất</button>
                         </div>
-                        <div class="update-section">
-                            <input type="number" id="tn-${ticket.id}" value="" placeholder="Số vé trừ">
-                            <button onclick="updateTicket('${ticket.id}')">Áp dụng</button>
+                  </div>
+                   
+                  <div class="search-box">
+                        <label for="phoneInput">Nhập SĐT:</label>
+                        <input type="tel" id="phoneInput" placeholder="Ví dụ: 0912345678">
+                  </div>
+
+                  <div class="ticket-summary">
+                        Tổng số vé: <span id="totalTickets">0</span>
+                  </div>
+
+                  <ul id="ticketList"></ul>
+                  <p id="no-tickets-message" style="display: none;">Không tìm thấy vé đã thanh toán cho SĐT này.</p>
+            </div>
+      </div>
+
+      <div id="statsModal" class="modal">
+            <div class="modal-content">
+                  <span class="close-button" onclick="closeModal()">&times;</span>
+                  <h2>Thống kê Doanh thu</h2>
+                  <div class="stats">
+                        <p>Tổng doanh thu: <strong id="totalRevenue">0 VND</strong></p>
+                        <p>Tổng số vé: <strong id="totalRevenueTickets">0 vé</strong></p>
+                        <p>Doanh thu hôm nay: <strong id="dailyRevenue">0 VND</strong> - Số vé: <strong id="dailyTickets">0 vé</strong></p>
+                        <p>Doanh thu tuần này: <strong id="weeklyRevenue">0 VND</strong> - Số vé: <strong id="weeklyTickets">0 vé</strong></p>
+                        <p>Doanh thu tháng này: <strong id="monthlyRevenue">0 VND</strong> - Số vé: <strong id="monthlyTickets">0 vé</strong></p>
+                  </div>
+                  <div class="tab-buttons">
+                        <button class="tab-button active" onclick="openTab(event, 'daily')">Ngày</button>
+                        <button class="tab-button" onclick="openTab(event, 'weekly')">Tuần</button>
+                        <button class="tab-button" onclick="openTab(event, 'monthly')">Tháng</button>
+                  </div>
+                   
+                  <div id="daily" class="tab-content active">
+                        <div class="chart-container">
+                              <div id="dailyChart"></div>
                         </div>
-                    `;
-                    ticketList.appendChild(li);
-                });
-            }
-        }
+                  </div>
+                  <div id="weekly" class="tab-content">
+                        <div class="chart-container">
+                              <div id="weeklyChart"></div>
+                        </div>
+                  </div>
+                  <div id="monthly" class="tab-content">
+                        <div class="chart-container">
+                              <div id="monthlyChart"></div>
+                        </div>
+                  </div>
 
-        window.updateTicket = function(ticketId) {
-            const input = document.getElementById('tn-' + ticketId);
-            const numToDeduct = parseInt(input.value);
+            </div>
+      </div>
 
-            if (isNaN(numToDeduct) || numToDeduct <= 0) {
-                showNotification('Vui lòng nhập một số dương để trừ vé.', 'error');
-                return;
+      <div id="notification" class="notification"></div>
+
+      <script>
+            // Firebase config
+            const firebaseConfig = {
+                  apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
+                  authDomain: "muveonline-919a8.firebaseapp.com",
+                  databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
+                  projectId: "muveonline-919a8",
+                  storageBucket: "muveonline-919a8.appspot.com",
+                  messagingSenderId: "399933853156",
+                  appId: "1:399933853156:web:982c1da02117606a994bf1"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.database();
+            const ticketsRef = db.ref('tickets');
+            const TICKET_PRICE = 65000;
+
+            const authSection = document.getElementById('authSection');
+            const adminPanel = document.getElementById('adminPanel');
+            const phoneInput = document.getElementById('phoneInput');
+            const ticketList = document.getElementById('ticketList');
+            const totalTicketsSpan = document.getElementById('totalTickets');
+            const noTicketsMessage = document.getElementById('no-tickets-message');
+            const notificationElement = document.getElementById('notification');
+            const statsModal = document.getElementById('statsModal');
+             
+            let dailyChart = null;
+            let weeklyChart = null;
+            let monthlyChart = null;
+             
+            let allTickets = {};
+
+            function formatCurrency(amount) {
+                  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
             }
 
-            const currentTicket = allTickets[ticketId];
-            if (!currentTicket) {
-                showNotification('Không tìm thấy vé.', 'error');
-                return;
+            function showNotification(message, type) {
+                  notificationElement.textContent = message;
+                  notificationElement.className = `notification show ${type}`;
+                  setTimeout(() => {
+                        notificationElement.className = 'notification';
+                  }, 3000);
             }
 
-            const currentNumber = currentTicket.ticketNumber || 0;
-            if (numToDeduct > currentNumber) {
-                showNotification('Số vé trừ không được lớn hơn số vé hiện có.', 'error');
-                return;
+            async function checkAdmin(uid) {
+                  const snapshot = await db.ref("admins/" + uid).once('value');
+                  return snapshot.exists();
             }
 
-            const newNumber = currentNumber - numToDeduct;
-            db.ref('tickets/' + ticketId).update({ ticketNumber: newNumber })
-                .then(() => {
-                    showNotification('Cập nhật thành công! Số vé mới: ' + newNumber, 'success');
-                    input.value = '';
-                })
-                .catch(err => {
-                    showNotification('Lỗi khi cập nhật vé.', 'error');
-                    console.error('Firebase Error', err);
-                });
-        };
-        
-        window.openTab = function(evt, tabName) {
-            let tabContent = document.getElementsByClassName("tab-content");
-            for (let i = 0; i < tabContent.length; i++) {
-                tabContent[i].style.display = "none";
-            }
-            let tabButtons = document.getElementsByClassName("tab-button");
-            for (let i = 0; i < tabButtons.length; i++) {
-                tabButtons[i].className = tabButtons[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        };
+            window.login = function() {
+                  const email = document.getElementById('email').value;
+                  const password = document.getElementById('password').value;
+                  auth.signInWithEmailAndPassword(email, password)
+                        .then(() => {
+                              showNotification('Đăng nhập thành công!', 'success');
+                        })
+                        .catch(err => {
+                              showNotification('Lỗi đăng nhập: ' + err.message, 'error');
+                        });
+            };
 
-        window.showStatistics = function () {
+            window.logout = function() {
+                  auth.signOut().then(() => {
+                        showNotification('Đã đăng xuất.', 'success');
+                  }).catch(err => {
+                        showNotification('Lỗi đăng xuất: ' + err.message, 'error');
+                  });
+            };
+
+            function filterTickets() {
+                  const searchTerm = phoneInput.value.trim();
+                  const filteredTickets = [];
+                  let totalTicketCount = 0;
+
+                  if (searchTerm.length > 0) {
+                        for (const ticketId in allTickets) {
+                              const ticket = allTickets[ticketId];
+                              if (ticket.phone && ticket.phone.includes(searchTerm) && ticket.status === 'paid') {
+                                    filteredTickets.push({ id: ticketId, ...ticket });
+                                    totalTicketCount += (ticket.ticketNumber || 0);
+                              }
+                        }
+                  }
+
+                  displayTickets(filteredTickets);
+                  totalTicketsSpan.textContent = totalTicketCount;
+            }
+
+            function displayTickets(tickets) {
+                  ticketList.innerHTML = '';
+                  if (tickets.length === 0) {
+                        noTicketsMessage.style.display = 'block';
+                  } else {
+                        noTicketsMessage.style.display = 'none';
+                        tickets.forEach(ticket => {
+                              const li = document.createElement('li');
+                              li.innerHTML = `
+                                    <div class="ticket-info">
+                                          <strong>Tên:</strong> ${ticket.name} | <strong>Số vé:</strong> ${ticket.ticketNumber || 0}
+                                    </div>
+                                    <div class="update-section">
+                                          <input type="number" id="tn-${ticket.id}" value="" placeholder="Số vé trừ">
+                                          <button onclick="updateTicket('${ticket.id}')">Áp dụng</button>
+                                    </div>
+                              `;
+                              ticketList.appendChild(li);
+                        });
+                  }
+            }
+
+            window.updateTicket = function(ticketId) {
+                  const input = document.getElementById('tn-' + ticketId);
+                  const numToDeduct = parseInt(input.value);
+
+                  if (isNaN(numToDeduct) || numToDeduct <= 0) {
+                        showNotification('Vui lòng nhập một số dương để trừ vé.', 'error');
+                        return;
+                  }
+
+                  const currentTicket = allTickets[ticketId];
+                  if (!currentTicket) {
+                        showNotification('Không tìm thấy vé.', 'error');
+                        return;
+                  }
+
+                  const currentNumber = currentTicket.ticketNumber || 0;
+                  if (numToDeduct > currentNumber) {
+                        showNotification('Số vé trừ không được lớn hơn số vé hiện có.', 'error');
+                        return;
+                  }
+
+                  const newNumber = currentNumber - numToDeduct;
+                  db.ref('tickets/' + ticketId).update({ ticketNumber: newNumber })
+                        .then(() => {
+                              showNotification('Cập nhật thành công! Số vé mới: ' + newNumber, 'success');
+                              input.value = '';
+                        })
+                        .catch(err => {
+                              showNotification('Lỗi khi cập nhật vé.', 'error');
+                              console.error('Firebase Error', err);
+                        });
+            };
+             
+            window.openTab = function(evt, tabName) {
+                  let tabContent = document.getElementsByClassName("tab-content");
+                  for (let i = 0; i < tabContent.length; i++) {
+                        tabContent[i].style.display = "none";
+                  }
+                  let tabButtons = document.getElementsByClassName("tab-button");
+                  for (let i = 0; i < tabButtons.length; i++) {
+                        tabButtons[i].className = tabButtons[i].className.replace(" active", "");
+                  }
+                  document.getElementById(tabName).style.display = "block";
+                  evt.currentTarget.className += " active";
+            };
+
+          window.showStatistics = function () {
     let totalRevenue = 0;
     let totalTicketsRevenue = 0;
     let dailyRevenue = 0;
@@ -536,79 +537,85 @@
 
     // Chuẩn bị dữ liệu biểu đồ
     const dailyData = {};
-    const startDateDaily = new Date();
-    startDateDaily.setDate(startDateDaily.getDate() - 29);
+    const weeklyData = {};
+    const monthlyData = {};
+
+    // Khởi tạo 30 ngày gần nhất
     for (let d = 0; d < 30; d++) {
-        const date = new Date(startDateDaily);
-        date.setDate(startDateDaily.getDate() + d);
+        const date = new Date();
+        date.setDate(now.getDate() - 29 + d);
         dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
     }
 
-    const weeklyData = {};
+    // Khởi tạo 4 tuần gần nhất
     for (let w = 0; w < 4; w++) {
         const startDate = new Date();
-        startDate.setDate(startDate.getDate() - ((3 - w) * 7));
+        startDate.setDate(now.getDate() - ((3 - w) * 7));
         const endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + 6);
-        weeklyData[`Tuần ${w + 1} (${startDate.getDate()}/${startDate.getMonth() + 1} - ${endDate.getDate()}/${endDate.getMonth() + 1})`] = { revenue: 0, tickets: 0 };
+        const startFormatted = `${startDate.getDate()}/${startDate.getMonth() + 1}`;
+        const endFormatted = `${endDate.getDate()}/${endDate.getMonth() + 1}`;
+        weeklyData[`Tuần ${w + 1} (${startFormatted} - ${endFormatted})`] = { revenue: 0, tickets: 0 };
     }
 
-    const monthlyData = {};
+    // Khởi tạo 12 tháng gần nhất
     for (let m = 0; m < 12; m++) {
         const date = new Date();
         date.setMonth(now.getMonth() - (11 - m));
         monthlyData[`Tháng ${date.getMonth() + 1}/${date.getFullYear()}`] = { revenue: 0, tickets: 0 };
     }
 
-    // --- Thống kê dựa trên totalPrice và status = paid ---
+    // Lặp qua tất cả vé để thống kê
     for (const ticketId in allTickets) {
         const ticket = allTickets[ticketId];
-        if (ticket.status === 'paid' && ticket.totalPrice) {
-            const ticketPrice = ticket.totalPrice; // Lấy tổng tiền
+        if (ticket.status === 'paid' && ticket.totalPrice && ticket.ticketNumber) {
+            const ticketPrice = ticket.totalPrice;
+            const ticketNumber = ticket.ticketNumber;
             const createdAt = new Date(ticket.createdAt).getTime();
             const ticketDate = new Date(createdAt);
 
             totalRevenue += ticketPrice;
-          const ticketNumber = Math.floor(ticketPrice / TICKET_PRICE); // số vé thực tế
+            totalTicketsRevenue += ticketNumber;
 
-totalTicketsRevenue += ticketNumber;
+            // Thống kê ngày, tuần, tháng
+            if (createdAt >= startOfDay) {
+                dailyRevenue += ticketPrice;
+                dailyTickets += ticketNumber;
+            }
+            if (createdAt >= startOfWeek) {
+                weeklyRevenue += ticketPrice;
+                weeklyTickets += ticketNumber;
+            }
+            if (createdAt >= startOfMonth) {
+                monthlyRevenue += ticketPrice;
+                monthlyTickets += ticketNumber;
+            }
 
-if (createdAt >= startOfDay) {
-    dailyTickets += ticketNumber;
-}
-
-if (createdAt >= startOfWeek) {
-    weeklyTickets += ticketNumber;
-}
-
-if (createdAt >= startOfMonth) {
-    monthlyTickets += ticketNumber;
-}
-
-            // Biểu đồ ngày
+            // Dữ liệu cho biểu đồ ngày
             const dailyKey = ticketDate.toLocaleDateString('vi-VN');
             if (dailyData[dailyKey]) {
                 dailyData[dailyKey].revenue += ticketPrice;
-                dailyData[dailyKey].tickets += 1;
+                dailyData[dailyKey].tickets += ticketNumber;
             }
 
-            // Biểu đồ tuần
+            // Dữ liệu cho biểu đồ tuần
             const weeklyKey = Object.keys(weeklyData).find(key => {
                 const weekDates = key.match(/\(([^)]+)\)/)[1].split(' - ');
                 const startWeekDate = new Date(`${weekDates[0].split('/')[1]}/${weekDates[0].split('/')[0]}/${ticketDate.getFullYear()}`);
                 const endWeekDate = new Date(`${weekDates[1].split('/')[1]}/${weekDates[1].split('/')[0]}/${ticketDate.getFullYear()}`);
+                endWeekDate.setHours(23, 59, 59, 999); // Set to end of day
                 return ticketDate >= startWeekDate && ticketDate <= endWeekDate;
             });
             if (weeklyKey) {
                 weeklyData[weeklyKey].revenue += ticketPrice;
-                weeklyData[weeklyKey].tickets += 1;
+                weeklyData[weeklyKey].tickets += ticketNumber;
             }
 
-            // Biểu đồ tháng
+            // Dữ liệu cho biểu đồ tháng
             const monthlyKey = `Tháng ${ticketDate.getMonth() + 1}/${ticketDate.getFullYear()}`;
             if (monthlyData[monthlyKey]) {
                 monthlyData[monthlyKey].revenue += ticketPrice;
-                monthlyData[monthlyKey].tickets += 1;
+                monthlyData[monthlyKey].tickets += ticketNumber;
             }
         }
     }
@@ -631,179 +638,191 @@ if (createdAt >= startOfMonth) {
     statsModal.style.display = 'block';
 };
 
+            function renderDailyChart(data) {
+                  const chartElement = document.getElementById('dailyChart');
+                  const labels = Object.keys(data);
+                  const revenues = Object.values(data).map(d => d.revenue);
+                  const tickets = Object.values(data).map(d => d.tickets);
 
-        function renderDailyChart(data) {
-            const ctx = document.getElementById('dailyChart').getContext('2d');
-            if (dailyChart) dailyChart.destroy();
-
-            const labels = Object.keys(data);
-            const revenues = Object.values(data).map(d => d.revenue);
-            const tickets = Object.values(data).map(d => d.tickets);
-
-            dailyChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Doanh thu (VND)',
-                        data: revenues,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1,
-                        yAxisID: 'y'
-                    }, {
-                        label: 'Số vé',
-                        data: tickets,
-                        borderColor: 'rgb(255, 159, 64)',
-                        tension: 0.1,
-                        yAxisID: 'y1'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            position: 'left',
-                            title: { display: true, text: 'Doanh thu (VND)' },
-                            ticks: { callback: (value) => formatCurrency(value) }
+                  const options = {
+                        series: [{
+                              name: 'Doanh thu',
+                              type: 'line',
+                              data: revenues
+                        }, {
+                              name: 'Số vé',
+                              type: 'bar',
+                              data: tickets
+                        }],
+                        chart: {
+                              height: 350,
+                              type: 'line',
+                              stacked: false,
+                              animations: { enabled: true, easing: 'easeinout' }
                         },
-                        y1: {
-                            beginAtZero: true,
-                            position: 'right',
-                            title: { display: true, text: 'Số vé' },
-                            grid: { drawOnChartArea: false }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function renderWeeklyChart(data) {
-            const ctx = document.getElementById('weeklyChart').getContext('2d');
-            if (weeklyChart) weeklyChart.destroy();
-
-            const labels = Object.keys(data);
-            const revenues = Object.values(data).map(d => d.revenue);
-            const tickets = Object.values(data).map(d => d.tickets);
-
-            weeklyChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Doanh thu (VND)',
-                        data: revenues,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgb(75, 192, 192)',
-                        borderWidth: 1,
-                        yAxisID: 'y'
-                    }, {
-                        label: 'Số vé',
-                        data: tickets,
-                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
-                        borderColor: 'rgb(255, 159, 64)',
-                        borderWidth: 1,
-                        yAxisID: 'y1'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            position: 'left',
-                            title: { display: true, text: 'Doanh thu (VND)' },
-                            ticks: { callback: (value) => formatCurrency(value) }
+                        stroke: { width: [4, 2] },
+                        title: { text: 'Doanh thu và Số vé (30 ngày gần nhất)', align: 'left' },
+                        dataLabels: { enabled: false },
+                        xaxis: {
+                              categories: labels,
+                              tooltip: { enabled: false }
                         },
-                        y1: {
-                            beginAtZero: true,
-                            position: 'right',
-                            title: { display: true, text: 'Số vé' },
-                            grid: { drawOnChartArea: false }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderMonthlyChart(data) {
-            const ctx = document.getElementById('monthlyChart').getContext('2d');
-            if (monthlyChart) monthlyChart.destroy();
-
-            const labels = Object.keys(data);
-            const revenues = Object.values(data).map(d => d.revenue);
-            const tickets = Object.values(data).map(d => d.tickets);
-
-            monthlyChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Doanh thu (VND)',
-                        data: revenues,
-                        backgroundColor: 'rgba(153, 102, 255, 0.6)',
-                        borderColor: 'rgb(153, 102, 255)',
-                        borderWidth: 1,
-                        yAxisID: 'y'
-                    }, {
-                        label: 'Số vé',
-                        data: tickets,
-                        backgroundColor: 'rgba(201, 203, 207, 0.6)',
-                        borderColor: 'rgb(201, 203, 207)',
-                        borderWidth: 1,
-                        yAxisID: 'y1'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            position: 'left',
-                            title: { display: true, text: 'Doanh thu (VND)' },
-                            ticks: { callback: (value) => formatCurrency(value) }
+                        yaxis: [{
+                              axisTicks: { show: true },
+                              axisBorder: { show: true, color: '#008FFB' },
+                              labels: { style: { colors: '#008FFB' }, formatter: (value) => formatCurrency(value) },
+                              title: { text: "Doanh thu", style: { color: '#008FFB' } },
+                        }, {
+                              axisTicks: { show: true },
+                              axisBorder: { show: true, color: '#FF4560' },
+                              labels: { style: { colors: '#FF4560' } },
+                              title: { text: "Số vé", style: { color: '#FF4560' } },
+                              opposite: true,
+                        }],
+                        tooltip: {
+                              shared: true,
+                              intersect: false,
+                              y: {
+                                    formatter: function (y, { seriesIndex }) {
+                                          if (seriesIndex === 0) return formatCurrency(y);
+                                          return y + " vé";
+                                    }
+                              }
                         },
-                        y1: {
-                            beginAtZero: true,
-                            position: 'right',
-                            title: { display: true, text: 'Số vé' },
-                            grid: { drawOnChartArea: false }
-                        }
-                    }
-                }
-            });
-        }
+                        responsive: [{
+                              breakpoint: 600,
+                              options: {
+                                    chart: { toolbar: { show: false } },
+                                    legend: { show: false }
+                              }
+                        }]
+                  };
 
-        window.closeModal = function() {
-            statsModal.style.display = 'none';
-        };
-
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                const isAdmin = await checkAdmin(user.uid);
-                if (isAdmin) {
-                    authSection.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    ticketsRef.on('value', snapshot => {
-                        allTickets = snapshot.val() || {};
-                        filterTickets();
-                    });
-                    phoneInput.addEventListener('input', filterTickets);
-                } else {
-                    showNotification('Bạn không có quyền truy cập admin.', 'error');
-                    auth.signOut();
-                    authSection.style.display = 'block';
-                    adminPanel.style.display = 'none';
-                }
-            } else {
-                authSection.style.display = 'block';
-                adminPanel.style.display = 'none';
+                  if (dailyChart) dailyChart.destroy();
+                  dailyChart = new ApexCharts(chartElement, options);
+                  dailyChart.render();
             }
-        });
 
-    </script>
+            function renderWeeklyChart(data) {
+                  const chartElement = document.getElementById('weeklyChart');
+                  const labels = Object.keys(data);
+                  const revenues = Object.values(data).map(d => d.revenue);
+                  const tickets = Object.values(data).map(d => d.tickets);
+
+                  const options = {
+                        series: [{
+                              name: 'Doanh thu',
+                              data: revenues
+                        }, {
+                              name: 'Số vé',
+                              data: tickets
+                        }],
+                        chart: {
+                              type: 'bar',
+                              height: 350,
+                              stacked: true,
+                              toolbar: { show: false }
+                        },
+                        plotOptions: { bar: { horizontal: false, columnWidth: '55%' } },
+                        dataLabels: { enabled: false },
+                        stroke: { show: true, width: 2, colors: ['transparent'] },
+                        xaxis: { categories: labels },
+                        yaxis: [{
+                              title: { text: 'Doanh thu', style: { color: '#008FFB' } },
+                              labels: { formatter: (value) => formatCurrency(value) }
+                        }, {
+                              title: { text: 'Số vé', style: { color: '#FF4560' } },
+                              opposite: true
+                        }],
+                        fill: { opacity: 1 },
+                        tooltip: {
+                              y: {
+                                    formatter: function (val, { seriesIndex }) {
+                                          if (seriesIndex === 0) return formatCurrency(val);
+                                          return val + " vé";
+                                    }
+                              }
+                        }
+                  };
+
+                  if (weeklyChart) weeklyChart.destroy();
+                  weeklyChart = new ApexCharts(chartElement, options);
+                  weeklyChart.render();
+            }
+
+            function renderMonthlyChart(data) {
+                  const chartElement = document.getElementById('monthlyChart');
+                  const labels = Object.keys(data);
+                  const revenues = Object.values(data).map(d => d.revenue);
+                  const tickets = Object.values(data).map(d => d.tickets);
+
+                  const options = {
+                        series: [{
+                              name: 'Doanh thu',
+                              data: revenues
+                        }, {
+                              name: 'Số vé',
+                              data: tickets
+                        }],
+                        chart: {
+                              type: 'bar',
+                              height: 350,
+                              toolbar: { show: false }
+                        },
+                        plotOptions: { bar: { horizontal: false, columnWidth: '55%' } },
+                        dataLabels: { enabled: false },
+                        stroke: { show: true, width: 2, colors: ['transparent'] },
+                        xaxis: { categories: labels },
+                        yaxis: [{
+                              title: { text: 'Doanh thu', style: { color: '#008FFB' } },
+                              labels: { formatter: (value) => formatCurrency(value) }
+                        }, {
+                              title: { text: 'Số vé', style: { color: '#FF4560' } },
+                              opposite: true
+                        }],
+                        fill: { opacity: 1 },
+                        tooltip: {
+                              y: {
+                                    formatter: function (val, { seriesIndex }) {
+                                          if (seriesIndex === 0) return formatCurrency(val);
+                                          return val + " vé";
+                                    }
+                              }
+                        }
+                  };
+
+                  if (monthlyChart) monthlyChart.destroy();
+                  monthlyChart = new ApexCharts(chartElement, options);
+                  monthlyChart.render();
+            }
+
+            window.closeModal = function() {
+                  statsModal.style.display = 'none';
+            };
+
+            auth.onAuthStateChanged(async (user) => {
+                  if (user) {
+                        const isAdmin = await checkAdmin(user.uid);
+                        if (isAdmin) {
+                              authSection.style.display = 'none';
+                              adminPanel.style.display = 'block';
+                              ticketsRef.on('value', snapshot => {
+                                    allTickets = snapshot.val() || {};
+                                    filterTickets();
+                              });
+                              phoneInput.addEventListener('input', filterTickets);
+                        } else {
+                              showNotification('Bạn không có quyền truy cập admin.', 'error');
+                              auth.signOut();
+                              authSection.style.display = 'block';
+                              adminPanel.style.display = 'none';
+                        }
+                  } else {
+                        authSection.style.display = 'block';
+                        adminPanel.style.display = 'none';
+                  }
+            });
+
+      </script>
 </body>
 </html>
