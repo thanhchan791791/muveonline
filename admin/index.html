@@ -156,25 +156,36 @@
                   font-style: italic;
             }
 
-            .notification {
-                  position: fixed;
-                  top: 20px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  padding: 15px 25px;
-                  border-radius: 8px;
-                  color: #fff;
-                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                  z-index: 1000;
-                  opacity: 0;
-                  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-            }
-            .notification.show {
-                  opacity: 1;
-                  transform: translateX(-50%) translateY(0);
-            }
-            .notification.success { background-color: var(--success-color); }
-            .notification.error { background-color: var(--danger-color); }
+           .notification {
+    position: fixed;
+    top: 50%; /* Căn giữa theo chiều dọc */
+    left: 50%; /* Căn giữa theo chiều ngang */
+    transform: translate(-50%, -50%); /* Căn giữa hoàn hảo */
+    padding: 20px 30px;
+    border-radius: 8px;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+    max-width: 80%;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.notification.success {
+    background-color: var(--success-color);
+}
+
+.notification.error {
+    background-color: var(--danger-color);
+}
+
 
             @keyframes fadeIn {
                   from { opacity: 0; transform: translateY(10px); }
