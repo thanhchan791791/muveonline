@@ -1,1006 +1,1009 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Vé Admin - MuveOnline</title>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quản lý nghỉ phép - Admin</title>
 
-        :root {
-            --primary-color: #4CAF50; /* Xanh lá cây */
-            --primary-dark: #388E3C;
-            --secondary-color: #2196F3; /* Xanh dương */
-            --danger-color: #f44336; /* Đỏ */
-            --bg-color: #f0f2f5;
-            --card-bg: #fff;
-            --border-color: #e0e0e0;
-            --text-color: #424242;
-            --subtle-text-color: #9e9e9e;
-            --success-color: #28a745;
-        }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 0.8s ease-out;
-        }
+ <style>
+  :root {
+    --primary-color: #ff6f61;
+    --secondary-color: #ffc9a8;
+    --dark-color: #333;
+    --text-color: #555;
+    --bg-color: #f7f9fc;
+    --card-bg: #ffffff;
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.05);
+  }
 
-        h1, h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: var(--primary-dark);
-        }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    padding: 20px;
+    color: var(--text-color);
+    line-height: 1.6;
+  }
 
-        .auth-container, .search-box {
-            margin-bottom: 20px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            background: #fafafa;
-            transition: box-shadow 0.3s ease-in-out;
-        }
-        .auth-container:hover, .search-box:hover {
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
+  .container {
+    max-width: 900px;
+    margin: auto;
+  }
 
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+  .header {
+    text-align: center;
+    padding: 2rem 0;
+  }
 
-        #phoneInput {
-            flex-grow: 1;
-            padding: 14px;
-            font-size: 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
+  .header h2 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+  }
 
-        #phoneInput:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-        }
+  .header p {
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+  }
 
-        .ticket-summary {
-            font-size: 1.2em;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            text-align: center;
-            background-color: #e8f5e9;
-            padding: 15px;
-            border-radius: 10px;
-            animation: slideInUp 0.6s ease-out;
-        }
+  .btn-group-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
 
-        #ticketList {
-            list-style: none;
-            padding: 0;
-            animation: slideInUp 0.6s ease-out;
-        }
+  .btn-group-actions .btn {
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 12px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  }
 
-        #ticketList li {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        #ticketList li:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        }
+  .btn-group-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+  }
 
-        .ticket-info {
-            flex-grow: 1;
-            font-size: 1em;
-        }
-        .ticket-info strong {
-            color: var(--primary-dark);
-        }
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
 
-        .update-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+  .btn-success {
+    background-color: #2ecc71;
+    border-color: #2ecc71;
+  }
 
-        .update-section input[type="number"] {
-            width: 80px;
-            padding: 10px;
-            font-size: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            text-align: center;
-        }
+  .btn-secondary {
+    background-color: #95a5a6;
+    border-color: #95a5a6;
+  }
 
-        .update-section button, .auth-button, .statistic-button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            background-color: var(--primary-color);
-            color: #fff;
-            font-weight: 700;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .statistic-button {
-            background-color: #607d8b; /* Xám xanh */
-        }
-        .statistic-button:hover {
-            background-color: #455a64;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
+  .btn-warning {
+    background-color: #f39c12;
+    border-color: #f39c12;
+  }
 
-        .update-section button:hover, .auth-button:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        #no-tickets-message {
-            text-align: center;
-            color: var(--subtle-text-color);
-            font-style: italic;
-            padding: 20px;
-        }
+  @media (min-width: 768px) {
+    .btn-group-actions {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
 
-        .notification {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 15px 25px;
-            border-radius: 8px;
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out, transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
+  .content-section {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-light);
+    margin-top: 20px;
+  }
 
-        .notification.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        .notification.hide {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.9);
-        }
+  .content-section h3 {
+    color: var(--dark-color);
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+  }
 
-        .notification.success { background-color: var(--success-color); }
-        .notification.error { background-color: var(--danger-color); }
+  .content-section h3::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background-color: var(--primary-color);
+    margin: 8px auto 0;
+    border-radius: 2px;
+  }
+  
+  .request-card {
+    background-color: var(--card-bg);
+    border-left: 5px solid var(--primary-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+  .request-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .request-card h5 {
+    color: var(--dark-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 0 0 5px;
+  }
 
-        /* Modal for statistics */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1001;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            animation: fadeInModal 0.4s ease-out;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 25px;
-            border: none;
-            width: 90%;
-            max-width: 700px;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-            animation: slideInPop 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
-        }
-        @keyframes slideInPop {
-            from { opacity: 0; transform: scale(0.8) translateY(50px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 32px;
-            font-weight: bold;
-            transition: color 0.2s;
-        }
-        .close-button:hover, .close-button:focus {
-            color: var(--danger-color);
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .stats p {
-            font-size: 1.1em;
-            margin: 10px 0;
-            display: flex;
-            justify-content: space-between;
-            background-color: #f8f8f8;
-            padding: 10px;
-            border-radius: 8px;
-            border-left: 5px solid var(--secondary-color);
-            transition: transform 0.2s ease-in-out;
-        }
-        .stats p:hover {
-            transform: translateX(5px);
-        }
-        .stats p strong {
-            color: var(--secondary-color);
-        }
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-        @keyframes fadeInModal {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .tab-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        .tab-button {
-            padding: 12px 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: #f5f5f5;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease-in-out;
-        }
-        .tab-button.active {
-            background-color: var(--primary-color);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
-        }
-        .tab-button:hover:not(.active) {
-            background-color: #e0e0e0;
-        }
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        .tab-content.active {
-            display: block;
-        }
+  .request-card .shift,
+  .request-card .dates,
+  .request-card .reason {
+    font-size: 0.9rem;
+    color: var(--text-color);
+  }
 
-        /* Lịch sử mua vé */
-        .history-search-box {
-            margin-bottom: 15px;
-        }
-        .history-search-box input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-sizing: border-box;
-            transition: border-color 0.3s;
-        }
-        .history-search-box input:focus {
-            outline: none;
-            border-color: var(--secondary-color);
-        }
-        #historyList, #deductionHistoryList {
-            list-style: none;
-            padding: 0;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px;
-            background-color: #fefefe;
-        }
-        #historyList li, #deductionHistoryList li {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            font-size: 0.9em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.2s, transform 0.2s ease-in-out;
-        }
-        #historyList li:hover, #deductionHistoryList li:hover {
-            background-color: #f9f9f9;
-            transform: translateX(5px);
-        }
-        #historyList li:last-child, #deductionHistoryList li:last-child {
-            border-bottom: none;
-        }
-        #historyList .history-info, #deductionHistoryList .history-info {
-            flex-grow: 1;
-        }
-        #historyList .history-date, #deductionHistoryList .history-date {
-            font-size: 0.8em;
-            color: var(--subtle-text-color);
-            text-align: right;
-        }
+  .request-card .status-action {
+    margin-top: 10px;
+    text-align: right;
+    font-weight: 500;
+  }
 
-        /* Mobile-specific adjustments */
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            .container {
-                padding: 15px;
-            }
-            .search-box {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .modal-content {
-                width: 95%;
-                margin: 20px auto;
-            }
-            .tab-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .tab-button {
-                width: 100%;
-                text-align: center;
-            }
-            .notification {
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-            }
-        }
+  .text-success { color: #2ecc71 !important; }
+  .text-danger { color: #e74c3c !important; }
+  .text-warning { color: #f39c12 !important; }
 
-        #adminPanel {
-            display: none;
-        }
-        .auth-container input {
-            padding: 12px;
-            margin: 8px 0;
-            width: calc(100% - 24px);
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-        .auth-button {
-            width: 100%;
-            margin-top: 15px;
-        }
+  .name-tag {
+    background-color: var(--secondary-color);
+    color: #8c5b36;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 4px;
+    font-size: 0.85rem;
+  }
 
-        /* New styles for date picker section */
-        .date-picker-section {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            text-align: center;
-        }
-        .date-picker-section h3 {
-            margin-bottom: 15px;
-            color: var(--text-color);
-        }
-        .date-picker-section input[type="date"] {
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            transition: border-color 0.3s;
-        }
-        .date-picker-section input[type="date"]:focus {
-            outline: none;
-            border-color: var(--secondary-color);
-        }
-        #selectedDateStats {
-            margin-top: 20px;
-            font-size: 1.1em;
-            background-color: #e3f2fd;
-            padding: 20px;
-            border-radius: 12px;
-            border-left: 5px solid var(--secondary-color);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            animation: slideInUp 0.5s ease-out;
-        }
-        #selectedDateStats p {
-            margin: 5px 0;
-            display: block;
-        }
-        #selectedDateStats strong {
-            color: var(--primary-dark);
-        }
-    </style>
+  .popup-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    z-index: 9999;
+  }
+
+  .popup-overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .popup-content {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 90%;
+    width: 400px;
+    transform: scale(0.95);
+    transition: transform 0.4s ease;
+  }
+
+  .popup-overlay.show .popup-content {
+    transform: scale(1);
+  }
+
+  .popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .popup-buttons button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .approve-btn {
+    background-color: #27ae60;
+    color: white;
+  }
+
+  .reject-btn {
+    background-color: #e74c3c;
+    color: white;
+  }
+
+  .approve-btn:hover, .reject-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .modal-list-container {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+
+  .nhanvien-table th {
+    background-color: var(--secondary-color);
+    color: #6a4126;
+  }
+  
+  .nhanvien-table tbody tr:hover {
+    background-color: #fffaf0;
+  }
+
+  .nhanvien-header {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-top: 20px;
+  }
+
+  .btn-sm-action {
+    font-size: 0.8rem;
+  }
+
+  #toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-color);
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, top 0.4s ease;
+    z-index: 10000;
+  }
+
+  #toast.show {
+    opacity: 1;
+    visibility: visible;
+    top: 30px;
+  }
+
+  #pendingCounter {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+  
+  #pendingCounter:hover {
+    transform: scale(1.05);
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  #pendingCount {
+    animation: pulse 1.5s infinite;
+  }
+  
+  #weekScheduleContainer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff7e6;
+    border-top: 2px solid var(--primary-color);
+    padding: 15px 25px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    z-index: 999;
+    max-height: 40vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.5s ease-out;
+  }
+  
+  #weekScheduleContainer.show {
+    transform: translateY(0);
+  }
+
+  #toggleWeekScheduleBtn {
+    background-color: var(--secondary-color);
+    color: #8c5b36;
+    border: none;
+    font-weight: 600;
+    padding: 8px 15px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+  }
+
+  #toggleWeekScheduleBtn:hover {
+    background-color: #ffb880;
+  }
+
+  .footer-toggle {
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  .footer-toggle i {
+    transition: transform 0.3s;
+  }
+
+  .footer-toggle.open i {
+    transform: rotate(180deg);
+  }
+  
+  @media (max-width: 576px) {
+    body {
+      padding: 10px;
+    }
+    .header h2 { font-size: 1.5rem; }
+    .btn-group-actions {
+      grid-template-columns: 1fr;
+    }
+    .request-card { padding: 15px; }
+    .popup-content { width: 95%; padding: 20px; }
+    #pendingCounter {
+      bottom: 10px;
+      right: 10px;
+      padding: 12px 20px;
+      font-size: 1rem;
+    }
+  }
+ </style>
+
 </head>
 <body>
-    <div class="container">
-        <div id="authSection">
-            <h2>Đăng nhập Admin</h2>
-            <div class="auth-container">
-                <input type="email" id="email" placeholder="Email">
-                <input type="password" id="password" placeholder="Mật khẩu">
-                <button class="auth-button" onclick="login()">Đăng nhập</button>
-            </div>
-        </div>
+  <div class="container">
+    <header class="header">
+      <h2><i class="fa-solid fa-shield-halved"></i> Quản lý nghỉ phép</h2>
+      <p>Chào mừng bạn đến trang quản lý yêu cầu nghỉ của nhân viên.</p>
+    </header>
 
-        <div id="adminPanel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h1>Quản lý Vé Khách Hàng</h1>
-                <div style="display: flex; gap: 10px;">
-                    <button class="statistic-button" onclick="showStatistics()">Thống kê Doanh thu</button>
-                    <button class="auth-button" onclick="logout()">Đăng xuất</button>
-                </div>
-            </div>
-            
-            <div class="search-box">
-                <label for="phoneInput">Nhập SĐT:</label>
-                <input type="tel" id="phoneInput" placeholder="Ví dụ: 0912345678">
-            </div>
-
-            <div class="ticket-summary">
-                Tổng số vé: <span id="totalTickets">0</span>
-            </div>
-
-            <ul id="ticketList"></ul>
-            <p id="no-tickets-message" style="display: none;">Không tìm thấy vé đã thanh toán cho SĐT này.</p>
-        </div>
+    <div class="btn-group-actions mb-4">
+      <button class="btn btn-primary" onclick="hienDanhSachNhanVien()">
+        <i class="fa fa-users"></i> Danh sách nhân viên
+      </button>
+      <button class="btn btn-success" onclick="hienFormNhanVien()">
+        <i class="fa fa-plus"></i> Thêm nhân viên
+      </button>
+      <button class="btn btn-secondary" onclick="hienDanhSachDaXuLy()">
+        <i class="fa fa-check-double"></i> Yêu cầu đã xử lý
+      </button>
+      <button class="btn btn-warning" onclick="guiLichNghiTelegram()">
+        <i class="fa-brands fa-telegram"></i> Gửi lịch nghỉ
+      </button>
     </div>
 
-    <div id="statsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal()">&times;</span>
-            <h2>Thống kê & Lịch sử</h2>
-            <div class="tab-buttons">
-                <button class="tab-button active" onclick="openTab(event, 'summary')">Tổng quan</button>
-                <button class="tab-button" onclick="openTab(event, 'daily')">Biểu đồ Ngày</button>
-                <button class="tab-button" onclick="openTab(event, 'history')">Lịch sử Vé</button>
-                <button class="tab-button" onclick="openTab(event, 'deductionHistory')">Lịch sử Áp dụng</button>
-            </div>
-            
-            <div id="summary" class="tab-content active">
-                <div class="stats">
-                    <p>Tổng doanh thu: <strong id="totalRevenue">0 VND</strong></p>
-                    <p>Tổng số vé: <strong id="totalRevenueTickets">0 vé</strong></p>
-                    <p>Doanh thu hôm nay: <strong id="dailyRevenue">0 VND</strong> - Số vé: <strong id="dailyTickets">0 vé</strong></p>
-                    <p>Doanh thu tháng này: <strong id="monthlyRevenue">0 VND</strong> - Số vé: <strong id="monthlyTickets">0 vé</strong></p>
-                </div>
-                <div class="date-picker-section">
-                    <h3>Xem doanh thu theo ngày</h3>
-                    <input type="date" id="selectedDateInput">
-                    <button onclick="showSelectedDayStatistics()">Xem Doanh thu</button>
-                    <div id="selectedDateStats" style="margin-top: 10px;"></div>
-                </div>
-            </div>
-            <div id="daily" class="tab-content">
-                <div class="chart-container">
-                    <div id="dailyChart"></div>
-                </div>
-            </div>
-            <div id="history" class="tab-content">
-                <h3>Lịch sử mua vé đã thanh toán</h3>
-                <div class="history-search-box">
-                    <input type="text" id="historySearchInput" placeholder="Tìm kiếm theo tên hoặc SĐT...">
-                </div>
-                <ul id="historyList"></ul>
-            </div>
-            <div id="deductionHistory" class="tab-content">
-                <h3>Lịch sử áp dụng vé</h3>
-                <ul id="deductionHistoryList"></ul>
-            </div>
+    <div class="content-section">
+      <h3 class="mb-4">Yêu cầu đang chờ duyệt</h3>
+      <div id="requestList">
         </div>
     </div>
+  </div>
 
-    <div id="notification" class="notification"></div>
+  <div id="actionPopup" class="popup-overlay">
+    <div class="popup-content">
+      <p class="mb-4 fs-5">Bạn muốn xử lý yêu cầu này?</p>
+      <div class="popup-buttons">
+        <button id="approveBtn" class="approve-btn">
+          <i class="fa fa-check"></i> Duyệt
+        </button>
+        <button id="rejectBtn" class="reject-btn">
+          <i class="fa fa-times"></i> Từ chối
+        </button>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
-            authDomain: "muveonline-919a8.firebaseapp.com",
-            databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
-            projectId: "muveonline-919a8",
-            storageBucket: "muveonline-919a8.appspot.com",
-            messagingSenderId: "399933853156",
-            appId: "1:399933853156:web:982c1da02117606a994bf1"
-        };
+  <div id="popupDaXuLy" class="popup-overlay">
+    <div class="popup-content" style="max-width: 600px;">
+      <h5 class="mb-3"><i class="fa fa-list-check"></i> Danh sách yêu cầu đã xử lý</h5>
+      <div id="daXuLyList" class="modal-list-container"></div>
+      <div class="popup-buttons" style="border-top: 1px solid #eee; padding-top: 12px;">
+        <button class="reject-btn" onclick="anDanhSachDaXuLy()">Đóng</button>
+      </div>
+    </div>
+  </div>
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
-        const ticketsRef = db.ref('tickets');
-        const TICKET_PRICE = 65000;
+  <div id="popupNhanVien" class="popup-overlay">
+    <div class="popup-content" style="width: 360px;">
+      <h5>➕ Thêm Nhân Viên</h5>
+      <input type="text" id="tenNhanVienMoi" class="form-control mt-3" placeholder="Tên nhân viên" />
+      <select id="caLamMoi" class="form-select mt-3">
+        <option value="">-- Chọn ca làm --</option>
+        <option value="Ca sáng">Ca sáng</option>
+        <option value="Spa">Spa</option>
+        <option value="Petdog">Petdog</option>
+        <option value="Ca tối">Ca tối</option>
+      </select>
+      <div class="popup-buttons mt-4">
+        <button class="approve-btn" onclick="luuNhanVienMoi()">Lưu</button>
+        <button class="reject-btn" onclick="anFormNhanVien()">Huỷ</button>
+      </div>
+    </div>
+  </div>
 
-        const authSection = document.getElementById('authSection');
-        const adminPanel = document.getElementById('adminPanel');
-        const phoneInput = document.getElementById('phoneInput');
-        const ticketList = document.getElementById('ticketList');
-        const totalTicketsSpan = document.getElementById('totalTickets');
-        const noTicketsMessage = document.getElementById('no-tickets-message');
-        const notificationElement = document.getElementById('notification');
-        const statsModal = document.getElementById('statsModal');
-        const historyList = document.getElementById('historyList');
-        const historySearchInput = document.getElementById('historySearchInput');
-        const deductionHistoryList = document.getElementById('deductionHistoryList');
-        const selectedDateInput = document.getElementById('selectedDateInput');
-        const selectedDateStatsDiv = document.getElementById('selectedDateStats');
+  <div id="popupDanhSach" class="popup-overlay">
+    <div class="popup-content" style="max-width: 700px;">
+      <h5 class="mb-3"><i class="fa fa-user-group"></i> Danh sách nhân viên</h5>
+      <div id="danhSachNhanVienContent" class="modal-list-container"></div>
+      <div class="popup-buttons mt-3" style="border-top: 1px solid #eee; padding-top: 12px;">
+        <button class="reject-btn" onclick="anDanhSachNhanVien()">Đóng</button>
+      </div>
+    </div>
+  </div>
 
-        let dailyChart = null;
-        
-        let allTickets = {};
-        let paidTicketsHistory = [];
-        let allDeductionHistory = [];
+  <div id="confirmDeletePopup" class="popup-overlay">
+    <div class="popup-content">
+      <p>Bạn có chắc chắn muốn xoá nhân viên này?</p>
+      <div class="popup-buttons">
+        <button class="approve-btn" onclick="confirmDelete()">Xoá</button>
+        <button class="reject-btn" onclick="anXacNhanXoa()">Huỷ</button>
+      </div>
+    </div>
+  </div>
 
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-        }
+  <div id="toast"></div>
 
-        function showNotification(message, type) {
-            notificationElement.textContent = message;
-            notificationElement.className = `notification show ${type}`;
-            setTimeout(() => {
-                notificationElement.className = `notification hide ${type}`;
-            }, 3000);
-            setTimeout(() => {
-                notificationElement.className = 'notification';
-            }, 3500);
-        }
+  <div id="weekScheduleContainer" class="d-flex flex-column">
+    <div class="footer-toggle d-flex justify-content-center align-items-center gap-2" onclick="toggleWeekSchedule()">
+      <span>Lịch nghỉ tuần tới (Đã duyệt)</span>
+      <i class="fa fa-chevron-up"></i>
+    </div>
+    <div id="weekSchedule" class="flex-grow-1"></div>
+  </div>
 
-        async function checkAdmin(uid) {
-            const snapshot = await db.ref("admins/" + uid).once('value');
-            return snapshot.exists();
-        }
+  <div id="pendingCounter">
+    Đang chờ duyệt: <span id="pendingCount">0</span>
+  </div>
 
-        window.login = function() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    showNotification('Đăng nhập thành công!', 'success');
-                })
-                .catch(err => {
-                    showNotification('Lỗi đăng nhập: ' + err.message, 'error');
-                });
-        };
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getDatabase, ref, onValue, update, set, remove, get } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-        window.logout = function() {
-            auth.signOut().then(() => {
-                showNotification('Đã đăng xuất.', 'success');
-            }).catch(err => {
-                showNotification('Lỗi đăng xuất: ' + err.message, 'error');
-            });
-        };
+  const firebaseConfig = {
+    apiKey: "AIzaSyC4k2DyiEVKXcMpc_j9XwqZG1OHHBNegDk",
+    authDomain: "lichnghi-4c665.firebaseapp.com",
+    databaseURL: "https://lichnghi-4c665-default-rtdb.firebaseio.com",
+    projectId: "lichnghi-4c665",
+    storageBucket: "lichnghi-4c665.appspot.com",
+    messagingSenderId: "86673813509",
+    appId: "1:86673813509:web:168376408dfcbf14e16c6c"
+  };
 
-        function filterTickets() {
-            const searchTerm = phoneInput.value.trim();
-            const filteredTickets = [];
-            let totalTicketCount = 0;
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-            if (searchTerm.length > 0) {
-                for (const ticketId in allTickets) {
-                    const ticket = allTickets[ticketId];
-                    if (ticket.phone && ticket.phone.includes(searchTerm) && ticket.status === 'paid') {
-                        filteredTickets.push({ id: ticketId, ...ticket });
-                        totalTicketCount += (ticket.ticketNumber || 0);
-                    }
-                }
-            }
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  }
 
-            displayTickets(filteredTickets);
-            totalTicketsSpan.textContent = totalTicketCount;
-        }
+  window.hienFormNhanVien = () => {
+    document.getElementById("popupNhanVien").classList.add("show");
+  };
 
-        function displayTickets(tickets) {
-            ticketList.innerHTML = '';
-            if (tickets.length === 0) {
-                noTicketsMessage.style.display = 'block';
+  window.anFormNhanVien = () => {
+    document.getElementById("popupNhanVien").classList.remove("show");
+    document.getElementById("tenNhanVienMoi").value = "";
+    document.getElementById("caLamMoi").value = "";
+  };
+
+  window.luuNhanVienMoi = async () => {
+    const ten = document.getElementById("tenNhanVienMoi").value.trim();
+    const ca = document.getElementById("caLamMoi").value;
+    if (ten === "" || ca === "") {
+      showToast("❗ Vui lòng nhập đầy đủ thông tin.");
+      return;
+    }
+    try {
+      const id = Date.now();
+      await set(ref(db, `nhanvien/${id}`), {
+        ten: ten,
+        calam: ca,
+        createdAt: new Date().toISOString()
+      });
+      showToast("✅ Đã thêm nhân viên thành công.");
+      anFormNhanVien();
+      loadDanhSachNhanVien();
+    } catch (error) {
+      console.error(error);
+      showToast("❌ Lỗi khi lưu nhân viên.");
+    }
+  };
+
+  // Xử lý danh sách nhân viên
+  const danhSachNhanVienContent = document.getElementById("danhSachNhanVienContent");
+  window.hienDanhSachNhanVien = () => {
+    loadDanhSachNhanVien();
+    document.getElementById("popupDanhSach").classList.add("show");
+  };
+
+  window.anDanhSachNhanVien = () => {
+    document.getElementById("popupDanhSach").classList.remove("show");
+  };
+
+  let idNhanVienCanXoa = null;
+  window.xoaNhanVien = (id) => {
+    idNhanVienCanXoa = id;
+    document.getElementById("confirmDeletePopup").classList.add("show");
+  };
+
+  window.anXacNhanXoa = () => {
+    document.getElementById("confirmDeletePopup").classList.remove("show");
+    idNhanVienCanXoa = null;
+  };
+
+  window.confirmDelete = async () => {
+    try {
+      await remove(ref(db, `nhanvien/${idNhanVienCanXoa}`));
+      showToast("🗑️ Đã xoá nhân viên.");
+      loadDanhSachNhanVien();
+    } catch (err) {
+      console.error(err);
+      showToast("❌ Lỗi khi xoá.");
+    } finally {
+      anXacNhanXoa();
+    }
+  };
+
+  function loadDanhSachNhanVien() {
+    onValue(ref(db, "nhanvien/"), snapshot => {
+      const data = snapshot.val();
+      danhSachNhanVienContent.innerHTML = "";
+
+      if (!data) {
+        danhSachNhanVienContent.innerHTML = "<p class='text-muted'>Không có nhân viên nào.</p>";
+        return;
+      }
+
+      const groupByShift = {};
+      for (const id in data) {
+        const nv = data[id];
+        if (!groupByShift[nv.calam]) groupByShift[nv.calam] = [];
+        groupByShift[nv.calam].push({ id, ...nv });
+      }
+
+      const order = ["Ca sáng", "Spa", "Petdog", "Ca tối"];
+      const shifts = Object.keys(groupByShift).sort((a, b) => order.indexOf(a) - order.indexOf(b));
+
+      shifts.forEach(shift => {
+        const title = document.createElement("div");
+        title.className = "nhanvien-header";
+        title.innerHTML = `<i class="fa-solid fa-clock"></i> ${shift}`;
+        danhSachNhanVienContent.appendChild(title);
+
+        const tableWrapper = document.createElement("div");
+        tableWrapper.className = "table-responsive nhanvien-table";
+        tableWrapper.innerHTML = `
+          <table class="table table-bordered table-hover table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th style="width: 5%">#</th>
+                <th>Tên nhân viên</th>
+                <th style="width: 80px">Xoá</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${groupByShift[shift].map((nv, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td><i class="fa fa-user text-warning me-1"></i> ${nv.ten}</td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-outline-danger btn-sm-action" onclick="xoaNhanVien(${nv.id})">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>`;
+        danhSachNhanVienContent.appendChild(tableWrapper);
+      });
+    }, { onlyOnce: true });
+  }
+
+  // Đếm số yêu cầu đang chờ duyệt
+  function updatePendingCount(count) {
+    document.getElementById("pendingCount").textContent = count;
+  }
+
+  // Hiện popup xử lý yêu cầu
+  const requestList = document.getElementById("requestList");
+  let currentRequests = [];
+  let currentShift = "";
+
+  window.showActionPopup = (requests, shift) => {
+    currentRequests = requests;
+    currentShift = shift;
+    document.getElementById("actionPopup").classList.add("show");
+  };
+
+  // Duyệt
+  document.getElementById("approveBtn").addEventListener("click", async () => {
+    for (const { date, id } of currentRequests) {
+      await update(ref(db, `lichnghi/${date}/${currentShift}/${id}`), { status: "đã duyệt" });
+    }
+    document.getElementById("actionPopup").classList.remove("show");
+    showToast("✅ Đã duyệt thành công.");
+    loadRequests();
+  });
+
+  // Từ chối
+  document.getElementById("rejectBtn").addEventListener("click", async () => {
+    for (const { date, id } of currentRequests) {
+      await update(ref(db, `lichnghi/${date}/${currentShift}/${id}`), { status: "từ chối" });
+    }
+    document.getElementById("actionPopup").classList.remove("show");
+    showToast("❌ Đã từ chối yêu cầu.");
+    loadRequests();
+  });
+
+  function formatVietnameseDate(dateStr) {
+    const date = new Date(dateStr);
+    const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+    const dayName = days[date.getDay()];
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    return `${dayName}, ${day}/${month}`;
+  }
+
+  function loadRequests() {
+    onValue(ref(db, "lichnghi/"), (snapshot) => {
+      const data = snapshot.val();
+      requestList.innerHTML = "";
+      updatePendingCount(0);
+      summarizeNextWeek(data);
+
+      if (!data) {
+        requestList.innerHTML = "<p class='text-center text-muted'>Không có yêu cầu nghỉ nào đang chờ duyệt.</p>";
+        return;
+      }
+
+      const entries = [];
+      for (const date in data) {
+        for (const shift in data[date]) {
+          for (const id in data[date][shift]) {
+            const req = data[date][shift][id];
+            const status = req.status || "chờ duyệt";
+
+            if (status !== "chờ duyệt") continue;
+
+            const formattedDate = formatVietnameseDate(date);
+            const key = `${req.name}|${shift}|${status}|${req.reason || "-"}`;
+
+            const existing = entries.find((e) => e.key === key);
+            if (existing) {
+              existing.requests.push({ date, id });
+              existing.dates.push(formattedDate);
             } else {
-                noTicketsMessage.style.display = 'none';
-                tickets.forEach(ticket => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <div class="ticket-info">
-                            <strong>Tên:</strong> ${ticket.name} | <strong>Số vé:</strong> ${ticket.ticketNumber || 0}
-                        </div>
-                        <div class="update-section">
-                            <input type="number" id="tn-${ticket.id}" value="" placeholder="Số vé trừ">
-                            <button onclick="updateTicket('${ticket.id}')">Áp dụng</button>
-                        </div>
-                    `;
-                    ticketList.appendChild(li);
-                });
+              entries.push({
+                key,
+                name: req.name,
+                shift,
+                status,
+                reason: req.reason || "-",
+                dates: [formattedDate],
+                requests: [{ date, id }],
+              });
             }
+          }
         }
+      }
 
-        window.updateTicket = function(ticketId) {
-            const input = document.getElementById('tn-' + ticketId);
-            const numToDeduct = parseInt(input.value);
+      updatePendingCount(entries.length);
 
-            if (isNaN(numToDeduct) || numToDeduct <= 0) {
-                showNotification('Vui lòng nhập một số dương để trừ vé.', 'error');
-                return;
-            }
-
-            const currentTicket = allTickets[ticketId];
-            if (!currentTicket) {
-                showNotification('Không tìm thấy vé.', 'error');
-                return;
-            }
-
-            const currentNumber = currentTicket.ticketNumber || 0;
-            if (numToDeduct > currentNumber) {
-                showNotification('Số vé trừ không được lớn hơn số vé hiện có.', 'error');
-                return;
-            }
-
-            const newNumber = currentNumber - numToDeduct;
-            const newHistoryEntry = {
-                timestamp: new Date().toISOString(),
-                deductedAmount: numToDeduct,
-                deductedBy: auth.currentUser.uid
-            };
-
-            const updates = {};
-            updates['/tickets/' + ticketId + '/ticketNumber'] = newNumber;
-            updates['/tickets/' + ticketId + '/deductionHistory/' + new Date().getTime()] = newHistoryEntry;
-            
-            db.ref().update(updates)
-                .then(() => {
-                    showNotification('Cập nhật thành công! Số vé mới: ' + newNumber, 'success');
-                    input.value = '';
-                })
-                .catch(err => {
-                    showNotification('Lỗi khi cập nhật vé.', 'error');
-                    console.error('Firebase Error', err);
-                });
-        };
-        
-        window.openTab = function(evt, tabName) {
-            let tabContent = document.getElementsByClassName("tab-content");
-            for (let i = 0; i < tabContent.length; i++) {
-                tabContent[i].style.display = "none";
-            }
-            let tabButtons = document.getElementsByClassName("tab-button");
-            for (let i = 0; i < tabButtons.length; i++) {
-                tabButtons[i].className = tabButtons[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-
-            if (tabName === 'history') {
-                historySearchInput.value = '';
-                renderHistory(paidTicketsHistory);
-            } else if (tabName === 'deductionHistory') {
-                renderDeductionHistory(allDeductionHistory);
-            } else if (tabName === 'daily') {
-                 // Re-render the daily chart when its tab is opened
-                const now = new Date();
-                const dailyData = {};
-                for (let d = 0; d < 30; d++) {
-                    const date = new Date();
-                    date.setDate(now.getDate() - 29 + d);
-                    dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
-                }
-                 for (const ticketId in allTickets) {
-                    const ticket = allTickets[ticketId];
-                    if (ticket.status === 'paid' && ticket.totalPrice && ticket.receivedAt) {
-                        const createdAt = new Date(ticket.receivedAt);
-                        const dailyKey = createdAt.toLocaleDateString('vi-VN');
-                        if (dailyData[dailyKey]) {
-                            dailyData[dailyKey].revenue += ticket.totalPrice || 0;
-                            dailyData[dailyKey].tickets += ticket.ticketNumber || 0;
-                        }
-                    }
-                }
-                renderDailyChart(dailyData);
-            }
-        };
-
-        function renderHistory(tickets) {
-            historyList.innerHTML = '';
-            if (tickets.length === 0) {
-                historyList.innerHTML = '<p style="text-align: center; color: #888;">Không có giao dịch đã thanh toán nào.</p>';
-                return;
-            }
-
-            tickets.sort((a, b) => {
-                const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-                const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                return timeB - timeA;
-            });
-
-            tickets.forEach(ticket => {
-                const li = document.createElement('li');
-                const date = new Date(ticket.createdAt);
-                const formattedDate = `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN')}`;
-                li.innerHTML = `
-                    <div class="history-info">
-                        <strong>${ticket.name}</strong> - SĐT: ${ticket.phone}<br>
-                        ${ticket.ticketNumber} vé | Tổng tiền: ${formatCurrency(ticket.totalPrice)}
-                    </div>
-                    <div class="history-date">${formattedDate}</div>
-                `;
-                historyList.appendChild(li);
-            });
-        }
-        
-        function renderDeductionHistory(history) {
-            deductionHistoryList.innerHTML = '';
-            if (history.length === 0) {
-                deductionHistoryList.innerHTML = '<p style="text-align: center; color: #888;">Không có lịch sử áp dụng vé nào.</p>';
-                return;
-            }
-            
-            // Sort by most recent timestamp
-            history.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-
-            history.forEach(entry => {
-                const li = document.createElement('li');
-                const date = new Date(entry.timestamp);
-                const formattedDate = `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN')}`;
-                li.innerHTML = `
-                    <div class="history-info">
-                        <strong>${entry.name}</strong> - SĐT: ${entry.phone}<br>
-                        Đã áp dụng **${entry.deductedAmount}** vé.
-                    </div>
-                    <div class="history-date">
-                        ${formattedDate}<br>
-                        <span style="font-style: italic;">Nhân viên: ${entry.deductedBy}</span>
-                    </div>
-                `;
-                deductionHistoryList.appendChild(li);
-            });
-        }
-
-        function filterHistoryTickets() {
-            const searchTerm = historySearchInput.value.toLowerCase().trim();
-            const filtered = paidTicketsHistory.filter(ticket => {
-                const name = ticket.name ? ticket.name.toLowerCase() : '';
-                const phone = ticket.phone ? ticket.phone.toLowerCase() : '';
-                return name.includes(searchTerm) || phone.includes(searchTerm);
-            });
-            renderHistory(filtered);
-        }
-
-        window.showStatistics = function () {
-            let totalRevenue = 0;
-            let totalRevenueTickets = 0;
-            let dailyRevenue = 0;
-            let dailyTickets = 0;
-            let monthlyRevenue = 0;
-            let monthlyTickets = 0;
-
-            paidTicketsHistory = [];
-            allDeductionHistory = [];
-
-            const now = new Date();
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            startOfMonth.setHours(0, 0, 0, 0);
-
-            const dailyData = {};
-            for (let d = 0; d < 30; d++) {
-                const date = new Date();
-                date.setDate(now.getDate() - 29 + d);
-                dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
-            }
-
-            for (const ticketId in allTickets) {
-                const ticket = allTickets[ticketId];
-                if (ticket.status === 'paid') {
-                    const price = ticket.totalPrice || 0;
-                    const ticketNumber = ticket.ticketNumber || 0;
-                    const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
-
-                    paidTicketsHistory.push(ticket);
-                    totalRevenue += price;
-                    totalRevenueTickets += ticketNumber;
-
-                    if (ticketDate) {
-                        if (ticketDate.toDateString() === now.toDateString()) {
-                            dailyRevenue += price;
-                            dailyTickets += ticketNumber;
-                        }
-                        if (ticketDate >= startOfMonth) {
-                            monthlyRevenue += price;
-                            monthlyTickets += ticketNumber;
-                        }
-                        const dateKey = ticketDate.toLocaleDateString('vi-VN');
-                        if (dailyData[dateKey]) {
-                            dailyData[dateKey].revenue += price;
-                            dailyData[dateKey].tickets += ticketNumber;
-                        }
-                    }
-                }
-
-                if (ticket.deductionHistory) {
-                    for (const key in ticket.deductionHistory) {
-                        const entry = ticket.deductionHistory[key];
-                        allDeductionHistory.push({
-                            ...entry,
-                            name: ticket.name,
-                            phone: ticket.phone
-                        });
-                    }
-                }
-            }
-
-            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
-            document.getElementById('totalRevenueTickets').textContent = totalRevenueTickets + ' vé';
-            document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
-            document.getElementById('dailyTickets').textContent = dailyTickets + ' vé';
-            document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
-            document.getElementById('monthlyTickets').textContent = monthlyTickets + ' vé';
-            
-            // Clear selected date stats on initial open
-            selectedDateInput.value = '';
-            selectedDateStatsDiv.innerHTML = '';
-
-            renderDailyChart(dailyData);
-            renderHistory(paidTicketsHistory);
-            renderDeductionHistory(allDeductionHistory);
-
-            statsModal.style.display = 'block';
-        };
-
-        window.showSelectedDayStatistics = function() {
-            const selectedDateValue = selectedDateInput.value;
-            if (!selectedDateValue) {
-                showNotification('Vui lòng chọn một ngày.', 'error');
-                return;
-            }
-
-            let selectedDayRevenue = 0;
-            let selectedDayTickets = 0;
-            const selectedDate = new Date(selectedDateValue);
-
-            for (const ticketId in allTickets) {
-                const ticket = allTickets[ticketId];
-                if (ticket.status === 'paid') {
-                    const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
-                    if (ticketDate && ticketDate.toDateString() === selectedDate.toDateString()) {
-                        selectedDayRevenue += ticket.totalPrice || 0;
-                        selectedDayTickets += ticket.ticketNumber || 0;
-                    }
-                }
-            }
-            
-            selectedDateStatsDiv.innerHTML = `
-                <p>Doanh thu ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${formatCurrency(selectedDayRevenue)}</strong></p>
-                <p>Số vé ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${selectedDayTickets} vé</strong></p>
-            `;
-        };
-
-        function renderDailyChart(data) {
-            const chartElement = document.getElementById('dailyChart');
-            const labels = Object.keys(data);
-            const revenues = Object.values(data).map(d => d.revenue);
-            const tickets = Object.values(data).map(d => d.tickets);
-
-            const options = {
-                series: [{
-                    name: 'Doanh thu',
-                    type: 'bar',
-                    data: revenues,
-                    yAxisID: 'revenue'
-                }, {
-                    name: 'Số vé',
-                    type: 'bar',
-                    data: tickets,
-                    yAxisID: 'tickets'
-                }],
-                chart: {
-                    height: 350,
-                    type: 'bar',
-                    stacked: false,
-                    animations: { enabled: true, easing: 'easeinout' }
-                },
-                title: { text: 'Doanh thu và Số vé (30 ngày gần nhất)', align: 'left' },
-                dataLabels: { enabled: false },
-                xaxis: {
-                    categories: labels,
-                    tooltip: { enabled: false }
-                },
-                yaxis: [{
-                    axisTicks: { show: true },
-                    axisBorder: { show: true, color: '#008FFB' },
-                    labels: { style: { colors: '#008FFB' }, formatter: (value) => formatCurrency(value) },
-                    title: { text: "Doanh thu", style: { color: '#008FFB' } },
-                    id: 'revenue'
-                }, {
-                    axisTicks: { show: true },
-                    axisBorder: { show: true, color: '#FF4560' },
-                    labels: { style: { colors: '#FF4560' } },
-                    title: { text: "Số vé", style: { color: '#FF4560' } },
-                    opposite: true,
-                    id: 'tickets'
-                }],
-                tooltip: {
-                    shared: true,
-                    intersect: false,
-                    y: {
-                        formatter: function (y, { seriesIndex }) {
-                            if (seriesIndex === 0) return formatCurrency(y);
-                            return y + " vé";
-                        }
-                    }
-                },
-                responsive: [{
-                    breakpoint: 600,
-                    options: {
-                        chart: { toolbar: { show: false } },
-                        legend: { show: false }
-                    }
-                }]
-            };
-
-            if (dailyChart) dailyChart.destroy();
-            dailyChart = new ApexCharts(chartElement, options);
-            dailyChart.render();
-        }
-
-        window.closeModal = function() {
-            statsModal.style.display = 'none';
-        };
-
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                const isAdmin = await checkAdmin(user.uid);
-                if (isAdmin) {
-                    authSection.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    ticketsRef.on('value', snapshot => {
-                        allTickets = snapshot.val() || {};
-                        filterTickets();
-                    });
-                    phoneInput.addEventListener('input', filterTickets);
-                    historySearchInput.addEventListener('input', filterHistoryTickets);
-                } else {
-                    showNotification('Bạn không có quyền truy cập admin.', 'error');
-                    auth.signOut();
-                    authSection.style.display = 'block';
-                    adminPanel.style.display = 'none';
-                }
-            } else {
-                authSection.style.display = 'block';
-                adminPanel.style.display = 'none';
-            }
+      if (entries.length === 0) {
+        requestList.innerHTML = "<p class='text-center text-muted'>Không có yêu cầu nghỉ nào đang chờ duyệt.</p>";
+      } else {
+        entries.forEach(entry => {
+          const { name, shift, reason, dates, requests } = entry;
+          const card = document.createElement("div");
+          card.className = "request-card";
+          card.innerHTML = `
+            <h5>${name} <span class="shift">(${shift})</span></h5>
+            <div class="dates">📅 ${dates.sort().join("<br>")}</div>
+            ${reason && reason.trim() !== "-" ? `<div class="reason">📝 Lí do: ${reason}</div>` : ""}
+            <div class="status-action text-warning">Chờ duyệt</div>
+          `;
+          card.addEventListener("click", () => showActionPopup(requests, shift));
+          requestList.appendChild(card);
         });
-    </script>
+      }
+    });
+  }
+
+  function summarizeNextWeek(data) {
+    const weekSchedule = document.getElementById("weekSchedule");
+    weekSchedule.innerHTML = "";
+
+    const today = new Date();
+    const nextWeek = {};
+
+    for (let i = 1; i <= 7; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + ((8 - today.getDay()) % 7) + i - 1);
+      const dateKey = date.toISOString().split("T")[0];
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const weekday = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"][date.getDay()];
+      nextWeek[dateKey] = { label: `${weekday} (${day}/${month})`, names: [] };
+    }
+
+    if (data) {
+      for (const date in data) {
+        if (!nextWeek[date]) continue;
+        for (const shift in data[date]) {
+          for (const id in data[date][shift]) {
+            const req = data[date][shift][id];
+            if (req.status === "đã duyệt") {
+              nextWeek[date].names.push(`${req.name} (${shift})`);
+            }
+          }
+        }
+      }
+    }
+
+    const hasApprovedLeave = Object.values(nextWeek).some(day => day.names.length > 0);
+
+    if (!hasApprovedLeave) {
+        weekSchedule.innerHTML = "<p class='text-center text-muted mt-3'>Chưa có yêu cầu nghỉ nào được duyệt cho tuần tới.</p>";
+        return;
+    }
+
+    for (const date in nextWeek) {
+      if (nextWeek[date].names.length === 0) continue;
+      const dayCard = document.createElement("div");
+      dayCard.className = "request-card";
+      dayCard.innerHTML = `
+        <h5>${nextWeek[date].label}</h5>
+        ${nextWeek[date].names.map(name => `<div class="name-tag">${name}</div>`).join("")}`;
+      weekSchedule.appendChild(dayCard);
+    }
+  }
+
+
+  window.hienDanhSachDaXuLy = () => {
+    const popupDaXuLy = document.getElementById("popupDaXuLy");
+    const daXuLyList = document.getElementById("daXuLyList");
+
+    daXuLyList.innerHTML = "<p class='text-center text-muted'>Đang tải...</p>";
+    popupDaXuLy.classList.add("show");
+
+    onValue(ref(db, "lichnghi/"), snapshot => {
+      const data = snapshot.val();
+      daXuLyList.innerHTML = "";
+
+      if (!data) {
+        daXuLyList.innerHTML = "<p class='text-center text-muted'>Không có yêu cầu nào.</p>";
+        return;
+      }
+
+      const entries = [];
+
+      for (const date in data) {
+        for (const shift in data[date]) {
+          for (const id in data[date][shift]) {
+            const req = data[date][shift][id];
+            const status = req.status;
+            if (status !== "đã duyệt" && status !== "từ chối") continue;
+
+            const key = `${req.name}|${shift}|${status}|${req.reason || "-"}`;
+            const formattedDate = formatVietnameseDate(date);
+
+            const existing = entries.find(e => e.key === key);
+            if (existing) {
+              existing.requests.push({ date, id });
+              existing.dates.push(formattedDate);
+            } else {
+              entries.push({
+                key,
+                name: req.name,
+                shift,
+                status,
+                reason: req.reason || "-",
+                dates: [formattedDate],
+                requests: [{ date, id }]
+              });
+            }
+          }
+        }
+      }
+      
+      entries.sort((a, b) => new Date(b.requests[0].date) - new Date(a.requests[0].date));
+
+      for (const entry of entries) {
+        const { name, shift, status, reason, dates, requests } = entry;
+        const statusHTML = status === "đã duyệt"
+          ? `<i class="fa-solid fa-circle-check text-success" title="Đã duyệt"></i>`
+          : `<i class="fa-solid fa-circle-xmark text-danger" title="Từ chối"></i>`;
+
+        const card = document.createElement("div");
+        card.className = "request-card";
+        card.innerHTML = `
+          <h5>${name} <span class="shift">(${shift})</span></h5>
+          <div class="dates">📅 ${dates.sort().join("<br>")}</div>
+          <div class="reason">📝 ${reason}</div>
+          <div class="status-action">${statusHTML}</div>
+        `;
+        daXuLyList.appendChild(card);
+      }
+
+      if (entries.length === 0) {
+        daXuLyList.innerHTML = "<p class='text-center text-muted'>Không có yêu cầu nào đã xử lý.</p>";
+      }
+    }, { onlyOnce: true });
+  };
+
+  window.anDanhSachDaXuLy = () => {
+    document.getElementById("popupDaXuLy").classList.remove("show");
+  };
+
+  window.guiLichNghiTelegram = async () => {
+    try {
+      const snapshot = await get(ref(db, "lichnghi/"));
+      const data = snapshot.val();
+
+      if (!data) {
+        showToast("📭 Không có lịch nghỉ để gửi.");
+        return;
+      }
+
+      const today = new Date();
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() + ((8 - today.getDay()) % 7));
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+
+      const formatDate = (date) => {
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        return `${day}/${month}`;
+      };
+
+      const weekLabel = `${formatDate(weekStart)} → ${formatDate(weekEnd)}`;
+      const updatedAt = `${formatDate(today)} – ${today.getHours().toString().padStart(2, "0")}:${today.getMinutes().toString().padStart(2, "0")}`;
+
+      const weekdayLabels = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+      const nextWeek = {};
+      const futureDates = [];
+
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
+        const key = date.toISOString().split("T")[0];
+        const label = `*${weekdayLabels[date.getDay()]} – ${formatDate(date)}*`;
+        nextWeek[key] = { label, names: [] };
+      }
+
+      for (const date in data) {
+        const currentDate = new Date(date);
+        for (const shift in data[date]) {
+          for (const id in data[date][shift]) {
+            const req = data[date][shift][id];
+            if (req.status === "đã duyệt") {
+              const line = `${req.name} — ${shift}`;
+              if (nextWeek[date]) {
+                nextWeek[date].names.push(line);
+              } else if (currentDate > weekEnd) {
+                const label = `${weekdayLabels[currentDate.getDay()]} – ${formatDate(currentDate)}`;
+                futureDates.push({ raw: date, display: label, name: line });
+              }
+            }
+          }
+        }
+      }
+
+      let message = `*📅 LỊCH NGHỈ DỰ KIẾN TUẦN: ${weekLabel}*\n`;
+      message += `Được cập nhật lúc: __${updatedAt}__\n\n`;
+      message += `──────────────────────────────\n`;
+
+      let hasData = false;
+      for (const date in nextWeek) {
+        if (nextWeek[date].names.length > 0) {
+          hasData = true;
+          message += `${nextWeek[date].label}\n`;
+          nextWeek[date].names.forEach(name => {
+            message += `• ${name}\n`;
+          });
+          message += `\n`;
+        }
+      }
+
+      if (!hasData) {
+        message += `_Chưa có ai đăng ký nghỉ tuần tới._\n\n`;
+      }
+
+      if (futureDates.length > 0) {
+        message += `──────────────────────────────\n`;
+        message += `*Tạm ứng lịch tuần tới:*\n`;
+        futureDates.sort((a, b) => new Date(a.raw) - new Date(b.raw));
+        futureDates.forEach(f => {
+          message += `• ${f.display}: ${f.name}\n`;
+        });
+        message += `\n`;
+      }
+
+      message += `*Lưu ý:* Vui lòng kiểm tra lại lịch trước khi sắp xếp ca trực.`;
+
+      const token = "7807531189:AAGhMQ9jjew7Q9ywMDSTaGDy4Ns6XtPQUrI";
+      const chatId = "-4716169472";
+      const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+      await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: "Markdown"
+          })
+      });
+
+      showToast("📨 Đã gửi lịch nghỉ lên Telegram.");
+    } catch (err) {
+      console.error(err);
+      showToast("❌ Gửi thất bại.");
+    }
+  };
+
+  window.toggleWeekSchedule = () => {
+    const container = document.getElementById("weekScheduleContainer");
+    const toggleIcon = document.querySelector(".footer-toggle i");
+    container.classList.toggle("show");
+    toggleIcon.classList.toggle("fa-chevron-up");
+    toggleIcon.classList.toggle("fa-chevron-down");
+  };
+
+  // Close popup on backdrop click
+  document.querySelectorAll('.popup-overlay').forEach(popup => {
+      popup.addEventListener('click', function(e) {
+          if (e.target === this) {
+              this.classList.remove('show');
+          }
+      });
+  });
+
+  loadRequests();
+</script>
+
 </body>
 </html>
