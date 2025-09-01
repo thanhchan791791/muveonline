@@ -1,839 +1,1006 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Quản lý Vé Admin - MuveOnline</title>
-      <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-      <style>
-            :root {
-                  --primary-color: #007bff;
-                  --success-color: #28a745;
-                  --danger-color: #dc3545;
-                  --bg-color: #f4f4f9;
-                  --card-bg: #fff;
-                  --border-color: #ddd;
-                  --text-color: #333;
-                  --subtle-text-color: #888;
-            }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Vé Admin - MuveOnline</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
+        :root {
+            --primary-color: #4CAF50; /* Xanh lá cây */
+            --primary-dark: #388E3C;
+            --secondary-color: #2196F3; /* Xanh dương */
+            --danger-color: #f44336; /* Đỏ */
+            --bg-color: #f0f2f5;
+            --card-bg: #fff;
+            --border-color: #e0e0e0;
+            --text-color: #424242;
+            --subtle-text-color: #9e9e9e;
+            --success-color: #28a745;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary-dark);
+        }
+
+        .auth-container, .search-box {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #fafafa;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .auth-container:hover, .search-box:hover {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #phoneInput {
+            flex-grow: 1;
+            padding: 14px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        #phoneInput:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        .ticket-summary {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        #ticketList {
+            list-style: none;
+            padding: 0;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        #ticketList li {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        #ticketList li:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .ticket-info {
+            flex-grow: 1;
+            font-size: 1em;
+        }
+        .ticket-info strong {
+            color: var(--primary-dark);
+        }
+
+        .update-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .update-section input[type="number"] {
+            width: 80px;
+            padding: 10px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .update-section button, .auth-button, .statistic-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: #fff;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .statistic-button {
+            background-color: #607d8b; /* Xám xanh */
+        }
+        .statistic-button:hover {
+            background-color: #455a64;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .update-section button:hover, .auth-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #no-tickets-message {
+            text-align: center;
+            color: var(--subtle-text-color);
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out, transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .notification.hide {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+
+        .notification.success { background-color: var(--success-color); }
+        .notification.error { background-color: var(--danger-color); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal for statistics */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            animation: fadeInModal 0.4s ease-out;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 25px;
+            border: none;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+            animation: slideInPop 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+        @keyframes slideInPop {
+            from { opacity: 0; transform: scale(0.8) translateY(50px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .close-button:hover, .close-button:focus {
+            color: var(--danger-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .stats p {
+            font-size: 1.1em;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 5px solid var(--secondary-color);
+            transition: transform 0.2s ease-in-out;
+        }
+        .stats p:hover {
+            transform: translateX(5px);
+        }
+        .stats p strong {
+            color: var(--secondary-color);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .tab-button {
+            padding: 12px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease-in-out;
+        }
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+        .tab-button:hover:not(.active) {
+            background-color: #e0e0e0;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Lịch sử mua vé */
+        .history-search-box {
+            margin-bottom: 15px;
+        }
+        .history-search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .history-search-box input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+        #historyList, #deductionHistoryList {
+            list-style: none;
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            background-color: #fefefe;
+        }
+        #historyList li, #deductionHistoryList li {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s, transform 0.2s ease-in-out;
+        }
+        #historyList li:hover, #deductionHistoryList li:hover {
+            background-color: #f9f9f9;
+            transform: translateX(5px);
+        }
+        #historyList li:last-child, #deductionHistoryList li:last-child {
+            border-bottom: none;
+        }
+        #historyList .history-info, #deductionHistoryList .history-info {
+            flex-grow: 1;
+        }
+        #historyList .history-date, #deductionHistoryList .history-date {
+            font-size: 0.8em;
+            color: var(--subtle-text-color);
+            text-align: right;
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 600px) {
             body {
-                  font-family: 'Segoe UI', Arial, sans-serif;
-                  margin: 0;
-                  padding: 20px;
-                  background-color: var(--bg-color);
-                  color: var(--text-color);
-                  line-height: 1.6;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  min-height: 100vh;
+                padding: 10px;
             }
-
             .container {
-                  width: 100%;
-                  max-width: 800px;
-                  background: var(--card-bg);
-                  padding: 20px;
-                  border-radius: 12px;
-                  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+                padding: 15px;
             }
-
-            h1, h2 {
-                  text-align: center;
-                  margin-bottom: 20px;
-            }
-
-            .search-box, .auth-container {
-                  margin-bottom: 20px;
-                  padding: 15px;
-                  border: 1px solid var(--border-color);
-                  border-radius: 8px;
-            }
-
             .search-box {
-                  display: flex;
-                  align-items: center;
-                  gap: 10px;
-            }
-
-            #phoneInput {
-                  flex-grow: 1;
-                  padding: 12px;
-                  font-size: 16px;
-                  border: 1px solid #ccc;
-                  border-radius: 6px;
-                  transition: border-color 0.3s;
-            }
-
-            #phoneInput:focus {
-                  outline: none;
-                  border-color: var(--primary-color);
-            }
-
-            .ticket-summary {
-                  font-size: 1.1em;
-                  font-weight: bold;
-                  color: var(--primary-color);
-                  margin-bottom: 15px;
-                  text-align: center;
-            }
-
-            #ticketList {
-                  list-style: none;
-                  padding: 0;
-                  animation: fadeIn 0.5s ease-in-out;
-            }
-
-            #ticketList li {
-                  background: #eef;
-                  border: 1px solid var(--border-color);
-                  padding: 15px;
-                  margin-bottom: 10px;
-                  border-radius: 8px;
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  gap: 10px;
-                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-                  transition: transform 0.2s ease-in-out;
-            }
-
-            #ticketList li:hover {
-                  transform: translateY(-3px);
-            }
-
-            .ticket-info {
-                  flex-grow: 1;
-                  font-size: 0.9em;
-            }
-
-            .update-section {
-                  display: flex;
-                  align-items: center;
-                  gap: 10px;
-            }
-
-            .update-section input[type="number"] {
-                  width: 70px;
-                  padding: 8px;
-                  font-size: 14px;
-                  border: 1px solid #ccc;
-                  border-radius: 4px;
-            }
-
-            .update-section button, .auth-button, .statistic-button {
-                  padding: 10px 15px;
-                  border: none;
-                  border-radius: 6px;
-                  cursor: pointer;
-                  background-color: var(--primary-color);
-                  color: #fff;
-                  font-weight: bold;
-                  transition: background-color 0.3s, transform 0.1s;
-            }
-            .statistic-button {
-                  background-color: #6c757d;
-            }
-            .statistic-button:hover {
-                  background-color: #5a6268;
-            }
-
-            .update-section button:active, .auth-button:active, .statistic-button:active {
-                  transform: scale(0.98);
-            }
-
-            .update-section button:hover, .auth-button:hover {
-                  background-color: #0056b3;
-            }
-             
-            #no-tickets-message {
-                  text-align: center;
-                  color: var(--subtle-text-color);
-                  font-style: italic;
-            }
-
-           .notification {
-    position: fixed;
-    top: 50%; /* Căn giữa theo chiều dọc */
-    left: 50%; /* Căn giữa theo chiều ngang */
-    transform: translate(-50%, -50%); /* Căn giữa hoàn hảo */
-    padding: 20px 30px;
-    border-radius: 8px;
-    color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-    max-width: 80%;
-    text-align: center;
-    font-size: 1.1em;
-}
-
-.notification.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-}
-
-.notification.success {
-    background-color: var(--success-color);
-}
-
-.notification.error {
-    background-color: var(--danger-color);
-}
-
-
-            @keyframes fadeIn {
-                  from { opacity: 0; transform: translateY(10px); }
-                  to { opacity: 1; transform: translateY(0); }
-            }
-
-            /* Modal for statistics */
-            .modal {
-                  display: none;
-                  position: fixed;
-                  z-index: 1001;
-                  left: 0;
-                  top: 0;
-                  width: 100%;
-                  height: 100%;
-                  overflow: auto;
-                  background-color: rgba(0,0,0,0.4);
-                  animation: fadeInModal 0.3s;
+                flex-direction: column;
+                align-items: stretch;
             }
             .modal-content {
-                  background-color: #fefefe;
-                  margin: 5% auto;
-                  padding: 20px;
-                  border: 1px solid #888;
-                  width: 80%;
-                  max-width: 700px;
-                  border-radius: 12px;
-                  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                width: 95%;
+                margin: 20px auto;
             }
-            .close-button {
-                  color: #aaa;
-                  float: right;
-                  font-size: 28px;
-                  font-weight: bold;
-            }
-            .close-button:hover, .close-button:focus {
-                  color: #000;
-                  text-decoration: none;
-                  cursor: pointer;
-            }
-            .stats p {
-                  font-size: 1.1em;
-                  margin: 10px 0;
-                  display: flex;
-                  justify-content: space-between;
-            }
-            .stats p strong {
-                  color: var(--primary-color);
-            }
-            .chart-container {
-                  position: relative;
-                  height: 300px;
-                  width: 100%;
-            }
-            @keyframes fadeInModal {
-                  from { opacity: 0; transform: scale(0.95); }
-                  to { opacity: 1; transform: scale(1); }
-            }
-             
             .tab-buttons {
-                  display: flex;
-                  justify-content: center;
-                  gap: 10px;
-                  margin-bottom: 20px;
+                flex-direction: column;
+                gap: 10px;
             }
             .tab-button {
-                  padding: 10px 20px;
-                  border: 1px solid var(--border-color);
-                  border-radius: 6px;
-                  background-color: #f0f0f0;
-                  cursor: pointer;
-                  font-weight: bold;
-                  transition: background-color 0.2s;
+                width: 100%;
+                text-align: center;
             }
-            .tab-button.active {
-                  background-color: var(--primary-color);
-                  color: #fff;
-            }
-            .tab-content {
-                  display: none;
-            }
-            .tab-content.active {
-                  display: block;
-            }
-
-            /* Mobile-specific adjustments */
-            @media (max-width: 600px) {
-                  .container {
-                        padding: 15px;
-                  }
-                  .search-box {
-                        flex-direction: column;
-                        align-items: stretch;
-                  }
-                  .modal-content {
-                        width: 90%;
-                  }
-            }
-
-            #adminPanel {
-                  display: none;
-            }
-            .auth-container input {
-                  padding: 10px;
-                  margin: 5px 0;
-                  width: calc(100% - 20px);
-                  box-sizing: border-box;
-                  border: 1px solid #ccc;
-                  border-radius: 5px;
-            }
-            .auth-button {
-                  width: 100%;
-                  margin-top: 10px;
-            }
-      </style>
-</head>
-<body>
-      <div class="container">
-            <div id="authSection">
-                  <h2>Đăng nhập Admin</h2>
-                  <div class="auth-container">
-                        <input type="email" id="email" placeholder="Email">
-                        <input type="password" id="password" placeholder="Mật khẩu">
-                        <button class="auth-button" onclick="login()">Đăng nhập</button>
-                  </div>
-            </div>
-
-            <div id="adminPanel">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h1>Quản lý Vé Khách Hàng</h1>
-                        <div style="display: flex; gap: 10px;">
-                              <button class="statistic-button" onclick="showStatistics()">Thống kê Doanh thu</button>
-                              <button class="auth-button" onclick="logout()">Đăng xuất</button>
-                        </div>
-                  </div>
-                   
-                  <div class="search-box">
-                        <label for="phoneInput">Nhập SĐT:</label>
-                        <input type="tel" id="phoneInput" placeholder="Ví dụ: 0912345678">
-                  </div>
-
-                  <div class="ticket-summary">
-                        Tổng số vé: <span id="totalTickets">0</span>
-                  </div>
-
-                  <ul id="ticketList"></ul>
-                  <p id="no-tickets-message" style="display: none;">Không tìm thấy vé đã thanh toán cho SĐT này.</p>
-            </div>
-      </div>
-
-      <div id="statsModal" class="modal">
-            <div class="modal-content">
-                  <span class="close-button" onclick="closeModal()">&times;</span>
-                  <h2>Thống kê Doanh thu</h2>
-                  <div class="stats">
-                        <p>Tổng doanh thu: <strong id="totalRevenue">0 VND</strong></p>
-                        <p>Tổng số vé: <strong id="totalRevenueTickets">0 vé</strong></p>
-                        <p>Doanh thu hôm nay: <strong id="dailyRevenue">0 VND</strong> - Số vé: <strong id="dailyTickets">0 vé</strong></p>
-                        <p>Doanh thu tuần này: <strong id="weeklyRevenue">0 VND</strong> - Số vé: <strong id="weeklyTickets">0 vé</strong></p>
-                        <p>Doanh thu tháng này: <strong id="monthlyRevenue">0 VND</strong> - Số vé: <strong id="monthlyTickets">0 vé</strong></p>
-                  </div>
-                  <div class="tab-buttons">
-                        <button class="tab-button active" onclick="openTab(event, 'daily')">Ngày</button>
-                        <button class="tab-button" onclick="openTab(event, 'weekly')">Tuần</button>
-                        <button class="tab-button" onclick="openTab(event, 'monthly')">Tháng</button>
-                  </div>
-                   
-                  <div id="daily" class="tab-content active">
-                        <div class="chart-container">
-                              <div id="dailyChart"></div>
-                        </div>
-                  </div>
-                  <div id="weekly" class="tab-content">
-                        <div class="chart-container">
-                              <div id="weeklyChart"></div>
-                        </div>
-                  </div>
-                  <div id="monthly" class="tab-content">
-                        <div class="chart-container">
-                              <div id="monthlyChart"></div>
-                        </div>
-                  </div>
-
-            </div>
-      </div>
-
-      <div id="notification" class="notification"></div>
-
-      <script>
-            // Firebase config
-            const firebaseConfig = {
-                  apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
-                  authDomain: "muveonline-919a8.firebaseapp.com",
-                  databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
-                  projectId: "muveonline-919a8",
-                  storageBucket: "muveonline-919a8.appspot.com",
-                  messagingSenderId: "399933853156",
-                  appId: "1:399933853156:web:982c1da02117606a994bf1"
-            };
-
-            firebase.initializeApp(firebaseConfig);
-            const auth = firebase.auth();
-            const db = firebase.database();
-            const ticketsRef = db.ref('tickets');
-            const TICKET_PRICE = 65000;
-
-            const authSection = document.getElementById('authSection');
-            const adminPanel = document.getElementById('adminPanel');
-            const phoneInput = document.getElementById('phoneInput');
-            const ticketList = document.getElementById('ticketList');
-            const totalTicketsSpan = document.getElementById('totalTickets');
-            const noTicketsMessage = document.getElementById('no-tickets-message');
-            const notificationElement = document.getElementById('notification');
-            const statsModal = document.getElementById('statsModal');
-             
-            let dailyChart = null;
-            let weeklyChart = null;
-            let monthlyChart = null;
-             
-            let allTickets = {};
-
-            function formatCurrency(amount) {
-                  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-            }
-
-            function showNotification(message, type) {
-                  notificationElement.textContent = message;
-                  notificationElement.className = `notification show ${type}`;
-                  setTimeout(() => {
-                        notificationElement.className = 'notification';
-                  }, 3000);
-            }
-
-            async function checkAdmin(uid) {
-                  const snapshot = await db.ref("admins/" + uid).once('value');
-                  return snapshot.exists();
-            }
-
-            window.login = function() {
-                  const email = document.getElementById('email').value;
-                  const password = document.getElementById('password').value;
-                  auth.signInWithEmailAndPassword(email, password)
-                        .then(() => {
-                              showNotification('Đăng nhập thành công!', 'success');
-                        })
-                        .catch(err => {
-                              showNotification('Lỗi đăng nhập: ' + err.message, 'error');
-                        });
-            };
-
-            window.logout = function() {
-                  auth.signOut().then(() => {
-                        showNotification('Đã đăng xuất.', 'success');
-                  }).catch(err => {
-                        showNotification('Lỗi đăng xuất: ' + err.message, 'error');
-                  });
-            };
-
-            function filterTickets() {
-                  const searchTerm = phoneInput.value.trim();
-                  const filteredTickets = [];
-                  let totalTicketCount = 0;
-
-                  if (searchTerm.length > 0) {
-                        for (const ticketId in allTickets) {
-                              const ticket = allTickets[ticketId];
-                              if (ticket.phone && ticket.phone.includes(searchTerm) && ticket.status === 'paid') {
-                                    filteredTickets.push({ id: ticketId, ...ticket });
-                                    totalTicketCount += (ticket.ticketNumber || 0);
-                              }
-                        }
-                  }
-
-                  displayTickets(filteredTickets);
-                  totalTicketsSpan.textContent = totalTicketCount;
-            }
-
-            function displayTickets(tickets) {
-                  ticketList.innerHTML = '';
-                  if (tickets.length === 0) {
-                        noTicketsMessage.style.display = 'block';
-                  } else {
-                        noTicketsMessage.style.display = 'none';
-                        tickets.forEach(ticket => {
-                              const li = document.createElement('li');
-                              li.innerHTML = `
-                                    <div class="ticket-info">
-                                          <strong>Tên:</strong> ${ticket.name} | <strong>Số vé:</strong> ${ticket.ticketNumber || 0}
-                                    </div>
-                                    <div class="update-section">
-                                          <input type="number" id="tn-${ticket.id}" value="" placeholder="Số vé trừ">
-                                          <button onclick="updateTicket('${ticket.id}')">Áp dụng</button>
-                                    </div>
-                              `;
-                              ticketList.appendChild(li);
-                        });
-                  }
-            }
-
-            window.updateTicket = function(ticketId) {
-                  const input = document.getElementById('tn-' + ticketId);
-                  const numToDeduct = parseInt(input.value);
-
-                  if (isNaN(numToDeduct) || numToDeduct <= 0) {
-                        showNotification('Vui lòng nhập một số dương để trừ vé.', 'error');
-                        return;
-                  }
-
-                  const currentTicket = allTickets[ticketId];
-                  if (!currentTicket) {
-                        showNotification('Không tìm thấy vé.', 'error');
-                        return;
-                  }
-
-                  const currentNumber = currentTicket.ticketNumber || 0;
-                  if (numToDeduct > currentNumber) {
-                        showNotification('Số vé trừ không được lớn hơn số vé hiện có.', 'error');
-                        return;
-                  }
-
-                  const newNumber = currentNumber - numToDeduct;
-                  db.ref('tickets/' + ticketId).update({ ticketNumber: newNumber })
-                        .then(() => {
-                              showNotification('Cập nhật thành công! Số vé mới: ' + newNumber, 'success');
-                              input.value = '';
-                        })
-                        .catch(err => {
-                              showNotification('Lỗi khi cập nhật vé.', 'error');
-                              console.error('Firebase Error', err);
-                        });
-            };
-             
-            window.openTab = function(evt, tabName) {
-                  let tabContent = document.getElementsByClassName("tab-content");
-                  for (let i = 0; i < tabContent.length; i++) {
-                        tabContent[i].style.display = "none";
-                  }
-                  let tabButtons = document.getElementsByClassName("tab-button");
-                  for (let i = 0; i < tabButtons.length; i++) {
-                        tabButtons[i].className = tabButtons[i].className.replace(" active", "");
-                  }
-                  document.getElementById(tabName).style.display = "block";
-                  evt.currentTarget.className += " active";
-            };
-
-          window.showStatistics = function () {
-    let totalRevenue = 0;
-    let totalTicketsRevenue = 0;
-    let dailyRevenue = 0;
-    let dailyTickets = 0;
-    let weeklyRevenue = 0;
-    let weeklyTickets = 0;
-    let monthlyRevenue = 0;
-    let monthlyTickets = 0;
-
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1)).getTime();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-
-    // Chuẩn bị dữ liệu biểu đồ
-    const dailyData = {};
-    const weeklyData = {};
-    const monthlyData = {};
-
-    // Khởi tạo 30 ngày gần nhất
-    for (let d = 0; d < 30; d++) {
-        const date = new Date();
-        date.setDate(now.getDate() - 29 + d);
-        dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
-    }
-
-    // Khởi tạo 4 tuần gần nhất
-    for (let w = 0; w < 4; w++) {
-        const startDate = new Date();
-        startDate.setDate(now.getDate() - ((3 - w) * 7));
-        const endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6);
-        const startFormatted = `${startDate.getDate()}/${startDate.getMonth() + 1}`;
-        const endFormatted = `${endDate.getDate()}/${endDate.getMonth() + 1}`;
-        weeklyData[`Tuần ${w + 1} (${startFormatted} - ${endFormatted})`] = { revenue: 0, tickets: 0 };
-    }
-
-    // Khởi tạo 12 tháng gần nhất
-    for (let m = 0; m < 12; m++) {
-        const date = new Date();
-        date.setMonth(now.getMonth() - (11 - m));
-        monthlyData[`Tháng ${date.getMonth() + 1}/${date.getFullYear()}`] = { revenue: 0, tickets: 0 };
-    }
-
-    // Lặp qua tất cả vé để thống kê
-    for (const ticketId in allTickets) {
-        const ticket = allTickets[ticketId];
-        if (ticket.status === 'paid' && ticket.totalPrice && ticket.ticketNumber) {
-            const ticketPrice = ticket.totalPrice;
-            const ticketNumber = ticket.ticketNumber;
-            const createdAt = new Date(ticket.createdAt).getTime();
-            const ticketDate = new Date(createdAt);
-
-            totalRevenue += ticketPrice;
-            totalTicketsRevenue += ticketNumber;
-
-            // Thống kê ngày, tuần, tháng
-            if (createdAt >= startOfDay) {
-                dailyRevenue += ticketPrice;
-                dailyTickets += ticketNumber;
-            }
-            if (createdAt >= startOfWeek) {
-                weeklyRevenue += ticketPrice;
-                weeklyTickets += ticketNumber;
-            }
-            if (createdAt >= startOfMonth) {
-                monthlyRevenue += ticketPrice;
-                monthlyTickets += ticketNumber;
-            }
-
-            // Dữ liệu cho biểu đồ ngày
-            const dailyKey = ticketDate.toLocaleDateString('vi-VN');
-            if (dailyData[dailyKey]) {
-                dailyData[dailyKey].revenue += ticketPrice;
-                dailyData[dailyKey].tickets += ticketNumber;
-            }
-
-            // Dữ liệu cho biểu đồ tuần
-            const weeklyKey = Object.keys(weeklyData).find(key => {
-                const weekDates = key.match(/\(([^)]+)\)/)[1].split(' - ');
-                const startWeekDate = new Date(`${weekDates[0].split('/')[1]}/${weekDates[0].split('/')[0]}/${ticketDate.getFullYear()}`);
-                const endWeekDate = new Date(`${weekDates[1].split('/')[1]}/${weekDates[1].split('/')[0]}/${ticketDate.getFullYear()}`);
-                endWeekDate.setHours(23, 59, 59, 999); // Set to end of day
-                return ticketDate >= startWeekDate && ticketDate <= endWeekDate;
-            });
-            if (weeklyKey) {
-                weeklyData[weeklyKey].revenue += ticketPrice;
-                weeklyData[weeklyKey].tickets += ticketNumber;
-            }
-
-            // Dữ liệu cho biểu đồ tháng
-            const monthlyKey = `Tháng ${ticketDate.getMonth() + 1}/${ticketDate.getFullYear()}`;
-            if (monthlyData[monthlyKey]) {
-                monthlyData[monthlyKey].revenue += ticketPrice;
-                monthlyData[monthlyKey].tickets += ticketNumber;
+            .notification {
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
             }
         }
-    }
 
-    // Cập nhật HTML
-    document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
-    document.getElementById('totalRevenueTickets').textContent = `${totalTicketsRevenue} vé`;
-    document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
-    document.getElementById('dailyTickets').textContent = `${dailyTickets} vé`;
-    document.getElementById('weeklyRevenue').textContent = formatCurrency(weeklyRevenue);
-    document.getElementById('weeklyTickets').textContent = `${weeklyTickets} vé`;
-    document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
-    document.getElementById('monthlyTickets').textContent = `${monthlyTickets} vé`;
+        #adminPanel {
+            display: none;
+        }
+        .auth-container input {
+            padding: 12px;
+            margin: 8px 0;
+            width: calc(100% - 24px);
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .auth-button {
+            width: 100%;
+            margin-top: 15px;
+        }
 
-    // Vẽ biểu đồ
-    renderDailyChart(dailyData);
-    renderWeeklyChart(weeklyData);
-    renderMonthlyChart(monthlyData);
+        /* New styles for date picker section */
+        .date-picker-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        .date-picker-section h3 {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+        .date-picker-section input[type="date"] {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            transition: border-color 0.3s;
+        }
+        .date-picker-section input[type="date"]:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+        #selectedDateStats {
+            margin-top: 20px;
+            font-size: 1.1em;
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid var(--secondary-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            animation: slideInUp 0.5s ease-out;
+        }
+        #selectedDateStats p {
+            margin: 5px 0;
+            display: block;
+        }
+        #selectedDateStats strong {
+            color: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="authSection">
+            <h2>Đăng nhập Admin</h2>
+            <div class="auth-container">
+                <input type="email" id="email" placeholder="Email">
+                <input type="password" id="password" placeholder="Mật khẩu">
+                <button class="auth-button" onclick="login()">Đăng nhập</button>
+            </div>
+        </div>
 
-    statsModal.style.display = 'block';
-};
+        <div id="adminPanel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h1>Quản lý Vé Khách Hàng</h1>
+                <div style="display: flex; gap: 10px;">
+                    <button class="statistic-button" onclick="showStatistics()">Thống kê Doanh thu</button>
+                    <button class="auth-button" onclick="logout()">Đăng xuất</button>
+                </div>
+            </div>
+            
+            <div class="search-box">
+                <label for="phoneInput">Nhập SĐT:</label>
+                <input type="tel" id="phoneInput" placeholder="Ví dụ: 0912345678">
+            </div>
 
-            function renderDailyChart(data) {
-                  const chartElement = document.getElementById('dailyChart');
-                  const labels = Object.keys(data);
-                  const revenues = Object.values(data).map(d => d.revenue);
-                  const tickets = Object.values(data).map(d => d.tickets);
+            <div class="ticket-summary">
+                Tổng số vé: <span id="totalTickets">0</span>
+            </div>
 
-                  const options = {
-                        series: [{
-                              name: 'Doanh thu',
-                              type: 'line',
-                              data: revenues
-                        }, {
-                              name: 'Số vé',
-                              type: 'bar',
-                              data: tickets
-                        }],
-                        chart: {
-                              height: 350,
-                              type: 'line',
-                              stacked: false,
-                              animations: { enabled: true, easing: 'easeinout' }
-                        },
-                        stroke: { width: [4, 2] },
-                        title: { text: 'Doanh thu và Số vé (30 ngày gần nhất)', align: 'left' },
-                        dataLabels: { enabled: false },
-                        xaxis: {
-                              categories: labels,
-                              tooltip: { enabled: false }
-                        },
-                        yaxis: [{
-                              axisTicks: { show: true },
-                              axisBorder: { show: true, color: '#008FFB' },
-                              labels: { style: { colors: '#008FFB' }, formatter: (value) => formatCurrency(value) },
-                              title: { text: "Doanh thu", style: { color: '#008FFB' } },
-                        }, {
-                              axisTicks: { show: true },
-                              axisBorder: { show: true, color: '#FF4560' },
-                              labels: { style: { colors: '#FF4560' } },
-                              title: { text: "Số vé", style: { color: '#FF4560' } },
-                              opposite: true,
-                        }],
-                        tooltip: {
-                              shared: true,
-                              intersect: false,
-                              y: {
-                                    formatter: function (y, { seriesIndex }) {
-                                          if (seriesIndex === 0) return formatCurrency(y);
-                                          return y + " vé";
-                                    }
-                              }
-                        },
-                        responsive: [{
-                              breakpoint: 600,
-                              options: {
-                                    chart: { toolbar: { show: false } },
-                                    legend: { show: false }
-                              }
-                        }]
-                  };
+            <ul id="ticketList"></ul>
+            <p id="no-tickets-message" style="display: none;">Không tìm thấy vé đã thanh toán cho SĐT này.</p>
+        </div>
+    </div>
 
-                  if (dailyChart) dailyChart.destroy();
-                  dailyChart = new ApexCharts(chartElement, options);
-                  dailyChart.render();
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>Thống kê & Lịch sử</h2>
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="openTab(event, 'summary')">Tổng quan</button>
+                <button class="tab-button" onclick="openTab(event, 'daily')">Biểu đồ Ngày</button>
+                <button class="tab-button" onclick="openTab(event, 'history')">Lịch sử Vé</button>
+                <button class="tab-button" onclick="openTab(event, 'deductionHistory')">Lịch sử Áp dụng</button>
+            </div>
+            
+            <div id="summary" class="tab-content active">
+                <div class="stats">
+                    <p>Tổng doanh thu: <strong id="totalRevenue">0 VND</strong></p>
+                    <p>Tổng số vé: <strong id="totalRevenueTickets">0 vé</strong></p>
+                    <p>Doanh thu hôm nay: <strong id="dailyRevenue">0 VND</strong> - Số vé: <strong id="dailyTickets">0 vé</strong></p>
+                    <p>Doanh thu tháng này: <strong id="monthlyRevenue">0 VND</strong> - Số vé: <strong id="monthlyTickets">0 vé</strong></p>
+                </div>
+                <div class="date-picker-section">
+                    <h3>Xem doanh thu theo ngày</h3>
+                    <input type="date" id="selectedDateInput">
+                    <button onclick="showSelectedDayStatistics()">Xem Doanh thu</button>
+                    <div id="selectedDateStats" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+            <div id="daily" class="tab-content">
+                <div class="chart-container">
+                    <div id="dailyChart"></div>
+                </div>
+            </div>
+            <div id="history" class="tab-content">
+                <h3>Lịch sử mua vé đã thanh toán</h3>
+                <div class="history-search-box">
+                    <input type="text" id="historySearchInput" placeholder="Tìm kiếm theo tên hoặc SĐT...">
+                </div>
+                <ul id="historyList"></ul>
+            </div>
+            <div id="deductionHistory" class="tab-content">
+                <h3>Lịch sử áp dụng vé</h3>
+                <ul id="deductionHistoryList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
+            authDomain: "muveonline-919a8.firebaseapp.com",
+            databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
+            projectId: "muveonline-919a8",
+            storageBucket: "muveonline-919a8.appspot.com",
+            messagingSenderId: "399933853156",
+            appId: "1:399933853156:web:982c1da02117606a994bf1"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+        const ticketsRef = db.ref('tickets');
+        const TICKET_PRICE = 65000;
+
+        const authSection = document.getElementById('authSection');
+        const adminPanel = document.getElementById('adminPanel');
+        const phoneInput = document.getElementById('phoneInput');
+        const ticketList = document.getElementById('ticketList');
+        const totalTicketsSpan = document.getElementById('totalTickets');
+        const noTicketsMessage = document.getElementById('no-tickets-message');
+        const notificationElement = document.getElementById('notification');
+        const statsModal = document.getElementById('statsModal');
+        const historyList = document.getElementById('historyList');
+        const historySearchInput = document.getElementById('historySearchInput');
+        const deductionHistoryList = document.getElementById('deductionHistoryList');
+        const selectedDateInput = document.getElementById('selectedDateInput');
+        const selectedDateStatsDiv = document.getElementById('selectedDateStats');
+
+        let dailyChart = null;
+        
+        let allTickets = {};
+        let paidTicketsHistory = [];
+        let allDeductionHistory = [];
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        function showNotification(message, type) {
+            notificationElement.textContent = message;
+            notificationElement.className = `notification show ${type}`;
+            setTimeout(() => {
+                notificationElement.className = `notification hide ${type}`;
+            }, 3000);
+            setTimeout(() => {
+                notificationElement.className = 'notification';
+            }, 3500);
+        }
+
+        async function checkAdmin(uid) {
+            const snapshot = await db.ref("admins/" + uid).once('value');
+            return snapshot.exists();
+        }
+
+        window.login = function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    showNotification('Đăng nhập thành công!', 'success');
+                })
+                .catch(err => {
+                    showNotification('Lỗi đăng nhập: ' + err.message, 'error');
+                });
+        };
+
+        window.logout = function() {
+            auth.signOut().then(() => {
+                showNotification('Đã đăng xuất.', 'success');
+            }).catch(err => {
+                showNotification('Lỗi đăng xuất: ' + err.message, 'error');
+            });
+        };
+
+        function filterTickets() {
+            const searchTerm = phoneInput.value.trim();
+            const filteredTickets = [];
+            let totalTicketCount = 0;
+
+            if (searchTerm.length > 0) {
+                for (const ticketId in allTickets) {
+                    const ticket = allTickets[ticketId];
+                    if (ticket.phone && ticket.phone.includes(searchTerm) && ticket.status === 'paid') {
+                        filteredTickets.push({ id: ticketId, ...ticket });
+                        totalTicketCount += (ticket.ticketNumber || 0);
+                    }
+                }
             }
 
-            function renderWeeklyChart(data) {
-                  const chartElement = document.getElementById('weeklyChart');
-                  const labels = Object.keys(data);
-                  const revenues = Object.values(data).map(d => d.revenue);
-                  const tickets = Object.values(data).map(d => d.tickets);
+            displayTickets(filteredTickets);
+            totalTicketsSpan.textContent = totalTicketCount;
+        }
 
-                  const options = {
-                        series: [{
-                              name: 'Doanh thu',
-                              data: revenues
-                        }, {
-                              name: 'Số vé',
-                              data: tickets
-                        }],
-                        chart: {
-                              type: 'bar',
-                              height: 350,
-                              stacked: true,
-                              toolbar: { show: false }
-                        },
-                        plotOptions: { bar: { horizontal: false, columnWidth: '55%' } },
-                        dataLabels: { enabled: false },
-                        stroke: { show: true, width: 2, colors: ['transparent'] },
-                        xaxis: { categories: labels },
-                        yaxis: [{
-                              title: { text: 'Doanh thu', style: { color: '#008FFB' } },
-                              labels: { formatter: (value) => formatCurrency(value) }
-                        }, {
-                              title: { text: 'Số vé', style: { color: '#FF4560' } },
-                              opposite: true
-                        }],
-                        fill: { opacity: 1 },
-                        tooltip: {
-                              y: {
-                                    formatter: function (val, { seriesIndex }) {
-                                          if (seriesIndex === 0) return formatCurrency(val);
-                                          return val + " vé";
-                                    }
-                              }
-                        }
-                  };
+        function displayTickets(tickets) {
+            ticketList.innerHTML = '';
+            if (tickets.length === 0) {
+                noTicketsMessage.style.display = 'block';
+            } else {
+                noTicketsMessage.style.display = 'none';
+                tickets.forEach(ticket => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="ticket-info">
+                            <strong>Tên:</strong> ${ticket.name} | <strong>Số vé:</strong> ${ticket.ticketNumber || 0}
+                        </div>
+                        <div class="update-section">
+                            <input type="number" id="tn-${ticket.id}" value="" placeholder="Số vé trừ">
+                            <button onclick="updateTicket('${ticket.id}')">Áp dụng</button>
+                        </div>
+                    `;
+                    ticketList.appendChild(li);
+                });
+            }
+        }
 
-                  if (weeklyChart) weeklyChart.destroy();
-                  weeklyChart = new ApexCharts(chartElement, options);
-                  weeklyChart.render();
+        window.updateTicket = function(ticketId) {
+            const input = document.getElementById('tn-' + ticketId);
+            const numToDeduct = parseInt(input.value);
+
+            if (isNaN(numToDeduct) || numToDeduct <= 0) {
+                showNotification('Vui lòng nhập một số dương để trừ vé.', 'error');
+                return;
             }
 
-            function renderMonthlyChart(data) {
-                  const chartElement = document.getElementById('monthlyChart');
-                  const labels = Object.keys(data);
-                  const revenues = Object.values(data).map(d => d.revenue);
-                  const tickets = Object.values(data).map(d => d.tickets);
-
-                  const options = {
-                        series: [{
-                              name: 'Doanh thu',
-                              data: revenues
-                        }, {
-                              name: 'Số vé',
-                              data: tickets
-                        }],
-                        chart: {
-                              type: 'bar',
-                              height: 350,
-                              toolbar: { show: false }
-                        },
-                        plotOptions: { bar: { horizontal: false, columnWidth: '55%' } },
-                        dataLabels: { enabled: false },
-                        stroke: { show: true, width: 2, colors: ['transparent'] },
-                        xaxis: { categories: labels },
-                        yaxis: [{
-                              title: { text: 'Doanh thu', style: { color: '#008FFB' } },
-                              labels: { formatter: (value) => formatCurrency(value) }
-                        }, {
-                              title: { text: 'Số vé', style: { color: '#FF4560' } },
-                              opposite: true
-                        }],
-                        fill: { opacity: 1 },
-                        tooltip: {
-                              y: {
-                                    formatter: function (val, { seriesIndex }) {
-                                          if (seriesIndex === 0) return formatCurrency(val);
-                                          return val + " vé";
-                                    }
-                              }
-                        }
-                  };
-
-                  if (monthlyChart) monthlyChart.destroy();
-                  monthlyChart = new ApexCharts(chartElement, options);
-                  monthlyChart.render();
+            const currentTicket = allTickets[ticketId];
+            if (!currentTicket) {
+                showNotification('Không tìm thấy vé.', 'error');
+                return;
             }
 
-            window.closeModal = function() {
-                  statsModal.style.display = 'none';
+            const currentNumber = currentTicket.ticketNumber || 0;
+            if (numToDeduct > currentNumber) {
+                showNotification('Số vé trừ không được lớn hơn số vé hiện có.', 'error');
+                return;
+            }
+
+            const newNumber = currentNumber - numToDeduct;
+            const newHistoryEntry = {
+                timestamp: new Date().toISOString(),
+                deductedAmount: numToDeduct,
+                deductedBy: auth.currentUser.uid
             };
 
-            auth.onAuthStateChanged(async (user) => {
-                  if (user) {
-                        const isAdmin = await checkAdmin(user.uid);
-                        if (isAdmin) {
-                              authSection.style.display = 'none';
-                              adminPanel.style.display = 'block';
-                              ticketsRef.on('value', snapshot => {
-                                    allTickets = snapshot.val() || {};
-                                    filterTickets();
-                              });
-                              phoneInput.addEventListener('input', filterTickets);
-                        } else {
-                              showNotification('Bạn không có quyền truy cập admin.', 'error');
-                              auth.signOut();
-                              authSection.style.display = 'block';
-                              adminPanel.style.display = 'none';
+            const updates = {};
+            updates['/tickets/' + ticketId + '/ticketNumber'] = newNumber;
+            updates['/tickets/' + ticketId + '/deductionHistory/' + new Date().getTime()] = newHistoryEntry;
+            
+            db.ref().update(updates)
+                .then(() => {
+                    showNotification('Cập nhật thành công! Số vé mới: ' + newNumber, 'success');
+                    input.value = '';
+                })
+                .catch(err => {
+                    showNotification('Lỗi khi cập nhật vé.', 'error');
+                    console.error('Firebase Error', err);
+                });
+        };
+        
+        window.openTab = function(evt, tabName) {
+            let tabContent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContent.length; i++) {
+                tabContent[i].style.display = "none";
+            }
+            let tabButtons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].className = tabButtons[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+
+            if (tabName === 'history') {
+                historySearchInput.value = '';
+                renderHistory(paidTicketsHistory);
+            } else if (tabName === 'deductionHistory') {
+                renderDeductionHistory(allDeductionHistory);
+            } else if (tabName === 'daily') {
+                 // Re-render the daily chart when its tab is opened
+                const now = new Date();
+                const dailyData = {};
+                for (let d = 0; d < 30; d++) {
+                    const date = new Date();
+                    date.setDate(now.getDate() - 29 + d);
+                    dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
+                }
+                 for (const ticketId in allTickets) {
+                    const ticket = allTickets[ticketId];
+                    if (ticket.status === 'paid' && ticket.totalPrice && ticket.receivedAt) {
+                        const createdAt = new Date(ticket.receivedAt);
+                        const dailyKey = createdAt.toLocaleDateString('vi-VN');
+                        if (dailyData[dailyKey]) {
+                            dailyData[dailyKey].revenue += ticket.totalPrice || 0;
+                            dailyData[dailyKey].tickets += ticket.ticketNumber || 0;
                         }
-                  } else {
-                        authSection.style.display = 'block';
-                        adminPanel.style.display = 'none';
-                  }
+                    }
+                }
+                renderDailyChart(dailyData);
+            }
+        };
+
+        function renderHistory(tickets) {
+            historyList.innerHTML = '';
+            if (tickets.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #888;">Không có giao dịch đã thanh toán nào.</p>';
+                return;
+            }
+
+            tickets.sort((a, b) => {
+                const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                return timeB - timeA;
             });
 
-      </script>
+            tickets.forEach(ticket => {
+                const li = document.createElement('li');
+                const date = new Date(ticket.createdAt);
+                const formattedDate = `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN')}`;
+                li.innerHTML = `
+                    <div class="history-info">
+                        <strong>${ticket.name}</strong> - SĐT: ${ticket.phone}<br>
+                        ${ticket.ticketNumber} vé | Tổng tiền: ${formatCurrency(ticket.totalPrice)}
+                    </div>
+                    <div class="history-date">${formattedDate}</div>
+                `;
+                historyList.appendChild(li);
+            });
+        }
+        
+        function renderDeductionHistory(history) {
+            deductionHistoryList.innerHTML = '';
+            if (history.length === 0) {
+                deductionHistoryList.innerHTML = '<p style="text-align: center; color: #888;">Không có lịch sử áp dụng vé nào.</p>';
+                return;
+            }
+            
+            // Sort by most recent timestamp
+            history.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+
+            history.forEach(entry => {
+                const li = document.createElement('li');
+                const date = new Date(entry.timestamp);
+                const formattedDate = `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN')}`;
+                li.innerHTML = `
+                    <div class="history-info">
+                        <strong>${entry.name}</strong> - SĐT: ${entry.phone}<br>
+                        Đã áp dụng **${entry.deductedAmount}** vé.
+                    </div>
+                    <div class="history-date">
+                        ${formattedDate}<br>
+                        <span style="font-style: italic;">Nhân viên: ${entry.deductedBy}</span>
+                    </div>
+                `;
+                deductionHistoryList.appendChild(li);
+            });
+        }
+
+        function filterHistoryTickets() {
+            const searchTerm = historySearchInput.value.toLowerCase().trim();
+            const filtered = paidTicketsHistory.filter(ticket => {
+                const name = ticket.name ? ticket.name.toLowerCase() : '';
+                const phone = ticket.phone ? ticket.phone.toLowerCase() : '';
+                return name.includes(searchTerm) || phone.includes(searchTerm);
+            });
+            renderHistory(filtered);
+        }
+
+        window.showStatistics = function () {
+            let totalRevenue = 0;
+            let totalRevenueTickets = 0;
+            let dailyRevenue = 0;
+            let dailyTickets = 0;
+            let monthlyRevenue = 0;
+            let monthlyTickets = 0;
+
+            paidTicketsHistory = [];
+            allDeductionHistory = [];
+
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+
+            const dailyData = {};
+            for (let d = 0; d < 30; d++) {
+                const date = new Date();
+                date.setDate(now.getDate() - 29 + d);
+                dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
+            }
+
+            for (const ticketId in allTickets) {
+                const ticket = allTickets[ticketId];
+                if (ticket.status === 'paid') {
+                    const price = ticket.totalPrice || 0;
+                    const ticketNumber = ticket.ticketNumber || 0;
+                    const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
+
+                    paidTicketsHistory.push(ticket);
+                    totalRevenue += price;
+                    totalRevenueTickets += ticketNumber;
+
+                    if (ticketDate) {
+                        if (ticketDate.toDateString() === now.toDateString()) {
+                            dailyRevenue += price;
+                            dailyTickets += ticketNumber;
+                        }
+                        if (ticketDate >= startOfMonth) {
+                            monthlyRevenue += price;
+                            monthlyTickets += ticketNumber;
+                        }
+                        const dateKey = ticketDate.toLocaleDateString('vi-VN');
+                        if (dailyData[dateKey]) {
+                            dailyData[dateKey].revenue += price;
+                            dailyData[dateKey].tickets += ticketNumber;
+                        }
+                    }
+                }
+
+                if (ticket.deductionHistory) {
+                    for (const key in ticket.deductionHistory) {
+                        const entry = ticket.deductionHistory[key];
+                        allDeductionHistory.push({
+                            ...entry,
+                            name: ticket.name,
+                            phone: ticket.phone
+                        });
+                    }
+                }
+            }
+
+            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+            document.getElementById('totalRevenueTickets').textContent = totalRevenueTickets + ' vé';
+            document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
+            document.getElementById('dailyTickets').textContent = dailyTickets + ' vé';
+            document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
+            document.getElementById('monthlyTickets').textContent = monthlyTickets + ' vé';
+            
+            // Clear selected date stats on initial open
+            selectedDateInput.value = '';
+            selectedDateStatsDiv.innerHTML = '';
+
+            renderDailyChart(dailyData);
+            renderHistory(paidTicketsHistory);
+            renderDeductionHistory(allDeductionHistory);
+
+            statsModal.style.display = 'block';
+        };
+
+        window.showSelectedDayStatistics = function() {
+            const selectedDateValue = selectedDateInput.value;
+            if (!selectedDateValue) {
+                showNotification('Vui lòng chọn một ngày.', 'error');
+                return;
+            }
+
+            let selectedDayRevenue = 0;
+            let selectedDayTickets = 0;
+            const selectedDate = new Date(selectedDateValue);
+
+            for (const ticketId in allTickets) {
+                const ticket = allTickets[ticketId];
+                if (ticket.status === 'paid') {
+                    const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
+                    if (ticketDate && ticketDate.toDateString() === selectedDate.toDateString()) {
+                        selectedDayRevenue += ticket.totalPrice || 0;
+                        selectedDayTickets += ticket.ticketNumber || 0;
+                    }
+                }
+            }
+            
+            selectedDateStatsDiv.innerHTML = `
+                <p>Doanh thu ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${formatCurrency(selectedDayRevenue)}</strong></p>
+                <p>Số vé ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${selectedDayTickets} vé</strong></p>
+            `;
+        };
+
+        function renderDailyChart(data) {
+            const chartElement = document.getElementById('dailyChart');
+            const labels = Object.keys(data);
+            const revenues = Object.values(data).map(d => d.revenue);
+            const tickets = Object.values(data).map(d => d.tickets);
+
+            const options = {
+                series: [{
+                    name: 'Doanh thu',
+                    type: 'bar',
+                    data: revenues,
+                    yAxisID: 'revenue'
+                }, {
+                    name: 'Số vé',
+                    type: 'bar',
+                    data: tickets,
+                    yAxisID: 'tickets'
+                }],
+                chart: {
+                    height: 350,
+                    type: 'bar',
+                    stacked: false,
+                    animations: { enabled: true, easing: 'easeinout' }
+                },
+                title: { text: 'Doanh thu và Số vé (30 ngày gần nhất)', align: 'left' },
+                dataLabels: { enabled: false },
+                xaxis: {
+                    categories: labels,
+                    tooltip: { enabled: false }
+                },
+                yaxis: [{
+                    axisTicks: { show: true },
+                    axisBorder: { show: true, color: '#008FFB' },
+                    labels: { style: { colors: '#008FFB' }, formatter: (value) => formatCurrency(value) },
+                    title: { text: "Doanh thu", style: { color: '#008FFB' } },
+                    id: 'revenue'
+                }, {
+                    axisTicks: { show: true },
+                    axisBorder: { show: true, color: '#FF4560' },
+                    labels: { style: { colors: '#FF4560' } },
+                    title: { text: "Số vé", style: { color: '#FF4560' } },
+                    opposite: true,
+                    id: 'tickets'
+                }],
+                tooltip: {
+                    shared: true,
+                    intersect: false,
+                    y: {
+                        formatter: function (y, { seriesIndex }) {
+                            if (seriesIndex === 0) return formatCurrency(y);
+                            return y + " vé";
+                        }
+                    }
+                },
+                responsive: [{
+                    breakpoint: 600,
+                    options: {
+                        chart: { toolbar: { show: false } },
+                        legend: { show: false }
+                    }
+                }]
+            };
+
+            if (dailyChart) dailyChart.destroy();
+            dailyChart = new ApexCharts(chartElement, options);
+            dailyChart.render();
+        }
+
+        window.closeModal = function() {
+            statsModal.style.display = 'none';
+        };
+
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const isAdmin = await checkAdmin(user.uid);
+                if (isAdmin) {
+                    authSection.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    ticketsRef.on('value', snapshot => {
+                        allTickets = snapshot.val() || {};
+                        filterTickets();
+                    });
+                    phoneInput.addEventListener('input', filterTickets);
+                    historySearchInput.addEventListener('input', filterHistoryTickets);
+                } else {
+                    showNotification('Bạn không có quyền truy cập admin.', 'error');
+                    auth.signOut();
+                    authSection.style.display = 'block';
+                    adminPanel.style.display = 'none';
+                }
+            } else {
+                authSection.style.display = 'block';
+                adminPanel.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
