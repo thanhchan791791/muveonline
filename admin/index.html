@@ -47,10 +47,14 @@
             animation: fadeIn 0.8s ease-out;
         }
 
-        h1, h2 {
+        h1, h2, h3 {
             text-align: center;
             margin-bottom: 25px;
             color: var(--primary-dark);
+        }
+        
+        h3 {
+            color: var(--text-color);
         }
 
         .auth-container, .search-box {
@@ -430,7 +434,7 @@
             outline: none;
             border-color: var(--secondary-color);
         }
-        #selectedDateStats {
+        #selectedDateStats, #deductionDateStats {
             margin-top: 20px;
             font-size: 1.1em;
             background-color: #e3f2fd;
@@ -440,11 +444,11 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             animation: slideInUp 0.5s ease-out;
         }
-        #selectedDateStats p {
+        #selectedDateStats p, #deductionDateStats p {
             margin: 5px 0;
             display: block;
         }
-        #selectedDateStats strong {
+        #selectedDateStats strong, #deductionDateStats strong {
             color: var(--primary-dark);
         }
     </style>
@@ -497,7 +501,7 @@
             <div id="summary" class="tab-content active">
                 <div class="stats">
                     <p>Tổng doanh thu: <strong id="totalRevenue">0 VND</strong></p>
-                    <p>Tổng số vé: <strong id="totalRevenueTickets">0 vé</strong></p>
+                    <p>Tổng số vé đã bán: <strong id="totalRevenueTickets">0 vé</strong></p>
                     <p>Doanh thu hôm nay: <strong id="dailyRevenue">0 VND</strong> - Số vé: <strong id="dailyTickets">0 vé</strong></p>
                     <p>Doanh thu tuần này: <strong id="weeklyRevenue">0 VND</strong> - Số vé: <strong id="weeklyTickets">0 vé</strong></p>
                     <p>Doanh thu tháng này: <strong id="monthlyRevenue">0 VND</strong> - Số vé: <strong id="monthlyTickets">0 vé</strong></p>
@@ -505,7 +509,7 @@
                 <div class="date-picker-section">
                     <h3>Xem doanh thu theo ngày</h3>
                     <input type="date" id="selectedDateInput">
-                    <button onclick="showSelectedDayStatistics()">Xem Doanh thu</button>
+                    <button class="statistic-button" style="margin-left: 10px;" onclick="showSelectedDayStatistics()">Xem</button>
                     <div id="selectedDateStats" style="margin-top: 10px;"></div>
                 </div>
             </div>
@@ -524,12 +528,17 @@
             <div id="deductionHistory" class="tab-content">
                 <h3>Lịch sử áp dụng vé</h3>
                 <ul id="deductionHistoryList"></ul>
+                <div class="date-picker-section">
+                    <h3>Thống kê vé áp dụng theo ngày</h3>
+                    <input type="date" id="deductionDateInput">
+                    <div id="deductionDateStats" style="margin-top: 10px;"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="notification" class="notification"></div>
-
+    
     <script>
         // Firebase config
         const firebaseConfig = {
@@ -561,6 +570,10 @@
         const deductionHistoryList = document.getElementById('deductionHistoryList');
         const selectedDateInput = document.getElementById('selectedDateInput');
         const selectedDateStatsDiv = document.getElementById('selectedDateStats');
+        
+        // New elements for deduction history stats
+        const deductionDateInput = document.getElementById('deductionDateInput');
+        const deductionDateStatsDiv = document.getElementById('deductionDateStats');
 
         let dailyChart = null;
         
@@ -674,7 +687,7 @@
             const newHistoryEntry = {
                 timestamp: new Date().toISOString(),
                 deductedAmount: numToDeduct,
-                deductedBy: auth.currentUser.uid
+                deductedBy: auth.currentUser.uid // You might want to store admin name/email here
             };
 
             const updates = {};
@@ -708,6 +721,9 @@
                 historySearchInput.value = '';
                 renderHistory(paidTicketsHistory);
             } else if (tabName === 'deductionHistory') {
+                // Reset deduction stats when tab is opened
+                deductionDateInput.value = '';
+                deductionDateStatsDiv.innerHTML = '';
                 renderDeductionHistory(allDeductionHistory);
             } else if (tabName === 'daily') {
                  // Re-render the daily chart when its tab is opened
@@ -720,8 +736,8 @@
                 }
                  for (const ticketId in allTickets) {
                     const ticket = allTickets[ticketId];
-                    if (ticket.status === 'paid' && ticket.totalPrice && ticket.receivedAt) {
-                        const createdAt = new Date(ticket.receivedAt);
+                    if (ticket.status === 'paid' && ticket.totalPrice && ticket.createdAt) {
+                        const createdAt = new Date(ticket.createdAt);
                         const dailyKey = createdAt.toLocaleDateString('vi-VN');
                         if (dailyData[dailyKey]) {
                             dailyData[dailyKey].revenue += ticket.totalPrice || 0;
@@ -775,14 +791,16 @@
                 const li = document.createElement('li');
                 const date = new Date(entry.timestamp);
                 const formattedDate = `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN')}`;
+                // This is a placeholder for admin name, you should implement a way to get the actual name
+                const adminName = "Admin"; 
                 li.innerHTML = `
                     <div class="history-info">
                         <strong>${entry.name}</strong> - SĐT: ${entry.phone}<br>
-                        Đã áp dụng **${entry.deductedAmount}** vé.
+                        Đã áp dụng <strong>${entry.deductedAmount}</strong> vé.
                     </div>
                     <div class="history-date">
                         ${formattedDate}<br>
-                        <span style="font-style: italic;">Nhân viên: Bích Vân </span>
+                        <span style="font-style: italic;">Bởi: ${adminName}</span>
                     </div>
                 `;
                 deductionHistoryList.appendChild(li);
@@ -799,101 +817,99 @@
             renderHistory(filtered);
         }
 
-       window.showStatistics = function () {
-    let totalRevenue = 0;
-    let totalRevenueTickets = 0;
-    let dailyRevenue = 0;
-    let dailyTickets = 0;
-    let monthlyRevenue = 0;
-    let monthlyTickets = 0;
-    let weeklyRevenue = 0;
-    let weeklyTickets = 0;
+        window.showStatistics = function () {
+            let totalRevenue = 0;
+            let totalRevenueTickets = 0;
+            let dailyRevenue = 0;
+            let dailyTickets = 0;
+            let monthlyRevenue = 0;
+            let monthlyTickets = 0;
+            let weeklyRevenue = 0;
+            let weeklyTickets = 0;
 
-    paidTicketsHistory = [];
-    allDeductionHistory = [];
+            paidTicketsHistory = [];
+            allDeductionHistory = [];
 
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    startOfMonth.setHours(0, 0, 0, 0);
+            const now = new Date();
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    // Calculate the start of the current week (Monday)
-    const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
-    const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust for Monday start
-    const startOfWeek = new Date(now.setDate(diff));
-    startOfWeek.setHours(0, 0, 0, 0);
+            const dayOfWeek = now.getDay();
+            const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); 
+            const startOfWeek = new Date(now.getFullYear(), now.getMonth(), diff);
+            
+            const dailyData = {};
+            for (let d = 0; d < 30; d++) {
+                const date = new Date();
+                date.setDate(now.getDate() - 29 + d);
+                dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
+            }
 
-    const dailyData = {};
-    for (let d = 0; d < 30; d++) {
-        const date = new Date();
-        date.setDate(now.getDate() - 29 + d);
-        dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
-    }
+            for (const ticketId in allTickets) {
+                const ticket = allTickets[ticketId];
+                if (ticket.status === 'paid' && ticket.totalPrice > 0) {
+                    const price = ticket.totalPrice || 0;
+                    const ticketNumber = ticket.ticketNumber || 0;
+                    const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
+                    
+                    paidTicketsHistory.push({id: ticketId, ...ticket});
+                    totalRevenue += price;
+                    totalRevenueTickets += ticketNumber;
 
-    for (const ticketId in allTickets) {
-        const ticket = allTickets[ticketId];
-        if (ticket.status === 'paid') {
-            const price = ticket.totalPrice || 0;
-            const ticketNumber = ticket.ticketNumber || 0;
-            const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
-
-            paidTicketsHistory.push(ticket);
-            totalRevenue += price;
-            totalRevenueTickets += ticketNumber;
-
-            if (ticketDate) {
-                // Check if the ticket is from today
-                if (ticketDate.toDateString() === now.toDateString()) {
-                    dailyRevenue += price;
-                    dailyTickets += ticketNumber;
+                    if (ticketDate) {
+                        if (ticketDate >= startOfDay) {
+                            dailyRevenue += price;
+                            dailyTickets += ticketNumber;
+                        }
+                        if (ticketDate >= startOfMonth) {
+                            monthlyRevenue += price;
+                            monthlyTickets += ticketNumber;
+                        }
+                        if (ticketDate >= startOfWeek) {
+                            weeklyRevenue += price;
+                            weeklyTickets += ticketNumber;
+                        }
+                        const dateKey = ticketDate.toLocaleDateString('vi-VN');
+                        if (dailyData[dateKey]) {
+                            dailyData[dateKey].revenue += price;
+                            dailyData[dateKey].tickets += ticketNumber;
+                        }
+                    }
                 }
-                // Check if the ticket is from this month
-                if (ticketDate >= startOfMonth) {
-                    monthlyRevenue += price;
-                    monthlyTickets += ticketNumber;
-                }
-                // Check if the ticket is from this week
-                if (ticketDate >= startOfWeek) {
-                    weeklyRevenue += price;
-                    weeklyTickets += ticketNumber;
-                }
-                const dateKey = ticketDate.toLocaleDateString('vi-VN');
-                if (dailyData[dateKey]) {
-                    dailyData[dateKey].revenue += price;
-                    dailyData[dateKey].tickets += ticketNumber;
+
+                if (ticket.deductionHistory) {
+                    for (const key in ticket.deductionHistory) {
+                        const entry = ticket.deductionHistory[key];
+                        allDeductionHistory.push({
+                            ...entry,
+                            name: ticket.name,
+                            phone: ticket.phone
+                        });
+                    }
                 }
             }
-        }
 
-        if (ticket.deductionHistory) {
-            for (const key in ticket.deductionHistory) {
-                const entry = ticket.deductionHistory[key];
-                allDeductionHistory.push({
-                    ...entry,
-                    name: ticket.name,
-                    phone: ticket.phone
-                });
-            }
-        }
-    }
+            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+            document.getElementById('totalRevenueTickets').textContent = totalRevenueTickets + ' vé';
+            document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
+            document.getElementById('dailyTickets').textContent = dailyTickets + ' vé';
+            document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
+            document.getElementById('monthlyTickets').textContent = monthlyTickets + ' vé';
+            document.getElementById('weeklyRevenue').textContent = formatCurrency(weeklyRevenue);
+            document.getElementById('weeklyTickets').textContent = weeklyTickets + ' vé';
 
-    document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
-    document.getElementById('totalRevenueTickets').textContent = totalRevenueTickets + ' vé';
-    document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
-    document.getElementById('dailyTickets').textContent = dailyTickets + ' vé';
-    document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
-    document.getElementById('monthlyTickets').textContent = monthlyTickets + ' vé';
-    document.getElementById('weeklyRevenue').textContent = formatCurrency(weeklyRevenue);
-    document.getElementById('weeklyTickets').textContent = weeklyTickets + ' vé';
+            selectedDateInput.value = '';
+            selectedDateStatsDiv.innerHTML = '';
+            deductionDateInput.value = '';
+            deductionDateStatsDiv.innerHTML = '';
 
-    selectedDateInput.value = '';
-    selectedDateStatsDiv.innerHTML = '';
+            renderDailyChart(dailyData);
+            renderHistory(paidTicketsHistory);
+            renderDeductionHistory(allDeductionHistory);
 
-    renderDailyChart(dailyData);
-    renderHistory(paidTicketsHistory);
-    renderDeductionHistory(allDeductionHistory);
+            statsModal.style.display = 'block';
+        };
 
-    statsModal.style.display = 'block';
-};
         window.showSelectedDayStatistics = function() {
             const selectedDateValue = selectedDateInput.value;
             if (!selectedDateValue) {
@@ -905,22 +921,42 @@
             let selectedDayTickets = 0;
             const selectedDate = new Date(selectedDateValue);
 
-            for (const ticketId in allTickets) {
-                const ticket = allTickets[ticketId];
-                if (ticket.status === 'paid') {
-                    const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
-                    if (ticketDate && ticketDate.toDateString() === selectedDate.toDateString()) {
-                        selectedDayRevenue += ticket.totalPrice || 0;
-                        selectedDayTickets += ticket.ticketNumber || 0;
-                    }
+            for (const ticket of paidTicketsHistory) {
+                const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
+                if (ticketDate && ticketDate.toDateString() === selectedDate.toDateString()) {
+                    selectedDayRevenue += ticket.totalPrice || 0;
+                    selectedDayTickets += ticket.ticketNumber || 0;
                 }
             }
             
             selectedDateStatsDiv.innerHTML = `
                 <p>Doanh thu ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${formatCurrency(selectedDayRevenue)}</strong></p>
-                <p>Số vé ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${selectedDayTickets} vé</strong></p>
+                <p>Số vé bán ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${selectedDayTickets} vé</strong></p>
             `;
         };
+        
+        // New function for deduction stats by date
+        function showDeductionStatsForDate() {
+            const selectedDateValue = deductionDateInput.value;
+            if (!selectedDateValue) {
+                deductionDateStatsDiv.innerHTML = '';
+                return;
+            }
+
+            let totalDeductedOnDate = 0;
+            const selectedDate = new Date(selectedDateValue);
+
+            for (const entry of allDeductionHistory) {
+                const deductionDate = entry.timestamp ? new Date(entry.timestamp) : null;
+                if (deductionDate && deductionDate.toDateString() === selectedDate.toDateString()) {
+                    totalDeductedOnDate += entry.deductedAmount || 0;
+                }
+            }
+
+            deductionDateStatsDiv.innerHTML = `
+                <p>Tổng số vé đã áp dụng ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${totalDeductedOnDate} vé</strong></p>
+            `;
+        }
 
         function renderDailyChart(data) {
             const chartElement = document.getElementById('dailyChart');
@@ -932,57 +968,43 @@
                 series: [{
                     name: 'Doanh thu',
                     type: 'bar',
-                    data: revenues,
-                    yAxisID: 'revenue'
+                    data: revenues
                 }, {
                     name: 'Số vé',
-                    type: 'bar',
-                    data: tickets,
-                    yAxisID: 'tickets'
+                    type: 'line',
+                    data: tickets
                 }],
                 chart: {
                     height: 350,
-                    type: 'bar',
-                    stacked: false,
+                    type: 'line',
                     animations: { enabled: true, easing: 'easeinout' }
                 },
-                title: { text: 'Doanh thu và Số vé (30 ngày gần nhất)', align: 'left' },
-                dataLabels: { enabled: false },
+                stroke: { width: [0, 4] },
+                title: { text: 'Doanh thu và Số vé bán (30 ngày gần nhất)', align: 'left' },
+                dataLabels: { enabled: true, enabledOnSeries: [1] },
                 xaxis: {
                     categories: labels,
                     tooltip: { enabled: false }
                 },
                 yaxis: [{
-                    axisTicks: { show: true },
-                    axisBorder: { show: true, color: '#008FFB' },
-                    labels: { style: { colors: '#008FFB' }, formatter: (value) => formatCurrency(value) },
-                    title: { text: "Doanh thu", style: { color: '#008FFB' } },
-                    id: 'revenue'
+                    title: { text: 'Doanh thu' },
+                    labels: { formatter: (value) => formatCurrency(value) }
                 }, {
-                    axisTicks: { show: true },
-                    axisBorder: { show: true, color: '#FF4560' },
-                    labels: { style: { colors: '#FF4560' } },
-                    title: { text: "Số vé", style: { color: '#FF4560' } },
                     opposite: true,
-                    id: 'tickets'
+                    title: { text: 'Số vé' }
                 }],
-                tooltip: {
+                 tooltip: {
                     shared: true,
                     intersect: false,
                     y: {
                         formatter: function (y, { seriesIndex }) {
-                            if (seriesIndex === 0) return formatCurrency(y);
-                            return y + " vé";
+                            if (typeof y !== "undefined") {
+                                return seriesIndex === 0 ? formatCurrency(y) : y + " vé";
+                            }
+                            return y;
                         }
                     }
-                },
-                responsive: [{
-                    breakpoint: 600,
-                    options: {
-                        chart: { toolbar: { show: false } },
-                        legend: { show: false }
-                    }
-                }]
+                }
             };
 
             if (dailyChart) dailyChart.destroy();
@@ -1006,11 +1028,11 @@
                     });
                     phoneInput.addEventListener('input', filterTickets);
                     historySearchInput.addEventListener('input', filterHistoryTickets);
+                    // Add event listener for the new date picker
+                    deductionDateInput.addEventListener('change', showDeductionStatsForDate);
                 } else {
                     showNotification('Bạn không có quyền truy cập admin.', 'error');
                     auth.signOut();
-                    authSection.style.display = 'block';
-                    adminPanel.style.display = 'none';
                 }
             } else {
                 authSection.style.display = 'block';
