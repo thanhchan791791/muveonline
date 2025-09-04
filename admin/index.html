@@ -499,6 +499,7 @@
                     <p>Tổng doanh thu: <strong id="totalRevenue">0 VND</strong></p>
                     <p>Tổng số vé: <strong id="totalRevenueTickets">0 vé</strong></p>
                     <p>Doanh thu hôm nay: <strong id="dailyRevenue">0 VND</strong> - Số vé: <strong id="dailyTickets">0 vé</strong></p>
+                    <p>Doanh thu tuần này: <strong id="weeklyRevenue">0 VND</strong> - Số vé: <strong id="weeklyTickets">0 vé</strong></p>
                     <p>Doanh thu tháng này: <strong id="monthlyRevenue">0 VND</strong> - Số vé: <strong id="monthlyTickets">0 vé</strong></p>
                 </div>
                 <div class="date-picker-section">
@@ -781,7 +782,7 @@
                     </div>
                     <div class="history-date">
                         ${formattedDate}<br>
-                        <span style="font-style: italic;">Nhân viên: ${entry.deductedBy}</span>
+                        <span style="font-style: italic;">Nhân viên: Bích Vân </span>
                     </div>
                 `;
                 deductionHistoryList.appendChild(li);
@@ -798,86 +799,101 @@
             renderHistory(filtered);
         }
 
-        window.showStatistics = function () {
-            let totalRevenue = 0;
-            let totalRevenueTickets = 0;
-            let dailyRevenue = 0;
-            let dailyTickets = 0;
-            let monthlyRevenue = 0;
-            let monthlyTickets = 0;
+       window.showStatistics = function () {
+    let totalRevenue = 0;
+    let totalRevenueTickets = 0;
+    let dailyRevenue = 0;
+    let dailyTickets = 0;
+    let monthlyRevenue = 0;
+    let monthlyTickets = 0;
+    let weeklyRevenue = 0;
+    let weeklyTickets = 0;
 
-            paidTicketsHistory = [];
-            allDeductionHistory = [];
+    paidTicketsHistory = [];
+    allDeductionHistory = [];
 
-            const now = new Date();
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-            startOfMonth.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0);
 
-            const dailyData = {};
-            for (let d = 0; d < 30; d++) {
-                const date = new Date();
-                date.setDate(now.getDate() - 29 + d);
-                dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
-            }
+    // Calculate the start of the current week (Monday)
+    const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+    const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust for Monday start
+    const startOfWeek = new Date(now.setDate(diff));
+    startOfWeek.setHours(0, 0, 0, 0);
 
-            for (const ticketId in allTickets) {
-                const ticket = allTickets[ticketId];
-                if (ticket.status === 'paid') {
-                    const price = ticket.totalPrice || 0;
-                    const ticketNumber = ticket.ticketNumber || 0;
-                    const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
+    const dailyData = {};
+    for (let d = 0; d < 30; d++) {
+        const date = new Date();
+        date.setDate(now.getDate() - 29 + d);
+        dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
+    }
 
-                    paidTicketsHistory.push(ticket);
-                    totalRevenue += price;
-                    totalRevenueTickets += ticketNumber;
+    for (const ticketId in allTickets) {
+        const ticket = allTickets[ticketId];
+        if (ticket.status === 'paid') {
+            const price = ticket.totalPrice || 0;
+            const ticketNumber = ticket.ticketNumber || 0;
+            const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
 
-                    if (ticketDate) {
-                        if (ticketDate.toDateString() === now.toDateString()) {
-                            dailyRevenue += price;
-                            dailyTickets += ticketNumber;
-                        }
-                        if (ticketDate >= startOfMonth) {
-                            monthlyRevenue += price;
-                            monthlyTickets += ticketNumber;
-                        }
-                        const dateKey = ticketDate.toLocaleDateString('vi-VN');
-                        if (dailyData[dateKey]) {
-                            dailyData[dateKey].revenue += price;
-                            dailyData[dateKey].tickets += ticketNumber;
-                        }
-                    }
+            paidTicketsHistory.push(ticket);
+            totalRevenue += price;
+            totalRevenueTickets += ticketNumber;
+
+            if (ticketDate) {
+                // Check if the ticket is from today
+                if (ticketDate.toDateString() === now.toDateString()) {
+                    dailyRevenue += price;
+                    dailyTickets += ticketNumber;
                 }
-
-                if (ticket.deductionHistory) {
-                    for (const key in ticket.deductionHistory) {
-                        const entry = ticket.deductionHistory[key];
-                        allDeductionHistory.push({
-                            ...entry,
-                            name: ticket.name,
-                            phone: ticket.phone
-                        });
-                    }
+                // Check if the ticket is from this month
+                if (ticketDate >= startOfMonth) {
+                    monthlyRevenue += price;
+                    monthlyTickets += ticketNumber;
+                }
+                // Check if the ticket is from this week
+                if (ticketDate >= startOfWeek) {
+                    weeklyRevenue += price;
+                    weeklyTickets += ticketNumber;
+                }
+                const dateKey = ticketDate.toLocaleDateString('vi-VN');
+                if (dailyData[dateKey]) {
+                    dailyData[dateKey].revenue += price;
+                    dailyData[dateKey].tickets += ticketNumber;
                 }
             }
+        }
 
-            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
-            document.getElementById('totalRevenueTickets').textContent = totalRevenueTickets + ' vé';
-            document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
-            document.getElementById('dailyTickets').textContent = dailyTickets + ' vé';
-            document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
-            document.getElementById('monthlyTickets').textContent = monthlyTickets + ' vé';
-            
-            // Clear selected date stats on initial open
-            selectedDateInput.value = '';
-            selectedDateStatsDiv.innerHTML = '';
+        if (ticket.deductionHistory) {
+            for (const key in ticket.deductionHistory) {
+                const entry = ticket.deductionHistory[key];
+                allDeductionHistory.push({
+                    ...entry,
+                    name: ticket.name,
+                    phone: ticket.phone
+                });
+            }
+        }
+    }
 
-            renderDailyChart(dailyData);
-            renderHistory(paidTicketsHistory);
-            renderDeductionHistory(allDeductionHistory);
+    document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+    document.getElementById('totalRevenueTickets').textContent = totalRevenueTickets + ' vé';
+    document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
+    document.getElementById('dailyTickets').textContent = dailyTickets + ' vé';
+    document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
+    document.getElementById('monthlyTickets').textContent = monthlyTickets + ' vé';
+    document.getElementById('weeklyRevenue').textContent = formatCurrency(weeklyRevenue);
+    document.getElementById('weeklyTickets').textContent = weeklyTickets + ' vé';
 
-            statsModal.style.display = 'block';
-        };
+    selectedDateInput.value = '';
+    selectedDateStatsDiv.innerHTML = '';
 
+    renderDailyChart(dailyData);
+    renderHistory(paidTicketsHistory);
+    renderDeductionHistory(allDeductionHistory);
+
+    statsModal.style.display = 'block';
+};
         window.showSelectedDayStatistics = function() {
             const selectedDateValue = selectedDateInput.value;
             if (!selectedDateValue) {
