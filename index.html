@@ -1,35 +1,665 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Đang bảo trì</title>
-  <style>
-    body{
-      margin:0;
-      font-family: Arial, sans-serif;
-      background:#0f1724;
-      color:#fff;
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding:20px;
-    }
-    h1{font-size:32px;margin-bottom:10px}
-    p{font-size:18px;color:#cbd5e1;max-width:500px}
-    .footer{margin-top:30px;font-size:14px;color:#94a3b8}
-  </style>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Mua Vé Cherry Pet Coffee</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ96j2y0zL0rLw0R1k+D4R4e2d3W4e2S/c6F5k2y+oFw/R0R9z2p4wG3j3y5A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+                    <style>
+                                        /* ----------------- Cài đặt chung & Body ----------------- */
+:root {
+          --primary-pink: #FF85A2;
+          --secondary-pink: #FCE4EC;
+          --dark-text: #4A4A4A;
+          --light-text: #FFFFFF;
+          --card-bg: #FFFFFF;
+          --shadow-elevation-1: 0 4px 6px rgba(0, 0, 0, 0.1);
+          --shadow-elevation-2: 0 10px 15px rgba(0, 0, 0, 0.15);
+          --price-color: #E74C3C;
+}
+body {
+          font-family: 'Poppins', sans-serif;
+          background: linear-gradient(135deg, #FFE6F0, #E0F7FA);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+          color: var(--dark-text);
+          position: relative;
+}
+
+/* ----------------- Container ----------------- */
+.container {
+          background: var(--card-bg);
+          border-radius: 20px;
+          box-shadow: var(--shadow-elevation-2);
+          padding: 30px;
+          box-sizing: border-box;
+          width: 100%;
+          max-width: 450px;
+          position: relative;
+}
+
+/* ----------------- Tiêu đề & Chữ ----------------- */
+h1, h2 {
+          text-align: center;
+          color: var(--primary-pink);
+}
+h1 {
+          font-size: 2.2em;
+          margin-bottom: 5px;
+          animation: popIn 0.5s ease-out forwards;
+}
+.subtitle {
+          font-size: 1.1em;
+          color: #888;
+          text-align: center;
+          margin-bottom: 25px;
+}
+
+/* ----------------- Hiệu ứng hình ảnh mới ----------------- */
+.header-image {
+          text-align: center;
+          margin-bottom: 20px;
+          animation: fadeInDown 0.8s ease-out;
+}
+.header-image img {
+          width: 120px;
+          height: 120px;
+          object-fit: cover;
+          border-radius: 50%;
+          border: 4px solid var(--primary-pink);
+          box-shadow: var(--shadow-elevation-1);
+}
+
+/* ----------------- Form & Nút bấm ----------------- */
+.input-group {
+          margin-bottom: 18px;
+          opacity: 0;
+          transform: translateY(10px);
+          transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+.input-group.visible {
+          opacity: 1;
+          transform: translateY(0);
+}
+label {
+          display: block;
+          font-weight: 600;
+          margin-bottom: 6px;
+}
+input[type="text"], input[type="tel"], input[type="number"] {
+          width: 100%;
+          padding: 12px 15px;
+          border: 2px solid #ccc;
+          border-radius: 10px;
+          font-size: 1em;
+          transition: all 0.3s ease;
+          box-sizing: border-box;
+}
+input:focus {
+          border-color: var(--primary-pink);
+          outline: none;
+          box-shadow: 0 0 0 3px var(--secondary-pink);
+}
+.price-display {
+          font-size: 1.5em;
+          font-weight: 700;
+          color: var(--primary-pink);
+          text-align: right;
+          margin-top: 20px;
+}
+button {
+          width: 100%;
+          padding: 14px;
+          background-color: var(--primary-pink);
+          color: var(--light-text);
+          border: none;
+          border-radius: 10px;
+          font-size: 1.1em;
+          font-weight: 600;
+          cursor: pointer;
+          transition: transform 0.2s, background-color 0.3s;
+          box-shadow: var(--shadow-elevation-1);
+}
+button:hover { transform: translateY(-2px); background-color: #E5718A; }
+
+/* ----------------- Chuyển bước & QR code ----------------- */
+.step {
+          display: none;
+          opacity: 0;
+          animation: fadeIn 0.5s ease-in-out forwards;
+}
+.step.active { display: block; }
+@keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+}
+.qr-section { text-align: center; }
+#qr-code {
+          padding: 10px;
+          background-color: var(--card-bg);
+          border-radius: 15px;
+          box-shadow: var(--shadow-elevation-1);
+          margin: 25px auto;
+          display: inline-block;
+          animation: bounceIn 0.8s;
+}
+@keyframes bounceIn {
+          0%, 20%, 40%, 60%, 80%, 100% {
+                    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+          }
+          0% { transform: scale3d(.3, .3, .3); }
+          20% { transform: scale3d(1.1, 1.1, 1.1); }
+          40% { transform: scale3d(.9, .9, .9); }
+          60% { transform: scale3d(1.03, 1.03, 1.03); }
+          80% { transform: scale3d(.97, .97, .97); }
+          100% { transform: scale3d(1, 1, 1); }
+}
+
+/* ----------------- Overlay thông báo ----------------- */
+.message-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(255, 255, 255, 0.95);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.5s ease;
+}
+.message-overlay.visible { opacity: 1; visibility: visible; }
+.message-card {
+          background: var(--card-bg);
+          padding: 40px 30px;
+          border-radius: 20px;
+          box-shadow: var(--shadow-elevation-2);
+          max-width: 380px;
+          text-align: center;
+          transform: translateY(-50px);
+          transition: transform 0.5s ease;
+          animation: scaleIn 0.5s ease-out;
+}
+@keyframes scaleIn {
+          from { transform: scale(0); }
+          to { transform: scale(1); }
+}
+.message-card .icon { font-size: 3.5em; margin-bottom: 15px; }
+.message-card h2 { font-size: 1.8em; margin-bottom: 10px; font-weight: 700; }
+.message-card p { font-size: 1.1em; margin-bottom: 25px; }
+
+.message-card.success h2, .message-card.success .icon { color: #2ecc71; }
+.message-card.error h2, .message-card.error .icon { color: #e74c3c; }
+
+/* ----------------- Loader & Nút bấm ----------------- */
+.loader {
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid var(--primary-pink);
+          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 15px;
+}
+@keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+}
+#close-message-btn {
+          background-color: var(--primary-pink);
+          color: var(--light-text);
+          font-weight: 600;
+}
+#close-message-btn:hover {
+          background-color: #E5718A;
+}
+
+/* Giao diện mới cho Vé và phần giá */
+.ticket-card {
+          background-color: #FFF;
+          padding: 20px;
+          border-radius: 15px;
+          box-shadow: var(--shadow-elevation-1);
+          margin-bottom: 25px;
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+          opacity: 0;
+          transform: translateY(10px);
+          animation: fadeIn 0.6s ease-in-out forwards;
+          border: 2px solid var(--primary-pink);
+          border-bottom: 8px solid var(--primary-pink); /* Thêm viền dưới dày hơn */
+}
+.ticket-card h2 {
+          color: var(--dark-text);
+          font-size: 1.5em;
+          margin-bottom: 5px;
+}
+    
+/* Thay đổi cho phần giá */
+.price-section {
+          background: linear-gradient(45deg, var(--primary-pink), #ffb3c1);
+          color: var(--light-text);
+          padding: 15px;
+          border-radius: 10px;
+          margin: 20px 0;
+          animation: scaleIn 0.6s ease-out;
+          box-shadow: 0 5px 10px rgba(255, 133, 162, 0.4);
+          position: relative; /* Thêm position relative */
+}
+.price-section p {
+          margin: 0;
+          font-size: 1.1em;
+          font-weight: 500;
+}
+.price-section .price-values {
+          display: flex;
+          justify-content: center;
+          align-items: baseline;
+          gap: 15px;
+          margin: 5px 0;
+}
+.price-section .current-price {
+          font-size: 2.8em;
+          font-weight: 800;
+}
+.price-section .original-price {
+          font-size: 1.5em;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.8);
+          text-decoration: line-through;
+}
+.price-section small {
+          font-size: 1em;
+          display: block;
+          font-weight: 500;
+          margin-top: 0;
+}
+/* Hiệu ứng giảm giá */
+.price-section::before {
+          content: '-35%'; /* Hoặc có thể là 'GIẢM GIÁ' */
+          position: absolute;
+          top: -10px; /* Di chuyển lên trên */
+          right: -10px; /* Di chuyển sang phải */
+          background: #ff4d4d; /* Màu đỏ nổi bật */
+          color: white;
+          padding: 5px 10px;
+          border-radius: 50px; /* Làm tròn như một huy hiệu */
+          font-size: 0.9em;
+          font-weight: bold;
+          transform: rotate(10deg); /* Xoay nhẹ để thêm phần sống động */
+          box-shadow: var(--shadow-elevation-1);
+          animation: bounceIn 1s ease-out; /* Thêm hiệu ứng bật ra */
+          animation-delay: 0.6s;
+}
+/* Style cho phần hình ảnh của các con vật */
+.animal-showcase {
+          display: flex;
+          justify-content: center; /* Đảm bảo các ảnh được căn giữa */
+          align-items: flex-end;
+          margin-top: 15px;
+          margin-bottom: 25px;
+          height: 120px;
+          position: relative;
+          padding: 0 10px;
+          gap: 15px; /* Thêm khoảng cách đều giữa các ảnh */
+}
+
+.animal-showcase .animal-item {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          flex-shrink: 0; /* Ngăn các ảnh bị co lại khi không cần thiết */
+          text-align: center;
+          opacity: 0;
+          transform: translateY(20px);
+          animation: popInAnimal 0.8s ease-out forwards;
+}
+.animal-showcase .animal-item:nth-child(1) { animation-delay: 0.1s; }
+.animal-showcase .animal-item:nth-child(2) { animation-delay: 0.3s; }
+.animal-showcase .animal-item:nth-child(3) { animation-delay: 0.5s; }
+.animal-showcase .animal-item:nth-child(4) { animation-delay: 0.7s; }
+.animal-showcase img {
+    width: 60px; /* Giảm chiều rộng của ảnh */
+    height: 60px; /* Giảm chiều cao của ảnh */
+    object-fit: contain; /* Đảm bảo hình ảnh vừa vặn trong khung mà không bị cắt */
+    border-radius: 50%;
+    border: 3px solid var(--primary-pink);
+    box-shadow: var(--shadow-elevation-1);
+    transition: all 0.3s ease;
+    background-color: var(--light-text);
+    padding: 10px; /* Tăng padding để tạo khoảng trống bên trong khung tròn */
+}
+
+.animal-showcase img:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: var(--shadow-elevation-2);
+}
+.animal-showcase .animal-label {
+          position: static;
+          margin-top: 5px;
+          background-color: var(--primary-pink);
+          color: var(--light-text);
+          padding: 3px 8px;
+          border-radius: 8px;
+          font-size: 0.85em;
+          font-weight: 500;
+          white-space: nowrap;
+          box-shadow: var(--shadow-elevation-1);
+          opacity: 0;
+          transform: translateY(10px);
+          animation: fadeIn 0.5s ease-out forwards;
+          animation-delay: 1s;
+}
+.description-text {
+          text-align: center;
+          font-size: 1.1em;
+          color: #666;
+          margin: 15px 0 25px;
+          line-height: 1.5;
+          animation: fadeIn 0.6s ease-out forwards;
+          animation-delay: 0.8s;
+}
+
+/* ----------------- Keyframes mới ----------------- */
+@keyframes popIn {
+          0% { transform: scale(0.5); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+}
+@keyframes fadeInDown {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
+}
+@keyframes popInAnimal {
+          0% { opacity: 0; transform: scale(0.5) translateY(20px); }
+          70% { opacity: 1; transform: scale(1.05) translateY(-5px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes scaleIn {
+          from { transform: scale(0.8); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+}
+                    </style>
+                    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+                    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
-  <h1>Website đang bảo trì</h1>
-  <p>Chúng tôi xin lỗi vì sự bất tiện. Hệ thống đang được nâng cấp và sẽ hoạt động trở lại sớm nhất có thể.</p>
-  <div class="footer">© <span id="year"></span> Cherrypet Coffee</div>
 
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+<div class="container">
+                    <div id="step-info" class="step active">
+                                        <div class="header-image">
+                                                            <img src="image/logocherry.png" alt="Cherry Pet Coffee Logo">
+                                        </div>
+                                        <h1>Cherry Pet Coffee <i class="fa-solid fa-mug-saucer" style="font-size: 0.8em;"></i></h1>
+                                        <p class="subtitle">Mua vé tham quan & trải nghiệm <i class="fa-solid fa-paw"></i></p>
+                                        <form id="infoForm">
+                                                            <div class="input-group visible">
+                                                                                <label for="name">Tên của bạn:</label>
+                                                                                <input type="text" id="name" placeholder="Nhập tên" required>
+                                                            </div>
+                                                            <div class="input-group" id="phone-input-group">
+                                                                                <label for="phone">Số điện thoại:</label>
+                                                                                <input type="tel" id="phone" placeholder="Nhập số điện thoại" required>
+                                                            </div>
+                                                            <button id="continueBtn" type="button" style="display: none;">Tiếp Tục</button>
+                                        </form>
+                    </div>
+
+                    <div id="step-ticket" class="step">
+                                        <h2>Khám phá thế giới của những người bạn bốn chân!</h2>
+                                        <div class="ticket-card">
+                                                            <div class="animal-showcase">
+                                                                                <div class="animal-item">
+                                                                                                    <img src="image/cho.png" alt="Chó">
+                                                                                                    <span class="animal-label">Chó</span>
+                                                                                </div>
+                                                                                <div class="animal-item">
+                                                                                                    <img src="image/meo.png" alt="Mèo">
+                                                                                                    <span class="animal-label">Mèo</span>
+                                                                                </div>
+                                                                                <div class="animal-item">
+                                                                                                    <img src="image/capy.png" alt="Capybara">
+                                                                                                    <span class="animal-label">Capybara</span>
+                                                                                </div>
+                                                                                <div class="animal-item">
+                                                                                                    <img src="image/gaumeo.png" alt="Gấu mèo">
+                                                                                                    <span class="animal-label">Gấu mèo</span>
+                                                                                </div>
+                                                            </div>
+                                                            <p class="description-text">
+                                                                                Bước vào thế giới của những người bạn bốn chân đáng yêu. Tự do tương tác với chó, mèo, gấu mèo và capybara.
+                                                            </p>
+                                                            <div class="price-section">
+                                                                                <p>Giá ưu đãi hôm nay</p>
+                                                                                <div class="price-values">
+                                                                                                    <span class="current-price">65.000 VNĐ</span>
+                                                                                                    <span class="original-price">100.000 VNĐ</span>
+                                                                                </div>
+                                                                                <small>/ người</small>
+                                                            </div>
+                                                                    
+                                                            <ul>
+                                                                                <li><i class="fa-solid fa-paw"></i> Chơi đùa thỏa thích cùng thú cưng.</li>
+                                                                                <li><i class="fa-solid fa-camera-retro"></i> Chụp ảnh check-in không giới hạn.</li>
+                                                            </ul>
+                                        </div>
+                                        <div class="input-group visible">
+                                                            <label for="ticketNumber">Số lượng vé:</label>
+                                                            <input type="number" id="ticketNumber" value="1" min="1" required>
+                                                            <div class="price-display" id="total-price">Tổng cộng: 65.000 VNĐ</div>
+                                        </div>
+                                        <button id="checkoutBtn">Thanh Toán</button>
+                    </div>
+
+                    <div id="step-payment" class="step">
+                                        <div class="qr-section">
+                                                            <h2>Thông tin Thanh Toán</h2>
+                                                            <p>Vui lòng quét mã QR để chuyển khoản đúng số tiền và nội dung chuyển khoản. Sau khi thanh toán, vui lòng đợi khoảng 20-30 giây hệ thống sẽ tự động xác nhận.</p>
+                                                            <div id="qr-code"></div>
+                                                            <p><strong>Ngân hàng:</strong> MB Bank</p>
+                                                            <p><strong>Số tài khoản:</strong> 0909650816</p>
+                                                            <p><strong>Tên tài khoản:</strong> Trần Vũ Ngọc Thành</p>
+                                                            <p><strong>Nội dung:</strong> <span id="payment-content-display">...</span></p>
+                                        </div>
+                    </div>
+</div>
+
+<div id="message-overlay" class="message-overlay">
+                    <div id="message-card" class="message-card">
+                                        <div id="message-icon" class="icon"></div>
+                                        <div id="message-loader" class="loader"></div>
+                                        <h2 id="message-title"></h2>
+                                        <p id="message-text"></p>
+                                        <button id="close-message-btn">Xong</button>
+                    </div>
+</div>
+
+<script>
+                    const firebaseConfig = {
+                                        apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
+                                        authDomain: "muveonline-919a8.firebaseapp.com",
+                                        databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
+                                        projectId: "muveonline-919a8",
+                                        storageBucket: "muveonline-919a8.firebasestorage.app",
+                                        messagingSenderId: "399933853156",
+                                        appId: "1:399933853156:web:982c1da02117606a994bf1"
+                    };
+
+                    firebase.initializeApp(firebaseConfig);
+                    const db = firebase.database();
+
+                    const steps = {
+                                        info: document.getElementById('step-info'),
+                                        ticket: document.getElementById('step-ticket'),
+                                        payment: document.getElementById('step-payment')
+                    };
+
+                    const infoForm = document.getElementById('infoForm');
+                    const nameInput = document.getElementById('name');
+                    const phoneInputGroup = document.getElementById('phone-input-group');
+                    const continueBtn = document.getElementById('continueBtn');
+                    const checkoutBtn = document.getElementById('checkoutBtn');
+                    const ticketNumberInput = document.getElementById('ticketNumber');
+                    const totalPriceDiv = document.getElementById('total-price');
+                    const qrCodeDiv = document.getElementById('qr-code');
+
+                    const messageOverlay = document.getElementById('message-overlay');
+                    const messageCard = document.getElementById('message-card');
+                    const messageIcon = document.getElementById('message-icon');
+                    const messageLoader = document.getElementById('message-loader');
+                    const messageTitle = document.getElementById('message-title');
+                    const messageText = document.getElementById('message-text');
+                    const closeMessageBtn = document.getElementById('close-message-btn');
+                    const paymentContentDisplay = document.getElementById('payment-content-display');
+
+                    let userInfo = {};
+                    let ticketNumberValue = 1;
+                    const TICKET_PRICE = 65000;
+                    let statusListener = null;
+
+                    // Hàm chuyển bước giao diện
+                    function goToStep(nextStep) {
+                                        Object.values(steps).forEach(s => s.classList.remove('active'));
+                                        nextStep.classList.add('active');
+                    }
+
+                    // Hàm định dạng tiền tệ
+                    function formatCurrency(n) { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n); }
+
+                    // Hàm hiển thị thông báo
+                    function showMessage(type, title, text) {
+                                        messageCard.className = `message-card ${type}`;
+                                        messageTitle.textContent = title;
+                                        messageText.textContent = text;
+                                        messageLoader.style.display = 'none';
+                                        closeMessageBtn.style.display = 'block';
+
+                                        if (type === 'success') {
+                                                            messageIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                                        } else if (type === 'error') {
+                                                            messageIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+                                        } else if (type === 'pending') {
+                                                            messageLoader.style.display = 'block';
+                                                            messageIcon.innerHTML = '';
+                                                            closeMessageBtn.style.display = 'none';
+                                        }
+                                                                    
+                                        messageOverlay.classList.add('visible');
+                    }
+
+                    // Hàm đóng thông báo và reset form
+                    function closeMessage() {
+                                        messageOverlay.classList.remove('visible');
+                                        ticketNumberInput.value = 1;
+                                        totalPriceDiv.textContent = `Tổng cộng: ${formatCurrency(TICKET_PRICE)}`;
+                                        nameInput.value = '';
+                                        document.getElementById('phone').value = '';
+                                        goToStep(steps.info);
+                                        phoneInputGroup.classList.remove('visible');
+                                        continueBtn.style.display = 'none';
+                                        if (statusListener) {
+                                                            db.ref().child('tickets').child(statusListener).off('value');
+                                                            statusListener = null;
+                                        }
+                    }
+
+                    closeMessageBtn.addEventListener('click', closeMessage);
+
+                    // Hiển thị ô nhập SĐT và nút "Tiếp Tục" khi nhập tên
+                    nameInput.addEventListener('input', () => {
+                                        if (nameInput.value.trim().length > 0) {
+                                                            phoneInputGroup.classList.add('visible');
+                                                            setTimeout(() => {
+                                                                                continueBtn.style.display = 'block';
+                                                                                continueBtn.classList.add('visible');
+                                                            }, 500); // Đợi hiệu ứng xong thì hiển thị nút
+                                        } else {
+                                                            phoneInputGroup.classList.remove('visible');
+                                                            continueBtn.style.display = 'none';
+                                        }
+                    });
+
+                    // Xử lý nút "Tiếp Tục" sau khi nhập thông tin
+                    continueBtn.addEventListener('click', () => {
+                                        const name = nameInput.value.trim();
+                                        const phone = document.getElementById('phone').value.trim();
+                                        if (!name || !phone) {
+                                                            showMessage('error', 'Lỗi', 'Vui lòng nhập đầy đủ thông tin!');
+                                                            return;
+                                        }
+                                        userInfo = { name, phone };
+                                        goToStep(steps.ticket);
+                    });
+
+                    // Cập nhật giá khi thay đổi số lượng vé
+                    ticketNumberInput.addEventListener('input', () => {
+                                        const count = parseInt(ticketNumberInput.value);
+                                        ticketNumberValue = count >= 1 ? count : 1;
+                                        totalPriceDiv.textContent = `Tổng cộng: ${formatCurrency(ticketNumberValue * TICKET_PRICE)}`;
+                    });
+
+                    // Xử lý thanh toán
+                    checkoutBtn.addEventListener('click', () => {
+                                        if (ticketNumberValue < 1) {
+                                                            showMessage('error', 'Lỗi', 'Số lượng vé phải lớn hơn 0!');
+                                                            return;
+                                        }
+                                        const totalPrice = ticketNumberValue * TICKET_PRICE;
+                                        const orderCode = "CHERRY" + Math.floor(100000 + Math.random() * 900000);
+                                        const ticketsRef = db.ref("tickets");
+                                        const newTicketRef = ticketsRef.push({
+                                                            name: userInfo.name,
+                                                            phone: userInfo.phone,
+                                                            ticketNumber: ticketNumberValue,
+                                                            totalPrice: totalPrice,
+                                                            orderCode: orderCode,
+                                                            status: "pending",
+                                                            createdAt: new Date().toISOString()
+                                        });
+
+                                        const paymentContent = orderCode;
+                                        paymentContentDisplay.textContent = paymentContent;
+                                        const qrUrl = `https://img.vietqr.io/image/970422-0909650816-compact.png?amount=${totalPrice}&addInfo=${encodeURIComponent(paymentContent)}`;
+                                        qrCodeDiv.innerHTML = `<img src="${qrUrl}" width="250" height="250" alt="QR Code">`;
+
+                                        let totalPriceDivQR = document.getElementById('total-price-qr');
+                                        if (!totalPriceDivQR) {
+                                                            totalPriceDivQR = document.createElement('div');
+                                                            totalPriceDivQR.id = 'total-price-qr';
+                                                            totalPriceDivQR.style.textAlign = 'center';
+                                                            totalPriceDivQR.style.marginTop = '15px';
+                                                            totalPriceDivQR.style.fontSize = '1.2em';
+                                                            totalPriceDivQR.style.fontWeight = '600';
+                                                            qrCodeDiv.parentNode.appendChild(totalPriceDivQR);
+                                        }
+                                        totalPriceDivQR.textContent = `Tổng tiền: ${totalPrice.toLocaleString('vi-VN')} VNĐ`;
+
+                                        goToStep(steps.payment);
+
+                                        if (statusListener) {
+                                                            newTicketRef.child('status').off('value', statusListener);
+                                        }
+                                        statusListener = newTicketRef.child('status').on('value', snapshot => {
+                                                            const status = snapshot.val();
+                                                            if (status === 'paid') {
+                                                                                showMessage('success', 'Thanh toán thành công!', `Vui lòng đến quầy cung cấp tên: ${userInfo.name} và SĐT: ${userInfo.phone} để nhận vé.`);
+                                                                                newTicketRef.child('status').off('value', statusListener);
+                                                            } else if (status === 'failed') {
+                                                                                showMessage('error', 'Thanh toán thất bại', 'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ hỗ trợ.');
+                                                                                newTicketRef.child('status').off('value', statusListener);
+                                                            }
+                                        });
+                    });
+</script>
+
 </body>
 </html>
