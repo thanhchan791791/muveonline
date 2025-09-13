@@ -448,8 +448,8 @@
             <div class="price-section" id="price-section">
                 <p>Giá ưu đãi hôm nay</p>
                 <div class="price-values">
-                    <span class="current-price" id="current-price">100.000 VNĐ</span>
-                    <span class="original-price" id="original-price"></span>
+                    <span class="current-price" id="current-price">65.000 VNĐ</span>
+                    <span class="original-price" id="original-price">100.000 VNĐ</span>
                 </div>
                 <small id="price-note">/ người</small>
             </div>
@@ -462,13 +462,12 @@
         <div class="input-group visible">
             <label for="ticketNumber">Số lượng vé:</label>
             <input type="number" id="ticketNumber" value="1" min="1" required>
-            <div class="price-display" id="total-price">Tổng cộng: 100.000 VNĐ</div>
+            <div class="price-display" id="total-price">Tổng cộng: 65.000 VNĐ</div>
         </div>
         <button id="checkoutBtn">Thanh Toán</button>
     </div>
 
-   <!-- Trong step-payment -->
-<div id="step-payment" class="step">
+   <div id="step-payment" class="step">
     <div class="qr-section">
         <h2>Thông tin Thanh Toán</h2>
         <p>Vui lòng quét mã QR để chuyển khoản đúng số tiền và nội dung chuyển khoản. Sau khi thanh toán, vui lòng đợi khoảng 10-20 giây hệ thống sẽ tự động xác nhận.</p>
@@ -539,8 +538,7 @@
     let ticketNumberValue = 1;
     const ORIGINAL_PRICE = 100000;
     const DISCOUNT_PRICE = 65000;
-    const DISCOUNT_THRESHOLD = 5;
-    let currentTicketPrice = ORIGINAL_PRICE;
+    let currentTicketPrice = DISCOUNT_PRICE;
     let statusListener = null;
 
     // Hàm chuyển bước giao diện
@@ -557,18 +555,12 @@
         const count = parseInt(ticketNumberInput.value);
         ticketNumberValue = count >= 1 ? count : 1;
         
-        const isDiscounted = ticketNumberValue >= DISCOUNT_THRESHOLD;
-        currentTicketPrice = isDiscounted ? DISCOUNT_PRICE : ORIGINAL_PRICE;
+        currentTicketPrice = DISCOUNT_PRICE;
         
         currentPriceSpan.textContent = formatCurrency(currentTicketPrice);
         
-        if (isDiscounted) {
-            priceSection.classList.add('has-discount');
-            originalPriceSpan.textContent = formatCurrency(ORIGINAL_PRICE);
-        } else {
-            priceSection.classList.remove('has-discount');
-            originalPriceSpan.textContent = ''; // Xóa giá gốc
-        }
+        priceSection.classList.add('has-discount');
+        originalPriceSpan.textContent = formatCurrency(ORIGINAL_PRICE);
 
         const totalPrice = ticketNumberValue * currentTicketPrice;
         totalPriceDiv.textContent = `Tổng cộng: ${formatCurrency(totalPrice)}`;
@@ -648,22 +640,14 @@
     // Xử lý nút "Thanh Toán"
     checkoutBtn.addEventListener('click', () => {
         const count = parseInt(ticketNumberInput.value);
-        if (count < DISCOUNT_THRESHOLD) {
-            showMessage(
-                'info', 
-                'Ưu Đãi Đặc Biệt!', 
-                `Ưu đãi giá vé chỉ dành cho khách mua từ ${DISCOUNT_THRESHOLD} vé trở lên. Vui lòng thêm số lượng vé để nhận ưu đãi!`
-            );
-            return;
-        }
-
-        const totalPrice = ticketNumberValue * currentTicketPrice;
+        
+        const totalPrice = count * currentTicketPrice;
         const orderCode = "CHERRY" + Math.floor(100000 + Math.random() * 900000);
         const ticketsRef = db.ref("tickets");
         const newTicketRef = ticketsRef.push({
             name: userInfo.name,
             phone: userInfo.phone,
-            ticketNumber: ticketNumberValue,
+            ticketNumber: count,
             totalPrice: totalPrice,
             orderCode: orderCode,
             status: "pending",
