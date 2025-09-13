@@ -467,17 +467,19 @@
         <button id="checkoutBtn">Thanh Toán</button>
     </div>
 
-    <div id="step-payment" class="step">
-        <div class="qr-section">
-            <h2>Thông tin Thanh Toán</h2>
-            <p>Vui lòng quét mã QR để chuyển khoản đúng số tiền và nội dung chuyển khoản. Sau khi thanh toán, vui lòng đợi khoảng 20-30 giây hệ thống sẽ tự động xác nhận.</p>
-            <div id="qr-code"></div>
-            <p><strong>Ngân hàng:</strong> MB Bank</p>
-            <p><strong>Số tài khoản:</strong> 0909650816</p>
-            <p><strong>Tên tài khoản:</strong> Trần Vũ Ngọc Thành</p>
-            <p><strong>Nội dung:</strong> <span id="payment-content-display">...</span></p>
-        </div>
+   <!-- Trong step-payment -->
+<div id="step-payment" class="step">
+    <div class="qr-section">
+        <h2>Thông tin Thanh Toán</h2>
+        <p>Vui lòng quét mã QR để chuyển khoản đúng số tiền và nội dung chuyển khoản. Sau khi thanh toán, vui lòng đợi khoảng 20-30 giây hệ thống sẽ tự động xác nhận.</p>
+        <div id="qr-code"></div>
+        <p><strong>Ngân hàng:</strong> MB Bank</p>
+        <p><strong>Số tài khoản:</strong> 973803388</p>
+        <p><strong>Tên tài khoản:</strong> Lê Vĩnh Tín</p>
+        <p><strong>Nội dung:</strong> <span id="payment-content-display">...</span></p>
     </div>
+</div>
+
 </div>
 
 <div id="message-overlay" class="message-overlay">
@@ -670,7 +672,7 @@
 
         const paymentContent = orderCode;
         paymentContentDisplay.textContent = paymentContent;
-        const qrUrl = `https://img.vietqr.io/image/970422-0909650816-compact.png?amount=${totalPrice}&addInfo=${encodeURIComponent(paymentContent)}`;
+const qrUrl = `https://img.vietqr.io/image/970422-973803388-compact.png?amount=${totalPrice}&addInfo=${encodeURIComponent(paymentContent)}`;
         qrCodeDiv.innerHTML = `<img src="${qrUrl}" width="250" height="250" alt="QR Code">`;
 
         let totalPriceDivQR = document.getElementById('total-price-qr');
