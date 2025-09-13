@@ -394,6 +394,27 @@
             from { transform: scale(0.8); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
+
+        /* Thêm style cho phần điều khiển số lượng */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .quantity-control button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            font-size: 1.5em;
+            font-weight: 700;
+            border-radius: 50%;
+            line-height: 1;
+        }
+        .quantity-control input {
+            width: 80px;
+            text-align: center;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -448,8 +469,8 @@
             <div class="price-section" id="price-section">
                 <p>Giá ưu đãi hôm nay</p>
                 <div class="price-values">
-                    <span class="current-price" id="current-price">65.000 VNĐ</span>
-                    <span class="original-price" id="original-price">100.000 VNĐ</span>
+                    <span class="current-price" id="current-price"></span>
+                    <span class="original-price" id="original-price"></span>
                 </div>
                 <small id="price-note">/ người</small>
             </div>
@@ -461,8 +482,12 @@
         </div>
         <div class="input-group visible">
             <label for="ticketNumber">Số lượng vé:</label>
-            <input type="number" id="ticketNumber" value="1" min="1" required>
-            <div class="price-display" id="total-price">Tổng cộng: 65.000 VNĐ</div>
+            <div class="quantity-control">
+                <button type="button" id="decreaseBtn">-</button>
+                <input type="text" id="ticketNumber" value="5" readonly>
+                <button type="button" id="increaseBtn">+</button>
+            </div>
+            <div class="price-display" id="total-price"></div>
         </div>
         <button id="checkoutBtn">Thanh Toán</button>
     </div>
@@ -519,6 +544,9 @@
     const ticketNumberInput = document.getElementById('ticketNumber');
     const totalPriceDiv = document.getElementById('total-price');
     const qrCodeDiv = document.getElementById('qr-code');
+    const decreaseBtn = document.getElementById('decreaseBtn');
+    const increaseBtn = document.getElementById('increaseBtn');
+
 
     const messageOverlay = document.getElementById('message-overlay');
     const messageCard = document.getElementById('message-card');
@@ -535,10 +563,9 @@
     const priceNote = document.getElementById('price-note');
 
     let userInfo = {};
-    let ticketNumberValue = 1;
+    const MIN_TICKETS = 5;
     const ORIGINAL_PRICE = 100000;
     const DISCOUNT_PRICE = 65000;
-    let currentTicketPrice = DISCOUNT_PRICE;
     let statusListener = null;
 
     // Hàm chuyển bước giao diện
@@ -553,17 +580,19 @@
     // Hàm cập nhật giá vé và hiển thị ưu đãi
     function updateTicketPrice() {
         const count = parseInt(ticketNumberInput.value);
-        ticketNumberValue = count >= 1 ? count : 1;
         
-        currentTicketPrice = DISCOUNT_PRICE;
-        
-        currentPriceSpan.textContent = formatCurrency(currentTicketPrice);
-        
+        // Always apply the discount price
         priceSection.classList.add('has-discount');
+        currentPriceSpan.textContent = formatCurrency(DISCOUNT_PRICE);
         originalPriceSpan.textContent = formatCurrency(ORIGINAL_PRICE);
+        originalPriceSpan.style.textDecoration = 'line-through';
+        originalPriceSpan.style.display = 'block';
 
-        const totalPrice = ticketNumberValue * currentTicketPrice;
+        const totalPrice = count * DISCOUNT_PRICE;
         totalPriceDiv.textContent = `Tổng cộng: ${formatCurrency(totalPrice)}`;
+        
+        // Disable decrease button if at minimum
+        decreaseBtn.disabled = count <= MIN_TICKETS;
     }
     
     // Hàm hiển thị thông báo
@@ -592,13 +621,13 @@
     // Hàm đóng thông báo và reset form
     function closeMessage() {
         messageOverlay.classList.remove('visible');
-        ticketNumberInput.value = 1;
+        ticketNumberInput.value = MIN_TICKETS;
         nameInput.value = '';
         document.getElementById('phone').value = '';
         goToStep(steps.info);
         phoneInputGroup.classList.remove('visible');
         continueBtn.style.display = 'none';
-        updateTicketPrice(); // Reset giá về ban đầu
+        updateTicketPrice(); // Reset price to initial discounted state
         if (statusListener) {
             db.ref().child('tickets').child(statusListener).off('value');
             statusListener = null;
@@ -633,15 +662,28 @@
         goToStep(steps.ticket);
         updateTicketPrice();
     });
+    
+    // Event listeners for quantity buttons
+    decreaseBtn.addEventListener('click', () => {
+        let currentTickets = parseInt(ticketNumberInput.value);
+        if (currentTickets > MIN_TICKETS) {
+            ticketNumberInput.value = currentTickets - 1;
+            updateTicketPrice();
+        }
+    });
 
-    // Cập nhật giá khi thay đổi số lượng vé
-    ticketNumberInput.addEventListener('input', updateTicketPrice);
+    increaseBtn.addEventListener('click', () => {
+        let currentTickets = parseInt(ticketNumberInput.value);
+        ticketNumberInput.value = currentTickets + 1;
+        updateTicketPrice();
+    });
+
 
     // Xử lý nút "Thanh Toán"
     checkoutBtn.addEventListener('click', () => {
         const count = parseInt(ticketNumberInput.value);
         
-        const totalPrice = count * currentTicketPrice;
+        const totalPrice = count * DISCOUNT_PRICE;
         const orderCode = "CHERRY" + Math.floor(100000 + Math.random() * 900000);
         const ticketsRef = db.ref("tickets");
         const newTicketRef = ticketsRef.push({
@@ -656,7 +698,7 @@
 
         const paymentContent = orderCode;
         paymentContentDisplay.textContent = paymentContent;
-const qrUrl = `https://img.vietqr.io/image/970422-973803388-compact.png?amount=${totalPrice}&addInfo=${encodeURIComponent(paymentContent)}`;
+        const qrUrl = `https://img.vietqr.io/image/970422-973803388-compact.png?amount=${totalPrice}&addInfo=${encodeURIComponent(paymentContent)}`;
         qrCodeDiv.innerHTML = `<img src="${qrUrl}" width="250" height="250" alt="QR Code">`;
 
         let totalPriceDivQR = document.getElementById('total-price-qr');
