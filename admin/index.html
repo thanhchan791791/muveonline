@@ -817,98 +817,92 @@
             renderHistory(filtered);
         }
 
-        window.showStatistics = function () {
-            let totalRevenue = 0;
-            let totalRevenueTickets = 0;
-            let dailyRevenue = 0;
-            let dailyTickets = 0;
-            let monthlyRevenue = 0;
-            let monthlyTickets = 0;
-            let weeklyRevenue = 0;
-            let weeklyTickets = 0;
+       window.showStatistics = function () {
+    let totalRevenue = 0;
+    let totalRevenueTickets = 0;
+    let dailyRevenue = 0;
+    let dailyTickets = 0;
+    let monthlyRevenue = 0;
+    let monthlyTickets = 0;
+    let weeklyRevenue = 0;
+    let weeklyTickets = 0;
 
-            paidTicketsHistory = [];
-            allDeductionHistory = [];
+    paidTicketsHistory = [];
+    allDeductionHistory = [];
 
-            const now = new Date();
-            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-            const dayOfWeek = now.getDay();
-            const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); 
-            const startOfWeek = new Date(now.getFullYear(), now.getMonth(), diff);
-            
-            const dailyData = {};
-            for (let d = 0; d < 30; d++) {
-                const date = new Date();
-                date.setDate(now.getDate() - 29 + d);
-                dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
+    // Tính ngày bắt đầu tuần (thứ 2)
+    const dayOfWeek = now.getDay(); // 0 = Chủ nhật
+    const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), diff);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    for (const ticketId in allTickets) {
+        const ticket = allTickets[ticketId];
+        if (ticket.status === 'paid') {
+            const createdAt = new Date(ticket.createdAt);
+            const ticketRevenue = ticket.totalPrice || 0;
+            const ticketCount = ticket.ticketNumber || 0;
+
+            totalRevenue += ticketRevenue;
+            totalRevenueTickets += ticketCount;
+            paidTicketsHistory.push({ id: ticketId, ...ticket });
+
+            // Hôm nay
+            if (createdAt >= startOfDay) {
+                dailyRevenue += ticketRevenue;
+                dailyTickets += ticketCount;
             }
-
-            for (const ticketId in allTickets) {
-                const ticket = allTickets[ticketId];
-                if (ticket.status === 'paid' && ticket.totalPrice > 0) {
-                    const price = ticket.totalPrice || 0;
-                    const ticketNumber = ticket.ticketNumber || 0;
-                    const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
-                    
-                    paidTicketsHistory.push({id: ticketId, ...ticket});
-                    totalRevenue += price;
-                    totalRevenueTickets += ticketNumber;
-
-                    if (ticketDate) {
-                        if (ticketDate >= startOfDay) {
-                            dailyRevenue += price;
-                            dailyTickets += ticketNumber;
-                        }
-                        if (ticketDate >= startOfMonth) {
-                            monthlyRevenue += price;
-                            monthlyTickets += ticketNumber;
-                        }
-                        if (ticketDate >= startOfWeek) {
-                            weeklyRevenue += price;
-                            weeklyTickets += ticketNumber;
-                        }
-                        const dateKey = ticketDate.toLocaleDateString('vi-VN');
-                        if (dailyData[dateKey]) {
-                            dailyData[dateKey].revenue += price;
-                            dailyData[dateKey].tickets += ticketNumber;
-                        }
-                    }
-                }
-
-                if (ticket.deductionHistory) {
-                    for (const key in ticket.deductionHistory) {
-                        const entry = ticket.deductionHistory[key];
-                        allDeductionHistory.push({
-                            ...entry,
-                            name: ticket.name,
-                            phone: ticket.phone
-                        });
-                    }
-                }
+            // Tuần này
+            if (createdAt >= startOfWeek) {
+                weeklyRevenue += ticketRevenue;
+                weeklyTickets += ticketCount;
             }
+            // Tháng này
+            if (createdAt >= startOfMonth) {
+                monthlyRevenue += ticketRevenue;
+                monthlyTickets += ticketCount;
+            }
+        }
 
-            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
-            document.getElementById('totalRevenueTickets').textContent = totalRevenueTickets + ' vé';
-            document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
-            document.getElementById('dailyTickets').textContent = dailyTickets + ' vé';
-            document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
-            document.getElementById('monthlyTickets').textContent = monthlyTickets + ' vé';
-            document.getElementById('weeklyRevenue').textContent = formatCurrency(weeklyRevenue);
-            document.getElementById('weeklyTickets').textContent = weeklyTickets + ' vé';
+        // Gộp lịch sử trừ vé (deductionHistory)
+        if (ticket.deductionHistory) {
+            for (const key in ticket.deductionHistory) {
+                const entry = ticket.deductionHistory[key];
+                allDeductionHistory.push({
+                    ...entry,
+                    name: ticket.name,
+                    phone: ticket.phone
+                });
+            }
+        }
+    }
 
-            selectedDateInput.value = '';
-            selectedDateStatsDiv.innerHTML = '';
-            deductionDateInput.value = '';
-            deductionDateStatsDiv.innerHTML = '';
+    // Gán dữ liệu lên giao diện
+   document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+document.getElementById('totalRevenueTickets').textContent = Math.floor(totalRevenue / 65000) + " vé";
 
-            renderDailyChart(dailyData);
-            renderHistory(paidTicketsHistory);
-            renderDeductionHistory(allDeductionHistory);
+document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
+document.getElementById('dailyTickets').textContent = Math.floor(dailyRevenue / 65000) + " vé";
 
-            statsModal.style.display = 'block';
-        };
+document.getElementById('weeklyRevenue').textContent = formatCurrency(weeklyRevenue);
+document.getElementById('weeklyTickets').textContent = Math.floor(weeklyRevenue / 65000) + " vé";
+
+document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
+document.getElementById('monthlyTickets').textContent = Math.floor(monthlyRevenue / 65000) + " vé";
+
+    // Render lại lịch sử
+    renderHistory(paidTicketsHistory);
+    renderDeductionHistory(allDeductionHistory);
+
+    // Mặc định mở tab "Tổng quan"
+    openTab({ currentTarget: document.querySelector('.tab-button') }, 'summary');
+    statsModal.style.display = 'block';
+};
+
 
         window.showSelectedDayStatistics = function() {
             const selectedDateValue = selectedDateInput.value;
