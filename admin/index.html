@@ -766,13 +766,14 @@
                 const li = document.createElement('li');
                 const date = new Date(ticket.createdAt);
                 const formattedDate = `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN')}`;
-                li.innerHTML = `
-                    <div class="history-info">
-                        <strong>${ticket.name}</strong> - SĐT: ${ticket.phone}<br>
-                        ${ticket.ticketNumber} vé | Tổng tiền: ${formatCurrency(ticket.totalPrice)}
-                    </div>
-                    <div class="history-date">${formattedDate}</div>
-                `;
+               li.innerHTML = `
+    <div class="history-info">
+        <strong>${ticket.name}</strong> - SĐT: ${ticket.phone}<br>
+        ${Math.floor(ticket.totalPrice / 65000)} vé | Tổng tiền: ${formatCurrency(ticket.totalPrice)}
+    </div>
+    <div class="history-date">${formattedDate}</div>
+`;
+
                 historyList.appendChild(li);
             });
         }
