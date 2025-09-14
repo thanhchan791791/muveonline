@@ -682,6 +682,7 @@
 
     const infoForm = document.getElementById('infoForm');
     const nameInput = document.getElementById('name');
+    const phoneInput = document.getElementById('phone');
     const phoneInputGroup = document.getElementById('phone-input-group');
     const continueBtn = document.getElementById('continueBtn');
     const checkoutBtn = document.getElementById('checkoutBtn');
@@ -776,7 +777,7 @@
         messageOverlay.classList.remove('visible');
         ticketNumberInput.value = MIN_TICKETS;
         nameInput.value = '';
-        document.getElementById('phone').value = '';
+        phoneInput.value = '';
         goToStep(steps.info);
         phoneInputGroup.classList.remove('visible');
         continueBtn.style.display = 'none';
@@ -806,7 +807,7 @@
     // Xử lý nút "Tiếp Tục" sau khi nhập thông tin
     continueBtn.addEventListener('click', () => {
         const name = nameInput.value.trim();
-        const phone = document.getElementById('phone').value.trim();
+        const phone = phoneInput.value.trim();
         if (!name || !phone) {
             showMessage('error', 'Lỗi', 'Vui lòng nhập đầy đủ thông tin!');
             return;
@@ -847,24 +848,8 @@
 
     // Xử lý nút "Quay lại" từ trang xác nhận
     backBtn.addEventListener('click', () => {
-        goToStep(steps.ticket);
-
-        // --- Bắt đầu phần code đã được sửa đổi và bổ sung ---
-        const animalItems = document.querySelectorAll('.animal-item');
-        animalItems.forEach(item => {
-            // Remove the animation to reset it
-            item.style.animation = 'none';
-            // Trigger a reflow to ensure the style change is applied
-            void item.offsetHeight;
-            // Re-add the animation to make it play again
-            item.style.animation = '';
-        });
-        // --- Kết thúc phần code đã được sửa đổi và bổ sung ---
-
-        ticketInputGroup.classList.add('visible');
-        // Re-trigger animations/display logic for ticket page elements if necessary
-        document.querySelector('.ticket-card').style.opacity = '1';
-        document.querySelector('.ticket-card').style.transform = 'translateY(0)';
+        // Tải lại trang
+        window.location.reload();
     });
 
     // Xử lý nút "Xác nhận & Thanh toán"
