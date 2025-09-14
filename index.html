@@ -130,6 +130,21 @@
             cursor: not-allowed;
             transform: none;
         }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .button-group button {
+            flex-grow: 1;
+        }
+        .button-group #back-btn {
+            background-color: #ccc;
+            color: var(--dark-text);
+        }
+        .button-group #back-btn:hover {
+            background-color: #b3b3b3;
+        }
 
         /* ----------------- Chuyển bước & QR code ----------------- */
         .step {
@@ -394,6 +409,18 @@
             from { transform: scale(0.8); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
+        
+        /* New Keyframes for Confirmation Step */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
 
         /* Thêm style cho phần điều khiển số lượng */
         .quantity-control {
@@ -421,6 +448,84 @@
             color: #e74c3c;
             font-weight: 600;
             margin-top: 10px;
+        }
+
+        /* ----------------- Cải tiến giao diện trang xác nhận ----------------- */
+        .confirmation-card {
+            background: linear-gradient(145deg, #fff, var(--secondary-pink));
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-elevation-2);
+            margin-bottom: 25px;
+            animation: fadeInUp 0.7s ease-out forwards;
+            border: 1px solid var(--primary-pink);
+            position: relative;
+        }
+        .confirmation-card h3 {
+            font-size: 1.6em;
+            color: var(--dark-text);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .confirmation-card .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+        .confirmation-card .info-row:hover {
+            background-color: rgba(255, 133, 162, 0.05);
+            padding: 12px 10px;
+            border-radius: 8px;
+        }
+        .confirmation-card .info-row:last-child {
+            border-bottom: none;
+        }
+        .confirmation-card .info-label {
+            font-weight: 500;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .confirmation-card .info-value {
+            font-weight: 700;
+            color: var(--dark-text);
+            text-align: right;
+            transition: color 0.3s ease;
+        }
+        .confirmation-card .info-row:first-child .info-value,
+        .confirmation-card .info-row:nth-child(2) .info-value {
+             color: var(--primary-pink);
+        }
+        .confirmation-card .info-row:nth-child(2) .info-value {
+            animation: shake 0.5s;
+            color: #E74C3C;
+            font-size: 1.2em;
+        }
+        .total-price-confirmation {
+            font-size: 2.2em;
+            font-weight: 800;
+            text-align: center;
+            color: var(--price-color);
+            margin-top: 25px;
+            animation: bounceIn 0.8s;
+            position: relative;
+        }
+        .total-price-confirmation::before {
+            content: 'Tổng cộng';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.5em;
+            font-weight: 500;
+            color: #888;
         }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -487,17 +592,47 @@
                 <li><i class="fa-solid fa-camera-retro"></i> Chụp ảnh check-in không giới hạn.</li>
             </ul>
         </div>
-        <div class="input-group visible">
+        <div class="input-group visible" id="ticket-input-group">
             <label for="ticketNumber">Số lượng vé:</label>
             <div class="quantity-control">
                 <button type="button" id="decreaseBtn">-</button>
                 <input type="text" id="ticketNumber" value="5" readonly>
                 <button type="button" id="increaseBtn">+</button>
             </div>
-            <p class="discount-note"><i class="fa-solid fa-fire"></i> Chương trình áp dụng khi mua tối thiểu 5 vé!</p>
+            <p class="discount-note"><i class="fa-solid fa-fire"></i> Chương trình áp dụng khi mua tối thiểu 5 vé!</p>
             <div class="price-display" id="total-price"></div>
         </div>
         <button id="checkoutBtn">Thanh Toán</button>
+    </div>
+
+    <div id="step-confirmation" class="step">
+        <h2>Xác nhận đơn hàng</h2>
+        <div class="confirmation-card">
+            <h3>Chi tiết đơn hàng của bạn</h3>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-user"></i> Tên khách hàng:</span>
+                <span class="info-value" id="confirm-name"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-phone-volume"></i> Số điện thoại:</span>
+                <span class="info-value" id="confirm-phone"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-ticket-alt"></i> Số lượng vé:</span>
+                <span class="info-value" id="confirm-tickets"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-tags"></i> Đơn giá:</span>
+                <span class="info-value" id="confirm-unit-price"></span>
+            </div>
+            <div class="total-price-confirmation">
+                <span id="confirm-total-price"></span>
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="backBtn" type="button">Quay lại</button>
+            <button id="confirmPayBtn" type="button">Xác nhận & Thanh toán</button>
+        </div>
     </div>
 
    <div id="step-payment" class="step">
@@ -541,6 +676,7 @@
     const steps = {
         info: document.getElementById('step-info'),
         ticket: document.getElementById('step-ticket'),
+        confirmation: document.getElementById('step-confirmation'),
         payment: document.getElementById('step-payment')
     };
 
@@ -549,11 +685,14 @@
     const phoneInputGroup = document.getElementById('phone-input-group');
     const continueBtn = document.getElementById('continueBtn');
     const checkoutBtn = document.getElementById('checkoutBtn');
+    const confirmPayBtn = document.getElementById('confirmPayBtn');
+    const backBtn = document.getElementById('backBtn');
     const ticketNumberInput = document.getElementById('ticketNumber');
     const totalPriceDiv = document.getElementById('total-price');
     const qrCodeDiv = document.getElementById('qr-code');
     const decreaseBtn = document.getElementById('decreaseBtn');
     const increaseBtn = document.getElementById('increaseBtn');
+    const ticketInputGroup = document.getElementById('ticket-input-group');
 
 
     const messageOverlay = document.getElementById('message-overlay');
@@ -569,6 +708,12 @@
     const currentPriceSpan = document.getElementById('current-price');
     const originalPriceSpan = document.getElementById('original-price');
     const priceNote = document.getElementById('price-note');
+
+    const confirmName = document.getElementById('confirm-name');
+    const confirmPhone = document.getElementById('confirm-phone');
+    const confirmTickets = document.getElementById('confirm-tickets');
+    const confirmUnitPrice = document.getElementById('confirm-unit-price');
+    const confirmTotalPrice = document.getElementById('confirm-total-price');
 
     let userInfo = {};
     const MIN_TICKETS = 5;
@@ -686,11 +831,45 @@
         updateTicketPrice();
     });
 
-
-    // Xử lý nút "Thanh Toán"
+    // Xử lý nút "Thanh Toán" - Chuyển sang trang xác nhận
     checkoutBtn.addEventListener('click', () => {
         const count = parseInt(ticketNumberInput.value);
+        const totalPrice = count * DISCOUNT_PRICE;
+
+        confirmName.textContent = userInfo.name;
+        confirmPhone.textContent = userInfo.phone;
+        confirmTickets.textContent = count;
+        confirmUnitPrice.textContent = formatCurrency(DISCOUNT_PRICE);
+        confirmTotalPrice.textContent = formatCurrency(totalPrice);
         
+        goToStep(steps.confirmation);
+    });
+
+    // Xử lý nút "Quay lại" từ trang xác nhận
+    backBtn.addEventListener('click', () => {
+        goToStep(steps.ticket);
+
+        // --- Bắt đầu phần code đã được sửa đổi và bổ sung ---
+        const animalItems = document.querySelectorAll('.animal-item');
+        animalItems.forEach(item => {
+            // Remove the animation to reset it
+            item.style.animation = 'none';
+            // Trigger a reflow to ensure the style change is applied
+            void item.offsetHeight;
+            // Re-add the animation to make it play again
+            item.style.animation = '';
+        });
+        // --- Kết thúc phần code đã được sửa đổi và bổ sung ---
+
+        ticketInputGroup.classList.add('visible');
+        // Re-trigger animations/display logic for ticket page elements if necessary
+        document.querySelector('.ticket-card').style.opacity = '1';
+        document.querySelector('.ticket-card').style.transform = 'translateY(0)';
+    });
+
+    // Xử lý nút "Xác nhận & Thanh toán"
+    confirmPayBtn.addEventListener('click', () => {
+        const count = parseInt(ticketNumberInput.value);
         const totalPrice = count * DISCOUNT_PRICE;
         const orderCode = "CHERRY" + Math.floor(100000 + Math.random() * 900000);
         const ticketsRef = db.ref("tickets");
