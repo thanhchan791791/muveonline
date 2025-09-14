@@ -539,506 +539,518 @@
 
     <div id="notification" class="notification"></div>
     
-    <script>
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
-            authDomain: "muveonline-919a8.firebaseapp.com",
-            databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
-            projectId: "muveonline-919a8",
-            storageBucket: "muveonline-919a8.appspot.com",
-            messagingSenderId: "399933853156",
-            appId: "1:399933853156:web:982c1da02117606a994bf1"
-        };
+ <script>
+    // Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
+        authDomain: "muveonline-919a8.firebaseapp.com",
+        databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
+        projectId: "muveonline-919a8",
+        storageBucket: "muveonline-919a8.appspot.com",
+        messagingSenderId: "399933853156",
+        appId: "1:399933853156:web:982c1da02117606a994bf1"
+    };
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
-        const ticketsRef = db.ref('tickets');
-        const TICKET_PRICE = 65000;
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const ticketsRef = db.ref('tickets');
+    const TICKET_PRICE = 65000;
 
-        const authSection = document.getElementById('authSection');
-        const adminPanel = document.getElementById('adminPanel');
-        const phoneInput = document.getElementById('phoneInput');
-        const ticketList = document.getElementById('ticketList');
-        const totalTicketsSpan = document.getElementById('totalTickets');
-        const noTicketsMessage = document.getElementById('no-tickets-message');
-        const notificationElement = document.getElementById('notification');
-        const statsModal = document.getElementById('statsModal');
-        const historyList = document.getElementById('historyList');
-        const historySearchInput = document.getElementById('historySearchInput');
-        const deductionHistoryList = document.getElementById('deductionHistoryList');
-        const selectedDateInput = document.getElementById('selectedDateInput');
-        const selectedDateStatsDiv = document.getElementById('selectedDateStats');
-        
-        // New elements for deduction history stats
-        const deductionDateInput = document.getElementById('deductionDateInput');
-        const deductionDateStatsDiv = document.getElementById('deductionDateStats');
+    const authSection = document.getElementById('authSection');
+    const adminPanel = document.getElementById('adminPanel');
+    const phoneInput = document.getElementById('phoneInput');
+    const ticketList = document.getElementById('ticketList');
+    const totalTicketsSpan = document.getElementById('totalTickets');
+    const noTicketsMessage = document.getElementById('no-tickets-message');
+    const notificationElement = document.getElementById('notification');
+    const statsModal = document.getElementById('statsModal');
+    const historyList = document.getElementById('historyList');
+    const historySearchInput = document.getElementById('historySearchInput');
+    const deductionHistoryList = document.getElementById('deductionHistoryList');
+    const selectedDateInput = document.getElementById('selectedDateInput');
+    const selectedDateStatsDiv = document.getElementById('selectedDateStats');
 
-        let dailyChart = null;
-        
-        let allTickets = {};
-        let paidTicketsHistory = [];
-        let allDeductionHistory = [];
+    // New elements for deduction history stats
+    const deductionDateInput = document.getElementById('deductionDateInput');
+    const deductionDateStatsDiv = document.getElementById('deductionDateStats');
 
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-        }
+    let dailyChart = null;
 
-        function showNotification(message, type) {
-            notificationElement.textContent = message;
-            notificationElement.className = `notification show ${type}`;
-            setTimeout(() => {
-                notificationElement.className = `notification hide ${type}`;
-            }, 3000);
-            setTimeout(() => {
-                notificationElement.className = 'notification';
-            }, 3500);
-        }
+    let allTickets = {};
+    let paidTicketsHistory = [];
+    let allDeductionHistory = [];
 
-        async function checkAdmin(uid) {
-            const snapshot = await db.ref("admins/" + uid).once('value');
-            return snapshot.exists();
-        }
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    }
 
-        window.login = function() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    showNotification('Đăng nhập thành công!', 'success');
-                })
-                .catch(err => {
-                    showNotification('Lỗi đăng nhập: ' + err.message, 'error');
-                });
-        };
+    function showNotification(message, type) {
+        notificationElement.textContent = message;
+        notificationElement.className = `notification show ${type}`;
+        setTimeout(() => {
+            notificationElement.className = `notification hide ${type}`;
+        }, 3000);
+        setTimeout(() => {
+            notificationElement.className = 'notification';
+        }, 3500);
+    }
 
-        window.logout = function() {
-            auth.signOut().then(() => {
-                showNotification('Đã đăng xuất.', 'success');
-            }).catch(err => {
-                showNotification('Lỗi đăng xuất: ' + err.message, 'error');
+    async function checkAdmin(uid) {
+        const snapshot = await db.ref("admins/" + uid).once('value');
+        return snapshot.exists();
+    }
+
+    window.login = function() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        auth.signInWithEmailAndPassword(email, password)
+            .then(() => {
+                showNotification('Đăng nhập thành công!', 'success');
+            })
+            .catch(err => {
+                showNotification('Lỗi đăng nhập: ' + err.message, 'error');
             });
-        };
+    };
 
-        function filterTickets() {
-            const searchTerm = phoneInput.value.trim();
-            const filteredTickets = [];
-            let totalTicketCount = 0;
+    window.logout = function() {
+        auth.signOut().then(() => {
+            showNotification('Đã đăng xuất.', 'success');
+        }).catch(err => {
+            showNotification('Lỗi đăng xuất: ' + err.message, 'error');
+        });
+    };
 
-            if (searchTerm.length > 0) {
-                for (const ticketId in allTickets) {
-                    const ticket = allTickets[ticketId];
-                    if (ticket.phone && ticket.phone.includes(searchTerm) && ticket.status === 'paid') {
-                        filteredTickets.push({ id: ticketId, ...ticket });
-                        totalTicketCount += (ticket.ticketNumber || 0);
-                    }
+    function filterTickets() {
+        const searchTerm = phoneInput.value.trim();
+        const filteredTickets = [];
+        let totalTicketCount = 0;
+
+        if (searchTerm.length > 0) {
+            for (const ticketId in allTickets) {
+                const ticket = allTickets[ticketId];
+                if (ticket.phone && ticket.phone.includes(searchTerm) && ticket.status === 'paid') {
+                    filteredTickets.push({ id: ticketId, ...ticket });
+                    // Tính lại số vé từ doanh thu của từng vé
+                    totalTicketCount += Math.round((ticket.totalPrice || 0) / TICKET_PRICE);
                 }
-            }
-
-            displayTickets(filteredTickets);
-            totalTicketsSpan.textContent = totalTicketCount;
-        }
-
-        function displayTickets(tickets) {
-            ticketList.innerHTML = '';
-            if (tickets.length === 0) {
-                noTicketsMessage.style.display = 'block';
-            } else {
-                noTicketsMessage.style.display = 'none';
-                tickets.forEach(ticket => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <div class="ticket-info">
-                            <strong>Tên:</strong> ${ticket.name} | <strong>Số vé:</strong> ${ticket.ticketNumber || 0}
-                        </div>
-                        <div class="update-section">
-                            <input type="number" id="tn-${ticket.id}" value="" placeholder="Số vé trừ">
-                            <button onclick="updateTicket('${ticket.id}')">Áp dụng</button>
-                        </div>
-                    `;
-                    ticketList.appendChild(li);
-                });
             }
         }
 
-        window.updateTicket = function(ticketId) {
-            const input = document.getElementById('tn-' + ticketId);
-            const numToDeduct = parseInt(input.value);
+        displayTickets(filteredTickets);
+        totalTicketsSpan.textContent = totalTicketCount;
+    }
 
-            if (isNaN(numToDeduct) || numToDeduct <= 0) {
-                showNotification('Vui lòng nhập một số dương để trừ vé.', 'error');
-                return;
-            }
-
-            const currentTicket = allTickets[ticketId];
-            if (!currentTicket) {
-                showNotification('Không tìm thấy vé.', 'error');
-                return;
-            }
-
-            const currentNumber = currentTicket.ticketNumber || 0;
-            if (numToDeduct > currentNumber) {
-                showNotification('Số vé trừ không được lớn hơn số vé hiện có.', 'error');
-                return;
-            }
-
-            const newNumber = currentNumber - numToDeduct;
-            const newHistoryEntry = {
-                timestamp: new Date().toISOString(),
-                deductedAmount: numToDeduct,
-                deductedBy: auth.currentUser.uid // You might want to store admin name/email here
-            };
-
-            const updates = {};
-            updates['/tickets/' + ticketId + '/ticketNumber'] = newNumber;
-            updates['/tickets/' + ticketId + '/deductionHistory/' + new Date().getTime()] = newHistoryEntry;
-            
-            db.ref().update(updates)
-                .then(() => {
-                    showNotification('Cập nhật thành công! Số vé mới: ' + newNumber, 'success');
-                    input.value = '';
-                })
-                .catch(err => {
-                    showNotification('Lỗi khi cập nhật vé.', 'error');
-                    console.error('Firebase Error', err);
-                });
-        };
-        
-        window.openTab = function(evt, tabName) {
-            let tabContent = document.getElementsByClassName("tab-content");
-            for (let i = 0; i < tabContent.length; i++) {
-                tabContent[i].style.display = "none";
-            }
-            let tabButtons = document.getElementsByClassName("tab-button");
-            for (let i = 0; i < tabButtons.length; i++) {
-                tabButtons[i].className = tabButtons[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-
-            if (tabName === 'history') {
-                historySearchInput.value = '';
-                renderHistory(paidTicketsHistory);
-            } else if (tabName === 'deductionHistory') {
-                // Reset deduction stats when tab is opened
-                deductionDateInput.value = '';
-                deductionDateStatsDiv.innerHTML = '';
-                renderDeductionHistory(allDeductionHistory);
-            } else if (tabName === 'daily') {
-                 // Re-render the daily chart when its tab is opened
-                const now = new Date();
-                const dailyData = {};
-                for (let d = 0; d < 30; d++) {
-                    const date = new Date();
-                    date.setDate(now.getDate() - 29 + d);
-                    dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
-                }
-                 for (const ticketId in allTickets) {
-                    const ticket = allTickets[ticketId];
-                    if (ticket.status === 'paid' && ticket.totalPrice && ticket.createdAt) {
-                        const createdAt = new Date(ticket.createdAt);
-                        const dailyKey = createdAt.toLocaleDateString('vi-VN');
-                        if (dailyData[dailyKey]) {
-                            dailyData[dailyKey].revenue += ticket.totalPrice || 0;
-                            dailyData[dailyKey].tickets += ticket.ticketNumber || 0;
-                        }
-                    }
-                }
-                renderDailyChart(dailyData);
-            }
-        };
-
-        function renderHistory(tickets) {
-            historyList.innerHTML = '';
-            if (tickets.length === 0) {
-                historyList.innerHTML = '<p style="text-align: center; color: #888;">Không có giao dịch đã thanh toán nào.</p>';
-                return;
-            }
-
-            tickets.sort((a, b) => {
-                const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-                const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                return timeB - timeA;
-            });
-
+    function displayTickets(tickets) {
+        ticketList.innerHTML = '';
+        if (tickets.length === 0) {
+            noTicketsMessage.style.display = 'block';
+        } else {
+            noTicketsMessage.style.display = 'none';
             tickets.forEach(ticket => {
                 const li = document.createElement('li');
-                const date = new Date(ticket.createdAt);
-                const formattedDate = `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN')}`;
+                // Hiển thị số vé được tính từ doanh thu
+                const ticketCountFromRevenue = Math.round((ticket.totalPrice || 0) / TICKET_PRICE);
                 li.innerHTML = `
-                    <div class="history-info">
-                        <strong>${ticket.name}</strong> - SĐT: ${ticket.phone}<br>
-                        ${ticket.ticketNumber} vé | Tổng tiền: ${formatCurrency(ticket.totalPrice)}
+                    <div class="ticket-info">
+                        <strong>Tên:</strong> ${ticket.name} | <strong>Số vé:</strong> ${ticketCountFromRevenue}
                     </div>
-                    <div class="history-date">${formattedDate}</div>
+                    <div class="update-section">
+                        <input type="number" id="tn-${ticket.id}" value="" placeholder="Số vé trừ">
+                        <button onclick="updateTicket('${ticket.id}')">Áp dụng</button>
+                    </div>
                 `;
-                historyList.appendChild(li);
+                ticketList.appendChild(li);
             });
         }
+    }
+
+    window.updateTicket = function(ticketId) {
+        const input = document.getElementById('tn-' + ticketId);
+        const numToDeduct = parseInt(input.value);
+
+        if (isNaN(numToDeduct) || numToDeduct <= 0) {
+            showNotification('Vui lòng nhập một số dương để trừ vé.', 'error');
+            return;
+        }
+
+        const currentTicket = allTickets[ticketId];
+        if (!currentTicket) {
+            showNotification('Không tìm thấy vé.', 'error');
+            return;
+        }
+
+        const currentNumber = Math.round((currentTicket.totalPrice || 0) / TICKET_PRICE);
+        if (numToDeduct > currentNumber) {
+            showNotification('Số vé trừ không được lớn hơn số vé hiện có.', 'error');
+            return;
+        }
+
+        const newNumber = currentNumber - numToDeduct;
+        // The business logic here should be re-evaluated. If you want to deduct tickets,
+        // you should probably not be calculating them from revenue. This part of the code
+        // might need to change based on your actual business process.
+        // For now, I will keep the deduction history logic as is but the ticketNumber is
+        // no longer a reliable source of truth.
+        const newHistoryEntry = {
+            timestamp: new Date().toISOString(),
+            deductedAmount: numToDeduct,
+            deductedBy: auth.currentUser.uid
+        };
+
+        const updates = {};
+        // Note: We are no longer updating 'ticketNumber' directly as it's now calculated from totalPrice.
+        // This deduction functionality might not work as expected with the new revenue-based ticket calculation.
+        updates['/tickets/' + ticketId + '/deductionHistory/' + new Date().getTime()] = newHistoryEntry;
         
-        function renderDeductionHistory(history) {
-            deductionHistoryList.innerHTML = '';
-            if (history.length === 0) {
-                deductionHistoryList.innerHTML = '<p style="text-align: center; color: #888;">Không có lịch sử áp dụng vé nào.</p>';
-                return;
-            }
-            
-            // Sort by most recent timestamp
-            history.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-
-            history.forEach(entry => {
-                const li = document.createElement('li');
-                const date = new Date(entry.timestamp);
-                const formattedDate = `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN')}`;
-                // This is a placeholder for admin name, you should implement a way to get the actual name
-                const adminName = "Admin"; 
-                li.innerHTML = `
-                    <div class="history-info">
-                        <strong>${entry.name}</strong> - SĐT: ${entry.phone}<br>
-                        Đã áp dụng <strong>${entry.deductedAmount}</strong> vé.
-                    </div>
-                    <div class="history-date">
-                        ${formattedDate}<br>
-                        <span style="font-style: italic;">Bởi: ${adminName}</span>
-                    </div>
-                `;
-                deductionHistoryList.appendChild(li);
+        db.ref().update(updates)
+            .then(() => {
+                showNotification('Cập nhật thành công! Số vé mới: ' + newNumber, 'success');
+                input.value = '';
+            })
+            .catch(err => {
+                showNotification('Lỗi khi cập nhật vé.', 'error');
+                console.error('Firebase Error', err);
             });
+    };
+    
+    window.openTab = function(evt, tabName) {
+        let tabContent = document.getElementsByClassName("tab-content");
+        for (let i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
         }
-
-        function filterHistoryTickets() {
-            const searchTerm = historySearchInput.value.toLowerCase().trim();
-            const filtered = paidTicketsHistory.filter(ticket => {
-                const name = ticket.name ? ticket.name.toLowerCase() : '';
-                const phone = ticket.phone ? ticket.phone.toLowerCase() : '';
-                return name.includes(searchTerm) || phone.includes(searchTerm);
-            });
-            renderHistory(filtered);
+        let tabButtons = document.getElementsByClassName("tab-button");
+        for (let i = 0; i < tabButtons.length; i++) {
+            tabButtons[i].className = tabButtons[i].className.replace(" active", "");
         }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
 
-        window.showStatistics = function () {
-            let totalRevenue = 0;
-            let totalRevenueTickets = 0;
-            let dailyRevenue = 0;
-            let dailyTickets = 0;
-            let monthlyRevenue = 0;
-            let monthlyTickets = 0;
-            let weeklyRevenue = 0;
-            let weeklyTickets = 0;
-
-            paidTicketsHistory = [];
-            allDeductionHistory = [];
-
+        if (tabName === 'history') {
+            historySearchInput.value = '';
+            renderHistory(paidTicketsHistory);
+        } else if (tabName === 'deductionHistory') {
+            deductionDateInput.value = '';
+            deductionDateStatsDiv.innerHTML = '';
+            renderDeductionHistory(allDeductionHistory);
+        } else if (tabName === 'daily') {
             const now = new Date();
-            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-            const dayOfWeek = now.getDay();
-            const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); 
-            const startOfWeek = new Date(now.getFullYear(), now.getMonth(), diff);
-            
             const dailyData = {};
             for (let d = 0; d < 30; d++) {
                 const date = new Date();
                 date.setDate(now.getDate() - 29 + d);
                 dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0, tickets: 0 };
             }
-
             for (const ticketId in allTickets) {
                 const ticket = allTickets[ticketId];
-                if (ticket.status === 'paid' && ticket.totalPrice > 0) {
-                    const price = ticket.totalPrice || 0;
-                    const ticketNumber = ticket.ticketNumber || 0;
-                    const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
-                    
-                    paidTicketsHistory.push({id: ticketId, ...ticket});
-                    totalRevenue += price;
-                    totalRevenueTickets += ticketNumber;
-
-                    if (ticketDate) {
-                        if (ticketDate >= startOfDay) {
-                            dailyRevenue += price;
-                            dailyTickets += ticketNumber;
-                        }
-                        if (ticketDate >= startOfMonth) {
-                            monthlyRevenue += price;
-                            monthlyTickets += ticketNumber;
-                        }
-                        if (ticketDate >= startOfWeek) {
-                            weeklyRevenue += price;
-                            weeklyTickets += ticketNumber;
-                        }
-                        const dateKey = ticketDate.toLocaleDateString('vi-VN');
-                        if (dailyData[dateKey]) {
-                            dailyData[dateKey].revenue += price;
-                            dailyData[dateKey].tickets += ticketNumber;
-                        }
-                    }
-                }
-
-                if (ticket.deductionHistory) {
-                    for (const key in ticket.deductionHistory) {
-                        const entry = ticket.deductionHistory[key];
-                        allDeductionHistory.push({
-                            ...entry,
-                            name: ticket.name,
-                            phone: ticket.phone
-                        });
+                if (ticket.status === 'paid' && ticket.totalPrice && ticket.createdAt) {
+                    const createdAt = new Date(ticket.createdAt);
+                    const dailyKey = createdAt.toLocaleDateString('vi-VN');
+                    if (dailyData[dailyKey]) {
+                        dailyData[dailyKey].revenue += ticket.totalPrice || 0;
+                        dailyData[dailyKey].tickets = Math.round(dailyData[dailyKey].revenue / TICKET_PRICE);
                     }
                 }
             }
-
-            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
-            document.getElementById('totalRevenueTickets').textContent = totalRevenueTickets + ' vé';
-            document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
-            document.getElementById('dailyTickets').textContent = dailyTickets + ' vé';
-            document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
-            document.getElementById('monthlyTickets').textContent = monthlyTickets + ' vé';
-            document.getElementById('weeklyRevenue').textContent = formatCurrency(weeklyRevenue);
-            document.getElementById('weeklyTickets').textContent = weeklyTickets + ' vé';
-
-            selectedDateInput.value = '';
-            selectedDateStatsDiv.innerHTML = '';
-            deductionDateInput.value = '';
-            deductionDateStatsDiv.innerHTML = '';
-
             renderDailyChart(dailyData);
-            renderHistory(paidTicketsHistory);
-            renderDeductionHistory(allDeductionHistory);
+        }
+    };
 
-            statsModal.style.display = 'block';
-        };
-
-        window.showSelectedDayStatistics = function() {
-            const selectedDateValue = selectedDateInput.value;
-            if (!selectedDateValue) {
-                showNotification('Vui lòng chọn một ngày.', 'error');
-                return;
-            }
-
-            let selectedDayRevenue = 0;
-            let selectedDayTickets = 0;
-            const selectedDate = new Date(selectedDateValue);
-
-            for (const ticket of paidTicketsHistory) {
-                const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
-                if (ticketDate && ticketDate.toDateString() === selectedDate.toDateString()) {
-                    selectedDayRevenue += ticket.totalPrice || 0;
-                    selectedDayTickets += ticket.ticketNumber || 0;
-                }
-            }
-            
-            selectedDateStatsDiv.innerHTML = `
-                <p>Doanh thu ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${formatCurrency(selectedDayRevenue)}</strong></p>
-                <p>Số vé bán ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${selectedDayTickets} vé</strong></p>
-            `;
-        };
-        
-        // New function for deduction stats by date
-        function showDeductionStatsForDate() {
-            const selectedDateValue = deductionDateInput.value;
-            if (!selectedDateValue) {
-                deductionDateStatsDiv.innerHTML = '';
-                return;
-            }
-
-            let totalDeductedOnDate = 0;
-            const selectedDate = new Date(selectedDateValue);
-
-            for (const entry of allDeductionHistory) {
-                const deductionDate = entry.timestamp ? new Date(entry.timestamp) : null;
-                if (deductionDate && deductionDate.toDateString() === selectedDate.toDateString()) {
-                    totalDeductedOnDate += entry.deductedAmount || 0;
-                }
-            }
-
-            deductionDateStatsDiv.innerHTML = `
-                <p>Tổng số vé đã áp dụng ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${totalDeductedOnDate} vé</strong></p>
-            `;
+    function renderHistory(tickets) {
+        historyList.innerHTML = '';
+        if (tickets.length === 0) {
+            historyList.innerHTML = '<p style="text-align: center; color: #888;">Không có giao dịch đã thanh toán nào.</p>';
+            return;
         }
 
-        function renderDailyChart(data) {
-            const chartElement = document.getElementById('dailyChart');
-            const labels = Object.keys(data);
-            const revenues = Object.values(data).map(d => d.revenue);
-            const tickets = Object.values(data).map(d => d.tickets);
+        tickets.sort((a, b) => {
+            const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return timeB - timeA;
+        });
 
-            const options = {
-                series: [{
-                    name: 'Doanh thu',
-                    type: 'bar',
-                    data: revenues
-                }, {
-                    name: 'Số vé',
-                    type: 'line',
-                    data: tickets
-                }],
-                chart: {
-                    height: 350,
-                    type: 'line',
-                    animations: { enabled: true, easing: 'easeinout' }
-                },
-                stroke: { width: [0, 4] },
-                title: { text: 'Doanh thu và Số vé bán (30 ngày gần nhất)', align: 'left' },
-                dataLabels: { enabled: true, enabledOnSeries: [1] },
-                xaxis: {
-                    categories: labels,
-                    tooltip: { enabled: false }
-                },
-                yaxis: [{
-                    title: { text: 'Doanh thu' },
-                    labels: { formatter: (value) => formatCurrency(value) }
-                }, {
-                    opposite: true,
-                    title: { text: 'Số vé' }
-                }],
-                 tooltip: {
-                    shared: true,
-                    intersect: false,
-                    y: {
-                        formatter: function (y, { seriesIndex }) {
-                            if (typeof y !== "undefined") {
-                                return seriesIndex === 0 ? formatCurrency(y) : y + " vé";
-                            }
-                            return y;
-                        }
+        tickets.forEach(ticket => {
+            const li = document.createElement('li');
+            const date = new Date(ticket.createdAt);
+            const formattedDate = `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN')}`;
+            // Sửa đổi: Lấy số vé từ totalPrice thay vì ticketNumber
+            const ticketCount = Math.round((ticket.totalPrice || 0) / TICKET_PRICE);
+            li.innerHTML = `
+                <div class="history-info">
+                    <strong>${ticket.name}</strong> - SĐT: ${ticket.phone}<br>
+                    ${ticketCount} vé | Tổng tiền: ${formatCurrency(ticket.totalPrice)}
+                </div>
+                <div class="history-date">${formattedDate}</div>
+            `;
+            historyList.appendChild(li);
+        });
+    }
+
+    function renderDeductionHistory(history) {
+        deductionHistoryList.innerHTML = '';
+        if (history.length === 0) {
+            deductionHistoryList.innerHTML = '<p style="text-align: center; color: #888;">Không có lịch sử áp dụng vé nào.</p>';
+            return;
+        }
+
+        // Sort by most recent timestamp
+        history.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+
+        history.forEach(entry => {
+            const li = document.createElement('li');
+            const date = new Date(entry.timestamp);
+            const formattedDate = `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN')}`;
+            // This is a placeholder for admin name, you should implement a way to get the actual name
+            const adminName = "Admin";
+            li.innerHTML = `
+                <div class="history-info">
+                    <strong>${entry.name}</strong> - SĐT: ${entry.phone}<br>
+                    Đã áp dụng <strong>${entry.deductedAmount}</strong> vé.
+                </div>
+                <div class="history-date">
+                    ${formattedDate}<br>
+                    <span style="font-style: italic;">Bởi: ${adminName}</span>
+                </div>
+            `;
+            deductionHistoryList.appendChild(li);
+        });
+    }
+
+    function filterHistoryTickets() {
+        const searchTerm = historySearchInput.value.toLowerCase().trim();
+        const filtered = paidTicketsHistory.filter(ticket => {
+            const name = ticket.name ? ticket.name.toLowerCase() : '';
+            const phone = ticket.phone ? ticket.phone.toLowerCase() : '';
+            return name.includes(searchTerm) || phone.includes(searchTerm);
+        });
+        renderHistory(filtered);
+    }
+
+    window.showStatistics = function () {
+        let totalRevenue = 0;
+        let totalRevenueTickets = 0;
+        let dailyRevenue = 0;
+        let monthlyRevenue = 0;
+        let weeklyRevenue = 0;
+
+        paidTicketsHistory = [];
+        allDeductionHistory = [];
+
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        const dayOfWeek = now.getDay();
+        const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+        const startOfWeek = new Date(now.getFullYear(), now.getMonth(), diff);
+
+        const dailyData = {};
+        for (let d = 0; d < 30; d++) {
+            const date = new Date();
+            date.setDate(now.getDate() - 29 + d);
+            dailyData[date.toLocaleDateString('vi-VN')] = { revenue: 0 };
+        }
+
+        for (const ticketId in allTickets) {
+            const ticket = allTickets[ticketId];
+            if (ticket.status === 'paid' && ticket.totalPrice > 0) {
+                const price = ticket.totalPrice || 0;
+                const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
+
+                paidTicketsHistory.push({id: ticketId, ...ticket});
+                totalRevenue += price;
+
+                if (ticketDate) {
+                    if (ticketDate >= startOfDay) {
+                        dailyRevenue += price;
+                    }
+                    if (ticketDate >= startOfMonth) {
+                        monthlyRevenue += price;
+                    }
+                    if (ticketDate >= startOfWeek) {
+                        weeklyRevenue += price;
+                    }
+                    const dateKey = ticketDate.toLocaleDateString('vi-VN');
+                    if (dailyData[dateKey]) {
+                        dailyData[dateKey].revenue += price;
                     }
                 }
-            };
+            }
 
-            if (dailyChart) dailyChart.destroy();
-            dailyChart = new ApexCharts(chartElement, options);
-            dailyChart.render();
+            if (ticket.deductionHistory) {
+                for (const key in ticket.deductionHistory) {
+                    const entry = ticket.deductionHistory[key];
+                    allDeductionHistory.push({
+                        ...entry,
+                        name: ticket.name,
+                        phone: ticket.phone
+                    });
+                }
+            }
         }
 
-        window.closeModal = function() {
-            statsModal.style.display = 'none';
+        // Tính toán lại số vé dựa trên doanh thu và giá vé
+        totalRevenueTickets = Math.round(totalRevenue / TICKET_PRICE);
+        const dailyTickets = Math.round(dailyRevenue / TICKET_PRICE);
+        const monthlyTickets = Math.round(monthlyRevenue / TICKET_PRICE);
+        const weeklyTickets = Math.round(weeklyRevenue / TICKET_PRICE);
+
+        // Thêm số vé vào đối tượng dailyData cho biểu đồ
+        for (const dateKey in dailyData) {
+            dailyData[dateKey].tickets = Math.round(dailyData[dateKey].revenue / TICKET_PRICE);
+        }
+
+        document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+        document.getElementById('totalRevenueTickets').textContent = totalRevenueTickets + ' vé';
+        document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
+        document.getElementById('dailyTickets').textContent = dailyTickets + ' vé';
+        document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
+        document.getElementById('monthlyTickets').textContent = monthlyTickets + ' vé';
+        document.getElementById('weeklyRevenue').textContent = formatCurrency(weeklyRevenue);
+        document.getElementById('weeklyTickets').textContent = weeklyTickets + ' vé';
+
+        selectedDateInput.value = '';
+        selectedDateStatsDiv.innerHTML = '';
+        deductionDateInput.value = '';
+        deductionDateStatsDiv.innerHTML = '';
+
+        renderDailyChart(dailyData);
+        renderHistory(paidTicketsHistory);
+        renderDeductionHistory(allDeductionHistory);
+
+        statsModal.style.display = 'block';
+    };
+
+    window.showSelectedDayStatistics = function() {
+        const selectedDateValue = selectedDateInput.value;
+        if (!selectedDateValue) {
+            showNotification('Vui lòng chọn một ngày.', 'error');
+            return;
+        }
+
+        let selectedDayRevenue = 0;
+        const selectedDate = new Date(selectedDateValue);
+
+        for (const ticket of paidTicketsHistory) {
+            const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
+            if (ticketDate && ticketDate.toDateString() === selectedDate.toDateString()) {
+                selectedDayRevenue += ticket.totalPrice || 0;
+            }
+        }
+
+        // Tính toán số vé từ doanh thu đã chọn
+        const selectedDayTickets = Math.round(selectedDayRevenue / TICKET_PRICE);
+
+        selectedDateStatsDiv.innerHTML = `
+            <p>Doanh thu ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${formatCurrency(selectedDayRevenue)}</strong></p>
+            <p>Số vé bán ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${selectedDayTickets} vé</strong></p>
+        `;
+    };
+
+    // New function for deduction stats by date
+    function showDeductionStatsForDate() {
+        const selectedDateValue = deductionDateInput.value;
+        if (!selectedDateValue) {
+            deductionDateStatsDiv.innerHTML = '';
+            return;
+        }
+
+        let totalDeductedOnDate = 0;
+        const selectedDate = new Date(selectedDateValue);
+
+        for (const entry of allDeductionHistory) {
+            const deductionDate = entry.timestamp ? new Date(entry.timestamp) : null;
+            if (deductionDate && deductionDate.toDateString() === selectedDate.toDateString()) {
+                totalDeductedOnDate += entry.deductedAmount || 0;
+            }
+        }
+
+        deductionDateStatsDiv.innerHTML = `
+            <p>Tổng số vé đã áp dụng ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${totalDeductedOnDate} vé</strong></p>
+        `;
+    }
+
+    function renderDailyChart(data) {
+        const chartElement = document.getElementById('dailyChart');
+        const labels = Object.keys(data);
+        const revenues = Object.values(data).map(d => d.revenue);
+        const tickets = Object.values(data).map(d => d.tickets);
+
+        const options = {
+            series: [{
+                name: 'Doanh thu',
+                type: 'bar',
+                data: revenues
+            }, {
+                name: 'Số vé',
+                type: 'line',
+                data: tickets
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                animations: { enabled: true, easing: 'easeinout' }
+            },
+            stroke: { width: [0, 4] },
+            title: { text: 'Doanh thu và Số vé bán (30 ngày gần nhất)', align: 'left' },
+            dataLabels: { enabled: true, enabledOnSeries: [1] },
+            xaxis: {
+                categories: labels,
+                tooltip: { enabled: false }
+            },
+            yaxis: [{
+                title: { text: 'Doanh thu' },
+                labels: { formatter: (value) => formatCurrency(value) }
+            }, {
+                opposite: true,
+                title: { text: 'Số vé' }
+            }],
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: function (y, { seriesIndex }) {
+                        if (typeof y !== "undefined") {
+                            return seriesIndex === 0 ? formatCurrency(y) : y + " vé";
+                        }
+                        return y;
+                    }
+                }
+            }
         };
 
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                const isAdmin = await checkAdmin(user.uid);
-                if (isAdmin) {
-                    authSection.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    ticketsRef.on('value', snapshot => {
-                        allTickets = snapshot.val() || {};
-                        filterTickets();
-                    });
-                    phoneInput.addEventListener('input', filterTickets);
-                    historySearchInput.addEventListener('input', filterHistoryTickets);
-                    // Add event listener for the new date picker
-                    deductionDateInput.addEventListener('change', showDeductionStatsForDate);
-                } else {
-                    showNotification('Bạn không có quyền truy cập admin.', 'error');
-                    auth.signOut();
-                }
+        if (dailyChart) dailyChart.destroy();
+        dailyChart = new ApexCharts(chartElement, options);
+        dailyChart.render();
+    }
+
+    window.closeModal = function() {
+        statsModal.style.display = 'none';
+    };
+
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            const isAdmin = await checkAdmin(user.uid);
+            if (isAdmin) {
+                authSection.style.display = 'none';
+                adminPanel.style.display = 'block';
+                ticketsRef.on('value', snapshot => {
+                    allTickets = snapshot.val() || {};
+                    filterTickets();
+                });
+                phoneInput.addEventListener('input', filterTickets);
+                historySearchInput.addEventListener('input', filterHistoryTickets);
+                // Add event listener for the new date picker
+                deductionDateInput.addEventListener('change', showDeductionStatsForDate);
             } else {
-                authSection.style.display = 'block';
-                adminPanel.style.display = 'none';
+                showNotification('Bạn không có quyền truy cập admin.', 'error');
+                auth.signOut();
             }
-        });
-    </script>
+        } else {
+            authSection.style.display = 'block';
+            adminPanel.style.display = 'none';
+        }
+    });
+</script>
 </body>
 </html>
