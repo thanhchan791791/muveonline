@@ -58,6 +58,16 @@
             text-align: center;
             margin-bottom: 25px;
         }
+        .info-note {
+            text-align: center;
+            font-size: 1em;
+            color: var(--primary-pink);
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: var(--secondary-pink);
+            border-radius: 10px;
+        }
 
         /* ----------------- Hiệu ứng hình ảnh mới ----------------- */
         .header-image {
@@ -527,6 +537,44 @@
             font-weight: 500;
             color: #888;
         }
+
+        /* ----------------- CUSTOM STYLE CHO CÂU THÔNG BÁO MỚI ----------------- */
+        .announcement-box {
+            position: relative;
+            background-color: #FFDDE2; /* Màu nền nhẹ nhàng, hài hòa với giao diện */
+            border: 2px solid var(--primary-pink); /* Viền màu hồng đậm hơn */
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            box-shadow: var(--shadow-elevation-1);
+            animation: fadeIn 0.8s ease-out;
+        }
+        .announcement-box h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.2em;
+            color: var(--primary-pink);
+            font-weight: 700;
+        }
+        .announcement-box p {
+            margin: 0;
+            font-size: 1em;
+            line-height: 1.4;
+            color: var(--dark-text);
+        }
+        .announcement-box .icon-hot {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #FF4D4D;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: bold;
+            transform: rotate(10deg);
+            animation: bounceIn 1s ease-out;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -541,6 +589,12 @@
         </div>
         <h1>Cherry Pet Coffee <i class="fa-solid fa-mug-saucer" style="font-size: 0.8em;"></i></h1>
         <p class="subtitle">Mua vé tham quan & trải nghiệm <i class="fa-solid fa-paw"></i></p>
+
+        <div class="announcement-box">
+            <span class="icon-hot">HOT</span>
+            <h3>Ưu đãi Vé Online</h3>
+            <p>Chương trình ưu đãi chỉ diễn ra trong 3 tuần! Vé mua rồi dùng thoải mái cho đến khi hết vé, không giới hạn thời gian sử dụng đâu nha.</p>
+        </div>
         <form id="infoForm">
             <div class="input-group visible">
                 <label for="name">Tên của bạn:</label>
@@ -549,6 +603,10 @@
             <div class="input-group" id="phone-input-group">
                 <label for="phone">Số điện thoại:</label>
                 <input type="tel" id="phone" placeholder="Nhập số điện thoại" required>
+            </div>
+            <div class="input-group" id="re-phone-input-group">
+                <label for="rePhone">Nhập lại số điện thoại:</label>
+                <input type="tel" id="rePhone" placeholder="Xác nhận số điện thoại" required>
             </div>
             <button id="continueBtn" type="button" style="display: none;">Tiếp Tục</button>
         </form>
@@ -683,7 +741,9 @@
     const infoForm = document.getElementById('infoForm');
     const nameInput = document.getElementById('name');
     const phoneInput = document.getElementById('phone');
+    const rePhoneInput = document.getElementById('rePhone'); // New
     const phoneInputGroup = document.getElementById('phone-input-group');
+    const rePhoneInputGroup = document.getElementById('re-phone-input-group'); // New
     const continueBtn = document.getElementById('continueBtn');
     const checkoutBtn = document.getElementById('checkoutBtn');
     const confirmPayBtn = document.getElementById('confirmPayBtn');
@@ -778,8 +838,10 @@
         ticketNumberInput.value = MIN_TICKETS;
         nameInput.value = '';
         phoneInput.value = '';
+        rePhoneInput.value = ''; // Reset new input
         goToStep(steps.info);
         phoneInputGroup.classList.remove('visible');
+        rePhoneInputGroup.classList.remove('visible'); // Hide new input
         continueBtn.style.display = 'none';
         updateTicketPrice(); // Reset price to initial discounted state
         if (statusListener) {
@@ -794,12 +856,14 @@
     nameInput.addEventListener('input', () => {
         if (nameInput.value.trim().length > 0) {
             phoneInputGroup.classList.add('visible');
+            rePhoneInputGroup.classList.add('visible'); // Show new input
             setTimeout(() => {
                 continueBtn.style.display = 'block';
                 continueBtn.classList.add('visible');
             }, 500);
         } else {
             phoneInputGroup.classList.remove('visible');
+            rePhoneInputGroup.classList.remove('visible'); // Hide new input
             continueBtn.style.display = 'none';
         }
     });
@@ -808,10 +872,25 @@
     continueBtn.addEventListener('click', () => {
         const name = nameInput.value.trim();
         const phone = phoneInput.value.trim();
-        if (!name || !phone) {
+        const rePhone = rePhoneInput.value.trim();
+
+        const phoneRegex = /^0\d{8,10}$/;
+
+        if (!name || !phone || !rePhone) {
             showMessage('error', 'Lỗi', 'Vui lòng nhập đầy đủ thông tin!');
             return;
         }
+
+        if (phone !== rePhone) {
+            showMessage('error', 'Lỗi', 'Số điện thoại xác nhận không trùng khớp.');
+            return;
+        }
+
+        if (!phoneRegex.test(phone)) {
+            showMessage('error', 'Lỗi', 'Số điện thoại không hợp lệ. Vui lòng nhập số có từ 9-11 chữ số và bắt đầu bằng số 0.');
+            return;
+        }
+
         userInfo = { name, phone };
         goToStep(steps.ticket);
         updateTicketPrice();
