@@ -451,6 +451,17 @@
         #selectedDateStats strong, #deductionDateStats strong {
             color: var(--primary-dark);
         }
+        
+        #deductionHistoryTotal {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            background-color: #f0f4c3;
+            border-radius: 8px;
+            border-left: 5px solid #cddc39;
+        }
     </style>
 </head>
 <body>
@@ -527,6 +538,7 @@
             </div>
             <div id="deductionHistory" class="tab-content">
                 <h3>Lịch sử áp dụng vé</h3>
+                <div id="deductionHistoryTotal"></div>
                 <ul id="deductionHistoryList"></ul>
                 <div class="date-picker-section">
                     <h3>Thống kê vé áp dụng theo ngày</h3>
@@ -574,12 +586,16 @@
         // New elements for deduction history stats
         const deductionDateInput = document.getElementById('deductionDateInput');
         const deductionDateStatsDiv = document.getElementById('deductionDateStats');
+        const deductionHistoryTotalDiv = document.getElementById('deductionHistoryTotal');
 
         let dailyChart = null;
         
         let allTickets = {};
         let paidTicketsHistory = [];
         let allDeductionHistory = [];
+        let totalPaidTickets = 0;
+        let totalDeductedTickets = 0;
+
 
         function formatCurrency(amount) {
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -779,6 +795,10 @@
         }
         
         function renderDeductionHistory(history) {
+            // Update total unused tickets
+            const totalUnusedTickets = totalPaidTickets - totalDeductedTickets;
+            deductionHistoryTotalDiv.innerHTML = `Tổng số vé chưa sử dụng: <strong>${totalUnusedTickets} vé</strong>`;
+
             deductionHistoryList.innerHTML = '';
             if (history.length === 0) {
                 deductionHistoryList.innerHTML = '<p style="text-align: center; color: #888;">Không có lịch sử áp dụng vé nào.</p>';
@@ -818,27 +838,32 @@
             renderHistory(filtered);
         }
 
-       window.showStatistics = function () {
+      window.showStatistics = function () {
     let totalRevenue = 0;
-    let totalRevenueTickets = 0;
     let dailyRevenue = 0;
-    let dailyTickets = 0;
     let monthlyRevenue = 0;
-    let monthlyTickets = 0;
     let weeklyRevenue = 0;
-    let weeklyTickets = 0;
 
+    totalPaidTickets = 0;
+    totalDeductedTickets = 0;
     paidTicketsHistory = [];
     allDeductionHistory = [];
 
     const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    // Tính ngày bắt đầu tuần (thứ 2)
-    const dayOfWeek = now.getDay(); // 0 = Chủ nhật
-    const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), diff);
+    // Bắt đầu ngày (hôm nay)
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    startOfDay.setHours(0, 0, 0, 0);
+
+    // Bắt đầu tháng
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    // Bắt đầu tuần (theo chuẩn ISO - tuần bắt đầu từ Thứ 2)
+    const day = now.getDay(); // Chủ nhật = 0, Thứ 2 = 1, ...
+    const diff = (day === 0 ? -6 : 1) - day; 
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() + diff);
     startOfWeek.setHours(0, 0, 0, 0);
 
     for (const ticketId in allTickets) {
@@ -846,26 +871,23 @@
         if (ticket.status === 'paid') {
             const createdAt = new Date(ticket.createdAt);
             const ticketRevenue = ticket.totalPrice || 0;
-            const ticketCount = ticket.ticketNumber || 0;
+            const ticketNumber = Math.floor(ticket.totalPrice / 65000);
 
             totalRevenue += ticketRevenue;
-            totalRevenueTickets += ticketCount;
+            totalPaidTickets += ticketNumber;
             paidTicketsHistory.push({ id: ticketId, ...ticket });
 
             // Hôm nay
             if (createdAt >= startOfDay) {
                 dailyRevenue += ticketRevenue;
-                dailyTickets += ticketCount;
             }
             // Tuần này
             if (createdAt >= startOfWeek) {
                 weeklyRevenue += ticketRevenue;
-                weeklyTickets += ticketCount;
             }
             // Tháng này
             if (createdAt >= startOfMonth) {
                 monthlyRevenue += ticketRevenue;
-                monthlyTickets += ticketCount;
             }
         }
 
@@ -878,22 +900,23 @@
                     name: ticket.name,
                     phone: ticket.phone
                 });
+                totalDeductedTickets += entry.deductedAmount || 0;
             }
         }
     }
 
     // Gán dữ liệu lên giao diện
-   document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
-document.getElementById('totalRevenueTickets').textContent = Math.floor(totalRevenue / 65000) + " vé";
+    document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+    document.getElementById('totalRevenueTickets').textContent = totalPaidTickets + " vé";
 
-document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
-document.getElementById('dailyTickets').textContent = Math.floor(dailyRevenue / 65000) + " vé";
+    document.getElementById('dailyRevenue').textContent = formatCurrency(dailyRevenue);
+    document.getElementById('dailyTickets').textContent = Math.floor(dailyRevenue / 65000) + " vé";
 
-document.getElementById('weeklyRevenue').textContent = formatCurrency(weeklyRevenue);
-document.getElementById('weeklyTickets').textContent = Math.floor(weeklyRevenue / 65000) + " vé";
+    document.getElementById('weeklyRevenue').textContent = formatCurrency(weeklyRevenue);
+    document.getElementById('weeklyTickets').textContent = Math.floor(weeklyRevenue / 65000) + " vé";
 
-document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
-document.getElementById('monthlyTickets').textContent = Math.floor(monthlyRevenue / 65000) + " vé";
+    document.getElementById('monthlyRevenue').textContent = formatCurrency(monthlyRevenue);
+    document.getElementById('monthlyTickets').textContent = Math.floor(monthlyRevenue / 65000) + " vé";
 
     // Render lại lịch sử
     renderHistory(paidTicketsHistory);
@@ -905,30 +928,33 @@ document.getElementById('monthlyTickets').textContent = Math.floor(monthlyRevenu
 };
 
 
-        window.showSelectedDayStatistics = function() {
-            const selectedDateValue = selectedDateInput.value;
-            if (!selectedDateValue) {
-                showNotification('Vui lòng chọn một ngày.', 'error');
-                return;
-            }
 
-            let selectedDayRevenue = 0;
-            let selectedDayTickets = 0;
-            const selectedDate = new Date(selectedDateValue);
+       window.showSelectedDayStatistics = function() {
+    const selectedDateValue = selectedDateInput.value;
+    if (!selectedDateValue) {
+        showNotification('Vui lòng chọn một ngày.', 'error');
+        return;
+    }
 
-            for (const ticket of paidTicketsHistory) {
-                const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
-                if (ticketDate && ticketDate.toDateString() === selectedDate.toDateString()) {
-                    selectedDayRevenue += ticket.totalPrice || 0;
-                    selectedDayTickets += ticket.ticketNumber || 0;
-                }
-            }
-            
-            selectedDateStatsDiv.innerHTML = `
-                <p>Doanh thu ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${formatCurrency(selectedDayRevenue)}</strong></p>
-                <p>Số vé bán ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${selectedDayTickets} vé</strong></p>
-            `;
-        };
+    let selectedDayRevenue = 0;
+    const selectedDate = new Date(selectedDateValue);
+
+    for (const ticket of paidTicketsHistory) {
+        const ticketDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
+        if (ticketDate && ticketDate.toDateString() === selectedDate.toDateString()) {
+            selectedDayRevenue += ticket.totalPrice || 0;
+        }
+    }
+
+    // Tính số vé = doanh thu / 65,000
+    const selectedDayTickets = Math.floor(selectedDayRevenue / 65000);
+
+    selectedDateStatsDiv.innerHTML = `
+        <p>Doanh thu ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${formatCurrency(selectedDayRevenue)}</strong></p>
+        <p>Số vé bán ngày ${selectedDate.toLocaleDateString('vi-VN')}: <strong>${selectedDayTickets} vé</strong></p>
+    `;
+};
+
         
         // New function for deduction stats by date
         function showDeductionStatsForDate() {
@@ -953,59 +979,62 @@ document.getElementById('monthlyTickets').textContent = Math.floor(monthlyRevenu
             `;
         }
 
-        function renderDailyChart(data) {
-            const chartElement = document.getElementById('dailyChart');
-            const labels = Object.keys(data);
-            const revenues = Object.values(data).map(d => d.revenue);
-            const tickets = Object.values(data).map(d => d.tickets);
+       function renderDailyChart(data) {
+    const chartElement = document.getElementById('dailyChart');
+    const labels = Object.keys(data);
+    const revenues = Object.values(data).map(d => d.revenue);
 
-            const options = {
-                series: [{
-                    name: 'Doanh thu',
-                    type: 'bar',
-                    data: revenues
-                }, {
-                    name: 'Số vé',
-                    type: 'line',
-                    data: tickets
-                }],
-                chart: {
-                    height: 350,
-                    type: 'line',
-                    animations: { enabled: true, easing: 'easeinout' }
-                },
-                stroke: { width: [0, 4] },
-                title: { text: 'Doanh thu và Số vé bán (30 ngày gần nhất)', align: 'left' },
-                dataLabels: { enabled: true, enabledOnSeries: [1] },
-                xaxis: {
-                    categories: labels,
-                    tooltip: { enabled: false }
-                },
-                yaxis: [{
-                    title: { text: 'Doanh thu' },
-                    labels: { formatter: (value) => formatCurrency(value) }
-                }, {
-                    opposite: true,
-                    title: { text: 'Số vé' }
-                }],
-                 tooltip: {
-                    shared: true,
-                    intersect: false,
-                    y: {
-                        formatter: function (y, { seriesIndex }) {
-                            if (typeof y !== "undefined") {
-                                return seriesIndex === 0 ? formatCurrency(y) : y + " vé";
-                            }
-                            return y;
-                        }
+    // Tính số vé = doanh thu / 65,000
+    const tickets = revenues.map(r => Math.floor(r / 65000));
+
+    const options = {
+        series: [{
+            name: 'Doanh thu',
+            type: 'bar',
+            data: revenues
+        }, {
+            name: 'Số vé',
+            type: 'line',
+            data: tickets
+        }],
+        chart: {
+            height: 350,
+            type: 'line',
+            animations: { enabled: true, easing: 'easeinout' }
+        },
+        stroke: { width: [0, 4] },
+        title: { text: 'Doanh thu và Số vé bán (30 ngày gần nhất)', align: 'left' },
+        dataLabels: { enabled: true, enabledOnSeries: [1] },
+        xaxis: {
+            categories: labels,
+            tooltip: { enabled: false }
+        },
+        yaxis: [{
+            title: { text: 'Doanh thu' },
+            labels: { formatter: (value) => formatCurrency(value) }
+        }, {
+            opposite: true,
+            title: { text: 'Số vé' }
+        }],
+        tooltip: {
+            shared: true,
+            intersect: false,
+            y: {
+                formatter: function (y, { seriesIndex }) {
+                    if (typeof y !== "undefined") {
+                        return seriesIndex === 0 ? formatCurrency(y) : y + " vé";
                     }
+                    return y;
                 }
-            };
-
-            if (dailyChart) dailyChart.destroy();
-            dailyChart = new ApexCharts(chartElement, options);
-            dailyChart.render();
+            }
         }
+    };
+
+    if (dailyChart) dailyChart.destroy();
+    dailyChart = new ApexCharts(chartElement, options);
+    dailyChart.render();
+}
+
 
         window.closeModal = function() {
             statsModal.style.display = 'none';
