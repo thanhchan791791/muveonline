@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -620,13 +621,19 @@
         window.login = function() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(email, password)
+
+            // --- PHẦN ĐÃ THAY ĐỔI: Thêm thiết lập độ bền phiên làm việc ---
+            auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                .then(() => {
+                    return auth.signInWithEmailAndPassword(email, password);
+                })
                 .then(() => {
                     showNotification('Đăng nhập thành công!', 'success');
                 })
                 .catch(err => {
                     showNotification('Lỗi đăng nhập: ' + err.message, 'error');
                 });
+            // ----------------------------------------------------------------
         };
 
         window.logout = function() {
