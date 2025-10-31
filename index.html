@@ -1,432 +1,991 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💌 Thành tỏ tình với Nhã 💖</title>
-    <!-- Tải Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tải Font Poppins (thay thế SF Pro Rounded) -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Tải Tone.js cho hiệu ứng âm thanh nhẹ nhàng -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <title>Mua Vé Cherry Pet Coffee</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ96j2y0zL0rLw0R1k+D4R4e2d3W4e2S/c6F5k2y+oFw/R0R9z2p4wG3j3y5A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* Cấu hình chung và font */
+        /* ----------------- Cài đặt chung & Body ----------------- */
         :root {
-            --pink-light: #FFC0CB;
-            --pink-medium: #FF8F9C;
-            --purple-light: #C3B1E1;
-            --white-trans: rgba(255, 255, 255, 0.75);
-            --blur-intensity: 15px;
+            --primary-pink: #FF85A2;
+            --secondary-pink: #FCE4EC;
+            --dark-text: #4A4A4A;
+            --light-text: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --shadow-elevation-1: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-elevation-2: 0 10px 15px rgba(0, 0, 0, 0.15);
+            --price-color: #E74C3C;
         }
-
         body {
             font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FFE6F0, #E0F7FA);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
-            overflow: hidden; /* Ngăn cuộn khi có hiệu ứng tim bay/confetti */
-            -webkit-tap-highlight-color: transparent; /* Tăng trải nghiệm mobile */
+            color: var(--dark-text);
+            position: relative;
         }
 
-        /* --- 1. Hiệu ứng Gradient Nền Động (Phase 1) --- */
-        .gradient-background {
+        /* ----------------- Container ----------------- */
+        .container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow-elevation-2);
+            padding: 30px;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+        }
+
+        /* ----------------- Tiêu đề & Chữ ----------------- */
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-pink);
+        }
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 5px;
+            animation: popIn 0.5s ease-out forwards;
+        }
+        .subtitle {
+            font-size: 1.1em;
+            color: #888;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .info-note {
+            text-align: center;
+            font-size: 1em;
+            color: var(--primary-pink);
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: var(--secondary-pink);
+            border-radius: 10px;
+        }
+
+        /* ----------------- Hiệu ứng hình ảnh mới ----------------- */
+        .header-image {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        .header-image img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid var(--primary-pink);
+            box-shadow: var(--shadow-elevation-1);
+        }
+
+        /* ----------------- Form & Nút bấm ----------------- */
+        .input-group {
+            margin-bottom: 18px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        .input-group.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        input[type="text"], input[type="tel"], input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: var(--primary-pink);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--secondary-pink);
+        }
+        .price-display {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-pink);
+            text-align: right;
+            margin-top: 20px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-pink);
+            color: var(--light-text);
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+            box-shadow: var(--shadow-elevation-1);
+        }
+        button:hover { transform: translateY(-2px); background-color: #E5718A; }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .button-group button {
+            flex-grow: 1;
+        }
+        .button-group #back-btn {
+            background-color: #ccc;
+            color: var(--dark-text);
+        }
+        .button-group #back-btn:hover {
+            background-color: #b3b3b3;
+        }
+
+        /* ----------------- Chuyển bước & QR code ----------------- */
+        .step {
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        .step.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .qr-section { text-align: center; }
+        #qr-code {
+            padding: 10px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow-elevation-1);
+            margin: 25px auto;
+            display: inline-block;
+            animation: bounceIn 0.8s;
+        }
+        @keyframes bounceIn {
+            0%, 20%, 40%, 60%, 80%, 100% {
+                transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+            }
+            0% { transform: scale3d(.3, .3, .3); }
+            20% { transform: scale3d(1.1, 1.1, 1.1); }
+            40% { transform: scale3d(.9, .9, .9); }
+            60% { transform: scale3d(1.03, 1.03, 1.03); }
+            80% { transform: scale3d(.97, .97, .97); }
+            100% { transform: scale3d(1, 1, 1); }
+        }
+
+        /* ----------------- Overlay thông báo ----------------- */
+        .message-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(-45deg, var(--pink-light), var(--purple-light), #F5B9D9, #A990F0);
-            background-size: 400% 400%;
-            animation: gradient-animation 15s ease infinite;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
         }
-
-        @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* --- 2. Hiệu ứng Tim Bay (Floating Hearts) --- */
-        @keyframes float-up {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
-        }
-
-        .heart {
-            position: absolute;
-            color: var(--pink-medium);
-            font-size: 1.5rem;
-            animation: float-up linear infinite;
-            pointer-events: none;
-            text-shadow: 0 0 5px rgba(255, 143, 156, 0.5);
-        }
-
-        /* --- 3. Hiệu ứng Đánh máy (Typing Animation) --- */
-        .typing-container {
-            display: inline-block;
-            overflow: hidden;
-            border-right: .15em solid white; /* Con trỏ nhấp nháy */
-            white-space: nowrap;
-            letter-spacing: .05em;
-            animation: blink-caret 0.75s step-end infinite;
-        }
-
-        .typing-static {
-            border-right: none;
-            animation: none;
-        }
-
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: white }
-        }
-
-        /* --- 4. Hiệu ứng Nút Gentle Slide Up & Fade-in (chậm rãi, tự nhiên) --- */
-        @keyframes slide-up-gentle {
-            0% { transform: translateY(30px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-
-        .slide-up-gentle-in {
-            /* Tốc độ nút: 0.8s */
-            animation: slide-up-gentle 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; 
-        }
-
-        /* --- 5. Hiệu ứng Thẻ iOS (Backdrop Blur) --- */
-        .ios-card {
-            background-color: var(--white-trans);
-            backdrop-filter: blur(var(--blur-intensity));
-            -webkit-backdrop-filter: blur(var(--blur-intensity));
+        .message-overlay.visible { opacity: 1; visibility: visible; }
+        .message-card {
+            background: var(--card-bg);
+            padding: 40px 30px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            transition: all 0.4s ease;
+            box-shadow: var(--shadow-elevation-2);
+            max-width: 380px;
+            text-align: center;
+            transform: translateY(-50px);
+            transition: transform 0.5s ease;
+            animation: scaleIn 0.5s ease-out;
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        .message-card .icon { font-size: 3.5em; margin-bottom: 15px; }
+        .message-card h2 { font-size: 1.8em; margin-bottom: 10px; font-weight: 700; }
+        .message-card p { font-size: 1.1em; margin-bottom: 25px; }
+
+        .message-card.success h2, .message-card.success .icon { color: #2ecc71; }
+        .message-card.error h2, .message-card.error .icon { color: #e74c3c; }
+        .message-card.info h2, .message-card.info .icon { color: #3498db; }
+
+
+        /* ----------------- Loader & Nút bấm ----------------- */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-pink);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #close-message-btn {
+            background-color: var(--primary-pink);
+            color: var(--light-text);
+            font-weight: 600;
+        }
+        #close-message-btn:hover {
+            background-color: #E5718A;
         }
 
-        /* --- 6. Hiệu ứng Đập Tim Lớn (Pulsing Heart) --- */
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        /* Giao diện mới cho Vé và phần giá */
+        .ticket-card {
+            background-color: #FFF;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-elevation-1);
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.6s ease-in-out forwards;
+            border: 2px solid var(--primary-pink);
+            border-bottom: 8px solid var(--primary-pink); /* Thêm viền dưới dày hơn */
+        }
+        .ticket-card h2 {
+            color: var(--dark-text);
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+            
+        /* Thay đổi cho phần giá */
+        .price-section {
+            background: linear-gradient(45deg, var(--primary-pink), #ffb3c1);
+            color: var(--light-text);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            animation: scaleIn 0.6s ease-out;
+            box-shadow: 0 5px 10px rgba(255, 133, 162, 0.4);
+            position: relative; /* Thêm position relative */
+        }
+        .price-section p {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        .price-section .price-values {
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: 15px;
+            margin: 5px 0;
+        }
+        .price-section .current-price {
+            font-size: 2.8em;
+            font-weight: 800;
+        }
+        .price-section .original-price {
+            font-size: 1.5em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: line-through;
+        }
+        .price-section small {
+            font-size: 1em;
+            display: block;
+            font-weight: 500;
+            margin-top: 0;
+        }
+        /* Hiệu ứng giảm giá */
+        .price-section.has-discount::before {
+            content: '-35%'; /* Hoặc có thể là 'GIẢM GIÁ' */
+            position: absolute;
+            top: -10px; /* Di chuyển lên trên */
+            right: -10px; /* Di chuyển sang phải */
+            background: #ff4d4d; /* Màu đỏ nổi bật */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50px; /* Làm tròn như một huy hiệu */
+            font-size: 0.9em;
+            font-weight: bold;
+            transform: rotate(10deg); /* Xoay nhẹ để thêm phần sống động */
+            box-shadow: var(--shadow-elevation-1);
+            animation: bounceIn 1s ease-out; /* Thêm hiệu ứng bật ra */
+            animation-delay: 0.6s;
+        }
+        /* Style cho phần hình ảnh của các con vật */
+        .animal-showcase {
+            display: flex;
+            justify-content: center; /* Đảm bảo các ảnh được căn giữa */
+            align-items: flex-end;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            height: 120px;
+            position: relative;
+            padding: 0 10px;
+            gap: 15px; /* Thêm khoảng cách đều giữa các ảnh */
         }
 
-        .pulsing-heart {
-            animation: pulse 1.5s infinite;
+        .animal-showcase .animal-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0; /* Ngăn các ảnh bị co lại khi không cần thiết */
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: popInAnimal 0.8s ease-out forwards;
+        }
+        .animal-showcase .animal-item:nth-child(1) { animation-delay: 0.1s; }
+        .animal-showcase .animal-item:nth-child(2) { animation-delay: 0.3s; }
+        .animal-showcase .animal-item:nth-child(3) { animation-delay: 0.5s; }
+        .animal-showcase .animal-item:nth-child(4) { animation-delay: 0.7s; }
+        .animal-showcase img {
+            width: 60px; /* Giảm chiều rộng của ảnh */
+            height: 60px; /* Giảm chiều cao của ảnh */
+            object-fit: contain; /* Đảm bảo hình ảnh vừa vặn trong khung mà không bị cắt */
+            border-radius: 50%;
+            border: 3px solid var(--primary-pink);
+            box-shadow: var(--shadow-elevation-1);
+            transition: all 0.3s ease;
+            background-color: var(--light-text);
+            padding: 10px; /* Tăng padding để tạo khoảng trống bên trong khung tròn */
         }
 
-        /* --- 7. Hiệu ứng Popup iOS (Zoom In) --- */
-        @keyframes zoom-in {
+        .animal-showcase img:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: var(--shadow-elevation-2);
+        }
+        .animal-showcase .animal-label {
+            position: static;
+            margin-top: 5px;
+            background-color: var(--primary-pink);
+            color: var(--light-text);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: var(--shadow-elevation-1);
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.5s ease-out forwards;
+            animation-delay: 1s;
+        }
+        .description-text {
+            text-align: center;
+            font-size: 1.1em;
+            color: #666;
+            margin: 15px 0 25px;
+            line-height: 1.5;
+            animation: fadeIn 0.6s ease-out forwards;
+            animation-delay: 0.8s;
+        }
+
+        /* ----------------- Keyframes mới ----------------- */
+        @keyframes popIn {
             0% { transform: scale(0.5); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-
-        .zoom-in {
-            animation: zoom-in 0.3s ease-out forwards;
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popInAnimal {
+            0% { opacity: 0; transform: scale(0.5) translateY(20px); }
+            70% { opacity: 1; transform: scale(1.05) translateY(-5px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        /* New Keyframes for Confirmation Step */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
         }
 
-        /* --- 8. Confetti (chỉ CSS/DOM) --- */
-        .confetti {
-            position: fixed;
-            z-index: 1000;
-            pointer-events: none;
-            width: 10px;
-            height: 10px;
-            opacity: 0;
+        /* Thêm style cho phần điều khiển số lượng */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .quantity-control button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            font-size: 1.5em;
+            font-weight: 700;
             border-radius: 50%;
-            transition: none;
+            line-height: 1;
+        }
+        .quantity-control input {
+            width: 80px;
+            text-align: center;
+        }
+        .discount-note {
+            text-align: center;
+            font-size: 0.95em;
+            color: #e74c3c;
+            font-weight: 600;
+            margin-top: 10px;
         }
 
-        @keyframes confetti-fall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0.5; }
+        /* ----------------- Cải tiến giao diện trang xác nhận ----------------- */
+        .confirmation-card {
+            background: linear-gradient(145deg, #fff, var(--secondary-pink));
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-elevation-2);
+            margin-bottom: 25px;
+            animation: fadeInUp 0.7s ease-out forwards;
+            border: 1px solid var(--primary-pink);
+            position: relative;
+        }
+        .confirmation-card h3 {
+            font-size: 1.6em;
+            color: var(--dark-text);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .confirmation-card .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+        .confirmation-card .info-row:hover {
+            background-color: rgba(255, 133, 162, 0.05);
+            padding: 12px 10px;
+            border-radius: 8px;
+        }
+        .confirmation-card .info-row:last-child {
+            border-bottom: none;
+        }
+        .confirmation-card .info-label {
+            font-weight: 500;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .confirmation-card .info-value {
+            font-weight: 700;
+            color: var(--dark-text);
+            text-align: right;
+            transition: color 0.3s ease;
+        }
+        .confirmation-card .info-row:first-child .info-value,
+        .confirmation-card .info-row:nth-child(2) .info-value {
+             color: var(--primary-pink);
+        }
+        .confirmation-card .info-row:nth-child(2) .info-value {
+            animation: shake 0.5s;
+            color: #E74C3C;
+            font-size: 1.2em;
+        }
+        .total-price-confirmation {
+            font-size: 2.2em;
+            font-weight: 800;
+            text-align: center;
+            color: var(--price-color);
+            margin-top: 25px;
+            animation: bounceIn 0.8s;
+            position: relative;
+        }
+        .total-price-confirmation::before {
+            content: 'Tổng cộng';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.5em;
+            font-weight: 500;
+            color: #888;
         }
 
+        /* ----------------- CUSTOM STYLE CHO CÂU THÔNG BÁO MỚI ----------------- */
+        .announcement-box {
+            position: relative;
+            background-color: #FFDDE2; /* Màu nền nhẹ nhàng, hài hòa với giao diện */
+            border: 2px solid var(--primary-pink); /* Viền màu hồng đậm hơn */
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            box-shadow: var(--shadow-elevation-1);
+            animation: fadeIn 0.8s ease-out;
+        }
+        .announcement-box h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.2em;
+            color: var(--primary-pink);
+            font-weight: 700;
+        }
+        .announcement-box p {
+            margin: 0;
+            font-size: 1em;
+            line-height: 1.4;
+            color: var(--dark-text);
+        }
+        .announcement-box .icon-hot {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #FF4D4D;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: bold;
+            transform: rotate(10deg);
+            animation: bounceIn 1s ease-out;
+        }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center text-white text-center p-4">
+<body>
 
-    <!-- Nền Gradient Động -->
-    <div id="background" class="gradient-background transition-all duration-1000 ease-in-out"></div>
-
-    <!-- Container cho các trái tim bay -->
-    <div id="heart-container" class="absolute w-full h-full overflow-hidden top-0 left-0"></div>
-
-    <!-- Container Chính -->
-    <div id="main-content" class="relative z-10 w-full max-w-sm md:max-w-md">
-
-        <!-- Phase 1: Mở đầu -->
-        <div id="intro-phase" class="space-y-6">
-            <h1 id="typing-text" class="text-4xl md:text-5xl font-extrabold tracking-tight text-shadow-lg drop-shadow-lg h-14 md:h-20">
-                <!-- Chữ sẽ được thêm vào bằng JS -->
-            </h1>
-            <p id="sub-text" class="text-xl md:text-2xl font-medium opacity-0 transition-opacity duration-700 ease-in mt-4">
-                Anh có điều này muốn nói với pe iu nè…
-            </p>
-            <button id="start-button" onclick="startConfession()"
-                class="hidden w-full max-w-xs mx-auto py-3 px-6 bg-white text-pink-medium rounded-full shadow-xl font-bold text-lg hover:shadow-2xl active:scale-95 transition-transform duration-200 focus:outline-none"
-                style="color: var(--pink-medium);"
-            >
-                Nhấn để xem điều anh muốn nói nhoo🥰
-            </button>
+<div class="container">
+    <div id="step-info" class="step active">
+        <div class="header-image">
+            <img src="image/logocherry.png" alt="Cherry Pet Coffee Logo">
         </div>
+        <h1>Cherry Pet Coffee <i class="fa-solid fa-mug-saucer" style="font-size: 0.8em;"></i></h1>
+        <p class="subtitle">Mua vé tham quan & trải nghiệm <i class="fa-solid fa-paw"></i></p>
 
-        <!-- Phase 2: Thẻ Tỏ tình Chính -->
-        <div id="confession-phase" class="hidden ios-card text-gray-800 space-y-4 md:space-y-6 transform translate-y-10 opacity-0">
-            <h2 id="line-1" class="text-3xl font-bold text-pink-medium text-left opacity-0 transition-opacity duration-700">Nhã à…</h2>
-            <p id="line-2" class="text-lg md:text-xl font-medium text-left opacity-0 transition-opacity duration-700 delay-300">Từ lần đầu gặp cậu, Anh thấy tim mình rung lên thật lạ 💓</p>
-            <p id="line-3" class="text-lg md:text-xl font-medium text-left opacity-0 transition-opacity duration-700 delay-700">Anh không biết nói sao cho hay…</p>
-            <p id="line-4" class="text-2xl md:text-3xl font-extrabold text-left opacity-0 transition-opacity duration-700 delay-1000 mt-6">Nhưng Anh biết một điều — Anh rất thích em 🥺❤️</p>
-
-            <!-- Tim Lớn -->
-            <div id="large-heart" class="text-6xl pulsing-heart mt-8 hidden transition-opacity duration-500">
-                <span style="color: var(--pink-medium);">💖</span>
+        <div class="announcement-box">
+            <span class="icon-hot">HOT</span>
+            <h3>Ưu đãi Vé Online</h3>
+            <p>Chương trình ưu đãi chỉ diễn ra trong 3 tuần! Vé mua rồi dùng thoải mái cho đến khi hết vé, không giới hạn thời gian sử dụng đâu nha.</p>
+        </div>
+        <form id="infoForm">
+            <div class="input-group visible">
+                <label for="name">Tên của bạn:</label>
+                <input type="text" id="name" placeholder="Nhập tên" required>
             </div>
-
-            <!-- Phase 3: Nút Cao trào -->
-            <button id="accept-button" onclick="showClimax()"
-                class="hidden w-full mt-8 py-3 px-6 bg-pink-medium text-white rounded-xl shadow-xl font-bold text-lg hover:bg-pink-medium/90 active:scale-95 transition-transform duration-200 focus:outline-none"
-                style="background-color: var(--pink-medium);"
-            >
-               Ấn vào nếu em cũng thích anh ^^
-            </button>
-        </div>
-
-        <!-- Popup Climax (Có thêm phần chụp màn hình) -->
-        <div id="climax-popup" class="fixed inset-0 flex items-center justify-center bg-black/20 z-20 hidden">
-            <div id="climax-card" class="ios-card zoom-in p-6 md:p-8 text-gray-800 shadow-2xl max-w-xs md:max-w-sm mx-auto text-center" style="transform: scale(0.5); opacity: 0;">
-                <p class="text-2xl md:text-3xl font-extrabold text-pink-medium">
-                    Thiệc hỏ 🥹
-                </p>
-                <p class="text-xl md:text-2xl font-medium mt-2">
-                    Anh hạnh phúc lắm luôn đó! 💞💫
-                </p>
-
-                <!-- Lời nhắc chụp màn hình -->
-                <div id="screenshot-prompt" class="mt-6 pt-4 border-t border-pink-light/50 opacity-0 transition-opacity duration-700">
-                    <p class="text-base font-semibold text-gray-600 mb-1 flex items-center justify-center">
-                        <span class="mr-2 text-xl"></span> Chụp màn hình khoảnh khắc này gửi cho anh nhoo!
-                    </p>
-                    <p class="text-xs text-gray-500 mt-1">
-                    </p>
-                </div>
+            <div class="input-group" id="phone-input-group">
+                <label for="phone">Số điện thoại:</label>
+                <input type="tel" id="phone" placeholder="Nhập số điện thoại" required>
             </div>
-        </div>
-
+            <div class="input-group" id="re-phone-input-group">
+                <label for="rePhone">Nhập lại số điện thoại:</label>
+                <input type="tel" id="rePhone" placeholder="Xác nhận số điện thoại" required>
+            </div>
+            <button id="continueBtn" type="button" style="display: none;">Tiếp Tục</button>
+        </form>
     </div>
 
-    <!-- JavaScript & Logic -->
-    <script>
-        // --- Cấu hình Firebase để tuân thủ quy tắc, mặc dù không dùng Firestore ---
-        // Biến toàn cục từ môi trường Canvas (KHÔNG THAY ĐỔI)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+    <div id="step-ticket" class="step">
+        <h2>Khám phá thế giới của những người bạn bốn chân!</h2>
+        <div class="ticket-card">
+            <div class="animal-showcase">
+                <div class="animal-item">
+                    <img src="image/cho.png" alt="Chó">
+                    <span class="animal-label">Chó</span>
+                </div>
+                <div class="animal-item">
+                    <img src="image/meo.png" alt="Mèo">
+                    <span class="animal-label">Mèo</span>
+                </div>
+                <div class="animal-item">
+                    <img src="image/capy.png" alt="Capybara">
+                    <span class="animal-label">Capybara</span>
+                </div>
+                <div class="animal-item">
+                    <img src="image/gaumeo.png" alt="Gấu mèo">
+                    <span class="animal-label">Gấu mèo</span>
+                </div>
+            </div>
+            <p class="description-text">
+                Bước vào thế giới của những người bạn bốn chân đáng yêu. Tự do tương tác với chó, mèo, gấu mèo và capybara.
+            </p>
+            <div class="price-section" id="price-section">
+                <p>Giá ưu đãi hôm nay</p>
+                <div class="price-values">
+                    <span class="current-price" id="current-price"></span>
+                    <span class="original-price" id="original-price"></span>
+                </div>
+                <small id="price-note">/ người</small>
+            </div>
+            
+            <ul>
+                <li><i class="fa-solid fa-paw"></i> Chơi đùa thỏa thích cùng thú cưng.</li>
+                <li><i class="fa-solid fa-camera-retro"></i> Chụp ảnh check-in không giới hạn.</li>
+            </ul>
+        </div>
+        <div class="input-group visible" id="ticket-input-group">
+            <label for="ticketNumber">Số lượng vé:</label>
+            <div class="quantity-control">
+                <button type="button" id="decreaseBtn">-</button>
+                <input type="text" id="ticketNumber" value="5" readonly>
+                <button type="button" id="increaseBtn">+</button>
+            </div>
+            <p class="discount-note"><i class="fa-solid fa-fire"></i> Chương trình áp dụng khi mua tối thiểu 5 vé!</p>
+            <div class="price-display" id="total-price"></div>
+        </div>
+        <button id="checkoutBtn">Thanh Toán</button>
+    </div>
 
-        // --- Tone.js Setup for sweet sound ---
-        const synth = new Tone.Synth({
-            oscillator: { type: "sine" },
-            envelope: {
-                attack: 0.01,
-                decay: 0.2,
-                sustain: 0.0,
-                release: 0.3
-            }
-        }).toDestination();
+    <div id="step-confirmation" class="step">
+        <h2>Xác nhận đơn hàng</h2>
+        <div class="confirmation-card">
+            <h3>Chi tiết đơn hàng của bạn</h3>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-user"></i> Tên khách hàng:</span>
+                <span class="info-value" id="confirm-name"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-phone-volume"></i> Số điện thoại:</span>
+                <span class="info-value" id="confirm-phone"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-ticket-alt"></i> Số lượng vé:</span>
+                <span class="info-value" id="confirm-tickets"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-tags"></i> Đơn giá:</span>
+                <span class="info-value" id="confirm-unit-price"></span>
+            </div>
+            <div class="total-price-confirmation">
+                <span id="confirm-total-price"></span>
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="backBtn" type="button">Quay lại</button>
+            <button id="confirmPayBtn" type="button">Xác nhận & Thanh toán</button>
+        </div>
+    </div>
 
-        function playSweetChord() {
-            // Đảm bảo Tone.js được khởi động trên trình duyệt di động
-            if (Tone.context.state !== 'running') {
-                Tone.start();
-            }
-            const now = Tone.now();
-            // Chơi một hợp âm trưởng nhẹ nhàng
-            synth.triggerAttackRelease('C5', '4n', now);
-            synth.triggerAttackRelease('E5', '4n', now + 0.05);
-            synth.triggerAttackRelease('G5', '4n', now + 0.1);
+   <div id="step-payment" class="step">
+    <div class="qr-section">
+        <h2>Thông tin Thanh Toán</h2>
+        <p>Vui lòng quét mã QR để chuyển khoản đúng số tiền và nội dung chuyển khoản. Sau khi thanh toán, vui lòng đợi khoảng 10-20 giây hệ thống sẽ tự động xác nhận.</p>
+        <div id="qr-code"></div>
+        <p><strong>Ngân hàng:</strong> MB Bank</p>
+        <p><strong>Số tài khoản:</strong> 973803388</p>
+        <p><strong>Tên tài khoản:</strong> Lê Vĩnh Tín</p>
+        <p><strong>Nội dung:</strong> <span id="payment-content-display">...</span></p>
+    </div>
+</div>
+
+</div>
+
+<div id="message-overlay" class="message-overlay">
+    <div id="message-card" class="message-card">
+        <div id="message-icon" class="icon"></div>
+        <div id="message-loader" class="loader"></div>
+        <h2 id="message-title"></h2>
+        <p id="message-text"></p>
+        <button id="close-message-btn">Xong</button>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
+        authDomain: "muveonline-919a8.firebaseapp.com",
+        databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
+        projectId: "muveonline-919a8",
+        storageBucket: "muveonline-919a8.firebasestorage.app",
+        messagingSenderId: "399933853156",
+        appId: "1:399933853156:web:982c1da02117606a994bf1"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const steps = {
+        info: document.getElementById('step-info'),
+        ticket: document.getElementById('step-ticket'),
+        confirmation: document.getElementById('step-confirmation'),
+        payment: document.getElementById('step-payment')
+    };
+
+    const infoForm = document.getElementById('infoForm');
+    const nameInput = document.getElementById('name');
+    const phoneInput = document.getElementById('phone');
+    const rePhoneInput = document.getElementById('rePhone'); // New
+    const phoneInputGroup = document.getElementById('phone-input-group');
+    const rePhoneInputGroup = document.getElementById('re-phone-input-group'); // New
+    const continueBtn = document.getElementById('continueBtn');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const confirmPayBtn = document.getElementById('confirmPayBtn');
+    const backBtn = document.getElementById('backBtn');
+    const ticketNumberInput = document.getElementById('ticketNumber');
+    const totalPriceDiv = document.getElementById('total-price');
+    const qrCodeDiv = document.getElementById('qr-code');
+    const decreaseBtn = document.getElementById('decreaseBtn');
+    const increaseBtn = document.getElementById('increaseBtn');
+    const ticketInputGroup = document.getElementById('ticket-input-group');
+
+
+    const messageOverlay = document.getElementById('message-overlay');
+    const messageCard = document.getElementById('message-card');
+    const messageIcon = document.getElementById('message-icon');
+    const messageLoader = document.getElementById('message-loader');
+    const messageTitle = document.getElementById('message-title');
+    const messageText = document.getElementById('message-text');
+    const closeMessageBtn = document.getElementById('close-message-btn');
+    const paymentContentDisplay = document.getElementById('payment-content-display');
+
+    const priceSection = document.getElementById('price-section');
+    const currentPriceSpan = document.getElementById('current-price');
+    const originalPriceSpan = document.getElementById('original-price');
+    const priceNote = document.getElementById('price-note');
+
+    const confirmName = document.getElementById('confirm-name');
+    const confirmPhone = document.getElementById('confirm-phone');
+    const confirmTickets = document.getElementById('confirm-tickets');
+    const confirmUnitPrice = document.getElementById('confirm-unit-price');
+    const confirmTotalPrice = document.getElementById('confirm-total-price');
+
+    let userInfo = {};
+    const MIN_TICKETS = 5;
+    const ORIGINAL_PRICE = 100000;
+    const DISCOUNT_PRICE = 65000;
+    let statusListener = null;
+
+    // Hàm chuyển bước giao diện
+    function goToStep(nextStep) {
+        Object.values(steps).forEach(s => s.classList.remove('active'));
+        nextStep.classList.add('active');
+    }
+
+    // Hàm định dạng tiền tệ
+    function formatCurrency(n) { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n); }
+
+    // Hàm cập nhật giá vé và hiển thị ưu đãi
+    function updateTicketPrice() {
+        const count = parseInt(ticketNumberInput.value);
+        
+        // Always apply the discount price
+        priceSection.classList.add('has-discount');
+        currentPriceSpan.textContent = formatCurrency(DISCOUNT_PRICE);
+        originalPriceSpan.textContent = formatCurrency(ORIGINAL_PRICE);
+        originalPriceSpan.style.textDecoration = 'line-through';
+        originalPriceSpan.style.display = 'block';
+
+        const totalPrice = count * DISCOUNT_PRICE;
+        totalPriceDiv.textContent = `Tổng cộng: ${formatCurrency(totalPrice)}`;
+        
+        // Disable decrease button if at minimum
+        decreaseBtn.disabled = count <= MIN_TICKETS;
+    }
+    
+    // Hàm hiển thị thông báo
+    function showMessage(type, title, text, showCloseBtn = true) {
+        messageCard.className = `message-card ${type}`;
+        messageTitle.textContent = title;
+        messageText.textContent = text;
+        messageLoader.style.display = 'none';
+        closeMessageBtn.style.display = showCloseBtn ? 'block' : 'none';
+
+        if (type === 'success') {
+            messageIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        } else if (type === 'error') {
+            messageIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+        } else if (type === 'pending') {
+            messageLoader.style.display = 'block';
+            messageIcon.innerHTML = '';
+            closeMessageBtn.style.display = 'none';
+        } else if (type === 'info') {
+            messageIcon.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
         }
+                                    
+        messageOverlay.classList.add('visible');
+    }
 
-        // --- Khai báo biến DOM ---
-        const typingTextEl = document.getElementById('typing-text');
-        const subTextEl = document.getElementById('sub-text');
-        const startButton = document.getElementById('start-button');
-        const confessionPhase = document.getElementById('confession-phase');
-        const acceptButton = document.getElementById('accept-button');
-        const climaxPopup = document.getElementById('climax-popup');
-        const climaxCard = document.getElementById('climax-card');
-        const screenshotPrompt = document.getElementById('screenshot-prompt');
-        const background = document.getElementById('background');
-        const largeHeart = document.getElementById('large-heart');
-
-        // --- Hàm tạo hiệu ứng tim bay ---
-        function createFloatingHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('heart');
-            heart.innerHTML = ['💖', '💕', '💓', '💗'][Math.floor(Math.random() * 4)];
-            
-            const size = Math.random() * 1.5 + 1; // 1rem to 2.5rem
-            const startX = Math.random() * window.innerWidth;
-            const duration = Math.random() * 10 + 5; // 5s to 15s
-
-            heart.style.left = `${startX}px`;
-            heart.style.fontSize = `${size}rem`;
-            heart.style.opacity = Math.random() * 0.5 + 0.5;
-            heart.style.animationDuration = `${duration}s`;
-            heart.style.animationDelay = `-${Math.random() * duration}s`; // Ngẫu nhiên hóa điểm bắt đầu
-            
-            document.getElementById('heart-container').appendChild(heart);
-            
-            // Xóa tim sau khi animation kết thúc
-            setTimeout(() => heart.remove(), duration * 1000);
+    // Hàm đóng thông báo và reset form
+    function closeMessage() {
+        messageOverlay.classList.remove('visible');
+        ticketNumberInput.value = MIN_TICKETS;
+        nameInput.value = '';
+        phoneInput.value = '';
+        rePhoneInput.value = ''; // Reset new input
+        goToStep(steps.info);
+        phoneInputGroup.classList.remove('visible');
+        rePhoneInputGroup.classList.remove('visible'); // Hide new input
+        continueBtn.style.display = 'none';
+        updateTicketPrice(); // Reset price to initial discounted state
+        if (statusListener) {
+            db.ref().child('tickets').child(statusListener).off('value');
+            statusListener = null;
         }
+    }
 
-        // Tạo liên tục các trái tim
-        let heartInterval;
-        function startHeartAnimation() {
-            if (!heartInterval) {
-                for (let i = 0; i < 20; i++) { // Bắt đầu với một loạt tim
-                    createFloatingHeart();
-                }
-                heartInterval = setInterval(createFloatingHeart, 500); // Thêm tim mới mỗi 0.5s
-            }
-        }
+    closeMessageBtn.addEventListener('click', closeMessage);
 
-        // --- Hàm hiệu ứng Đánh máy (Typing Animation) ---
-        function typeWriter(text, element, callback) {
-            let i = 0;
-            element.classList.remove('typing-static'); // Thêm hiệu ứng con trỏ nhấp nháy
-            
-            function typing() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    // *** ĐÃ ĐIỀU CHỈNH: Tăng độ trễ lên 200ms cho hiệu ứng "chậm thật chậm" ***
-                    setTimeout(typing, 200); 
-                } else {
-                    element.classList.add('typing-static'); // Dừng con trỏ
-                    if (callback) {
-                        setTimeout(callback, 500);
-                    }
-                }
-            }
-            typing();
-        }
-
-        // --- PHASES LOGIC ---
-
-        // Phase 1: Bắt đầu
-        function startIntro() {
-            startHeartAnimation();
-            const textToType = "Hi Nhã 💖";
-            typeWriter(textToType, typingTextEl, () => {
-                subTextEl.classList.remove('opacity-0');
-                subTextEl.classList.add('opacity-100', 'transition-opacity', 'duration-700');
-                
-                // Hiển thị nút sau khi subText hiện ra
-                setTimeout(() => {
-                    startButton.classList.remove('hidden');
-                    // Áp dụng hiệu ứng slide-up-gentle-in mới
-                    startButton.classList.add('slide-up-gentle-in'); 
-                }, 700);
-            });
-        }
-
-        // Phase 2: Tỏ tình
-        function startConfession() {
-            startButton.style.display = 'none';
-            document.getElementById('intro-phase').style.display = 'none';
-            
-            // Đổi nền gradient rực rỡ hơn
-            background.style.background = 'linear-gradient(-45deg, #FF69B4, #E6E6FA, #FFB6C1, #8A2BE2)';
-            background.style.backgroundSize = '400% 400%';
-            
-            confessionPhase.classList.remove('hidden');
-            
-            // Hiệu ứng Slide-Up & Fade-in cho card
+    // Hiển thị ô nhập SĐT và nút "Tiếp Tục" khi nhập tên
+    nameInput.addEventListener('input', () => {
+        if (nameInput.value.trim().length > 0) {
+            phoneInputGroup.classList.add('visible');
+            rePhoneInputGroup.classList.add('visible'); // Show new input
             setTimeout(() => {
-                confessionPhase.classList.remove('translate-y-10', 'opacity-0');
-                confessionPhase.classList.add('translate-y-0', 'opacity-100');
-                
-                // Hiển thị lần lượt các dòng
-                const lines = [
-                    document.getElementById('line-1'),
-                    document.getElementById('line-2'),
-                    document.getElementById('line-3'),
-                    document.getElementById('line-4')
-                ];
-                
-                lines.forEach((line, index) => {
-                    // Cài đặt độ trễ để các dòng hiện lần lượt
-                    setTimeout(() => {
-                        line.classList.remove('opacity-0');
-                    }, index * 1200 + 400); 
-                });
+                continueBtn.style.display = 'block';
+                continueBtn.classList.add('visible');
+            }, 500);
+        } else {
+            phoneInputGroup.classList.remove('visible');
+            rePhoneInputGroup.classList.remove('visible'); // Hide new input
+            continueBtn.style.display = 'none';
+        }
+    });
 
-                // Hiển thị tim lớn và nút chấp nhận sau khi các dòng đã hiện
-                setTimeout(() => {
-                    largeHeart.classList.remove('hidden');
-                    largeHeart.classList.add('opacity-100');
-                    
-                    acceptButton.classList.remove('hidden');
-                    // Áp dụng hiệu ứng slide-up-gentle-in mới
-                    acceptButton.classList.add('slide-up-gentle-in'); 
-                }, 4 * 1200 + 1000); // Chờ 4 dòng + 1s
-            }, 50);
+    // Xử lý nút "Tiếp Tục" sau khi nhập thông tin
+    continueBtn.addEventListener('click', () => {
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const rePhone = rePhoneInput.value.trim();
+
+        const phoneRegex = /^0\d{8,10}$/;
+
+        if (!name || !phone || !rePhone) {
+            showMessage('error', 'Lỗi', 'Vui lòng nhập đầy đủ thông tin!');
+            return;
         }
 
-        // Phase 3: Cao trào (Chấp nhận)
-        function showClimax() {
-            playSweetChord(); // Chơi âm thanh vui vẻ
-            
-            acceptButton.style.display = 'none';
-            confessionPhase.style.pointerEvents = 'none'; // Ngăn tương tác với card
-            
-            climaxPopup.classList.remove('hidden');
-            
-            // Hiệu ứng Zoom In
-            setTimeout(() => {
-                climaxCard.style.transform = 'scale(1)';
-                climaxCard.style.opacity = '1';
-                createConfetti(100); // Tạo 100 hạt confetti
-                
-                // Hiện prompt chụp màn hình sau khi popup hiện ra
-                setTimeout(() => {
-                    screenshotPrompt.classList.remove('opacity-0');
-                }, 500); // Chờ 0.5s sau khi popup hiện ra
-            }, 50);
+        if (phone !== rePhone) {
+            showMessage('error', 'Lỗi', 'Số điện thoại xác nhận không trùng khớp.');
+            return;
         }
 
-        // --- Hàm tạo Confetti (DOM/CSS Lightweight) ---
-        function createConfetti(num) {
-            const colors = ['#FFC0CB', '#FF69B4', '#E6E6FA', '#C3B1E1', '#FFFFFF'];
-            const container = document.body;
-            
-            for (let i = 0; i < num; i++) {
-                const confetti = document.createElement('div');
-                confetti.classList.add('confetti');
-                
-                const size = Math.random() * 8 + 5; // Kích thước 5px - 13px
-                confetti.style.width = `${size}px`;
-                confetti.style.height = `${size}px`;
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                confetti.style.left = `${Math.random() * 100}vw`;
-                confetti.style.top = `${Math.random() * 10 - 20}vh`; // Bắt đầu từ trên cùng
-                
-                const duration = Math.random() * 3 + 2; // 2s - 5s
-                confetti.style.animation = `confetti-fall ${duration}s ease-in forwards`;
-                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
-                
-                container.appendChild(confetti);
+        if (!phoneRegex.test(phone)) {
+            showMessage('error', 'Lỗi', 'Số điện thoại không hợp lệ. Vui lòng nhập số có từ 9-11 chữ số và bắt đầu bằng số 0.');
+            return;
+        }
 
-                // Dọn dẹp DOM
-                setTimeout(() => confetti.remove(), duration * 1000 + 500);
+        userInfo = { name, phone };
+        goToStep(steps.ticket);
+        updateTicketPrice();
+    });
+    
+    // Event listeners for quantity buttons
+    decreaseBtn.addEventListener('click', () => {
+        let currentTickets = parseInt(ticketNumberInput.value);
+        if (currentTickets > MIN_TICKETS) {
+            ticketNumberInput.value = currentTickets - 1;
+            updateTicketPrice();
+        }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+        let currentTickets = parseInt(ticketNumberInput.value);
+        ticketNumberInput.value = currentTickets + 1;
+        updateTicketPrice();
+    });
+
+    // Xử lý nút "Thanh Toán" - Chuyển sang trang xác nhận
+    checkoutBtn.addEventListener('click', () => {
+        const count = parseInt(ticketNumberInput.value);
+        const totalPrice = count * DISCOUNT_PRICE;
+
+        confirmName.textContent = userInfo.name;
+        confirmPhone.textContent = userInfo.phone;
+        confirmTickets.textContent = count;
+        confirmUnitPrice.textContent = formatCurrency(DISCOUNT_PRICE);
+        confirmTotalPrice.textContent = formatCurrency(totalPrice);
+        
+        goToStep(steps.confirmation);
+    });
+
+    // Xử lý nút "Quay lại" từ trang xác nhận
+    backBtn.addEventListener('click', () => {
+        // Tải lại trang
+        window.location.reload();
+    });
+
+    // Xử lý nút "Xác nhận & Thanh toán"
+    confirmPayBtn.addEventListener('click', () => {
+        const count = parseInt(ticketNumberInput.value);
+        const totalPrice = count * DISCOUNT_PRICE;
+        const orderCode = "CHERRY" + Math.floor(100000 + Math.random() * 900000);
+        const ticketsRef = db.ref("tickets");
+        const newTicketRef = ticketsRef.push({
+            name: userInfo.name,
+            phone: userInfo.phone,
+            ticketNumber: count,
+            totalPrice: totalPrice,
+            orderCode: orderCode,
+            status: "pending",
+            createdAt: new Date().toISOString()
+        });
+
+        const paymentContent = orderCode;
+        paymentContentDisplay.textContent = paymentContent;
+        const qrUrl = `https://img.vietqr.io/image/970422-973803388-compact.png?amount=${totalPrice}&addInfo=${encodeURIComponent(paymentContent)}`;
+        qrCodeDiv.innerHTML = `<img src="${qrUrl}" width="250" height="250" alt="QR Code">`;
+
+        let totalPriceDivQR = document.getElementById('total-price-qr');
+        if (!totalPriceDivQR) {
+            totalPriceDivQR = document.createElement('div');
+            totalPriceDivQR.id = 'total-price-qr';
+            totalPriceDivQR.style.textAlign = 'center';
+            totalPriceDivQR.style.marginTop = '15px';
+            totalPriceDivQR.style.fontSize = '1.2em';
+            totalPriceDivQR.style.fontWeight = '600';
+            qrCodeDiv.parentNode.appendChild(totalPriceDivQR);
+        }
+        totalPriceDivQR.textContent = `Tổng tiền: ${totalPrice.toLocaleString('vi-VN')} VNĐ`;
+
+        goToStep(steps.payment);
+
+        if (statusListener) {
+            newTicketRef.child('status').off('value', statusListener);
+        }
+        statusListener = newTicketRef.child('status').on('value', snapshot => {
+            const status = snapshot.val();
+            if (status === 'paid') {
+                showMessage('success', 'Thanh toán thành công!', `Vui lòng đến quầy cung cấp tên: ${userInfo.name} và SĐT: ${userInfo.phone} để nhận vé.`);
+                newTicketRef.child('status').off('value', statusListener);
+            } else if (status === 'failed') {
+                showMessage('error', 'Thanh toán thất bại', 'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ hỗ trợ.');
+                newTicketRef.child('status').off('value', statusListener);
             }
-        }
+        });
+    });
 
-        // Khởi chạy intro khi trang tải xong
-        window.onload = startIntro;
+    // Lần đầu tải trang, đảm bảo giá hiển thị đúng
+    document.addEventListener('DOMContentLoaded', () => {
+        updateTicketPrice();
+    });
+</script>
 
-    </script>
 </body>
 </html>
-
