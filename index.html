@@ -1,3 +1,437 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💌 Thành tỏ tình với Nhã 💖</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Font Poppins (thay thế SF Pro Rounded) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Tải Tone.js cho hiệu ứng âm thanh nhẹ nhàng -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        /* Cấu hình chung và font */
+        :root {
+            --pink-light: #FFC0CB;
+            --pink-medium: #FF8F9C;
+            --purple-light: #C3B1E1;
+            --white-trans: rgba(255, 255, 255, 0.75);
+            --blur-intensity: 15px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Ngăn cuộn khi có hiệu ứng tim bay/confetti */
+            -webkit-tap-highlight-color: transparent; /* Tăng trải nghiệm mobile */
+        }
+
+        /* --- 1. Hiệu ứng Gradient Nền Động (Phase 1) --- */
+        .gradient-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, var(--pink-light), var(--purple-light), #F5B9D9, #A990F0);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- 2. Hiệu ứng Tim Bay (Floating Hearts) --- */
+        @keyframes float-up {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+        }
+
+        .heart {
+            position: absolute;
+            color: var(--pink-medium);
+            font-size: 1.5rem;
+            animation: float-up linear infinite;
+            pointer-events: none;
+            text-shadow: 0 0 5px rgba(255, 143, 156, 0.5);
+        }
+
+        /* --- 3. Hiệu ứng Đánh máy (Typing Animation) --- */
+        .typing-container {
+            display: inline-block;
+            overflow: hidden;
+            border-right: .15em solid white; /* Con trỏ nhấp nháy */
+            white-space: nowrap;
+            letter-spacing: .05em;
+            animation: blink-caret 0.75s step-end infinite;
+        }
+
+        .typing-static {
+            border-right: none;
+            animation: none;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: white }
+        }
+
+        /* --- 4. Hiệu ứng Nút Gentle Slide Up & Fade-in (chậm rãi, tự nhiên) --- */
+        @keyframes slide-up-gentle {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .slide-up-gentle-in {
+            /* Tốc độ nút: 0.8s */
+            animation: slide-up-gentle 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; 
+        }
+
+        /* --- 5. Hiệu ứng Thẻ iOS (Backdrop Blur) --- */
+        .ios-card {
+            background-color: var(--white-trans);
+            backdrop-filter: blur(var(--blur-intensity));
+            -webkit-backdrop-filter: blur(var(--blur-intensity));
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            transition: all 0.4s ease;
+        }
+
+        /* --- 6. Hiệu ứng Đập Tim Lớn (Pulsing Heart) --- */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .pulsing-heart {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* --- 7. Hiệu ứng Popup iOS (Zoom In) --- */
+        @keyframes zoom-in {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .zoom-in {
+            animation: zoom-in 0.3s ease-out forwards;
+        }
+
+        /* --- 8. Confetti (chỉ CSS/DOM) --- */
+        .confetti {
+            position: fixed;
+            z-index: 1000;
+            pointer-events: none;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            border-radius: 50%;
+            transition: none;
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0.5; }
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center text-white text-center p-4">
+
+    <!-- Nền Gradient Động -->
+    <div id="background" class="gradient-background transition-all duration-1000 ease-in-out"></div>
+
+    <!-- Container cho các trái tim bay -->
+    <div id="heart-container" class="absolute w-full h-full overflow-hidden top-0 left-0"></div>
+
+    <!-- Container Chính -->
+    <div id="main-content" class="relative z-10 w-full max-w-sm md:max-w-md">
+
+        <!-- Phase 1: Mở đầu -->
+        <div id="intro-phase" class="space-y-6">
+            <h1 id="typing-text" class="text-4xl md:text-5xl font-extrabold tracking-tight text-shadow-lg drop-shadow-lg h-14 md:h-20">
+                <!-- Chữ sẽ được thêm vào bằng JS -->
+            </h1>
+            <p id="sub-text" class="text-xl md:text-2xl font-medium opacity-0 transition-opacity duration-700 ease-in mt-4">
+                Tớ có điều này muốn nói với cậu…
+            </p>
+            <button id="start-button" onclick="startConfession()"
+                class="hidden w-full max-w-xs mx-auto py-3 px-6 bg-white text-pink-medium rounded-full shadow-xl font-bold text-lg hover:shadow-2xl active:scale-95 transition-transform duration-200 focus:outline-none"
+                style="color: var(--pink-medium);"
+            >
+                Nhấn để xem điều tớ muốn nói 💌
+            </button>
+        </div>
+
+        <!-- Phase 2: Thẻ Tỏ tình Chính -->
+        <div id="confession-phase" class="hidden ios-card text-gray-800 space-y-4 md:space-y-6 transform translate-y-10 opacity-0">
+            <h2 id="line-1" class="text-3xl font-bold text-pink-medium text-left opacity-0 transition-opacity duration-700">Nhã à…</h2>
+            <p id="line-2" class="text-lg md:text-xl font-medium text-left opacity-0 transition-opacity duration-700 delay-300">Từ lần đầu gặp cậu, tớ thấy tim mình rung lên thật lạ 💓</p>
+            <p id="line-3" class="text-lg md:text-xl font-medium text-left opacity-0 transition-opacity duration-700 delay-700">Tớ không biết nói sao cho hay…</p>
+            <p id="line-4" class="text-2xl md:text-3xl font-extrabold text-left opacity-0 transition-opacity duration-700 delay-1000 mt-6">Nhưng tớ biết một điều — tớ rất thích cậu 🥺❤️</p>
+
+            <!-- Tim Lớn -->
+            <div id="large-heart" class="text-6xl pulsing-heart mt-8 hidden transition-opacity duration-500">
+                <span style="color: var(--pink-medium);">💖</span>
+            </div>
+
+            <!-- Phase 3: Nút Cao trào -->
+            <button id="accept-button" onclick="showClimax()"
+                class="hidden w-full mt-8 py-3 px-6 bg-pink-medium text-white rounded-xl shadow-xl font-bold text-lg hover:bg-pink-medium/90 active:scale-95 transition-transform duration-200 focus:outline-none"
+                style="background-color: var(--pink-medium);"
+            >
+                Nếu cậu cũng thích tớ 💕
+            </button>
+        </div>
+
+        <!-- Popup Climax (Có thêm phần chụp màn hình) -->
+        <div id="climax-popup" class="fixed inset-0 flex items-center justify-center bg-black/20 z-20 hidden">
+            <div id="climax-card" class="ios-card zoom-in p-6 md:p-8 text-gray-800 shadow-2xl max-w-xs md:max-w-sm mx-auto text-center" style="transform: scale(0.5); opacity: 0;">
+                <p class="text-2xl md:text-3xl font-extrabold text-pink-medium">
+                    Thật sao Nhã 🥹?
+                </p>
+                <p class="text-xl md:text-2xl font-medium mt-2">
+                    Tớ hạnh phúc lắm luôn đó! 💞💫
+                </p>
+
+                <!-- Lời nhắc chụp màn hình -->
+                <div id="screenshot-prompt" class="mt-6 pt-4 border-t border-pink-light/50 opacity-0 transition-opacity duration-700">
+                    <p class="text-base font-semibold text-gray-600 mb-1 flex items-center justify-center">
+                        <span class="mr-2 text-xl">📸</span> Chụp lại khoảnh khắc này gửi cho Thành nhoo!
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">
+                        (Dùng nút vật lý trên điện thoại, sau đó chia sẻ nhé!)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript & Logic -->
+    <script>
+        // --- Cấu hình Firebase để tuân thủ quy tắc, mặc dù không dùng Firestore ---
+        // Biến toàn cục từ môi trường Canvas (KHÔNG THAY ĐỔI)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Tone.js Setup for sweet sound ---
+        const synth = new Tone.Synth({
+            oscillator: { type: "sine" },
+            envelope: {
+                attack: 0.01,
+                decay: 0.2,
+                sustain: 0.0,
+                release: 0.3
+            }
+        }).toDestination();
+
+        function playSweetChord() {
+            // Đảm bảo Tone.js được khởi động trên trình duyệt di động
+            if (Tone.context.state !== 'running') {
+                Tone.start();
+            }
+            const now = Tone.now();
+            // Chơi một hợp âm trưởng nhẹ nhàng
+            synth.triggerAttackRelease('C5', '4n', now);
+            synth.triggerAttackRelease('E5', '4n', now + 0.05);
+            synth.triggerAttackRelease('G5', '4n', now + 0.1);
+        }
+
+        // --- Khai báo biến DOM ---
+        const typingTextEl = document.getElementById('typing-text');
+        const subTextEl = document.getElementById('sub-text');
+        const startButton = document.getElementById('start-button');
+        const confessionPhase = document.getElementById('confession-phase');
+        const acceptButton = document.getElementById('accept-button');
+        const climaxPopup = document.getElementById('climax-popup');
+        const climaxCard = document.getElementById('climax-card');
+        const screenshotPrompt = document.getElementById('screenshot-prompt');
+        const background = document.getElementById('background');
+        const largeHeart = document.getElementById('large-heart');
+
+        // --- Hàm tạo hiệu ứng tim bay ---
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = ['💖', '💕', '💓', '💗'][Math.floor(Math.random() * 4)];
+            
+            const size = Math.random() * 1.5 + 1; // 1rem to 2.5rem
+            const startX = Math.random() * window.innerWidth;
+            const duration = Math.random() * 10 + 5; // 5s to 15s
+
+            heart.style.left = `${startX}px`;
+            heart.style.fontSize = `${size}rem`;
+            heart.style.opacity = Math.random() * 0.5 + 0.5;
+            heart.style.animationDuration = `${duration}s`;
+            heart.style.animationDelay = `-${Math.random() * duration}s`; // Ngẫu nhiên hóa điểm bắt đầu
+            
+            document.getElementById('heart-container').appendChild(heart);
+            
+            // Xóa tim sau khi animation kết thúc
+            setTimeout(() => heart.remove(), duration * 1000);
+        }
+
+        // Tạo liên tục các trái tim
+        let heartInterval;
+        function startHeartAnimation() {
+            if (!heartInterval) {
+                for (let i = 0; i < 20; i++) { // Bắt đầu với một loạt tim
+                    createFloatingHeart();
+                }
+                heartInterval = setInterval(createFloatingHeart, 500); // Thêm tim mới mỗi 0.5s
+            }
+        }
+
+        // --- Hàm hiệu ứng Đánh máy (Typing Animation) ---
+        function typeWriter(text, element, callback) {
+            let i = 0;
+            element.classList.remove('typing-static'); // Thêm hiệu ứng con trỏ nhấp nháy
+            
+            function typing() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    // *** ĐÃ ĐIỀU CHỈNH: Tăng độ trễ lên 200ms cho hiệu ứng "chậm thật chậm" ***
+                    setTimeout(typing, 200); 
+                } else {
+                    element.classList.add('typing-static'); // Dừng con trỏ
+                    if (callback) {
+                        setTimeout(callback, 500);
+                    }
+                }
+            }
+            typing();
+        }
+
+        // --- PHASES LOGIC ---
+
+        // Phase 1: Bắt đầu
+        function startIntro() {
+            startHeartAnimation();
+            const textToType = "Hi Nhã 💖";
+            typeWriter(textToType, typingTextEl, () => {
+                subTextEl.classList.remove('opacity-0');
+                subTextEl.classList.add('opacity-100', 'transition-opacity', 'duration-700');
+                
+                // Hiển thị nút sau khi subText hiện ra
+                setTimeout(() => {
+                    startButton.classList.remove('hidden');
+                    // Áp dụng hiệu ứng slide-up-gentle-in mới
+                    startButton.classList.add('slide-up-gentle-in'); 
+                }, 700);
+            });
+        }
+
+        // Phase 2: Tỏ tình
+        function startConfession() {
+            startButton.style.display = 'none';
+            document.getElementById('intro-phase').style.display = 'none';
+            
+            // Đổi nền gradient rực rỡ hơn
+            background.style.background = 'linear-gradient(-45deg, #FF69B4, #E6E6FA, #FFB6C1, #8A2BE2)';
+            background.style.backgroundSize = '400% 400%';
+            
+            confessionPhase.classList.remove('hidden');
+            
+            // Hiệu ứng Slide-Up & Fade-in cho card
+            setTimeout(() => {
+                confessionPhase.classList.remove('translate-y-10', 'opacity-0');
+                confessionPhase.classList.add('translate-y-0', 'opacity-100');
+                
+                // Hiển thị lần lượt các dòng
+                const lines = [
+                    document.getElementById('line-1'),
+                    document.getElementById('line-2'),
+                    document.getElementById('line-3'),
+                    document.getElementById('line-4')
+                ];
+                
+                lines.forEach((line, index) => {
+                    // Cài đặt độ trễ để các dòng hiện lần lượt
+                    setTimeout(() => {
+                        line.classList.remove('opacity-0');
+                    }, index * 1200 + 400); 
+                });
+
+                // Hiển thị tim lớn và nút chấp nhận sau khi các dòng đã hiện
+                setTimeout(() => {
+                    largeHeart.classList.remove('hidden');
+                    largeHeart.classList.add('opacity-100');
+                    
+                    acceptButton.classList.remove('hidden');
+                    // Áp dụng hiệu ứng slide-up-gentle-in mới
+                    acceptButton.classList.add('slide-up-gentle-in'); 
+                }, 4 * 1200 + 1000); // Chờ 4 dòng + 1s
+            }, 50);
+        }
+
+        // Phase 3: Cao trào (Chấp nhận)
+        function showClimax() {
+            playSweetChord(); // Chơi âm thanh vui vẻ
+            
+            acceptButton.style.display = 'none';
+            confessionPhase.style.pointerEvents = 'none'; // Ngăn tương tác với card
+            
+            climaxPopup.classList.remove('hidden');
+            
+            // Hiệu ứng Zoom In
+            setTimeout(() => {
+                climaxCard.style.transform = 'scale(1)';
+                climaxCard.style.opacity = '1';
+                createConfetti(100); // Tạo 100 hạt confetti
+                
+                // Hiện prompt chụp màn hình sau khi popup hiện ra
+                setTimeout(() => {
+                    screenshotPrompt.classList.remove('opacity-0');
+                }, 500); // Chờ 0.5s sau khi popup hiện ra
+            }, 50);
+        }
+
+        // --- Hàm tạo Confetti (DOM/CSS Lightweight) ---
+        function createConfetti(num) {
+            const colors = ['#FFC0CB', '#FF69B4', '#E6E6FA', '#C3B1E1', '#FFFFFF'];
+            const container = document.body;
+            
+            for (let i = 0; i < num; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                
+                const size = Math.random() * 8 + 5; // Kích thước 5px - 13px
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.top = `${Math.random() * 10 - 20}vh`; // Bắt đầu từ trên cùng
+                
+                const duration = Math.random() * 3 + 2; // 2s - 5s
+                confetti.style.animation = `confetti-fall ${duration}s ease-in forwards`;
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                
+                container.appendChild(confetti);
+
+                // Dọn dẹp DOM
+                setTimeout(() => confetti.remove(), duration * 1000 + 500);
+            }
+        }
+
+        // Khởi chạy intro khi trang tải xong
+        window.onload = startIntro;
+
+    </script>
+</body>
+</html>
+
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
