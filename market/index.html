@@ -333,7 +333,6 @@
               <div class="input full"><label>Ghi chú</label><textarea id="noteInput" rows="3" placeholder="Ví dụ: Ăn trưa..."></textarea></div>
               <div class="controls full">
                 <button id="addBtn" class="btn primary" type="button">Lưu lại</button>
-                <button id="clearBtn" class="btn ghost" type="button">Reset dữ liệu</button>
               </div>
             </form>
         </div>
@@ -553,7 +552,6 @@
                 </div>
                 <div class="tx-right">
                     <div class="tx-amt ${colorClass}">${sign}${formatCurrency(tx.amount)}</div>
-                    <button class="del-btn-small" onclick="window.deleteTx('${tx.id}', '${dateKey}')">&times;</button>
                 </div>
             `;
             detailListEl.appendChild(item);
