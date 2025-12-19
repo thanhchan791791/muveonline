@@ -15,21 +15,29 @@
             --bg-creme: #FAF9F6;
             --ios-blur: rgba(255, 255, 255, 0.85);
             --header-height: 80px;
-            --sidebar-width: 125px;
+            --sidebar-width: 110px;
             --safe-area-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* KHÓA CUỘN NGANG TUYỆT ĐỐI */
+        html, body {
+            height: 100vh;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden !important;
+            position: fixed;
         }
 
         * {
             -webkit-tap-highlight-color: transparent;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            box-sizing: border-box;
         }
 
         body {
-            height: 100vh;
-            overflow: hidden;
             background-color: var(--bg-creme);
             color: #2C1B18;
-            margin: 0;
         }
 
         /* --- HEADER --- */
@@ -40,7 +48,7 @@
             -webkit-backdrop-filter: blur(25px) saturate(200%);
             display: flex;
             align-items: center;
-            padding: 0 24px;
+            padding: 0 15px;
             position: fixed;
             top: 0;
             width: 100%;
@@ -49,288 +57,168 @@
         }
 
         .restaurant-logo {
-            height: 48px;
-            width: 48px;
-            object-fit: contain;
-            border-radius: 14px;
-            margin-right: 16px;
+            height: 40px; width: 40px;
+            object-fit: contain; border-radius: 10px; margin-right: 12px;
         }
 
         .restaurant-name {
-            font-weight: 900;
-            font-size: 1.4rem;
-            color: var(--primary-color);
-            margin: 0;
-            letter-spacing: -1px;
-            text-transform: uppercase;
+            font-weight: 900; font-size: 1.2rem;
+            color: var(--primary-color); margin: 0;
+            letter-spacing: -0.5px; text-transform: uppercase;
         }
 
         /* --- LAYOUT --- */
         .order-container {
             display: flex;
             height: 100vh;
+            width: 100vw;
             padding-top: var(--header-height);
             padding-bottom: var(--safe-area-bottom);
         }
 
         .sidebar {
             width: var(--sidebar-width);
+            flex-shrink: 0;
             background: #F2EFE9;
             overflow-y: auto;
             scrollbar-width: none;
             border-right: 1px solid rgba(62, 39, 35, 0.05);
-            padding: 10px 8px;
+            padding: 10px 5px;
         }
         .sidebar::-webkit-scrollbar { display: none; }
 
+        /* Tiêu đề nhóm trong sidebar */
+        .sidebar-group-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--gold-accent);
+            text-align: center;
+            letter-spacing: 1px;
+            margin: 15px 0 8px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
         .nav-link {
-            padding: 16px 12px;
-            margin-bottom: 12px;
+            padding: 12px 8px;
+            margin-bottom: 8px;
             color: #8D736B;
             text-align: center;
-            font-size: 0.82rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            border-radius: 18px;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            line-height: 1.2;
             border: 1px solid transparent;
         }
 
+        /* Highlight danh mục đang xem */
         .nav-link.active {
             background: #FFFFFF !important;
             color: var(--primary-color) !important;
-            font-weight: 800 !important;
-            box-shadow: 0 12px 24px rgba(62, 39, 35, 0.12);
-            transform: scale(1.1) translateX(5px);
-            border: 1px solid rgba(198, 156, 109, 0.3);
-            position: relative;
-        }
-        
-        .nav-link.active::before {
-            content: '';
-            position: absolute;
-            left: -5px; top: 25%; height: 50%; width: 4px;
-            background: var(--gold-accent); border-radius: 10px;
+            font-weight: 900 !important;
+            box-shadow: 0 8px 15px rgba(62, 39, 35, 0.1);
+            transform: scale(1.05);
+            border: 1px solid rgba(198, 156, 109, 0.2);
         }
 
         /* --- CONTENT --- */
         .menu-content {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             scroll-behavior: smooth;
-            padding: 0 24px;
+            padding: 0 15px;
             -webkit-overflow-scrolling: touch;
         }
 
         .category-header {
             position: relative;
             font-weight: 900;
-            font-size: 2.2rem;
+            font-size: 1.6rem;
             color: var(--primary-color);
-            letter-spacing: -1.5px;
-            margin: 30px 0;
-        }
-
-        .category-header::after {
-            content: '';
-            position: absolute;
-            bottom: -8px; left: 0;
-            width: 60px; height: 6px;
-            background: linear-gradient(90deg, var(--gold-accent), transparent);
-            border-radius: 10px;
+            letter-spacing: -1px;
+            margin: 25px 0 15px;
         }
 
         .food-item {
             display: flex;
-            padding: 18px;
+            padding: 12px;
             background: #fff;
-            border-radius: 28px;
-            margin-bottom: 22px;
-            box-shadow: 0 12px 30px rgba(62, 39, 35, 0.04);
-            transition: all 0.3s ease;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 15px rgba(62, 39, 35, 0.04);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
-        .food-img {
-            width: 100px; height: 100px;
-            object-fit: cover; border-radius: 22px;
-        }
+        .food-item:active { transform: scale(0.96); background: #FDFCFB; }
 
-        .food-detail {
-            flex: 1; padding-left: 18px;
-            display: flex; flex-direction: column; justify-content: space-between;
-        }
+        .food-img { width: 85px; height: 85px; object-fit: cover; border-radius: 15px; flex-shrink: 0; }
+        .food-detail { flex: 1; padding-left: 12px; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+        .food-name { font-weight: 700; font-size: 1rem; color: #2D1B18; margin-bottom: 4px; }
+        .food-price { color: var(--primary-color); font-weight: 800; font-size: 1.1rem; }
 
-        .food-name { font-weight: 700; font-size: 1.15rem; color: #2D1B18; }
-        .food-price { color: var(--primary-color); font-weight: 800; font-size: 1.25rem; }
-
-        /* --- CONTROLS --- */
-        .quantity-control {
-            display: flex; align-items: center;
-            background: #F5F3F0; border-radius: 25px;
-            padding: 4px; gap: 8px;
+        .item-badge {
+            position: absolute; top: 8px; right: 8px;
+            background: var(--gold-accent); color: white;
+            font-size: 0.7rem; padding: 2px 8px; border-radius: 10px;
+            font-weight: 800; display: none;
         }
-
-        .btn-circle {
-            width: 36px; height: 36px; border-radius: 50%;
-            border: none; background: #fff; color: var(--primary-color);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-        }
-        
-        .btn-add-fill { background: var(--primary-color); color: #fff; }
 
         /* --- FLY ANIMATION --- */
         .fly-dot {
-            position: fixed;
-            width: 25px; height: 25px;
-            background: var(--gold-accent);
-            border-radius: 50%;
-            z-index: 9999;
-            pointer-events: none;
+            position: fixed; width: 25px; height: 25px;
+            background: var(--gold-accent); border-radius: 50%;
+            z-index: 9999; pointer-events: none;
             box-shadow: 0 0 15px var(--gold-accent);
-            transition: all 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* --- FOOTER ICON CART --- */
+        /* --- CART ICON & BADGE --- */
         .footer-cart-icon {
-            position: fixed;
-            bottom: calc(30px + var(--safe-area-bottom));
-            right: 25px;
-            width: 70px;
-            height: 70px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            z-index: 2000;
-            cursor: pointer;
-            opacity: 0;
-            transform: translateY(100px) scale(0.5);
-            pointer-events: none;
-            transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: fixed; bottom: calc(25px + var(--safe-area-bottom));
+            right: 20px; width: 60px; height: 60px;
+            background: var(--primary-color); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 2000;
+            opacity: 0; transform: translateY(100px);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .footer-cart-icon.visible {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
+        .footer-cart-icon.visible { opacity: 1; transform: translateY(0); }
 
-        /* HIỆU ỨNG NHẤP NHÔ (BOUNCE) KHI NHẬN MÓN */
-        @keyframes bounce {
-            0% { transform: scale(1); }
-            30% { transform: scale(1.3); }
-            50% { transform: scale(0.9); }
-            70% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .footer-cart-icon.bump {
-            animation: bounce 0.5s ease-out;
-        }
-
-        .footer-cart-icon i { font-size: 1.8rem; color: #fff; }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        .footer-cart-icon.bump { animation: bounce 0.4s ease-out; }
 
         .cart-badge {
-            position: absolute;
-            top: -5px; right: -5px;
-            background: var(--gold-accent);
-            color: white;
-            font-weight: 800;
-            font-size: 0.85rem;
-            min-width: 25px; height: 25px;
-            border-radius: 50%;
+            position: absolute; top: -2px; right: -2px;
+            background: var(--gold-accent); color: white;
+            font-weight: 800; font-size: 0.75rem;
+            min-width: 22px; height: 22px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            border: 3px solid var(--primary-color);
+            border: 2px solid var(--primary-color);
         }
 
         /* --- ORDER SHEET --- */
         .order-sheet {
-            position: fixed;
-            bottom: -100%; left: 0; right: 0;
-            background: #fff;
-            border-radius: 35px 35px 0 0;
-            z-index: 2100;
-            padding: 25px;
-            padding-bottom: calc(30px + var(--safe-area-bottom));
-            max-height: 85vh;
-            overflow-y: auto;
-            transition: bottom 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 -20px 60px rgba(0,0,0,0.25);
+            position: fixed; bottom: -100%; left: 0; right: 0;
+            background: #fff; border-radius: 30px 30px 0 0;
+            z-index: 2100; padding: 20px;
+            padding-bottom: calc(20px + var(--safe-area-bottom));
+            max-height: 80vh; overflow-y: auto;
+            transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .order-sheet.open { bottom: 0; }
+        .sheet-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 2050; display: none; }
 
-        .sheet-handle {
-            width: 45px; height: 5px; background: #E0E0E0;
-            border-radius: 10px; margin: 0 auto 20px;
-        }
+        .quantity-control { display: flex; align-items: center; background: #F5F3F0; border-radius: 20px; padding: 3px; gap: 8px; }
+        .btn-circle { width: 30px; height: 30px; border-radius: 50%; border: none; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 600; }
+        .btn-confirm-order { width: 100%; background: var(--primary-color); color: #fff; border: none; padding: 16px; border-radius: 18px; font-weight: 800; margin-top: 15px; }
 
-        .sheet-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); z-index: 2050;
-            backdrop-filter: blur(4px);
-            display: none;
-        }
-
-        .cart-item-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 18px 0; border-bottom: 1px solid #F8F8F8;
-        }
-
-        .cart-item-info { flex: 1; }
-        .cart-item-name { font-weight: 700; color: #3E2723; font-size: 1.1rem; }
-        .cart-item-price { font-size: 0.95rem; color: var(--gold-accent); font-weight: 700; }
-
-        .sheet-footer {
-            margin-top: 30px;
-            background: #F9F7F2;
-            padding: 20px;
-            border-radius: 25px;
-        }
-
-        .btn-confirm-order {
-            width: 100%;
-            background: var(--primary-color);
-            color: #fff;
-            border: none;
-            padding: 18px;
-            border-radius: 20px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-        }
-
-        /* --- SUCCESS EFFECT --- */
-        #success-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.5s ease;
-            backdrop-filter: blur(10px);
-        }
+        #success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
         #success-overlay.show { opacity: 1; pointer-events: auto; }
-
-        .success-icon {
-            width: 100px; height: 100px;
-            background: var(--primary-color);
-            color: #fff;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 4rem;
-            margin-bottom: 20px;
-            transform: scale(0);
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        #success-overlay.show .success-icon { transform: scale(1); }
-
-        .success-text {
-            font-weight: 900; color: var(--primary-color);
-            font-size: 1.8rem; text-align: center;
-        }
     </style>
 </head>
 <body data-bs-spy="scroll" data-bs-target="#sidebar-nav" data-bs-offset="100">
@@ -348,30 +236,30 @@
 </div>
 
 <div class="footer-cart-icon" id="cartIcon" onclick="toggleCart()">
-    <i class="bi bi-bag-heart-fill"></i>
+    <i class="bi bi-bag-heart-fill" style="color:white; font-size:1.5rem;"></i>
     <div class="cart-badge" id="total-count-badge">0</div>
 </div>
 
 <div class="sheet-overlay" id="overlay" onclick="toggleCart()"></div>
 <div class="order-sheet" id="orderSheet">
-    <div class="sheet-handle"></div>
+    <div style="width:40px; height:4px; background:#DDD; border-radius:10px; margin:0 auto 15px;"></div>
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 style="font-weight: 900; color: #3E2723; margin: 0;">Đơn hàng của bạn</h3>
-        <span onclick="toggleCart()" style="color: #6D4C41; font-weight: 600; cursor: pointer;">Đóng</span>
+        <h4 style="font-weight: 800; color: #3E2723; margin: 0;">Giỏ hàng</h4>
+        <span onclick="toggleCart()" style="color: #C69C6D; font-weight: 700;">Đóng</span>
     </div>
     <div id="cart-list"></div>
-    <div class="sheet-footer" id="sheet-footer-ui" style="display:none;">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <span style="font-weight: 600; color: #8E8E93;">Tổng cộng:</span>
-            <span id="total-price" style="font-size: 1.6rem; font-weight: 900; color: var(--primary-color);">0đ</span>
+    <div id="sheet-footer-ui" style="display:none; margin-top:20px; border-top:1px solid #EEE;">
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span style="font-weight: 600; color: #888;">Tổng cộng:</span>
+            <span id="total-price" style="font-size: 1.4rem; font-weight: 900; color: var(--primary-color);">0đ</span>
         </div>
-        <button class="btn-confirm-order" onclick="submitOrder()">Gửi Đơn</button>
+        <button class="btn-confirm-order" onclick="submitOrder()">ĐẶT MÓN NGAY</button>
     </div>
 </div>
 
 <div id="success-overlay">
-    <div class="success-icon"><i class="bi bi-check-lg"></i></div>
-    <div class="success-text">Tuyệt vời!<br><span style="font-size: 1.1rem; font-weight: 600; color: #6D4C41;">Nhà hàng đã nhận được đơn của bạn.</span></div>
+    <i class="bi bi-check-circle-fill" style="font-size: 5rem; color: var(--primary-color);"></i>
+    <h2 style="font-weight: 900; margin-top: 20px;">Gửi đơn thành công!</h2>
 </div>
 
 <script type="module">
@@ -392,7 +280,7 @@
     const db = getDatabase(app);
     let masterMenu = {};
     let cart = {};
-    let lastTotalCount = 0; // Biến theo dõi số lượng cũ để kích hoạt animation
+    let lastTotalCount = 0;
 
     const foodLabels = { "4mon": "4 món đặc sản", "7mon": "Top trải nghiệm", "metTongHop": "Mẹt Tổng Hợp", "monCanh": "Món Canh", "monChinh": "Món Chính", "monRau": "Món Rau", "monthemmet": "Món Thêm" };
     const drinkLabels = { "coCon": "Đồ Có Cồn", "giaiKhat": "Giải Khát", "kem": "Kem", "nuocEp": "Nước Ép" };
@@ -407,16 +295,22 @@
     function renderFullMenu(groups, menuData) {
         const sidebar = document.getElementById('category-list');
         const mainMenu = document.getElementById('main-menu');
-        sidebar.innerHTML = '<div class="menu-group-label" style="font-size: 0.6rem; color: #C69C6D; letter-spacing: 2px; text-align: center; margin-bottom: 10px;">THỰC ĐƠN</div>';
+        sidebar.innerHTML = '';
         mainMenu.innerHTML = '';
+        
+        // Render NHÓM THỰC ĐƠN
+        sidebar.innerHTML += '<div class="sidebar-group-label">Thực đơn</div>';
         renderCategoryGroup(groups.food, menuData.food, foodLabels, sidebar, mainMenu);
-        sidebar.innerHTML += '<div class="menu-group-label" style="margin-top: 15px; font-size: 0.6rem; color: #C69C6D; letter-spacing: 2px; text-align: center; margin-bottom: 10px;">THỨC UỐNG</div>';
+        
+        // Render NHÓM THỨC UỐNG
+        sidebar.innerHTML += '<div class="sidebar-group-label">Thức uống</div>';
         renderCategoryGroup(groups.drink, menuData.drink, drinkLabels, sidebar, mainMenu);
         
+        // Làm mới ScrollSpy sau khi render
         setTimeout(() => {
             const scrollSpy = bootstrap.ScrollSpy.getInstance(document.body);
             if (scrollSpy) scrollSpy.refresh();
-        }, 500);
+        }, 300);
     }
 
     function renderCategoryGroup(groups, details, labels, sidebarEl, contentEl) {
@@ -428,18 +322,12 @@
                     if (info && info.imageUrl && info.imageUrl.trim() !== "" && info.status !== "sold-out") {
                         hasValid = true;
                         sectionContent += `
-                        <div class="food-item">
+                        <div class="food-item" onclick="handleItemClick(event, '${itemId}', ${info.price})">
+                            <div class="item-badge" id="badge-${itemId}">0</div>
                             <img src="${info.imageUrl}" class="food-img" loading="lazy">
                             <div class="food-detail">
                                 <div class="food-name">${info.name}</div>
-                                <div class="d-flex justify-content-between align-items-end">
-                                    <span class="food-price">${info.price.toLocaleString()}đ</span>
-                                    <div class="quantity-control">
-                                        <div class="btn-circle" onclick="updateCart('${itemId}', -1, ${info.price})">−</div>
-                                        <span id="qty-${itemId}" style="font-weight:900; min-width:28px; text-align:center;">${cart[itemId]?.qty || 0}</span>
-                                        <div class="btn-circle btn-add-fill" onclick="animateFly(event); updateCart('${itemId}', 1, ${info.price})">+</div>
-                                    </div>
-                                </div>
+                                <div class="food-price">${info.price.toLocaleString()}đ</div>
                             </div>
                         </div>`;
                     }
@@ -452,12 +340,21 @@
         });
     }
 
+    window.handleItemClick = (e, id, price) => {
+        animateFly(e);
+        updateCart(id, 1, price);
+    };
+
     window.updateCart = (id, delta, price) => {
         if (!cart[id]) cart[id] = { qty: 0, price: price, name: masterMenu[id]?.name || id };
         cart[id].qty += delta;
         if (cart[id].qty <= 0) delete cart[id];
-        const qtyEl = document.getElementById(`qty-${id}`);
-        if (qtyEl) qtyEl.innerText = cart[id]?.qty || 0;
+        
+        const b = document.getElementById(`badge-${id}`);
+        if(b) {
+            b.innerText = cart[id]?.qty || 0;
+            b.style.display = cart[id]?.qty > 0 ? 'block' : 'none';
+        }
         updateTotalUI();
     };
 
@@ -467,18 +364,25 @@
         Object.keys(cart).forEach(id => { 
             const item = cart[id];
             total += (item.qty * item.price); count += item.qty;
-            listHtml += `<div class="cart-item-row"><div class="cart-item-info"><div class="cart-item-name">${item.name}</div><div class="cart-item-price">${item.price.toLocaleString()}đ</div></div><div class="quantity-control"><div class="btn-circle" onclick="updateCart('${id}', -1, ${item.price})">−</div><span style="font-weight:900; min-width:25px; text-align:center;">${item.qty}</span><div class="btn-circle btn-add-fill" onclick="updateCart('${id}', 1, ${item.price})">+</div></div></div>`;
+            listHtml += `
+            <div class="cart-item-row">
+                <div style="flex:1">
+                    <div style="font-weight:700; color:#3E2723">${item.name}</div>
+                    <div style="color:#C69C6D; font-size:0.9rem">${(item.qty * item.price).toLocaleString()}đ</div>
+                </div>
+                <div class="quantity-control">
+                    <div class="btn-circle" onclick="updateCart('${id}', -1, ${item.price})">−</div>
+                    <span style="font-weight:800; min-width:20px; text-align:center;">${item.qty}</span>
+                    <div class="btn-circle" style="background:var(--primary-color); color:white" onclick="updateCart('${id}', 1, ${item.price})">+</div>
+                </div>
+            </div>`;
         });
         
         const icon = document.getElementById('cartIcon');
-        
-        // Kích hoạt hiệu ứng nhấp nhô nếu số lượng tăng lên
         if (count > lastTotalCount) {
             icon.classList.remove('bump');
-            void icon.offsetWidth; // Trigger reflow để reset animation
+            void icon.offsetWidth;
             icon.classList.add('bump');
-            // Gỡ bỏ class sau khi animation hoàn tất để sẵn sàng cho lần sau
-            setTimeout(() => icon.classList.remove('bump'), 500);
         }
         lastTotalCount = count;
 
@@ -486,15 +390,13 @@
             icon.classList.add('visible'); 
             document.getElementById('total-count-badge').innerText = count; 
             document.getElementById('sheet-footer-ui').style.display = 'block'; 
-        }
-        else { 
+        } else { 
             icon.classList.remove('visible'); 
             document.getElementById('sheet-footer-ui').style.display = 'none'; 
             toggleCart(false); 
         }
-        
         document.getElementById('total-price').innerText = total.toLocaleString() + 'đ';
-        document.getElementById('cart-list').innerHTML = listHtml || '<p style="text-align:center; opacity:0.4; margin-top:40px;">Giỏ hàng trống</p>';
+        document.getElementById('cart-list').innerHTML = listHtml || '<p style="text-align:center; opacity:0.4; margin-top:20px;">Giỏ hàng đang trống</p>';
     }
 
     window.animateFly = (e) => {
@@ -502,19 +404,13 @@
         dot.className = 'fly-dot';
         dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
         document.body.appendChild(dot);
-        
-        requestAnimationFrame(() => {
+        setTimeout(() => {
             const rect = document.getElementById('cartIcon').getBoundingClientRect();
-            const targetX = rect.width > 0 ? (rect.left + 35) : (window.innerWidth - 60);
-            const targetY = rect.height > 0 ? (rect.top + 35) : (window.innerHeight - 60);
-            
-            dot.style.left = targetX + 'px';
-            dot.style.top = targetY + 'px';
-            dot.style.transform = 'scale(0.1)'; 
-            dot.style.opacity = '0.5';
-        });
-        
-        setTimeout(() => dot.remove(), 1500);
+            dot.style.left = (rect.left + 20) + 'px';
+            dot.style.top = (rect.top + 20) + 'px';
+            dot.style.transform = 'scale(0.2)'; dot.style.opacity = '0';
+        }, 10);
+        setTimeout(() => dot.remove(), 800);
     };
 
     window.toggleCart = (force) => {
@@ -529,19 +425,8 @@
         toggleCart(false);
         const success = document.getElementById('success-overlay');
         success.classList.add('show');
-        const duration = 3 * 1000;
-        const end = Date.now() + duration;
-        (function frame() {
-            confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#C69C6D', '#3E2723'] });
-            confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#C69C6D', '#3E2723'] });
-            if (Date.now() < end) requestAnimationFrame(frame);
-        }());
-        setTimeout(() => {
-            success.classList.remove('show');
-            cart = {};
-            updateTotalUI();
-            location.reload();
-        }, 4000);
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C69C6D', '#3E2723'] });
+        setTimeout(() => location.reload(), 3000);
     };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
