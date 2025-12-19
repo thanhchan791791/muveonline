@@ -2,432 +2,990 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Ẩm thực Buôn Mê - Premium Order</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mua Vé Cherry Pet Coffee</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ96j2y0zL0rLw0R1k+D4R4e2d3W4e2S/c6F5k2y+oFw/R0R9z2p4wG3j3y5A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
+        /* ----------------- Cài đặt chung & Body ----------------- */
         :root {
-            --primary-color: #3E2723;
-            --gold-accent: #C69C6D;
-            --bg-creme: #FAF9F6;
-            --ios-blur: rgba(255, 255, 255, 0.85);
-            --header-height: 80px;
-            --sidebar-width: 110px;
-            --safe-area-bottom: env(safe-area-inset-bottom);
+            --primary-pink: #FF85A2;
+            --secondary-pink: #FCE4EC;
+            --dark-text: #4A4A4A;
+            --light-text: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --shadow-elevation-1: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-elevation-2: 0 10px 15px rgba(0, 0, 0, 0.15);
+            --price-color: #E74C3C;
         }
-
-        /* KHÓA CUỘN NGANG TUYỆT ĐỐI */
-        html, body {
-            height: 100vh;
-            width: 100%;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FFE6F0, #E0F7FA);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
-            overflow: hidden !important;
-            position: fixed;
+            color: var(--dark-text);
+            position: relative;
         }
 
-        * {
-            -webkit-tap-highlight-color: transparent;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        /* ----------------- Container ----------------- */
+        .container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow-elevation-2);
+            padding: 30px;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+        }
+
+        /* ----------------- Tiêu đề & Chữ ----------------- */
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-pink);
+        }
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 5px;
+            animation: popIn 0.5s ease-out forwards;
+        }
+        .subtitle {
+            font-size: 1.1em;
+            color: #888;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .info-note {
+            text-align: center;
+            font-size: 1em;
+            color: var(--primary-pink);
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: var(--secondary-pink);
+            border-radius: 10px;
+        }
+
+        /* ----------------- Hiệu ứng hình ảnh mới ----------------- */
+        .header-image {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        .header-image img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid var(--primary-pink);
+            box-shadow: var(--shadow-elevation-1);
+        }
+
+        /* ----------------- Form & Nút bấm ----------------- */
+        .input-group {
+            margin-bottom: 18px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        .input-group.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        input[type="text"], input[type="tel"], input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
             box-sizing: border-box;
         }
-
-        body {
-            background-color: var(--bg-creme);
-            color: #2C1B18;
+        input:focus {
+            border-color: var(--primary-pink);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--secondary-pink);
+        }
+        .price-display {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-pink);
+            text-align: right;
+            margin-top: 20px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-pink);
+            color: var(--light-text);
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+            box-shadow: var(--shadow-elevation-1);
+        }
+        button:hover { transform: translateY(-2px); background-color: #E5718A; }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .button-group button {
+            flex-grow: 1;
+        }
+        .button-group #back-btn {
+            background-color: #ccc;
+            color: var(--dark-text);
+        }
+        .button-group #back-btn:hover {
+            background-color: #b3b3b3;
         }
 
-        /* --- HEADER --- */
-        .restaurant-header {
-            height: var(--header-height);
-            background: var(--ios-blur);
-            backdrop-filter: blur(25px) saturate(200%);
-            -webkit-backdrop-filter: blur(25px) saturate(200%);
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
+        /* ----------------- Chuyển bước & QR code ----------------- */
+        .step {
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        .step.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .qr-section { text-align: center; }
+        #qr-code {
+            padding: 10px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow-elevation-1);
+            margin: 25px auto;
+            display: inline-block;
+            animation: bounceIn 0.8s;
+        }
+        @keyframes bounceIn {
+            0%, 20%, 40%, 60%, 80%, 100% {
+                transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+            }
+            0% { transform: scale3d(.3, .3, .3); }
+            20% { transform: scale3d(1.1, 1.1, 1.1); }
+            40% { transform: scale3d(.9, .9, .9); }
+            60% { transform: scale3d(1.03, 1.03, 1.03); }
+            80% { transform: scale3d(.97, .97, .97); }
+            100% { transform: scale3d(1, 1, 1); }
+        }
+
+        /* ----------------- Overlay thông báo ----------------- */
+        .message-overlay {
             position: fixed;
             top: 0;
+            left: 0;
             width: 100%;
-            z-index: 1100;
-            border-bottom: 1px solid rgba(62, 39, 35, 0.08);
-        }
-
-        .restaurant-logo {
-            height: 40px; width: 40px;
-            object-fit: contain; border-radius: 10px; margin-right: 12px;
-        }
-
-        .restaurant-name {
-            font-weight: 900; font-size: 1.2rem;
-            color: var(--primary-color); margin: 0;
-            letter-spacing: -0.5px; text-transform: uppercase;
-        }
-
-        /* --- LAYOUT --- */
-        .order-container {
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
             display: flex;
-            height: 100vh;
-            width: 100vw;
-            padding-top: var(--header-height);
-            padding-bottom: var(--safe-area-bottom);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
         }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            flex-shrink: 0;
-            background: #F2EFE9;
-            overflow-y: auto;
-            scrollbar-width: none;
-            border-right: 1px solid rgba(62, 39, 35, 0.05);
-            padding: 10px 5px;
-        }
-        .sidebar::-webkit-scrollbar { display: none; }
-
-        .sidebar-group-label {
-            font-size: 0.65rem;
-            font-weight: 800;
-            color: var(--gold-accent);
-            text-align: center;
-            letter-spacing: 1px;
-            margin: 15px 0 8px;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
-
-        .nav-link {
-            padding: 12px 8px;
-            margin-bottom: 8px;
-            color: #8D736B;
-            text-align: center;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 14px;
-            transition: all 0.3s ease;
-            line-height: 1.2;
-            border: 1px solid transparent;
-        }
-
-        .nav-link.active {
-            background: #FFFFFF !important;
-            color: var(--primary-color) !important;
-            font-weight: 900 !important;
-            box-shadow: 0 8px 15px rgba(62, 39, 35, 0.1);
-            transform: scale(1.05);
-            border: 1px solid rgba(198, 156, 109, 0.2);
-        }
-
-        /* --- CONTENT --- */
-        .menu-content {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-            padding: 0 15px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .category-header {
-            position: relative;
-            font-weight: 900;
-            font-size: 1.6rem;
-            color: var(--primary-color);
-            letter-spacing: -1px;
-            margin: 25px 0 15px;
-            padding-top: 10px;
-        }
-
-        .food-item {
-            display: flex;
-            padding: 12px;
-            background: #fff;
+        .message-overlay.visible { opacity: 1; visibility: visible; }
+        .message-card {
+            background: var(--card-bg);
+            padding: 40px 30px;
             border-radius: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 6px 15px rgba(62, 39, 35, 0.04);
-            cursor: pointer;
+            box-shadow: var(--shadow-elevation-2);
+            max-width: 380px;
+            text-align: center;
+            transform: translateY(-50px);
+            transition: transform 0.5s ease;
+            animation: scaleIn 0.5s ease-out;
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        .message-card .icon { font-size: 3.5em; margin-bottom: 15px; }
+        .message-card h2 { font-size: 1.8em; margin-bottom: 10px; font-weight: 700; }
+        .message-card p { font-size: 1.1em; margin-bottom: 25px; }
+
+        .message-card.success h2, .message-card.success .icon { color: #2ecc71; }
+        .message-card.error h2, .message-card.error .icon { color: #e74c3c; }
+        .message-card.info h2, .message-card.info .icon { color: #3498db; }
+
+
+        /* ----------------- Loader & Nút bấm ----------------- */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-pink);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #close-message-btn {
+            background-color: var(--primary-pink);
+            color: var(--light-text);
+            font-weight: 600;
+        }
+        #close-message-btn:hover {
+            background-color: #E5718A;
+        }
+
+        /* Giao diện mới cho Vé và phần giá */
+        .ticket-card {
+            background-color: #FFF;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-elevation-1);
+            margin-bottom: 25px;
+            text-align: center;
             position: relative;
             overflow: hidden;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.6s ease-in-out forwards;
+            border: 2px solid var(--primary-pink);
+            border-bottom: 8px solid var(--primary-pink); /* Thêm viền dưới dày hơn */
+        }
+        .ticket-card h2 {
+            color: var(--dark-text);
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+            
+        /* Thay đổi cho phần giá */
+        .price-section {
+            background: linear-gradient(45deg, var(--primary-pink), #ffb3c1);
+            color: var(--light-text);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            animation: scaleIn 0.6s ease-out;
+            box-shadow: 0 5px 10px rgba(255, 133, 162, 0.4);
+            position: relative; /* Thêm position relative */
+        }
+        .price-section p {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        .price-section .price-values {
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: 15px;
+            margin: 5px 0;
+        }
+        .price-section .current-price {
+            font-size: 2.8em;
+            font-weight: 800;
+        }
+        .price-section .original-price {
+            font-size: 1.5em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: line-through;
+        }
+        .price-section small {
+            font-size: 1em;
+            display: block;
+            font-weight: 500;
+            margin-top: 0;
+        }
+        /* Hiệu ứng giảm giá */
+        .price-section.has-discount::before {
+            content: '-35%'; /* Hoặc có thể là 'GIẢM GIÁ' */
+            position: absolute;
+            top: -10px; /* Di chuyển lên trên */
+            right: -10px; /* Di chuyển sang phải */
+            background: #ff4d4d; /* Màu đỏ nổi bật */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50px; /* Làm tròn như một huy hiệu */
+            font-size: 0.9em;
+            font-weight: bold;
+            transform: rotate(10deg); /* Xoay nhẹ để thêm phần sống động */
+            box-shadow: var(--shadow-elevation-1);
+            animation: bounceIn 1s ease-out; /* Thêm hiệu ứng bật ra */
+            animation-delay: 0.6s;
+        }
+        /* Style cho phần hình ảnh của các con vật */
+        .animal-showcase {
+            display: flex;
+            justify-content: center; /* Đảm bảo các ảnh được căn giữa */
+            align-items: flex-end;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            height: 120px;
+            position: relative;
+            padding: 0 10px;
+            gap: 15px; /* Thêm khoảng cách đều giữa các ảnh */
         }
 
-        .food-item:active { transform: scale(0.96); background: #FDFCFB; }
-
-        .food-img { width: 85px; height: 85px; object-fit: cover; border-radius: 15px; flex-shrink: 0; }
-        .food-detail { flex: 1; padding-left: 12px; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
-        .food-name { font-weight: 700; font-size: 1rem; color: #2D1B18; margin-bottom: 4px; }
-        .food-price { color: var(--primary-color); font-weight: 800; font-size: 1.1rem; }
-
-        .item-badge {
-            position: absolute; top: 8px; right: 8px;
-            background: var(--gold-accent); color: white;
-            font-size: 0.7rem; padding: 2px 8px; border-radius: 10px;
-            font-weight: 800; display: none;
+        .animal-showcase .animal-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0; /* Ngăn các ảnh bị co lại khi không cần thiết */
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: popInAnimal 0.8s ease-out forwards;
+        }
+        .animal-showcase .animal-item:nth-child(1) { animation-delay: 0.1s; }
+        .animal-showcase .animal-item:nth-child(2) { animation-delay: 0.3s; }
+        .animal-showcase .animal-item:nth-child(3) { animation-delay: 0.5s; }
+        .animal-showcase .animal-item:nth-child(4) { animation-delay: 0.7s; }
+        .animal-showcase img {
+            width: 60px; /* Giảm chiều rộng của ảnh */
+            height: 60px; /* Giảm chiều cao của ảnh */
+            object-fit: contain; /* Đảm bảo hình ảnh vừa vặn trong khung mà không bị cắt */
+            border-radius: 50%;
+            border: 3px solid var(--primary-pink);
+            box-shadow: var(--shadow-elevation-1);
+            transition: all 0.3s ease;
+            background-color: var(--light-text);
+            padding: 10px; /* Tăng padding để tạo khoảng trống bên trong khung tròn */
         }
 
-        /* --- FLY ANIMATION --- */
-        .fly-dot {
-            position: fixed; width: 25px; height: 25px;
-            background: var(--gold-accent); border-radius: 50%;
-            z-index: 9999; pointer-events: none;
-            box-shadow: 0 0 15px var(--gold-accent);
-            transition: all 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+        .animal-showcase img:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: var(--shadow-elevation-2);
+        }
+        .animal-showcase .animal-label {
+            position: static;
+            margin-top: 5px;
+            background-color: var(--primary-pink);
+            color: var(--light-text);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: var(--shadow-elevation-1);
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.5s ease-out forwards;
+            animation-delay: 1s;
+        }
+        .description-text {
+            text-align: center;
+            font-size: 1.1em;
+            color: #666;
+            margin: 15px 0 25px;
+            line-height: 1.5;
+            animation: fadeIn 0.6s ease-out forwards;
+            animation-delay: 0.8s;
         }
 
-        /* --- CART ICON --- */
-        .footer-cart-icon {
-            position: fixed; bottom: calc(25px + var(--safe-area-bottom));
-            right: 20px; width: 60px; height: 60px;
-            background: var(--primary-color); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 2000;
-            opacity: 0; transform: translateY(100px);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        /* ----------------- Keyframes mới ----------------- */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popInAnimal {
+            0% { opacity: 0; transform: scale(0.5) translateY(20px); }
+            70% { opacity: 1; transform: scale(1.05) translateY(-5px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        /* New Keyframes for Confirmation Step */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
         }
 
-        .footer-cart-icon.visible { opacity: 1; transform: translateY(0); }
-
-        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-        .footer-cart-icon.bump { animation: bounce 0.4s ease-out; }
-
-        .cart-badge {
-            position: absolute; top: -2px; right: -2px;
-            background: var(--gold-accent); color: white;
-            font-weight: 800; font-size: 0.75rem;
-            min-width: 22px; height: 22px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            border: 2px solid var(--primary-color);
+        /* Thêm style cho phần điều khiển số lượng */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .quantity-control button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            font-size: 1.5em;
+            font-weight: 700;
+            border-radius: 50%;
+            line-height: 1;
+        }
+        .quantity-control input {
+            width: 80px;
+            text-align: center;
+        }
+        .discount-note {
+            text-align: center;
+            font-size: 0.95em;
+            color: #e74c3c;
+            font-weight: 600;
+            margin-top: 10px;
         }
 
-        /* --- ORDER SHEET --- */
-        .order-sheet {
-            position: fixed; bottom: -100%; left: 0; right: 0;
-            background: #fff; border-radius: 30px 30px 0 0;
-            z-index: 2100; padding: 20px;
-            padding-bottom: calc(20px + var(--safe-area-bottom));
-            max-height: 80vh; overflow-y: auto;
-            transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        /* ----------------- Cải tiến giao diện trang xác nhận ----------------- */
+        .confirmation-card {
+            background: linear-gradient(145deg, #fff, var(--secondary-pink));
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-elevation-2);
+            margin-bottom: 25px;
+            animation: fadeInUp 0.7s ease-out forwards;
+            border: 1px solid var(--primary-pink);
+            position: relative;
         }
-        .order-sheet.open { bottom: 0; }
-        .sheet-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 2050; display: none; }
+        .confirmation-card h3 {
+            font-size: 1.6em;
+            color: var(--dark-text);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .confirmation-card .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+        .confirmation-card .info-row:hover {
+            background-color: rgba(255, 133, 162, 0.05);
+            padding: 12px 10px;
+            border-radius: 8px;
+        }
+        .confirmation-card .info-row:last-child {
+            border-bottom: none;
+        }
+        .confirmation-card .info-label {
+            font-weight: 500;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .confirmation-card .info-value {
+            font-weight: 700;
+            color: var(--dark-text);
+            text-align: right;
+            transition: color 0.3s ease;
+        }
+        .confirmation-card .info-row:first-child .info-value,
+        .confirmation-card .info-row:nth-child(2) .info-value {
+             color: var(--primary-pink);
+        }
+        .confirmation-card .info-row:nth-child(2) .info-value {
+            animation: shake 0.5s;
+            color: #E74C3C;
+            font-size: 1.2em;
+        }
+        .total-price-confirmation {
+            font-size: 2.2em;
+            font-weight: 800;
+            text-align: center;
+            color: var(--price-color);
+            margin-top: 25px;
+            animation: bounceIn 0.8s;
+            position: relative;
+        }
+        .total-price-confirmation::before {
+            content: 'Tổng cộng';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.5em;
+            font-weight: 500;
+            color: #888;
+        }
 
-        .quantity-control { display: flex; align-items: center; background: #F5F3F0; border-radius: 20px; padding: 3px; gap: 8px; }
-        .btn-circle { width: 30px; height: 30px; border-radius: 50%; border: none; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 600; }
-        .btn-confirm-order { width: 100%; background: var(--primary-color); color: #fff; border: none; padding: 16px; border-radius: 18px; font-weight: 800; margin-top: 15px; }
-
-        #success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
-        #success-overlay.show { opacity: 1; pointer-events: auto; }
+        /* ----------------- CUSTOM STYLE CHO CÂU THÔNG BÁO MỚI ----------------- */
+        .announcement-box {
+            position: relative;
+            background-color: #FFDDE2; /* Màu nền nhẹ nhàng, hài hòa với giao diện */
+            border: 2px solid var(--primary-pink); /* Viền màu hồng đậm hơn */
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            box-shadow: var(--shadow-elevation-1);
+            animation: fadeIn 0.8s ease-out;
+        }
+        .announcement-box h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.2em;
+            color: var(--primary-pink);
+            font-weight: 700;
+        }
+        .announcement-box p {
+            margin: 0;
+            font-size: 1em;
+            line-height: 1.4;
+            color: var(--dark-text);
+        }
+        .announcement-box .icon-hot {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #FF4D4D;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: bold;
+            transform: rotate(10deg);
+            animation: bounceIn 1s ease-out;
+        }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
-<div class="restaurant-header">
-    <img src="logobanme.png" alt="Logo" class="restaurant-logo" onerror="this.src='https://via.placeholder.com/100?text=BM'">
-    <h1 class="restaurant-name">Ẩm thực Buôn Mê</h1>
-</div>
-
-<div class="order-container">
-    <div class="sidebar">
-        <div class="nav flex-column" id="category-list" role="tablist"></div>
-    </div>
-    <div class="menu-content" id="main-menu" data-bs-spy="scroll" data-bs-target="#category-list" data-bs-offset="100" tabindex="0"></div>
-</div>
-
-<div class="footer-cart-icon" id="cartIcon" onclick="toggleCart()">
-    <i class="bi bi-bag-heart-fill" style="color:white; font-size:1.5rem;"></i>
-    <div class="cart-badge" id="total-count-badge">0</div>
-</div>
-
-<div class="sheet-overlay" id="overlay" onclick="toggleCart()"></div>
-<div class="order-sheet" id="orderSheet">
-    <div style="width:40px; height:4px; background:#DDD; border-radius:10px; margin:0 auto 15px;"></div>
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 style="font-weight: 800; color: #3E2723; margin: 0;">Giỏ hàng</h4>
-        <span onclick="toggleCart()" style="color: #C69C6D; font-weight: 700;">Đóng</span>
-    </div>
-    <div id="cart-list"></div>
-    <div id="sheet-footer-ui" style="display:none; margin-top:20px; border-top:1px solid #EEE;">
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <span style="font-weight: 600; color: #888;">Tổng cộng:</span>
-            <span id="total-price" style="font-size: 1.4rem; font-weight: 900; color: var(--primary-color);">0đ</span>
+<div class="container">
+    <div id="step-info" class="step active">
+        <div class="header-image">
+            <img src="image/logocherry.png" alt="Cherry Pet Coffee Logo">
         </div>
-        <button class="btn-confirm-order" onclick="submitOrder()">ĐẶT MÓN NGAY</button>
+        <h1>Cherry Pet Coffee <i class="fa-solid fa-mug-saucer" style="font-size: 0.8em;"></i></h1>
+        <p class="subtitle">Mua vé tham quan & trải nghiệm <i class="fa-solid fa-paw"></i></p>
+
+        <div class="announcement-box">
+            <span class="icon-hot">HOT</span>
+            <h3>Ưu đãi Vé Online</h3>
+            <p>Chương trình ưu đãi chỉ diễn ra trong 3 tuần! Vé mua rồi dùng thoải mái cho đến khi hết vé, không giới hạn thời gian sử dụng đâu nha.</p>
+        </div>
+        <form id="infoForm">
+            <div class="input-group visible">
+                <label for="name">Tên của bạn:</label>
+                <input type="text" id="name" placeholder="Nhập tên" required>
+            </div>
+            <div class="input-group" id="phone-input-group">
+                <label for="phone">Số điện thoại:</label>
+                <input type="tel" id="phone" placeholder="Nhập số điện thoại" required>
+            </div>
+            <div class="input-group" id="re-phone-input-group">
+                <label for="rePhone">Nhập lại số điện thoại:</label>
+                <input type="tel" id="rePhone" placeholder="Xác nhận số điện thoại" required>
+            </div>
+            <button id="continueBtn" type="button" style="display: none;">Tiếp Tục</button>
+        </form>
+    </div>
+
+    <div id="step-ticket" class="step">
+        <h2>Khám phá thế giới của những người bạn bốn chân!</h2>
+        <div class="ticket-card">
+            <div class="animal-showcase">
+                <div class="animal-item">
+                    <img src="image/cho.png" alt="Chó">
+                    <span class="animal-label">Chó</span>
+                </div>
+                <div class="animal-item">
+                    <img src="image/meo.png" alt="Mèo">
+                    <span class="animal-label">Mèo</span>
+                </div>
+                <div class="animal-item">
+                    <img src="image/capy.png" alt="Capybara">
+                    <span class="animal-label">Capybara</span>
+                </div>
+                <div class="animal-item">
+                    <img src="image/gaumeo.png" alt="Gấu mèo">
+                    <span class="animal-label">Gấu mèo</span>
+                </div>
+            </div>
+            <p class="description-text">
+                Bước vào thế giới của những người bạn bốn chân đáng yêu. Tự do tương tác với chó, mèo, gấu mèo và capybara.
+            </p>
+            <div class="price-section" id="price-section">
+                <p>Giá ưu đãi hôm nay</p>
+                <div class="price-values">
+                    <span class="current-price" id="current-price"></span>
+                    <span class="original-price" id="original-price"></span>
+                </div>
+                <small id="price-note">/ người</small>
+            </div>
+            
+            <ul>
+                <li><i class="fa-solid fa-paw"></i> Chơi đùa thỏa thích cùng thú cưng.</li>
+                <li><i class="fa-solid fa-camera-retro"></i> Chụp ảnh check-in không giới hạn.</li>
+            </ul>
+        </div>
+        <div class="input-group visible" id="ticket-input-group">
+            <label for="ticketNumber">Số lượng vé:</label>
+            <div class="quantity-control">
+                <button type="button" id="decreaseBtn">-</button>
+                <input type="text" id="ticketNumber" value="5" readonly>
+                <button type="button" id="increaseBtn">+</button>
+            </div>
+            <p class="discount-note"><i class="fa-solid fa-fire"></i> Chương trình áp dụng khi mua tối thiểu 5 vé!</p>
+            <div class="price-display" id="total-price"></div>
+        </div>
+        <button id="checkoutBtn">Thanh Toán</button>
+    </div>
+
+    <div id="step-confirmation" class="step">
+        <h2>Xác nhận đơn hàng</h2>
+        <div class="confirmation-card">
+            <h3>Chi tiết đơn hàng của bạn</h3>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-user"></i> Tên khách hàng:</span>
+                <span class="info-value" id="confirm-name"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-phone-volume"></i> Số điện thoại:</span>
+                <span class="info-value" id="confirm-phone"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-ticket-alt"></i> Số lượng vé:</span>
+                <span class="info-value" id="confirm-tickets"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fa-solid fa-tags"></i> Đơn giá:</span>
+                <span class="info-value" id="confirm-unit-price"></span>
+            </div>
+            <div class="total-price-confirmation">
+                <span id="confirm-total-price"></span>
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="backBtn" type="button">Quay lại</button>
+            <button id="confirmPayBtn" type="button">Xác nhận & Thanh toán</button>
+        </div>
+    </div>
+
+   <div id="step-payment" class="step">
+    <div class="qr-section">
+        <h2>Thông tin Thanh Toán</h2>
+        <p>Vui lòng quét mã QR để chuyển khoản đúng số tiền và nội dung chuyển khoản. Sau khi thanh toán, vui lòng đợi khoảng 10-20 giây hệ thống sẽ tự động xác nhận.</p>
+        <div id="qr-code"></div>
+        <p><strong>Ngân hàng:</strong> MB Bank</p>
+        <p><strong>Số tài khoản:</strong> 973803388</p>
+        <p><strong>Tên tài khoản:</strong> Lê Vĩnh Tín</p>
+        <p><strong>Nội dung:</strong> <span id="payment-content-display">...</span></p>
     </div>
 </div>
 
-<div id="success-overlay">
-    <i class="bi bi-check-circle-fill" style="font-size: 5rem; color: var(--primary-color);"></i>
-    <h2 style="font-weight: 900; margin-top: 20px;">Gửi đơn thành công!</h2>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+<div id="message-overlay" class="message-overlay">
+    <div id="message-card" class="message-card">
+        <div id="message-icon" class="icon"></div>
+        <div id="message-loader" class="loader"></div>
+        <h2 id="message-title"></h2>
+        <p id="message-text"></p>
+        <button id="close-message-btn">Xong</button>
+    </div>
+</div>
 
+<script>
     const firebaseConfig = {
-        apiKey: "AIzaSyAV7r-rjXo6U62LX1AA7c7DAHb8GhOOOsg",
-        authDomain: "saigon-dalat.firebaseapp.com",
-        databaseURL: "https://saigon-dalat-default-rtdb.firebaseio.com",
-        projectId: "saigon-dalat",
-        storageBucket: "saigon-dalat.firebasestorage.app",
-        messagingSenderId: "339735183485",
-        appId: "1:339735183485:web:bc23cd740104d272577114"
+        apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
+        authDomain: "muveonline-919a8.firebaseapp.com",
+        databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
+        projectId: "muveonline-919a8",
+        storageBucket: "muveonline-919a8.firebasestorage.app",
+        messagingSenderId: "399933853156",
+        appId: "1:399933853156:web:982c1da02117606a994bf1"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    let masterMenu = {};
-    let cart = {};
-    let lastTotalCount = 0;
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    const foodLabels = { "4mon": "4 món đặc sản", "7mon": "Top trải nghiệm", "metTongHop": "Mẹt Tổng Hợp", "monCanh": "Món Canh", "monChinh": "Món Chính", "monRau": "Món Rau", "monthemmet": "Món Thêm" };
-    const drinkLabels = { "coCon": "Đồ Có Cồn", "giaiKhat": "Giải Khát", "kem": "Kem", "nuocEp": "Nước Ép" };
+    const steps = {
+        info: document.getElementById('step-info'),
+        ticket: document.getElementById('step-ticket'),
+        confirmation: document.getElementById('step-confirmation'),
+        payment: document.getElementById('step-payment')
+    };
 
-    onValue(ref(db, '/'), (snapshot) => {
-        const data = snapshot.val();
-        if (!data) return;
-        masterMenu = { ...data.menu.food, ...data.menu.drink };
-        renderFullMenu(data.menuGroups, data.menu);
+    const infoForm = document.getElementById('infoForm');
+    const nameInput = document.getElementById('name');
+    const phoneInput = document.getElementById('phone');
+    const rePhoneInput = document.getElementById('rePhone'); // New
+    const phoneInputGroup = document.getElementById('phone-input-group');
+    const rePhoneInputGroup = document.getElementById('re-phone-input-group'); // New
+    const continueBtn = document.getElementById('continueBtn');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const confirmPayBtn = document.getElementById('confirmPayBtn');
+    const backBtn = document.getElementById('backBtn');
+    const ticketNumberInput = document.getElementById('ticketNumber');
+    const totalPriceDiv = document.getElementById('total-price');
+    const qrCodeDiv = document.getElementById('qr-code');
+    const decreaseBtn = document.getElementById('decreaseBtn');
+    const increaseBtn = document.getElementById('increaseBtn');
+    const ticketInputGroup = document.getElementById('ticket-input-group');
+
+
+    const messageOverlay = document.getElementById('message-overlay');
+    const messageCard = document.getElementById('message-card');
+    const messageIcon = document.getElementById('message-icon');
+    const messageLoader = document.getElementById('message-loader');
+    const messageTitle = document.getElementById('message-title');
+    const messageText = document.getElementById('message-text');
+    const closeMessageBtn = document.getElementById('close-message-btn');
+    const paymentContentDisplay = document.getElementById('payment-content-display');
+
+    const priceSection = document.getElementById('price-section');
+    const currentPriceSpan = document.getElementById('current-price');
+    const originalPriceSpan = document.getElementById('original-price');
+    const priceNote = document.getElementById('price-note');
+
+    const confirmName = document.getElementById('confirm-name');
+    const confirmPhone = document.getElementById('confirm-phone');
+    const confirmTickets = document.getElementById('confirm-tickets');
+    const confirmUnitPrice = document.getElementById('confirm-unit-price');
+    const confirmTotalPrice = document.getElementById('confirm-total-price');
+
+    let userInfo = {};
+    const MIN_TICKETS = 5;
+    const ORIGINAL_PRICE = 100000;
+    const DISCOUNT_PRICE = 65000;
+    let statusListener = null;
+
+    // Hàm chuyển bước giao diện
+    function goToStep(nextStep) {
+        Object.values(steps).forEach(s => s.classList.remove('active'));
+        nextStep.classList.add('active');
+    }
+
+    // Hàm định dạng tiền tệ
+    function formatCurrency(n) { return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n); }
+
+    // Hàm cập nhật giá vé và hiển thị ưu đãi
+    function updateTicketPrice() {
+        const count = parseInt(ticketNumberInput.value);
+        
+        // Always apply the discount price
+        priceSection.classList.add('has-discount');
+        currentPriceSpan.textContent = formatCurrency(DISCOUNT_PRICE);
+        originalPriceSpan.textContent = formatCurrency(ORIGINAL_PRICE);
+        originalPriceSpan.style.textDecoration = 'line-through';
+        originalPriceSpan.style.display = 'block';
+
+        const totalPrice = count * DISCOUNT_PRICE;
+        totalPriceDiv.textContent = `Tổng cộng: ${formatCurrency(totalPrice)}`;
+        
+        // Disable decrease button if at minimum
+        decreaseBtn.disabled = count <= MIN_TICKETS;
+    }
+    
+    // Hàm hiển thị thông báo
+    function showMessage(type, title, text, showCloseBtn = true) {
+        messageCard.className = `message-card ${type}`;
+        messageTitle.textContent = title;
+        messageText.textContent = text;
+        messageLoader.style.display = 'none';
+        closeMessageBtn.style.display = showCloseBtn ? 'block' : 'none';
+
+        if (type === 'success') {
+            messageIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        } else if (type === 'error') {
+            messageIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+        } else if (type === 'pending') {
+            messageLoader.style.display = 'block';
+            messageIcon.innerHTML = '';
+            closeMessageBtn.style.display = 'none';
+        } else if (type === 'info') {
+            messageIcon.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+        }
+                                    
+        messageOverlay.classList.add('visible');
+    }
+
+    // Hàm đóng thông báo và reset form
+    function closeMessage() {
+        messageOverlay.classList.remove('visible');
+        ticketNumberInput.value = MIN_TICKETS;
+        nameInput.value = '';
+        phoneInput.value = '';
+        rePhoneInput.value = ''; // Reset new input
+        goToStep(steps.info);
+        phoneInputGroup.classList.remove('visible');
+        rePhoneInputGroup.classList.remove('visible'); // Hide new input
+        continueBtn.style.display = 'none';
+        updateTicketPrice(); // Reset price to initial discounted state
+        if (statusListener) {
+            db.ref().child('tickets').child(statusListener).off('value');
+            statusListener = null;
+        }
+    }
+
+    closeMessageBtn.addEventListener('click', closeMessage);
+
+    // Hiển thị ô nhập SĐT và nút "Tiếp Tục" khi nhập tên
+    nameInput.addEventListener('input', () => {
+        if (nameInput.value.trim().length > 0) {
+            phoneInputGroup.classList.add('visible');
+            rePhoneInputGroup.classList.add('visible'); // Show new input
+            setTimeout(() => {
+                continueBtn.style.display = 'block';
+                continueBtn.classList.add('visible');
+            }, 500);
+        } else {
+            phoneInputGroup.classList.remove('visible');
+            rePhoneInputGroup.classList.remove('visible'); // Hide new input
+            continueBtn.style.display = 'none';
+        }
     });
 
-    function renderFullMenu(groups, menuData) {
-        const sidebar = document.getElementById('category-list');
-        const mainMenu = document.getElementById('main-menu');
-        sidebar.innerHTML = '';
-        mainMenu.innerHTML = '';
-        
-        sidebar.innerHTML += '<div class="sidebar-group-label">Thực đơn</div>';
-        renderCategoryGroup(groups.food, menuData.food, foodLabels, sidebar, mainMenu);
-        
-        sidebar.innerHTML += '<div class="sidebar-group-label">Thức uống</div>';
-        renderCategoryGroup(groups.drink, menuData.drink, drinkLabels, sidebar, mainMenu);
-        
-        // Khởi tạo ScrollSpy sau khi đã render DOM
-        setTimeout(() => {
-            new bootstrap.ScrollSpy(document.getElementById('main-menu'), {
-                target: '#category-list',
-                offset: 120 // Điều chỉnh offset để highlight chuẩn khi cuộn lên
-            });
-        }, 500);
-    }
+    // Xử lý nút "Tiếp Tục" sau khi nhập thông tin
+    continueBtn.addEventListener('click', () => {
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const rePhone = rePhoneInput.value.trim();
 
-    function renderCategoryGroup(groups, details, labels, sidebarEl, contentEl) {
-        Object.keys(labels).forEach(catId => {
-            if (groups && groups[catId]) {
-                let sectionContent = ''; let hasValid = false;
-                Object.keys(groups[catId]).forEach(itemId => {
-                    const info = details[itemId];
-                    if (info && info.imageUrl && info.imageUrl.trim() !== "" && info.status !== "sold-out") {
-                        hasValid = true;
-                        sectionContent += `
-                        <div class="food-item" onclick="handleItemClick(event, '${itemId}', ${info.price})">
-                            <div class="item-badge" id="badge-${itemId}">0</div>
-                            <img src="${info.imageUrl}" class="food-img" loading="lazy">
-                            <div class="food-detail">
-                                <div class="food-name">${info.name}</div>
-                                <div class="food-price">${info.price.toLocaleString()}đ</div>
-                            </div>
-                        </div>`;
-                    }
-                });
-                if (hasValid) {
-                    sidebarEl.innerHTML += `<a class="nav-link" href="#cat-${catId}">${labels[catId]}</a>`;
-                    contentEl.innerHTML += `<div id="cat-${catId}" class="menu-section"><div class="category-header">${labels[catId]}</div>${sectionContent}</div>`;
-                }
+        const phoneRegex = /^0\d{8,10}$/;
+
+        if (!name || !phone || !rePhone) {
+            showMessage('error', 'Lỗi', 'Vui lòng nhập đầy đủ thông tin!');
+            return;
+        }
+
+        if (phone !== rePhone) {
+            showMessage('error', 'Lỗi', 'Số điện thoại xác nhận không trùng khớp.');
+            return;
+        }
+
+        if (!phoneRegex.test(phone)) {
+            showMessage('error', 'Lỗi', 'Số điện thoại không hợp lệ. Vui lòng nhập số có từ 9-11 chữ số và bắt đầu bằng số 0.');
+            return;
+        }
+
+        userInfo = { name, phone };
+        goToStep(steps.ticket);
+        updateTicketPrice();
+    });
+    
+    // Event listeners for quantity buttons
+    decreaseBtn.addEventListener('click', () => {
+        let currentTickets = parseInt(ticketNumberInput.value);
+        if (currentTickets > MIN_TICKETS) {
+            ticketNumberInput.value = currentTickets - 1;
+            updateTicketPrice();
+        }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+        let currentTickets = parseInt(ticketNumberInput.value);
+        ticketNumberInput.value = currentTickets + 1;
+        updateTicketPrice();
+    });
+
+    // Xử lý nút "Thanh Toán" - Chuyển sang trang xác nhận
+    checkoutBtn.addEventListener('click', () => {
+        const count = parseInt(ticketNumberInput.value);
+        const totalPrice = count * DISCOUNT_PRICE;
+
+        confirmName.textContent = userInfo.name;
+        confirmPhone.textContent = userInfo.phone;
+        confirmTickets.textContent = count;
+        confirmUnitPrice.textContent = formatCurrency(DISCOUNT_PRICE);
+        confirmTotalPrice.textContent = formatCurrency(totalPrice);
+        
+        goToStep(steps.confirmation);
+    });
+
+    // Xử lý nút "Quay lại" từ trang xác nhận
+    backBtn.addEventListener('click', () => {
+        // Tải lại trang
+        window.location.reload();
+    });
+
+    // Xử lý nút "Xác nhận & Thanh toán"
+    confirmPayBtn.addEventListener('click', () => {
+        const count = parseInt(ticketNumberInput.value);
+        const totalPrice = count * DISCOUNT_PRICE;
+        const orderCode = "CHERRY" + Math.floor(100000 + Math.random() * 900000);
+        const ticketsRef = db.ref("tickets");
+        const newTicketRef = ticketsRef.push({
+            name: userInfo.name,
+            phone: userInfo.phone,
+            ticketNumber: count,
+            totalPrice: totalPrice,
+            orderCode: orderCode,
+            status: "pending",
+            createdAt: new Date().toISOString()
+        });
+
+        const paymentContent = orderCode;
+        paymentContentDisplay.textContent = paymentContent;
+        const qrUrl = `https://img.vietqr.io/image/970422-973803388-compact.png?amount=${totalPrice}&addInfo=${encodeURIComponent(paymentContent)}`;
+        qrCodeDiv.innerHTML = `<img src="${qrUrl}" width="250" height="250" alt="QR Code">`;
+
+        let totalPriceDivQR = document.getElementById('total-price-qr');
+        if (!totalPriceDivQR) {
+            totalPriceDivQR = document.createElement('div');
+            totalPriceDivQR.id = 'total-price-qr';
+            totalPriceDivQR.style.textAlign = 'center';
+            totalPriceDivQR.style.marginTop = '15px';
+            totalPriceDivQR.style.fontSize = '1.2em';
+            totalPriceDivQR.style.fontWeight = '600';
+            qrCodeDiv.parentNode.appendChild(totalPriceDivQR);
+        }
+        totalPriceDivQR.textContent = `Tổng tiền: ${totalPrice.toLocaleString('vi-VN')} VNĐ`;
+
+        goToStep(steps.payment);
+
+        if (statusListener) {
+            newTicketRef.child('status').off('value', statusListener);
+        }
+        statusListener = newTicketRef.child('status').on('value', snapshot => {
+            const status = snapshot.val();
+            if (status === 'paid') {
+                showMessage('success', 'Thanh toán thành công!', `Vui lòng đến quầy cung cấp tên: ${userInfo.name} và SĐT: ${userInfo.phone} để nhận vé.`);
+                newTicketRef.child('status').off('value', statusListener);
+            } else if (status === 'failed') {
+                showMessage('error', 'Thanh toán thất bại', 'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ hỗ trợ.');
+                newTicketRef.child('status').off('value', statusListener);
             }
         });
-    }
+    });
 
-    window.handleItemClick = (e, id, price) => {
-        animateFly(e);
-        updateCart(id, 1, price);
-    };
-
-    window.updateCart = (id, delta, price) => {
-        if (!cart[id]) cart[id] = { qty: 0, price: price, name: masterMenu[id]?.name || id };
-        cart[id].qty += delta;
-        if (cart[id].qty <= 0) delete cart[id];
-        
-        const b = document.getElementById(`badge-${id}`);
-        if(b) {
-            b.innerText = cart[id]?.qty || 0;
-            b.style.display = cart[id]?.qty > 0 ? 'block' : 'none';
-        }
-        updateTotalUI();
-    };
-
-    function updateTotalUI() {
-        let total = 0, count = 0;
-        let listHtml = '';
-        Object.keys(cart).forEach(id => { 
-            const item = cart[id];
-            total += (item.qty * item.price); count += item.qty;
-            listHtml += `
-            <div class="cart-item-row">
-                <div style="flex:1">
-                    <div style="font-weight:700; color:#3E2723">${item.name}</div>
-                    <div style="color:#C69C6D; font-size:0.9rem">${(item.qty * item.price).toLocaleString()}đ</div>
-                </div>
-                <div class="quantity-control">
-                    <div class="btn-circle" onclick="updateCart('${id}', -1, ${item.price})">−</div>
-                    <span style="font-weight:800; min-width:20px; text-align:center;">${item.qty}</span>
-                    <div class="btn-circle" style="background:var(--primary-color); color:white" onclick="updateCart('${id}', 1, ${item.price})">+</div>
-                </div>
-            </div>`;
-        });
-        
-        const icon = document.getElementById('cartIcon');
-        if (count > lastTotalCount) {
-            icon.classList.remove('bump');
-            void icon.offsetWidth;
-            icon.classList.add('bump');
-        }
-        lastTotalCount = count;
-
-        if (count > 0) { 
-            icon.classList.add('visible'); 
-            document.getElementById('total-count-badge').innerText = count; 
-            document.getElementById('sheet-footer-ui').style.display = 'block'; 
-        } else { 
-            icon.classList.remove('visible'); 
-            document.getElementById('sheet-footer-ui').style.display = 'none'; 
-            toggleCart(false); 
-        }
-        document.getElementById('total-price').innerText = total.toLocaleString() + 'đ';
-        document.getElementById('cart-list').innerHTML = listHtml || '<p style="text-align:center; opacity:0.4; margin-top:20px;">Giỏ hàng đang trống</p>';
-    }
-
-    window.animateFly = (e) => {
-        const dot = document.createElement('div');
-        dot.className = 'fly-dot';
-        dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
-        document.body.appendChild(dot);
-        setTimeout(() => {
-            const rect = document.getElementById('cartIcon').getBoundingClientRect();
-            dot.style.left = (rect.left + 20) + 'px';
-            dot.style.top = (rect.top + 20) + 'px';
-            dot.style.transform = 'scale(0.2)'; dot.style.opacity = '0';
-        }, 10);
-        setTimeout(() => dot.remove(), 800);
-    };
-
-    window.toggleCart = (force) => {
-        const sheet = document.getElementById('orderSheet');
-        const overlay = document.getElementById('overlay');
-        if (force === false) { sheet.classList.remove('open'); overlay.style.display = 'none'; return; }
-        sheet.classList.toggle('open');
-        overlay.style.display = sheet.classList.contains('open') ? 'block' : 'none';
-    };
-
-    window.submitOrder = () => {
-        toggleCart(false);
-        const success = document.getElementById('success-overlay');
-        success.classList.add('show');
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C69C6D', '#3E2723'] });
-        setTimeout(() => location.reload(), 3000);
-    };
+    // Lần đầu tải trang, đảm bảo giá hiển thị đúng
+    document.addEventListener('DOMContentLoaded', () => {
+        updateTicketPrice();
+    });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
