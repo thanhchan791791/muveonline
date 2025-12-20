@@ -88,17 +88,14 @@
         .sidebar::-webkit-scrollbar { display: none; }
 
         .sidebar-group-label {
-            font-size: 0.8rem;
-            font-weight: 900;
-            color: #FFFFFF;
-            background: var(--primary-color);
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--gold-accent);
             text-align: center;
-            letter-spacing: 1.5px;
-            margin: 20px 4px 10px;
-            padding: 6px 2px;
+            letter-spacing: 1px;
+            margin: 15px 0 8px;
             text-transform: uppercase;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            opacity: 0.8;
         }
 
         .nav-link {
@@ -121,14 +118,6 @@
             box-shadow: 0 8px 15px rgba(62, 39, 35, 0.1);
             transform: scale(1.05);
             border: 1px solid rgba(198, 156, 109, 0.2);
-        }
-
-        /* ICON CHO SIDEBAR */
-        .nav-link i.best-choice-side {
-            color: #FFD700;
-            font-size: 1.1rem; /* Tăng nhẹ kích thước cho rõ nét */
-            display: block;
-            margin-bottom: 2px;
         }
 
         /* --- CONTENT --- */
@@ -169,23 +158,6 @@
         .food-detail { flex: 1; padding-left: 12px; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
         .food-name { font-weight: 700; font-size: 1rem; color: #2D1B18; margin-bottom: 4px; }
         .food-price { color: var(--primary-color); font-weight: 800; font-size: 1.1rem; }
-
-        .best-seller-badge {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: #FFD700;
-            color: #3E2723;
-            font-size: 0.65rem;
-            font-weight: 800;
-            padding: 2px 8px;
-            border-bottom-right-radius: 12px;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-        }
 
         .item-badge {
             position: absolute; top: 8px; right: 8px;
@@ -262,47 +234,12 @@
 
         .quantity-control { display: flex; align-items: center; background: #F5F3F0; border-radius: 20px; padding: 3px; gap: 15px; }
         .btn-circle { width: 35px; height: 35px; border-radius: 50%; border: none; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn-confirm-order { width: 100%; background: var(--primary-color); color: #fff; border: none; padding: 166px; border-radius: 18px; font-weight: 800; margin-top: 15px; }
+        .btn-confirm-order { width: 100%; background: var(--primary-color); color: #fff; border: none; padding: 16px; border-radius: 18px; font-weight: 800; margin-top: 15px; }
         
         .cart-item-row { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #F5F5F5; }
 
-        /* --- HIỆU ỨNG TIẾN TRÌNH VÀ DẤU TÍCH --- */
-        #success-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: white; z-index: 9999; display: flex; 
-            flex-direction: column; align-items: center; justify-content: center; 
-            opacity: 0; pointer-events: none; transition: opacity 0.4s; 
-        }
+        #success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
         #success-overlay.show { opacity: 1; pointer-events: auto; }
-
-        .progress-svg {
-            width: 120px; height: 120px;
-            transform: rotate(-90deg);
-        }
-        .progress-bg { fill: none; stroke: #f0f0f0; stroke-width: 8; }
-        .progress-bar {
-            fill: none; stroke: var(--primary-color); stroke-width: 8;
-            stroke-dasharray: 314; stroke-dashoffset: 314;
-            stroke-linecap: round;
-        }
-        .animate-progress { animation: fillProgress 2s ease-in-out forwards; }
-
-        .checkmark-container {
-            position: absolute;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; transform: scale(0.5);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .checkmark-container.visible { opacity: 1; transform: scale(1); }
-        .checkmark-container i { font-size: 4rem; color: var(--primary-color); }
-
-        @keyframes fillProgress { to { stroke-dashoffset: 0; } }
-        
-        #success-text {
-            font-weight: 900; margin-top: 20px; 
-            opacity: 0; transition: opacity 0.5s;
-            color: var(--primary-color);
-        }
     </style>
 </head>
 <body>
@@ -364,16 +301,8 @@
 </div>
 
 <div id="success-overlay">
-    <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-        <svg class="progress-svg">
-            <circle class="progress-bg" cx="60" cy="60" r="50"></circle>
-            <circle id="p-bar" class="progress-bar" cx="60" cy="60" r="50"></circle>
-        </svg>
-        <div class="checkmark-container" id="check-box">
-            <i class="bi bi-check-lg"></i>
-        </div>
-    </div>
-    <h2 id="success-text">Gửi đơn thành công!</h2>
+    <i class="bi bi-check-circle-fill" style="font-size: 5rem; color: var(--primary-color);"></i>
+    <h2 style="font-weight: 900; margin-top: 20px;">Gửi đơn thành công!</h2>
 </div>
 
 <script type="module">
@@ -435,14 +364,8 @@
                     const info = details[itemId];
                     if (info && info.imageUrl && info.imageUrl.trim() !== "" && info.status !== "sold-out") {
                         hasValid = true;
-                        
-                        // KIỂM TRA MÓN BEST SELLER
-                        const isBestSeller = (info.name.includes("Mẹt 7 món") || info.name.includes("Mẹt 10 món"));
-                        const bestSellerTag = isBestSeller ? '<div class="best-seller-badge"><i class="bi bi-star-fill"></i> Best Seller</div>' : '';
-
                         sectionContent += `
                         <div class="food-item" onclick="openItemModal(event, '${itemId}')">
-                            ${bestSellerTag}
                             <div class="item-badge" id="badge-${itemId}">0</div>
                             <img src="${info.imageUrl}" class="food-img" loading="lazy">
                             <div class="food-detail">
@@ -453,29 +376,24 @@
                     }
                 });
                 if (hasValid) {
-                    // SỬA ĐỔI CHÍNH TẠI ĐÂY: Áp dụng icon cho cả Mẹt và Nước Ép
-                    let sideIcon = '';
-                    if(catId === 'metTongHop') {
-                        sideIcon = '<i class="bi bi-award-fill best-choice-side"></i>';
-                    } else if(catId === 'nuocEp') {
-                        sideIcon = '<i class="bi bi-award-fill best-choice-side"></i>';
-                    }
-                    
-                    sidebarEl.innerHTML += `<a class="nav-link" href="#cat-${catId}">${sideIcon}${labels[catId]}</a>`;
+                    sidebarEl.innerHTML += `<a class="nav-link" href="#cat-${catId}">${labels[catId]}</a>`;
                     contentEl.innerHTML += `<div id="cat-${catId}" class="menu-section"><div class="category-header">${labels[catId]}</div>${sectionContent}</div>`;
                 }
             }
         });
     }
 
+    // Modal Logic
     window.openItemModal = (e, id) => {
         const item = masterMenu[id];
         currentModalItem = { id, ...item, qty: 1, clickEvent: e };
+        
         document.getElementById('modal-img').src = item.imageUrl;
         document.getElementById('modal-name').innerText = item.name;
         document.getElementById('modal-price').innerText = item.price.toLocaleString() + 'đ';
         document.getElementById('modal-qty').innerText = '1';
         document.getElementById('modal-note').value = '';
+        
         document.getElementById('itemModal').classList.add('show');
         document.getElementById('overlay').style.display = 'block';
 
@@ -510,8 +428,10 @@
             cart[id] = { qty: 0, price: price, name: masterMenu[id]?.name || id, note: "" };
         }
         cart[id].qty += delta;
-        if (note) cart[id].note = note;
+        if (note) cart[id].note = note; // Cập nhật ghi chú nếu có
+        
         if (cart[id].qty <= 0) delete cart[id];
+        
         const b = document.getElementById(`badge-${id}`);
         if(b) {
             b.innerText = cart[id]?.qty || 0;
@@ -540,6 +460,7 @@
                 </div>
             </div>`;
         });
+        
         const icon = document.getElementById('cartIcon');
         if (count > lastTotalCount) {
             icon.classList.remove('bump');
@@ -547,6 +468,7 @@
             icon.classList.add('bump');
         }
         lastTotalCount = count;
+
         if (count > 0) { 
             icon.classList.add('visible'); 
             document.getElementById('total-count-badge').innerText = count; 
@@ -585,20 +507,10 @@
 
     window.submitOrder = () => {
         toggleCart(false);
-        const successOverlay = document.getElementById('success-overlay');
-        const bar = document.getElementById('p-bar');
-        const checkBox = document.getElementById('check-box');
-        const text = document.getElementById('success-text');
-
-        successOverlay.classList.add('show');
-        bar.classList.add('animate-progress');
-
-        setTimeout(() => {
-            checkBox.classList.add('visible');
-            text.style.opacity = '1';
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C69C6D', '#3E2723'] });
-            setTimeout(() => location.reload(), 3500);
-        }, 2000);
+        const success = document.getElementById('success-overlay');
+        success.classList.add('show');
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C69C6D', '#3E2723'] });
+        setTimeout(() => location.reload(), 3000);
     };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
