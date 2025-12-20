@@ -87,15 +87,17 @@
         }
         .sidebar::-webkit-scrollbar { display: none; }
 
+        /* PHẦN ĐÃ SỬA: CHỮ TO HƠN, NỔI BẬT VỪA PHẢI */
         .sidebar-group-label {
-            font-size: 0.65rem;
+            font-size: 0.9rem; /* Chữ to hơn */
             font-weight: 800;
-            color: var(--gold-accent);
+            color: var(--primary-color);
             text-align: center;
-            letter-spacing: 1px;
-            margin: 15px 0 8px;
+            letter-spacing: 0.5px;
+            margin: 25px 0 12px;
             text-transform: uppercase;
-            opacity: 0.8;
+            padding-bottom: 5px;
+            border-bottom: 2px solid rgba(198, 156, 109, 0.3); /* Gạch chân nhẹ để phân khu */
         }
 
         .nav-link {
@@ -109,6 +111,7 @@
             transition: all 0.3s ease;
             line-height: 1.2;
             border: 1px solid transparent;
+            position: relative;
         }
 
         .nav-link.active {
@@ -118,6 +121,15 @@
             box-shadow: 0 8px 15px rgba(62, 39, 35, 0.1);
             transform: scale(1.05);
             border: 1px solid rgba(198, 156, 109, 0.2);
+        }
+
+        .bestseller-icon {
+            position: absolute;
+            top: -2px;
+            right: 4px;
+            font-size: 0.8rem;
+            color: #FF4D4D;
+            filter: drop-shadow(0 0 2px rgba(255, 77, 77, 0.4));
         }
 
         /* --- CONTENT --- */
@@ -376,14 +388,18 @@
                     }
                 });
                 if (hasValid) {
-                    sidebarEl.innerHTML += `<a class="nav-link" href="#cat-${catId}">${labels[catId]}</a>`;
+                    let bestSellerHtml = '';
+                    if (catId === 'metTongHop' || catId === 'nuocEp') {
+                        bestSellerHtml = '<i class="bi bi-star-fill bestseller-icon"></i>';
+                    }
+
+                    sidebarEl.innerHTML += `<a class="nav-link" href="#cat-${catId}">${bestSellerHtml}${labels[catId]}</a>`;
                     contentEl.innerHTML += `<div id="cat-${catId}" class="menu-section"><div class="category-header">${labels[catId]}</div>${sectionContent}</div>`;
                 }
             }
         });
     }
 
-    // Modal Logic
     window.openItemModal = (e, id) => {
         const item = masterMenu[id];
         currentModalItem = { id, ...item, qty: 1, clickEvent: e };
@@ -428,7 +444,7 @@
             cart[id] = { qty: 0, price: price, name: masterMenu[id]?.name || id, note: "" };
         }
         cart[id].qty += delta;
-        if (note) cart[id].note = note; // Cập nhật ghi chú nếu có
+        if (note) cart[id].note = note;
         
         if (cart[id].qty <= 0) delete cart[id];
         
