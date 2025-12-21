@@ -87,9 +87,8 @@
         }
         .sidebar::-webkit-scrollbar { display: none; }
 
-        /* PHẦN ĐÃ SỬA: CHỮ TO HƠN, NỔI BẬT VỪA PHẢI */
         .sidebar-group-label {
-            font-size: 0.9rem; /* Chữ to hơn */
+            font-size: 0.9rem;
             font-weight: 800;
             color: var(--primary-color);
             text-align: center;
@@ -97,7 +96,7 @@
             margin: 25px 0 12px;
             text-transform: uppercase;
             padding-bottom: 5px;
-            border-bottom: 2px solid rgba(198, 156, 109, 0.3); /* Gạch chân nhẹ để phân khu */
+            border-bottom: 2px solid rgba(198, 156, 109, 0.3);
         }
 
         .nav-link {
@@ -247,6 +246,7 @@
         .quantity-control { display: flex; align-items: center; background: #F5F3F0; border-radius: 20px; padding: 3px; gap: 15px; }
         .btn-circle { width: 35px; height: 35px; border-radius: 50%; border: none; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-confirm-order { width: 100%; background: var(--primary-color); color: #fff; border: none; padding: 16px; border-radius: 18px; font-weight: 800; margin-top: 15px; }
+        .btn-confirm-order:disabled { background: #ccc !important; cursor: not-allowed; }
         
         .cart-item-row { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #F5F5F5; }
 
@@ -308,7 +308,7 @@
             <span style="font-weight: 600; color: #888;">Tổng cộng:</span>
             <span id="total-price" style="font-size: 1.4rem; font-weight: 900; color: var(--primary-color);">0đ</span>
         </div>
-        <button class="btn-confirm-order" onclick="submitOrder()">ĐẶT MÓN NGAY</button>
+        <button class="btn-confirm-order" id="btn-main-submit" onclick="submitOrder()">ĐẶT MÓN NGAY</button>
     </div>
 </div>
 
@@ -337,6 +337,27 @@
     let cart = {};
     let lastTotalCount = 0;
     let currentModalItem = null;
+
+    // LẤY SỐ BÀN TỪ URL (?table=B23 hoặc #table=B23)
+    function getTableFromURL() {
+        // Kiểm tra dấu ? trước
+        const urlParams = new URLSearchParams(window.location.search);
+        let table = urlParams.get('table');
+        
+        // Nếu không thấy ?, kiểm tra dấu # (Hash)
+        if (!table && window.location.hash) {
+            const hash = window.location.hash.substring(1); // bỏ dấu #
+            const hashParams = new URLSearchParams(hash);
+            table = hashParams.get('table');
+        }
+        
+        return table || "Khong xac dinh";
+    }
+    const tableNumber = getTableFromURL();
+
+    // THÔNG TIN TELEGRAM
+    const TELEGRAM_TOKEN = "8581857488:AAGFtZdA3NecouzR8YaJsH0eVKEFlGZ2fB0";
+    const TELEGRAM_CHAT_ID = "-5038976521";
 
     const foodLabels = { "4mon": "Món phải thử", "7mon": "Món nên trải nghiệm", "metTongHop": "Mẹt tổng hợp nhiều món", "monCanh": "Món Canh", "monChinh": "Món Chính", "monRau": "Món Rau", "monthemmet": "Món Thêm" };
     const drinkLabels = { "coCon": "Đồ Có Cồn", "giaiKhat": "Giải Khát", "kem": "Kem", "nuocEp": "Nước Ép" };
@@ -521,11 +542,57 @@
         overlay.style.display = sheet.classList.contains('open') ? 'block' : 'none';
     };
 
-    window.submitOrder = () => {
+    // HÀM GỬI TELEGRAM - ĐÃ THÊM SỐ BÀN VÀ TỐI GIẢN THEO YÊU CẦU
+    async function sendTelegramMessage(cartData) {
+        let message = `BAN: ${tableNumber}\n`;
+        
+        
+        Object.keys(cartData).forEach((id, index) => {
+            const item = cartData[id];
+            message += `${index + 1}. ${item.name} (x${item.qty})\n`;
+            if(item.note) message += `- Ghi chu: ${item.note}\n`;
+            message += "\n";
+        });
+        
+        message += "------------------";
+
+        const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+        
+        try {
+            await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: message
+                })
+            });
+        } catch (error) {
+            console.error("Loi gui Telegram:", error);
+        }
+    }
+
+    window.submitOrder = async () => {
+        const btn = document.getElementById('btn-main-submit');
+        
+        // Khóa nút lại để không gửi nhiều đơn
+        btn.disabled = true;
+        btn.innerText = "Dang gui...";
+
+        // Gửi đơn lên Telegram
+        await sendTelegramMessage(cart);
+        
         toggleCart(false);
         const success = document.getElementById('success-overlay');
         success.classList.add('show');
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#C69C6D', '#3E2723'] });
+        
+        confetti({ 
+            particleCount: 150, 
+            spread: 70, 
+            origin: { y: 0.6 }, 
+            colors: ['#C69C6D', '#3E2723'] 
+        });
+        
         setTimeout(() => location.reload(), 3000);
     };
 </script>
