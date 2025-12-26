@@ -194,14 +194,6 @@
             overflow-y: auto;
         }
 
-        #summary-report-overlay .modal-content {
-            border-radius: 24px;
-            max-width: 700px;
-            width: 100%;
-            padding: 20px 10px;
-            overflow-x: hidden; /* Khóa cuộn ngang */
-        }
-
         @keyframes slideUp {
             from { transform: translateY(100%); }
             to { transform: translateY(0); }
@@ -237,102 +229,96 @@
             padding-right: 30px;
         }
 
-        .modal-content table {
-            width: 100%;
-            border-collapse: collapse;
+        /* --- SỬA ĐỔI THẺ DETAIL-ITEM NHỎ LẠI --- */
+        #detail-body {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 20px;
         }
 
-        .modal-content th {
-            text-align: left;
-            font-size: 13px;
-            text-transform: uppercase;
-            color: var(--ios-secondary-text);
-            padding: 10px 5px;
-            background: transparent;
-            border-bottom: 1px solid var(--ios-border);
+        .detail-item {
+            flex: 0 1 auto;
+            min-width: 80px;
+            background: #f9f9fb;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 6px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            text-align: center;
         }
 
-        .modal-content td {
-            padding: 12px 5px;
-            border-bottom: 1px solid #F2F2F7;
-            text-align: left;
-            font-size: 14px;
+        .detail-item .day-label { 
+            font-size: 10px; 
+            font-weight: 700; 
+            color: var(--ios-secondary-text); 
+        }
+        
+        .detail-item .time-value { 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: var(--ios-text); 
+            white-space: nowrap;
         }
 
-        .input-table {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--ios-border);
-            border-radius: 10px;
+        .extra-info-section {
+            background: #F2F2F7;
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .extra-info-section h4 {
+            margin: 0 0 12px 0;
             font-size: 15px;
-            outline: none;
-            background: #FAFAFA;
-            transition: var(--transition);
+            color: var(--ios-indigo);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .input-table:focus {
-            border-color: var(--ios-blue);
-            background: #FFF;
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
+
+        .info-card {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+
+        .info-card .label { font-size: 11px; color: var(--ios-secondary-text); display: block; margin-bottom: 3px; }
+        .info-card .value { font-size: 14px; font-weight: 700; color: var(--ios-text); }
+        
+        .salary-highlight {
+            background: var(--ios-green) !important;
+            color: white !important;
+        }
+        .salary-highlight .label { color: rgba(255,255,255,0.8); }
+        .salary-highlight .value { color: white; }
+
+        .modal-content table { width: 100%; border-collapse: collapse; }
+        .modal-content th { text-align: left; font-size: 13px; text-transform: uppercase; color: var(--ios-secondary-text); padding: 10px 5px; border-bottom: 1px solid var(--ios-border); }
+        .modal-content td { padding: 12px 5px; border-bottom: 1px solid #F2F2F7; font-size: 14px; }
+
+        .input-table { width: 100%; padding: 8px 12px; border: 1px solid var(--ios-border); border-radius: 10px; font-size: 15px; outline: none; background: #FAFAFA; transition: var(--transition); }
+        .input-table:focus { border-color: var(--ios-blue); background: #FFF; }
 
         .late { color: var(--ios-red); font-weight: 600; }
         .final-salary { color: var(--ios-green); font-weight: 700; }
 
-        .report-header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--ios-bg);
-            padding-bottom: 15px;
-        }
-
-        /* --- PHẦN SỬA ĐỔI CHO BẢNG TỔNG KẾT --- */
-        .report-table {
-            width: 100%;
-            min-width: unset; /* Bỏ min-width để không bị tràn */
-            table-layout: fixed; /* Cố định layout để chia cột chính xác */
-        }
-
-        .report-table th {
-            background-color: #f8f9fa;
-            color: #333;
-            font-weight: 700;
-            text-align: center;
-            font-size: 11px; /* Giảm nhẹ font size */
-            padding: 10px 2px;
-            white-space: normal; /* Cho phép xuống dòng nếu tiêu đề dài */
-            word-wrap: break-word;
-        }
-
-        .report-table td {
-            text-align: center;
-            border: 1px solid #eee;
-            padding: 10px 2px;
-            font-size: 12px; /* Giảm nhẹ font size để vừa màn hình nhỏ */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Tỷ lệ cột: Tên chiếm 28%, còn lại 18% mỗi cột */
+        .report-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--ios-bg); padding-bottom: 15px; }
+        .report-table { width: 100%; table-layout: fixed; }
+        .report-table th { background-color: #f8f9fa; color: #333; font-weight: 700; text-align: center; font-size: 11px; padding: 10px 2px; word-wrap: break-word; }
+        .report-table td { text-align: center; border: 1px solid #eee; padding: 10px 2px; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .report-table th:nth-child(1), .report-table td:nth-child(1) { width: 28%; text-align: left; padding-left: 5px; }
-        .report-table th:nth-child(2), .report-table td:nth-child(2) { width: 18%; }
-        .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 18%; }
-        .report-table th:nth-child(4), .report-table td:nth-child(4) { width: 18%; }
-        .report-table th:nth-child(5), .report-table td:nth-child(5) { width: 18%; }
-        /* -------------------------------------- */
 
-        .add-penalty-form {
-            background: #F2F2F7;
-            padding: 15px;
-            border-radius: var(--radius-md);
-            margin-bottom: 20px;
-            display: none;
-        }
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 13px;
-            margin-top: 10px;
-        }
+        .add-penalty-form { background: #F2F2F7; padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; display: none; }
+        .btn-small { padding: 8px 12px; font-size: 13px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -350,7 +336,6 @@
         <button class="btn-action btn-salary" onclick="openSalaryModal()">💰 Tính Lương Nhân Viên</button>
         <button class="btn-action btn-bonus" onclick="openBonusModal()">🎁 Thưởng & Ghi Chú</button>
         <button class="btn-action btn-penalty" onclick="openPenaltyModal()">🚨 Danh Sách Phạt Trễ</button>
-        <button class="btn-action btn-export" onclick="openFinalSummaryModal()">📸 Tổng Kết (Chụp Ảnh)</button>
     </div>
 
     <table id="summary-table">
@@ -362,10 +347,8 @@
     <div class="modal-content">
         <span class="close-btn" onclick="closeAllModals()">&times;</span>
         <h3 id="modal-title"></h3>
-        <table>
-            <thead><tr><th>Ngày</th><th>Giờ</th><th>Trạng thái</th></tr></thead>
-            <tbody id="detail-body"></tbody>
-        </table>
+        <div id="detail-body"></div>
+        <div id="extra-info-container"></div>
     </div>
 </div>
 
@@ -376,12 +359,7 @@
         <div style="overflow-x: auto;">
             <table>
                 <thead>
-                    <tr>
-                        <th>Nhân viên</th>
-                        <th>Tổng Giờ</th>
-                        <th>Đơn giá (đ/h)</th>
-                        <th>Thành tiền</th>
-                    </tr>
+                    <tr><th>Nhân viên</th><th>Tổng Giờ</th><th>Đơn giá (đ/h)</th><th>Thành tiền</th></tr>
                 </thead>
                 <tbody id="salary-body"></tbody>
             </table>
@@ -393,26 +371,18 @@
     <div class="modal-content">
         <span class="close-btn" onclick="closeAllModals()">&times;</span>
         <h3 style="color: var(--ios-red);">Xử Phạt Nhân Viên</h3>
-        
         <button class="btn-action btn-penalty" style="margin-bottom: 15px; padding: 10px;" onclick="toggleAddPenalty()">➕ Thêm Phạt Thủ Công</button>
-        
         <div id="add-penalty-form" class="add-penalty-form">
-            <label style="font-size: 13px; font-weight: 600;">Chọn nhân viên (theo tên):</label>
-            <select id="penalty-emp-select" class="input-table" style="margin-bottom: 10px;"></select>
-            
-            <label style="font-size: 13px; font-weight: 600;">Số tiền phạt (đ):</label>
-            <input type="number" id="penalty-amount-input" class="input-table" placeholder="Ví dụ: 50000" style="margin-bottom: 10px;">
-            
-            <label style="font-size: 13px; font-weight: 600;">Lý do / Ghi chú:</label>
-            <input type="text" id="penalty-note-input" class="input-table" placeholder="Ví dụ: Vi phạm đồng phục">
-            
+            <label>Chọn nhân viên:</label>
+            <select id="penalty-emp-select" class="input-table"></select>
+            <label>Số tiền phạt (đ):</label>
+            <input type="number" id="penalty-amount-input" class="input-table" placeholder="Ví dụ: 50000">
+            <label>Lý do:</label>
+            <input type="text" id="penalty-note-input" class="input-table" placeholder="Ghi chú">
             <button class="btn-action btn-salary btn-small" onclick="saveManualPenalty()">Xác nhận thêm</button>
         </div>
-
-        <p style="font-size: 12px; color: var(--ios-secondary-text); margin-bottom: 10px;">* Đi trễ ca sáng (>7h05) hoặc chiều (>15h): 1-10p (100k), >10p (200k)</p>
-        
         <table>
-            <thead><tr><th>Họ Tên</th><th>Chi tiết & Ghi chú</th><th>Tổng phạt</th></tr></thead>
+            <thead><tr><th>Họ Tên</th><th>Chi tiết</th><th>Tổng phạt</th></tr></thead>
             <tbody id="penalty-body"></tbody>
         </table>
     </div>
@@ -423,42 +393,9 @@
         <span class="close-btn" onclick="closeAllModals()">&times;</span>
         <h3 style="color: var(--ios-orange);">Thưởng & Ghi Chú</h3>
         <table>
-            <thead>
-                <tr>
-                    <th>Họ Tên</th>
-                    <th>Tiền Thưởng (đ)</th>
-                    <th>Ghi Chú</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Họ Tên</th><th>Tiền Thưởng (đ)</th><th>Ghi Chú</th></tr></thead>
             <tbody id="bonus-body"></tbody>
         </table>
-    </div>
-</div>
-
-<div id="summary-report-overlay">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeAllModals()">&times;</span>
-        <div class="report-header">
-            <h3 style="margin-bottom: 5px; color: var(--ios-indigo);">BẢNG TỔNG KẾT LƯƠNG</h3>
-            <div id="report-date" style="font-size: 14px; color: #666;"></div>
-        </div>
-        <div>
-            <table class="report-table">
-                <thead>
-                    <tr>
-                        <th>Họ Tên</th>
-                        <th>Lương Gốc</th>
-                        <th>Thưởng</th>
-                        <th>Phạt</th>
-                        <th>Thực Nhận</th>
-                    </tr>
-                </thead>
-                <tbody id="report-body"></tbody>
-            </table>
-        </div>
-        <div style="margin-top: 20px; text-align: right; font-size: 11px; color: #999;">
-            * Báo cáo thu nhập nhân viên tháng hiện tại.
-        </div>
     </div>
 </div>
 
@@ -485,9 +422,7 @@
             const row = data[i];
             const rowStr = row.join(" ");
             if (rowStr.includes("Ngày :")) {
-                const dateText = rowStr.trim();
-                document.getElementById('date-range').innerText = dateText;
-                document.getElementById('report-date').innerText = dateText;
+                document.getElementById('date-range').innerText = rowStr.trim();
             }
             if (row.some(cell => String(cell).includes("ID:"))) {
                 let emp = {
@@ -517,18 +452,15 @@
                 if (times.length >= 2) {
                     const firstIn = times[0];
                     const firstH = parseInt(firstIn.split(':')[0]);
-                    
                     let limitStr = (firstH < 11) ? "07:05" : "15:00";
-                    
                     let diff = getMinutesLate(firstIn, limitStr);
                     if (diff > 0) {
                         emp.stats.lateCount++;
                         isLateDay = true;
                         let penalty = (diff <= 10) ? 100000 : 200000;
                         emp.stats.totalPenalty += penalty;
-                        emp.lateDetails.push(`Ngày ${dayNum} (${firstIn} - Trễ ${diff}p): -${penalty.toLocaleString()}đ`);
+                        emp.lateDetails.push(`Ngày ${dayNum}: Trễ ${diff}p (-${penalty.toLocaleString()}đ)`);
                     }
-
                     emp.stats.totalMinutes += calculateDiff(times[0], times[times.length - 1]);
                 } else {
                     emp.stats.missingPunch++; statusText = "Thiếu công";
@@ -572,103 +504,95 @@
 
     function showDetail(idx) {
         const emp = allEmployees[idx];
-        document.getElementById('modal-title').innerText = emp.name;
-        const tbody = document.getElementById('detail-body');
-        tbody.innerHTML = '';
+        document.getElementById('modal-title').innerText = "Chi tiết: " + emp.name;
+        
+        const container = document.getElementById('detail-body');
+        container.innerHTML = '';
         emp.dailyData.forEach(d => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>Ngày ${d.day}</td><td>${d.time}</td><td style="color:${d.status==='Đi trễ'?'var(--ios-red)':(d.status==='Nghỉ'?'#999':'var(--ios-green)')}; font-weight:500">${d.status}</td>`;
-            tbody.appendChild(tr);
+            if (d.status !== 'Nghỉ') {
+                const item = document.createElement('div');
+                item.className = 'detail-item';
+                // Chỉ hiển thị Ngày và Giờ, không hiển thị trạng thái
+                item.innerHTML = `<span class="day-label">${d.day}</span><span class="time-value">${d.time}</span>`;
+                container.appendChild(item);
+            }
         });
+
+        const extraContainer = document.getElementById('extra-info-container');
+        const h = Math.floor(emp.stats.totalMinutes / 60), m = emp.stats.totalMinutes % 60;
+        const totalOff = Math.max(0, 30 - emp.stats.activeDays);
+        const lateDays = emp.lateDetails.length > 0 ? emp.lateDetails.join(", ") : "Không có";
+        const totalSalary = calculateFinal(emp);
+        
+        extraContainer.innerHTML = `
+            <div class="extra-info-section">
+                <h4>Tổng hợp chi tiết</h4>
+                <div class="info-grid">
+                    <div class="info-card"><span class="label">Tổng giờ làm</span><span class="value">${h}g ${m}p</span></div>
+                    <div class="info-card"><span class="label">Tổng ngày nghỉ</span><span class="value">${totalOff} ngày</span></div>
+                    <div class="info-card"><span class="label">Chấm công thiếu</span><span class="value">${emp.stats.missingPunch} buổi</span></div>
+                    <div class="info-card"><span class="label">Đơn giá lương</span><span class="value">${(emp.hourlyRate || 0).toLocaleString()} đ/h</span></div>
+                    <div class="info-card"><span class="label">Tiền thưởng</span><span class="value">${(emp.bonusAmount || 0).toLocaleString()} đ</span></div>
+                    <div class="info-card salary-highlight"><span class="label">Tổng thực nhận</span><span class="value">${totalSalary.toLocaleString()} đ</span></div>
+                </div>
+                <div class="info-card" style="margin-top:10px; width:100%"><span class="label">Ngày đi trễ & Phạt</span><span class="value" style="color:var(--ios-red); font-size:12px;">${lateDays}</span></div>
+                <div class="info-card" style="margin-top:10px; width:100%"><span class="label">Ghi chú cụ thể</span><span class="value" style="font-weight:400">${emp.bonusNote || "Không có ghi chú"}</span></div>
+            </div>
+        `;
         document.getElementById('modal-overlay').style.display = 'flex';
     }
 
     function openSalaryModal() {
         const tbody = document.getElementById('salary-body');
         tbody.innerHTML = '';
-        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp, index) => {
+        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
             const h = Math.floor(emp.stats.totalMinutes / 60), m = emp.stats.totalMinutes % 60;
             const empIdx = allEmployees.indexOf(emp);
             const tr = document.createElement('tr');
-            tr.id = `row-sal-${empIdx}`;
-            
-            tr.innerHTML = `
-                <td><div style="font-weight:600">${emp.name}</div><div style="font-size:11px; color:#8e8e93">ID: ${emp.id}</div></td>
-                <td>${h}h ${m}p</td>
-                <td><input type="number" class="input-table" placeholder="Đơn giá" value="${emp.hourlyRate || ''}" oninput="updateFullSalary(${empIdx}, this.value)"></td>
-                <td id="final-sal-${empIdx}" class="final-salary">${calculateFinal(emp).toLocaleString()} đ</td>
-            `;
+            tr.innerHTML = `<td><b>${emp.name}</b></td><td>${h}h ${m}p</td>
+                <td><input type="number" class="input-table" value="${emp.hourlyRate || ''}" oninput="allEmployees[${empIdx}].hourlyRate=parseFloat(this.value)||0; updateFullSalary(${empIdx})"></td>
+                <td id="final-sal-${empIdx}" class="final-salary">${calculateFinal(emp).toLocaleString()} đ</td>`;
             tbody.appendChild(tr);
         });
         document.getElementById('salary-overlay').style.display = 'flex';
     }
 
-    function updateFullSalary(idx, val) {
-        const emp = allEmployees[idx];
-        emp.hourlyRate = parseFloat(val) || 0;
-        const final = calculateFinal(emp);
-        document.getElementById(`final-sal-${idx}`).innerText = final.toLocaleString() + " đ";
+    function updateFullSalary(idx) {
+        document.getElementById(`final-sal-${idx}`).innerText = calculateFinal(allEmployees[idx]).toLocaleString() + " đ";
     }
 
     function calculateFinal(emp) {
         const base = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
         const totalManual = emp.manualPenalties.reduce((sum, p) => sum + p.amount, 0);
-        return base + emp.bonusAmount - (emp.stats.totalPenalty + totalManual);
+        return base + (emp.bonusAmount || 0) - (emp.stats.totalPenalty + totalManual);
     }
 
     function toggleAddPenalty() {
-        const form = document.getElementById('add-penalty-form');
-        const select = document.getElementById('penalty-emp-select');
-        
-        if (form.style.display === 'block') {
-            form.style.display = 'none';
-        } else {
-            form.style.display = 'block';
-            select.innerHTML = '<option value="">-- Chọn tên nhân viên --</option>';
-            allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
-                select.innerHTML += `<option value="${emp.id}">${emp.name}</option>`;
-            });
-        }
+        const f = document.getElementById('add-penalty-form');
+        f.style.display = f.style.display === 'block' ? 'none' : 'block';
+        const s = document.getElementById('penalty-emp-select');
+        s.innerHTML = '<option value="">-- Chọn nhân viên --</option>';
+        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach(e => s.innerHTML += `<option value="${e.id}">${e.name}</option>`);
     }
 
     function saveManualPenalty() {
-        const empId = document.getElementById('penalty-emp-select').value;
-        const amount = parseFloat(document.getElementById('penalty-amount-input').value) || 0;
+        const id = document.getElementById('penalty-emp-select').value;
+        const amt = parseFloat(document.getElementById('penalty-amount-input').value) || 0;
         const note = document.getElementById('penalty-note-input').value || "Phạt bổ sung";
-
-        if (empId === "" || amount <= 0) {
-            alert("Vui lòng chọn nhân viên và nhập số tiền hợp lệ!");
-            return;
-        }
-
-        const emp = allEmployees.find(e => e.id === empId);
-        if (emp) {
-            emp.manualPenalties.push({ amount, note });
-        }
-        
-        document.getElementById('penalty-amount-input').value = "";
-        document.getElementById('penalty-note-input').value = "";
-        toggleAddPenalty();
-        openPenaltyModal();
+        if (!id || amt <= 0) return alert("Nhập đủ thông tin!");
+        allEmployees.find(e => e.id === id).manualPenalties.push({ amount: amt, note });
+        toggleAddPenalty(); openPenaltyModal();
     }
 
     function openPenaltyModal() {
         const tbody = document.getElementById('penalty-body');
         tbody.innerHTML = '';
         allEmployees.forEach(emp => {
-            const totalManual = emp.manualPenalties.reduce((sum, p) => sum + p.amount, 0);
-            const totalPenalty = emp.stats.totalPenalty + totalManual;
-            
-            if (totalPenalty > 0) {
-                let detailsHtml = emp.lateDetails.map(d => `<div style="margin-bottom:2px;">• ${d}</div>`).join('');
-                let manualHtml = emp.manualPenalties.map(p => `<div style="color:var(--ios-orange); font-size:11px;">• [Thủ công] ${p.note}: -${p.amount.toLocaleString()}đ</div>`).join('');
-                
+            const manual = emp.manualPenalties.reduce((s, p) => s + p.amount, 0);
+            const total = emp.stats.totalPenalty + manual;
+            if (total > 0) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><b>${emp.name}</b></td>
-                    <td style="font-size:11px">${detailsHtml}${manualHtml}</td>
-                    <td class="late">${totalPenalty.toLocaleString()} đ</td>
-                `;
+                tr.innerHTML = `<td><b>${emp.name}</b></td><td style="font-size:11px">${emp.lateDetails.join('<br>')}${emp.manualPenalties.map(p=>`<br>[Thủ công] ${p.note}: -${p.amount.toLocaleString()}`).join('')}</td><td class="late">${total.toLocaleString()} đ</td>`;
                 tbody.appendChild(tr);
             }
         });
@@ -679,46 +603,15 @@
         const tbody = document.getElementById('bonus-body');
         tbody.innerHTML = '';
         allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
-            const empIdx = allEmployees.indexOf(emp);
+            const idx = allEmployees.indexOf(emp);
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><b>${emp.name}</b></td>
-                <td><input type="number" class="input-table" value="${emp.bonusAmount || ''}" oninput="allEmployees[${empIdx}].bonusAmount=parseFloat(this.value)||0"></td>
-                <td><input type="text" class="input-table" value="${emp.bonusNote || ''}" oninput="allEmployees[${empIdx}].bonusNote=this.value"></td>
-            `;
+            tr.innerHTML = `<td><b>${emp.name}</b></td><td><input type="number" class="input-table" value="${emp.bonusAmount || ''}" oninput="allEmployees[${idx}].bonusAmount=parseFloat(this.value)||0"></td><td><input type="text" class="input-table" value="${emp.bonusNote || ''}" oninput="allEmployees[${idx}].bonusNote=this.value"></td>`;
             tbody.appendChild(tr);
         });
         document.getElementById('bonus-overlay').style.display = 'flex';
     }
 
-    function openFinalSummaryModal() {
-        const tbody = document.getElementById('report-body');
-        tbody.innerHTML = '';
-        
-        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
-            const baseSalary = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
-            const totalManual = emp.manualPenalties.reduce((sum, p) => sum + p.amount, 0);
-            const totalPenalty = emp.stats.totalPenalty + totalManual;
-            const final = baseSalary + emp.bonusAmount - totalPenalty;
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${emp.name}</td>
-                <td>${baseSalary.toLocaleString()}</td>
-                <td style="color:var(--ios-blue)">+${emp.bonusAmount.toLocaleString()}</td>
-                <td style="color:var(--ios-red)">-${totalPenalty.toLocaleString()}</td>
-                <td style="font-weight:700; color:var(--ios-green)">${final.toLocaleString()}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-        
-        document.getElementById('summary-report-overlay').style.display = 'flex';
-    }
-
-    function closeAllModals() {
-        document.querySelectorAll('[id$="-overlay"]').forEach(m => m.style.display = 'none');
-        document.getElementById('add-penalty-form').style.display = 'none';
-    }
+    function closeAllModals() { document.querySelectorAll('[id$="-overlay"]').forEach(m => m.style.display = 'none'); }
     window.onclick = function(e) { if (e.target.id.includes('overlay')) closeAllModals(); }
 </script>
 </body>
