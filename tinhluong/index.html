@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Thống Kê Chấm Công & Tính Lương</title>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-indigo: #5856D6;
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-secondary-text: #8E8E93;
+            --ios-border: #C6C6C8;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
+            margin: 0;
+            padding: env(safe-area-inset-top) 16px 40px 16px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            text-align: left;
+            margin: 30px 0 10px 0;
+            color: var(--ios-text);
+        }
+
+        #date-range {
+            font-size: 15px;
+            color: var(--ios-secondary-text);
+            margin-bottom: 25px;
+            padding-left: 2px;
+        }
+
+        .upload-section {
+            background: var(--ios-card);
+            border-radius: var(--radius-lg);
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: var(--transition);
+        }
+
+        .upload-section label {
+            display: block;
+            font-weight: 600;
+            font-size: 17px;
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            font-size: 14px;
+            color: var(--ios-secondary-text);
+        }
+
+        .action-bar {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-action:active {
+            transform: scale(0.97);
+            opacity: 0.8;
+        }
+
+        .btn-salary { background-color: var(--ios-green); color: white; }
+        .btn-penalty { background-color: var(--ios-red); color: white; }
+        .btn-bonus { background-color: var(--ios-orange); color: white; }
+        .btn-export { background-color: var(--ios-indigo); color: white; }
+
+        #summary-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            display: none;
+        }
+
+        #summary-table thead { display: none; }
+
+        #summary-table tr {
+            background: var(--ios-card);
+            box-shadow: var(--shadow);
+            border-radius: var(--radius-md);
+            display: block;
+            margin-bottom: 12px;
+            padding: 15px;
+            transition: var(--transition);
+        }
+
+        #summary-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border: none;
+            font-size: 15px;
+        }
+
+        #summary-table td:first-child { font-weight: 400; color: var(--ios-secondary-text); font-size: 12px; }
+        #summary-table td:nth-child(2) { border-bottom: 1px solid #F2F2F7; padding-bottom: 10px; margin-bottom: 5px; font-size: 17px; }
+
+        #summary-table td::before {
+            content: attr(data-label);
+            font-weight: 500;
+            color: var(--ios-secondary-text);
+        }
+
+        .emp-name-btn {
+            color: var(--ios-blue) !important;
+            text-decoration: none !important;
+            font-weight: 700;
+        }
+
+        [id$="-overlay"] {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        #summary-report-overlay {
+            align-items: center !important;
+            padding: 10px;
+        }
+
+        .modal-content {
+            background: var(--ios-card);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
+            position: relative;
+            animation: slideUp 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            overflow-y: auto;
+        }
+
+        #summary-report-overlay .modal-content {
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        @media (min-width: 600px) {
+            [id$="-overlay"] { align-items: center; padding: 20px; }
+            .modal-content { border-radius: 24px; }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+            background: #E5E5EA;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #3C3C43;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-right: 30px;
+        }
+
+        .modal-content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .modal-content th {
+            text-align: left;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: var(--ios-secondary-text);
+            padding: 10px 5px;
+            background: transparent;
+            border-bottom: 1px solid var(--ios-border);
+        }
+
+        .modal-content td {
+            padding: 12px 5px;
+            border-bottom: 1px solid #F2F2F7;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .input-table {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--ios-border);
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            background: #FAFAFA;
+            transition: var(--transition);
+        }
+
+        .input-table:focus {
+            border-color: var(--ios-blue);
+            background: #FFF;
+        }
+
+        .late { color: var(--ios-red); font-weight: 600; }
+        .final-salary { color: var(--ios-green); font-weight: 700; }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--ios-bg);
+            padding-bottom: 15px;
+        }
+        .report-table th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 700;
+            text-align: center;
+            font-size: 11px;
+        }
+        .report-table td {
+            text-align: center;
+            border: 1px solid #eee;
+        }
+
+        .add-penalty-form {
+            background: #F2F2F7;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            display: none;
+        }
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Chấm Công</h2>
+    <div id="date-range">Vui lòng tải file để xem dữ liệu</div>
+    
+    <div class="upload-section">
+        <label>Bảng tính tháng này</label>
+        <input type="file" id="file-input" accept=".xlsx, .xls" />
+    </div>
+
+    <div class="action-bar" id="action-bar">
+        <button class="btn-action btn-salary" onclick="openSalaryModal()">💰 Tính Lương Nhân Viên</button>
+        <button class="btn-action btn-bonus" onclick="openBonusModal()">🎁 Thưởng & Ghi Chú</button>
+        <button class="btn-action btn-penalty" onclick="openPenaltyModal()">🚨 Danh Sách Phạt Trễ</button>
+        <button class="btn-action btn-export" onclick="openFinalSummaryModal()">📸 Tổng Kết (Chụp Ảnh)</button>
+    </div>
+
+    <table id="summary-table">
+        <tbody id="summary-body"></tbody>
+    </table>
+</div>
+
+<div id="modal-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAllModals()">&times;</span>
+        <h3 id="modal-title"></h3>
+        <table>
+            <thead><tr><th>Ngày</th><th>Giờ</th><th>Trạng thái</th></tr></thead>
+            <tbody id="detail-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="salary-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAllModals()">&times;</span>
+        <h3 style="color: var(--ios-green);">Nhập Đơn Giá Lương</h3>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nhân viên</th>
+                        <th>Tổng Giờ</th>
+                        <th>Đơn giá (đ/h)</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody id="salary-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="penalty-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAllModals()">&times;</span>
+        <h3 style="color: var(--ios-red);">Xử Phạt Nhân Viên</h3>
+        
+        <button class="btn-action btn-penalty" style="margin-bottom: 15px; padding: 10px;" onclick="toggleAddPenalty()">➕ Thêm Phạt Thủ Công</button>
+        
+        <div id="add-penalty-form" class="add-penalty-form">
+            <label style="font-size: 13px; font-weight: 600;">Chọn nhân viên (theo tên):</label>
+            <select id="penalty-emp-select" class="input-table" style="margin-bottom: 10px;"></select>
+            
+            <label style="font-size: 13px; font-weight: 600;">Số tiền phạt (đ):</label>
+            <input type="number" id="penalty-amount-input" class="input-table" placeholder="Ví dụ: 50000" style="margin-bottom: 10px;">
+            
+            <label style="font-size: 13px; font-weight: 600;">Lý do / Ghi chú:</label>
+            <input type="text" id="penalty-note-input" class="input-table" placeholder="Ví dụ: Vi phạm đồng phục">
+            
+            <button class="btn-action btn-salary btn-small" onclick="saveManualPenalty()">Xác nhận thêm</button>
+        </div>
+
+        <p style="font-size: 12px; color: var(--ios-secondary-text); margin-bottom: 10px;">* Đi trễ ca sáng (>7h05) hoặc chiều (>15h): 1-10p (100k), >10p (200k)</p>
+        
+        <table>
+            <thead><tr><th>Họ Tên</th><th>Chi tiết & Ghi chú</th><th>Tổng phạt</th></tr></thead>
+            <tbody id="penalty-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="bonus-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAllModals()">&times;</span>
+        <h3 style="color: var(--ios-orange);">Thưởng & Ghi Chú</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Họ Tên</th>
+                    <th>Tiền Thưởng (đ)</th>
+                    <th>Ghi Chú</th>
+                </tr>
+            </thead>
+            <tbody id="bonus-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="summary-report-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAllModals()">&times;</span>
+        <div class="report-header">
+            <h3 style="margin-bottom: 5px; color: var(--ios-indigo);">BẢNG TỔNG KẾT LƯƠNG</h3>
+            <div id="report-date" style="font-size: 14px; color: #666;"></div>
+        </div>
+        <div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Họ Tên</th>
+                        <th>Lương Gốc</th>
+                        <th>Thưởng (+)</th>
+                        <th>Phạt (-)</th>
+                        <th>Thực Nhận</th>
+                    </tr>
+                </thead>
+                <tbody id="report-body"></tbody>
+            </table>
+        </div>
+        <div style="margin-top: 20px; text-align: right; font-size: 11px; color: #999;">
+            * Báo cáo thu nhập nhân viên tháng hiện tại.
+        </div>
+    </div>
+</div>
+
+<script>
+    let allEmployees = [];
+
+    document.getElementById('file-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+            processAttendance(jsonData);
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    function processAttendance(data) {
+        allEmployees = [];
+        for (let i = 0; i < data.length; i++) {
+            const row = data[i];
+            const rowStr = row.join(" ");
+            if (rowStr.includes("Ngày :")) {
+                const dateText = rowStr.trim();
+                document.getElementById('date-range').innerText = dateText;
+                document.getElementById('report-date').innerText = dateText;
+            }
+            if (row.some(cell => String(cell).includes("ID:"))) {
+                let emp = {
+                    id: row[2] || "N/A", name: row[9] || "N/A",
+                    dailyData: [], stats: { totalMinutes: 0, lateCount: 0, missingPunch: 0, activeDays: 0, totalPenalty: 0 },
+                    lateDetails: [], hourlyRate: 0, bonusAmount: 0, bonusNote: "", manualPenalties: []
+                };
+                allEmployees.push(emp);
+                analyzeTimeData(data[i+1], emp);
+            }
+        }
+        displaySummary();
+    }
+
+    function analyzeTimeData(row, emp) {
+        if (!row) return;
+        for (let col = 0; col < row.length; col++) {
+            const cellValue = String(row[col] || "").trim();
+            const dayNum = col + 1;
+            if (!cellValue.includes(':')) {
+                emp.dailyData.push({ day: dayNum, time: "-", status: "Nghỉ" }); continue;
+            }
+            const times = cellValue.split(/[\s\n]+/).filter(t => t.includes(':'));
+            if (times.length >= 1) {
+                emp.stats.activeDays++;
+                let statusText = "Bình thường", isLateDay = false;
+                if (times.length >= 2) {
+                    const firstIn = times[0];
+                    const firstH = parseInt(firstIn.split(':')[0]);
+                    
+                    let limitStr = (firstH < 11) ? "07:05" : "15:00";
+                    
+                    let diff = getMinutesLate(firstIn, limitStr);
+                    if (diff > 0) {
+                        emp.stats.lateCount++;
+                        isLateDay = true;
+                        let penalty = (diff <= 10) ? 100000 : 200000;
+                        emp.stats.totalPenalty += penalty;
+                        emp.lateDetails.push(`Ngày ${dayNum} (${firstIn} - Trễ ${diff}p): -${penalty.toLocaleString()}đ`);
+                    }
+
+                    emp.stats.totalMinutes += calculateDiff(times[0], times[times.length - 1]);
+                } else {
+                    emp.stats.missingPunch++; statusText = "Thiếu công";
+                }
+                emp.dailyData.push({ day: dayNum, time: times.join(" | "), status: isLateDay ? "Đi trễ" : statusText });
+            }
+        }
+    }
+
+    function getMinutesLate(timeStr, limitStr) {
+        const [tH, tM] = timeStr.split(':').map(Number);
+        const [lH, lM] = limitStr.split(':').map(Number);
+        const diff = (tH * 60 + tM) - (lH * 60 + lM);
+        return diff > 0 ? diff : 0;
+    }
+
+    function calculateDiff(start, end) {
+        const [sH, sM] = start.split(':').map(Number);
+        const [eH, eM] = end.split(':').map(Number);
+        return (eH * 60 + eM) - (sH * 60 + sM);
+    }
+
+    function displaySummary() {
+        const tbody = document.getElementById('summary-body');
+        tbody.innerHTML = '';
+        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
+            const h = Math.floor(emp.stats.totalMinutes / 60), m = emp.stats.totalMinutes % 60;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>ID: ${emp.id}</td>
+                <td class="emp-name-btn" onclick="showDetail(${allEmployees.indexOf(emp)})">${emp.name}</td>
+                <td data-label="Tổng giờ"><b>${h}g ${m}p</b></td>
+                <td data-label="Đi trễ" class="${emp.stats.lateCount > 0 ? 'late' : ''}">${emp.stats.lateCount} buổi</td>
+                <td data-label="Thiếu công">${emp.stats.missingPunch} ngày</td>
+                <td data-label="Nghỉ">${Math.max(0, 30 - emp.stats.activeDays)} ngày</td>`;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('summary-table').style.display = 'table';
+        document.getElementById('action-bar').style.display = 'flex';
+    }
+
+    function showDetail(idx) {
+        const emp = allEmployees[idx];
+        document.getElementById('modal-title').innerText = emp.name;
+        const tbody = document.getElementById('detail-body');
+        tbody.innerHTML = '';
+        emp.dailyData.forEach(d => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>Ngày ${d.day}</td><td>${d.time}</td><td style="color:${d.status==='Đi trễ'?'var(--ios-red)':(d.status==='Nghỉ'?'#999':'var(--ios-green)')}; font-weight:500">${d.status}</td>`;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    function openSalaryModal() {
+        const tbody = document.getElementById('salary-body');
+        tbody.innerHTML = '';
+        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp, index) => {
+            const h = Math.floor(emp.stats.totalMinutes / 60), m = emp.stats.totalMinutes % 60;
+            const empIdx = allEmployees.indexOf(emp);
+            const tr = document.createElement('tr');
+            tr.id = `row-sal-${empIdx}`;
+            
+            tr.innerHTML = `
+                <td><div style="font-weight:600">${emp.name}</div><div style="font-size:11px; color:#8e8e93">ID: ${emp.id}</div></td>
+                <td>${h}h ${m}p</td>
+                <td><input type="number" class="input-table" placeholder="Đơn giá" value="${emp.hourlyRate || ''}" oninput="updateFullSalary(${empIdx}, this.value)"></td>
+                <td id="final-sal-${empIdx}" class="final-salary">${calculateFinal(emp).toLocaleString()} đ</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('salary-overlay').style.display = 'flex';
+    }
+
+    function updateFullSalary(idx, val) {
+        const emp = allEmployees[idx];
+        emp.hourlyRate = parseFloat(val) || 0;
+        const final = calculateFinal(emp);
+        document.getElementById(`final-sal-${idx}`).innerText = final.toLocaleString() + " đ";
+    }
+
+    function calculateFinal(emp) {
+        const base = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
+        const totalManual = emp.manualPenalties.reduce((sum, p) => sum + p.amount, 0);
+        return base + emp.bonusAmount - (emp.stats.totalPenalty + totalManual);
+    }
+
+    function toggleAddPenalty() {
+        const form = document.getElementById('add-penalty-form');
+        const select = document.getElementById('penalty-emp-select');
+        
+        if (form.style.display === 'block') {
+            form.style.display = 'none';
+        } else {
+            form.style.display = 'block';
+            select.innerHTML = '<option value="">-- Chọn tên nhân viên --</option>';
+            // CHỈNH SỬA: Dùng ID làm value để định danh chính xác, nhưng chỉ hiển thị Name
+            allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
+                select.innerHTML += `<option value="${emp.id}">${emp.name}</option>`;
+            });
+        }
+    }
+
+    function saveManualPenalty() {
+        const empId = document.getElementById('penalty-emp-select').value;
+        const amount = parseFloat(document.getElementById('penalty-amount-input').value) || 0;
+        const note = document.getElementById('penalty-note-input').value || "Phạt bổ sung";
+
+        if (empId === "" || amount <= 0) {
+            alert("Vui lòng chọn nhân viên và nhập số tiền hợp lệ!");
+            return;
+        }
+
+        // CHỈNH SỬA: Tìm đúng nhân viên theo ID trong mảng gốc
+        const emp = allEmployees.find(e => e.id === empId);
+        if (emp) {
+            emp.manualPenalties.push({ amount, note });
+        }
+        
+        document.getElementById('penalty-amount-input').value = "";
+        document.getElementById('penalty-note-input').value = "";
+        toggleAddPenalty();
+        openPenaltyModal();
+    }
+
+    function openPenaltyModal() {
+        const tbody = document.getElementById('penalty-body');
+        tbody.innerHTML = '';
+        allEmployees.forEach(emp => {
+            const totalManual = emp.manualPenalties.reduce((sum, p) => sum + p.amount, 0);
+            const totalPenalty = emp.stats.totalPenalty + totalManual;
+            
+            if (totalPenalty > 0) {
+                let detailsHtml = emp.lateDetails.map(d => `<div style="margin-bottom:2px;">• ${d}</div>`).join('');
+                let manualHtml = emp.manualPenalties.map(p => `<div style="color:var(--ios-orange); font-size:11px;">• [Thủ công] ${p.note}: -${p.amount.toLocaleString()}đ</div>`).join('');
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${emp.name}</b></td>
+                    <td style="font-size:11px">${detailsHtml}${manualHtml}</td>
+                    <td class="late">${totalPenalty.toLocaleString()} đ</td>
+                `;
+                tbody.appendChild(tr);
+            }
+        });
+        document.getElementById('penalty-overlay').style.display = 'flex';
+    }
+
+    function openBonusModal() {
+        const tbody = document.getElementById('bonus-body');
+        tbody.innerHTML = '';
+        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
+            const empIdx = allEmployees.indexOf(emp);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${emp.name}</b></td>
+                <td><input type="number" class="input-table" value="${emp.bonusAmount || ''}" oninput="allEmployees[${empIdx}].bonusAmount=parseFloat(this.value)||0"></td>
+                <td><input type="text" class="input-table" value="${emp.bonusNote || ''}" oninput="allEmployees[${empIdx}].bonusNote=this.value"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('bonus-overlay').style.display = 'flex';
+    }
+
+    function openFinalSummaryModal() {
+        const tbody = document.getElementById('report-body');
+        tbody.innerHTML = '';
+        
+        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
+            const baseSalary = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
+            const totalManual = emp.manualPenalties.reduce((sum, p) => sum + p.amount, 0);
+            const totalPenalty = emp.stats.totalPenalty + totalManual;
+            const final = baseSalary + emp.bonusAmount - totalPenalty;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${emp.id}</td>
+                <td style="text-align:left; font-weight:600;">${emp.name}</td>
+                <td>${baseSalary.toLocaleString()}</td>
+                <td style="color:var(--ios-blue)">+${emp.bonusAmount.toLocaleString()}</td>
+                <td style="color:var(--ios-red)">-${totalPenalty.toLocaleString()}</td>
+                <td style="font-weight:700; color:var(--ios-green)">${final.toLocaleString()}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        document.getElementById('summary-report-overlay').style.display = 'flex';
+    }
+
+    function closeAllModals() {
+        document.querySelectorAll('[id$="-overlay"]').forEach(m => m.style.display = 'none');
+        document.getElementById('add-penalty-form').style.display = 'none';
+    }
+    window.onclick = function(e) { if (e.target.id.includes('overlay')) closeAllModals(); }
+</script>
+</body>
+</html>
