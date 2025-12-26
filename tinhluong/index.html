@@ -196,9 +196,10 @@
 
         #summary-report-overlay .modal-content {
             border-radius: 24px;
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
-            overflow-x: hidden;
+            padding: 20px 10px;
+            overflow-x: hidden; /* Khóa cuộn ngang */
         }
 
         @keyframes slideUp {
@@ -283,17 +284,42 @@
             border-bottom: 2px solid var(--ios-bg);
             padding-bottom: 15px;
         }
+
+        /* --- PHẦN SỬA ĐỔI CHO BẢNG TỔNG KẾT --- */
+        .report-table {
+            width: 100%;
+            min-width: unset; /* Bỏ min-width để không bị tràn */
+            table-layout: fixed; /* Cố định layout để chia cột chính xác */
+        }
+
         .report-table th {
             background-color: #f8f9fa;
             color: #333;
             font-weight: 700;
             text-align: center;
-            font-size: 11px;
+            font-size: 11px; /* Giảm nhẹ font size */
+            padding: 10px 2px;
+            white-space: normal; /* Cho phép xuống dòng nếu tiêu đề dài */
+            word-wrap: break-word;
         }
+
         .report-table td {
             text-align: center;
             border: 1px solid #eee;
+            padding: 10px 2px;
+            font-size: 12px; /* Giảm nhẹ font size để vừa màn hình nhỏ */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+
+        /* Tỷ lệ cột: Tên chiếm 28%, còn lại 18% mỗi cột */
+        .report-table th:nth-child(1), .report-table td:nth-child(1) { width: 28%; text-align: left; padding-left: 5px; }
+        .report-table th:nth-child(2), .report-table td:nth-child(2) { width: 18%; }
+        .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 18%; }
+        .report-table th:nth-child(4), .report-table td:nth-child(4) { width: 18%; }
+        .report-table th:nth-child(5), .report-table td:nth-child(5) { width: 18%; }
+        /* -------------------------------------- */
 
         .add-penalty-form {
             background: #F2F2F7;
@@ -420,11 +446,10 @@
             <table class="report-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Họ Tên</th>
                         <th>Lương Gốc</th>
-                        <th>Thưởng (+)</th>
-                        <th>Phạt (-)</th>
+                        <th>Thưởng</th>
+                        <th>Phạt</th>
                         <th>Thực Nhận</th>
                     </tr>
                 </thead>
@@ -600,7 +625,6 @@
         } else {
             form.style.display = 'block';
             select.innerHTML = '<option value="">-- Chọn tên nhân viên --</option>';
-            // CHỈNH SỬA: Dùng ID làm value để định danh chính xác, nhưng chỉ hiển thị Name
             allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
                 select.innerHTML += `<option value="${emp.id}">${emp.name}</option>`;
             });
@@ -617,7 +641,6 @@
             return;
         }
 
-        // CHỈNH SỬA: Tìm đúng nhân viên theo ID trong mảng gốc
         const emp = allEmployees.find(e => e.id === empId);
         if (emp) {
             emp.manualPenalties.push({ amount, note });
@@ -680,8 +703,7 @@
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${emp.id}</td>
-                <td style="text-align:left; font-weight:600;">${emp.name}</td>
+                <td>${emp.name}</td>
                 <td>${baseSalary.toLocaleString()}</td>
                 <td style="color:var(--ios-blue)">+${emp.bonusAmount.toLocaleString()}</td>
                 <td style="color:var(--ios-red)">-${totalPenalty.toLocaleString()}</td>
