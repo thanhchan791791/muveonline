@@ -14,7 +14,7 @@
             --ios-red: #FF3B30;
             --ios-gray: #8E8E93;
             --ios-light-gray: #E5E5EA;
-            --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
             --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -28,49 +28,106 @@
             background-color: var(--ios-bg); 
             color: #1C1C1E;
             margin: 0;
-            padding: 20px 15px;
+            padding: 20px 15px 100px 15px; /* Thêm padding bottom để không bị che bởi nút */
             line-height: 1.5;
         }
 
-        /* --- Animation Entry --- */
-        @keyframes iosSlideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* --- Modal System --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: none; /* Ẩn mặc định */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
         }
 
-        /* --- Layout Container --- */
-        .container, .list-container { 
-            max-width: 600px; 
-            margin: 0 auto 25px auto; 
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        /* --- Layout Container (Form) --- */
+        .container { 
+            width: 100%;
+            max-width: 500px; 
+            background: var(--ios-card); 
+            padding: 24px; 
+            border-radius: 28px; 
+            box-shadow: var(--shadow);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active .container {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .list-container { 
+            max-width: 900px; 
+            margin: 0 auto; 
             background: var(--ios-card); 
             padding: 24px; 
             border-radius: 24px; 
             box-shadow: var(--shadow);
-            animation: iosSlideUp 0.6s ease-out;
         }
 
-        .list-container {
-            max-width: 900px;
+        /* --- Floating Action Buttons --- */
+        .fab-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 999;
         }
+
+        .fab {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            border: none;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .fab-bonus { background-color: var(--ios-green); }
+        .fab-penalty { background-color: var(--ios-red); }
+        .fab:active { transform: scale(0.9); }
 
         /* --- Typography --- */
         h2, h3 { 
             font-weight: 700;
             letter-spacing: -0.5px;
             color: #000; 
-            text-align: center; 
             margin-bottom: 25px; 
         }
 
-        h2 { font-size: 24px; }
-        h3 { font-size: 20px; text-align: left; padding-left: 5px; }
+        h2 { font-size: 22px; text-align: center; }
+        h3 { font-size: 20px; text-align: left; }
 
         /* --- Form Elements --- */
         .form-group { margin-bottom: 20px; }
         label { 
             display: block; 
-            font-size: 14px;
-            font-weight: 600; 
+            font-size: 13px;
+            font-weight: 700; 
             margin-bottom: 8px; 
             color: var(--ios-gray);
             margin-left: 4px;
@@ -80,7 +137,7 @@
             width: 100%; 
             padding: 14px 16px; 
             border: 1px solid transparent; 
-            background-color: #F9F9F9;
+            background-color: #F2F2F7;
             border-radius: 14px; 
             font-size: 16px;
             transition: var(--transition);
@@ -97,7 +154,7 @@
         /* --- Buttons Style --- */
         .btn-group { display: flex; gap: 12px; margin-top: 25px; }
         
-        button { 
+        .btn-submit { 
             flex: 1; 
             padding: 16px; 
             border: none; 
@@ -107,18 +164,10 @@
             color: white; 
             font-size: 16px; 
             transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        button:active {
-            transform: scale(0.96);
-            opacity: 0.8;
-        }
-
-        .btn-bonus { background-color: var(--ios-green); shadow: 0 4px 12px rgba(52, 199, 89, 0.3); }
-        .btn-penalty { background-color: var(--ios-red); shadow: 0 4px 12px rgba(255, 59, 48, 0.3); }
+        .btn-bonus { background-color: var(--ios-green); }
+        .btn-penalty { background-color: var(--ios-red); }
         
         /* --- Message/Toast --- */
         #message { 
@@ -128,15 +177,12 @@
             display: none; 
             text-align: center; 
             font-weight: 600;
-            animation: iosSlideUp 0.3s ease;
         }
         .success { background: #E2F9E9; color: var(--ios-green); }
         .error { background: #FFE5E5; color: var(--ios-red); }
 
         /* --- Data Table iOS Style --- */
-        .list-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        
         th { 
             text-transform: uppercase;
             font-size: 11px;
@@ -145,86 +191,73 @@
             text-align: left;
             border-bottom: 1px solid var(--ios-light-gray);
         }
-
         td { 
             padding: 16px 10px; 
             border-bottom: 0.5px solid var(--ios-light-gray);
             font-size: 15px;
         }
 
-        tr:last-child td { border-bottom: none; }
-
         .text-bonus { color: var(--ios-green); font-weight: 700; }
         .text-penalty { color: var(--ios-red); font-weight: 700; }
         
-        /* --- Action Buttons --- */
         .action-btns { display: flex; gap: 8px; }
-        
         .btn-edit, .btn-delete { 
             padding: 6px 12px; 
+            border: none;
             border-radius: 10px; 
             font-size: 13px; 
             font-weight: 600;
-            width: auto;
-            flex: none;
+            cursor: pointer;
         }
-
         .btn-edit { background: #E8F2FF; color: var(--ios-blue); }
         .btn-delete { background: #FFE5E5; color: var(--ios-red); }
 
-        /* --- Glassmorphism Header (Sticky) --- */
-        h3 {
-            position: sticky;
-            top: 0;
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            margin: -20px -20px 10px -20px;
-            padding: 20px;
-            z-index: 10;
-        }
-
-        /* --- Responsive Tweaks --- */
         @media (max-width: 480px) {
-            .container, .list-container { padding: 18px; border-radius: 20px; }
-            td, th { padding: 12px 8px; font-size: 14px; }
+            .container { padding: 20px; border-radius: 24px; }
+            .fab-container { right: 20px; bottom: 20px; }
             .btn-group { flex-direction: column; }
-            .action-btns { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2 id="form-title">Thêm Thưởng / Phạt</h2>
-    
-    <div class="form-group">
-        <label>CHỌN NHÂN VIÊN</label>
-        <select id="employee-select">
-            <option value="">-- Đang tải danh sách... --</option>
-        </select>
-    </div>
+<div class="fab-container">
+    <button class="fab fab-bonus" onclick="openModal('BONUS')" title="Thêm Thưởng">+</button>
+    <button class="fab fab-penalty" onclick="openModal('PENALTY')" title="Thêm Phạt">−</button>
+</div>
 
-    <div class="form-group">
-        <label>SỐ TIỀN (VNĐ)</label>
-        <input type="number" id="amount" placeholder="Ví dụ: 500000">
-    </div>
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnOuterClick(event)">
+    <div class="container" id="form-container">
+        <h2 id="form-title">Thêm Thưởng / Phạt</h2>
+        
+        <div class="form-group">
+            <label>CHỌN NHÂN VIÊN</label>
+            <select id="employee-select">
+                <option value="">-- Đang tải danh sách... --</option>
+            </select>
+        </div>
 
-    <div class="form-group">
-        <label>GHI CHÚ / LÝ DO</label>
-        <textarea id="note" rows="3" placeholder="Nhập lý do chi tiết..."></textarea>
-    </div>
+        <div class="form-group">
+            <label>SỐ TIỀN (VNĐ)</label>
+            <input type="number" id="amount" placeholder="Ví dụ: 500000">
+        </div>
 
-    <div id="message"></div>
+        <div class="form-group">
+            <label>GHI CHÚ / LÝ DO</label>
+            <textarea id="note" rows="3" placeholder="Nhập lý do chi tiết..."></textarea>
+        </div>
 
-    <div class="btn-group" id="normal-btns">
-        <button class="btn-bonus" onclick="submitData('BONUS')">LƯU THƯỞNG</button>
-        <button class="btn-penalty" onclick="submitData('PENALTY')">LƯU PHẠT</button>
-    </div>
-    
-    <div class="btn-group" id="edit-btns" style="display: none;">
-        <button class="btn-bonus" id="confirm-edit-btn">CẬP NHẬT</button>
-        <button style="background-color: #8E8E93;" onclick="cancelEdit()">HỦY</button>
+        <div id="message"></div>
+
+        <div class="btn-group" id="normal-btns">
+            <button class="btn-submit" id="btn-save-main" onclick="">LƯU DỮ LIỆU</button>
+            <button style="background-color: #8E8E93; flex: 0.5;" class="btn-submit" onclick="closeModal()">HỦY</button>
+        </div>
+        
+        <div class="btn-group" id="edit-btns" style="display: none;">
+            <button class="btn-submit btn-bonus" id="confirm-edit-btn">CẬP NHẬT</button>
+            <button style="background-color: #8E8E93;" class="btn-submit" onclick="cancelEdit()">HỦY</button>
+        </div>
     </div>
 </div>
 
@@ -256,6 +289,37 @@
     const BONUS_PATH = `bonus_records/Bonus_1766803246316/records`;
     const PENALTY_PATH = `penalty_records/Penalty_1766806609663/records`;
 
+    // UI Logic: Open/Close Modal
+    window.openModal = function(type) {
+        const overlay = document.getElementById('modal-overlay');
+        const title = document.getElementById('form-title');
+        const saveBtn = document.getElementById('btn-save-main');
+        
+        resetForm();
+        overlay.classList.add('active');
+        
+        if(type === 'BONUS') {
+            title.innerText = "Thêm Thưởng Mới";
+            saveBtn.innerText = "LƯU THƯỞNG";
+            saveBtn.className = "btn-submit btn-bonus";
+            saveBtn.onclick = () => submitData('BONUS');
+        } else {
+            title.innerText = "Thêm Hình Phạt";
+            saveBtn.innerText = "LƯU PHẠT";
+            saveBtn.className = "btn-submit btn-penalty";
+            saveBtn.onclick = () => submitData('PENALTY');
+        }
+    }
+
+    window.closeModal = function() {
+        document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    window.closeModalOnOuterClick = function(e) {
+        if(e.target.id === 'modal-overlay') closeModal();
+    }
+
+    // Data Loading
     async function loadEmployees() {
         const select = document.getElementById('employee-select');
         const path = 'employee_list/List_1766810871909'; 
@@ -331,7 +395,7 @@
             }
             await set(ref(db, path), records);
             showMessage("Lưu thành công!", "success");
-            resetForm();
+            setTimeout(closeModal, 1000);
         } catch (e) { showMessage("Lỗi: " + e.message, "error"); }
     }
 
@@ -358,12 +422,11 @@
         document.getElementById('normal-btns').style.display = 'none';
         document.getElementById('edit-btns').style.display = 'flex';
 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.getElementById('modal-overlay').classList.add('active');
 
         document.getElementById('confirm-edit-btn').onclick = async () => {
             const newAmount = parseInt(document.getElementById('amount').value);
             const newNote = document.getElementById('note').value;
-            
             const snapUpdate = await get(ref(db, path));
             let records = snapUpdate.val();
             
@@ -377,33 +440,28 @@
             
             await set(ref(db, path), records);
             showMessage("Đã cập nhật!", "success");
-            cancelEdit();
+            setTimeout(cancelEdit, 1000);
         };
     }
 
     window.cancelEdit = function() {
-        resetForm();
-        document.getElementById('form-title').innerText = "Thêm Thưởng / Phạt";
-        document.getElementById('normal-btns').style.display = 'flex';
-        document.getElementById('edit-btns').style.display = 'none';
+        closeModal();
+        setTimeout(() => {
+            document.getElementById('normal-btns').style.display = 'flex';
+            document.getElementById('edit-btns').style.display = 'none';
+        }, 400);
     }
 
     function resetForm() {
         document.getElementById('amount').value = '';
         document.getElementById('note').value = '';
         document.getElementById('employee-select').value = '';
+        document.getElementById('message').style.display = 'none';
     }
 
     function showMessage(text, type) {
         const msgDiv = document.getElementById('message');
         msgDiv.innerText = text; msgDiv.className = type; msgDiv.style.display = 'block';
-        setTimeout(() => {
-            msgDiv.style.opacity = '0';
-            setTimeout(() => {
-                msgDiv.style.display = 'none';
-                msgDiv.style.opacity = '1';
-            }, 300);
-        }, 3000);
     }
 
     loadEmployees();
