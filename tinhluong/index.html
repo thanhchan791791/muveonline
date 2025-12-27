@@ -3,545 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Thống Kê Chấm Công & Tính Lương</title>
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue, query, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAV7r-rjXo6U62LX1AA7c7DAHb8GhOOOsg",
-            authDomain: "saigon-dalat.firebaseapp.com",
-            databaseURL: "https://saigon-dalat-default-rtdb.firebaseio.com",
-            projectId: "saigon-dalat",
-            storageBucket: "saigon-dalat.firebasestorage.app",
-            messagingSenderId: "339735183485",
-            appId: "1:339735183485:web:bc23cd740104d272577114",
-            measurementId: "G-FDLZXR2X8P"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        window.cloudBonusData = [];
-        window.cloudSalaryData = [];
-        window.cloudPenaltySummary = {}; 
-
-        onValue(query(ref(db, 'bonus_records'), limitToLast(1)), (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                const lastKey = Object.keys(data)[0];
-                window.cloudBonusData = data[lastKey].records || [];
-                syncDataAfterUpload();
-            }
-        });
-
-        onValue(query(ref(db, 'salary_config'), limitToLast(1)), (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                const lastKey = Object.keys(data)[0];
-                window.cloudSalaryData = data[lastKey].records || [];
-                syncDataAfterUpload();
-            }
-        });
-
-        onValue(query(ref(db, 'penalty_records'), limitToLast(10)), (snapshot) => {
-            window.cloudPenaltySummary = {}; 
-            if (snapshot.exists()) {
-                const allBatches = snapshot.val();
-                Object.values(allBatches).forEach(batch => {
-                    if (batch.records) {
-                        batch.records.forEach(rec => {
-                            if (!window.cloudPenaltySummary[rec.name]) {
-                                window.cloudPenaltySummary[rec.name] = { total: 0, details: [] };
-                            }
-                            window.cloudPenaltySummary[rec.name].total += rec.totalPenalty || 0;
-                            if (rec.details) window.cloudPenaltySummary[rec.name].details.push(...rec.details);
-                        });
-                    }
-                });
-            }
-            syncDataAfterUpload();
-        });
-
-        window.saveSalaryToFirebase = function() {
-            if (allEmployees.length === 0) return alert("Không có dữ liệu!");
-            const data = allEmployees
-                .filter(emp => emp.hourlyRate > 0)
-                .map(emp => ({ id: emp.id, name: emp.name, hourlyRate: emp.hourlyRate }));
-            set(ref(db, 'salary_config/Salary_' + Date.now()), { records: data, createdAt: new Date().toLocaleString() })
-            .then(() => alert("✅ Đã lưu!"));
-        };
-
-        window.saveBonusToFirebase = function() {
-            if (allEmployees.length === 0) return alert("Không có dữ liệu!");
-            const data = allEmployees
-                .filter(emp => (emp.bonusAmount > 0 || emp.bonusNote !== ""))
-                .map(emp => ({ id: emp.id, name: emp.name, bonusAmount: emp.bonusAmount, bonusNote: emp.bonusNote }));
-            set(ref(db, 'bonus_records/Bonus_' + Date.now()), { records: data, createdAt: new Date().toLocaleString() })
-            .then(() => alert("✅ Đã lưu!"));
-        };
-
-        window.savePenaltyToFirebase = function() {
-            if (allEmployees.length === 0) return alert("Không có dữ liệu!");
-            const data = allEmployees
-                .filter(emp => (emp.stats.totalPenalty > 0))
-                .map(emp => ({ id: emp.id, name: emp.name, totalPenalty: emp.stats.totalPenalty, details: emp.lateDetails }));
-            set(ref(db, 'penalty_records/Penalty_' + Date.now()), { records: data, createdAt: new Date().toLocaleString() })
-            .then(() => alert("✅ Đã lưu!"));
-        };
-
-        window.openPenaltyModal = function() {
-            const tbody = document.getElementById('penalty-body');
-            tbody.innerHTML = '';
-            allEmployees.forEach(emp => {
-                const cloudData = window.cloudPenaltySummary[emp.name] || { total: 0, details: [] };
-                const total = emp.stats.totalPenalty + cloudData.total;
-                const allDetails = [...new Set([...cloudData.details, ...emp.lateDetails])];
-                if (total > 0) {
-                    tbody.innerHTML += `<tr><td style="font-weight:600">${emp.name}</td><td style="font-size:11px; color:#8E8E93;">${allDetails.join('<br>')}</td><td style="color:#FF3B30; font-weight:700; text-align:right;">${total.toLocaleString()}đ</td></tr>`;
-                }
-            });
-            document.getElementById('penalty-overlay').style.display = 'flex';
-        };
-    </script>
-
+    <title>Quản Lý Lương & Thưởng Phạt</title>
     <style>
         :root {
             --ios-blue: #007AFF;
-            --ios-green: #34C759;
-            --ios-red: #FF3B30;
-            --ios-orange: #FF9500;
+            --ios-gray: #8E8E93;
             --ios-bg: #F2F2F7;
-            --ios-card: rgba(255, 255, 255, 0.85);
-            --ios-text: #1C1C1E;
-            --ios-secondary-text: #8E8E93;
-            --ios-border: rgba(60, 60, 67, 0.12);
-            --radius-xl: 24px;
-            --radius-lg: 18px;
-            --radius-md: 12px;
-            --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.04);
-            --bezier-ios: cubic-bezier(0.32, 0.72, 0, 1);
+            --ios-card-bg: #FFFFFF;
+            --ios-tab-bg: rgba(255, 255, 255, 0.85);
+            --ios-border: rgba(0, 0, 0, 0.1);
+            --ios-text: #000000;
+            --ios-text-secondary: #636366;
+            --transition-bounce: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
         }
 
-        body { 
-            background-color: var(--ios-bg); 
-            color: var(--ios-text); 
-            margin: 0; 
-            padding: 20px 16px env(safe-area-inset-bottom);
-            line-height: 1.4;
+        body {
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        h2 {
-            font-size: 34px;
+        /* MÀN HÌNH CHỌN (HOME) */
+        #home-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 30px;
+            background-color: var(--ios-bg);
+            position: absolute;
+            width: 100%;
+            z-index: 200;
+            transition: all 0.4s var(--transition-bounce);
+        }
+
+        .welcome-text {
+            margin-bottom: 50px;
+            text-align: center;
+            animation: slideUp 0.6s var(--transition-bounce);
+        }
+
+        .welcome-text h2 {
+            font-size: 32px;
             font-weight: 800;
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
+            color: #1c1c1e;
             margin-bottom: 8px;
-            padding-left: 4px;
         }
 
-        #date-range { 
-            font-size: 15px; 
-            font-weight: 500;
-            color: var(--ios-secondary-text); 
-            margin-bottom: 24px; 
-            padding-left: 4px;
+        .welcome-text p {
+            color: var(--ios-text-secondary);
+            font-size: 17px;
+            font-weight: 400;
         }
 
-        /* Upload Section */
-        .upload-section { 
-            background: var(--ios-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--radius-lg); 
-            padding: 24px; 
-            text-align: center; 
-            border: 1px solid var(--ios-border);
-            box-shadow: var(--shadow-soft);
-            margin-bottom: 24px;
-            transition: transform 0.2s var(--bezier-ios);
-        }
-        
-        input[type="file"] {
-            font-size: 15px;
-            color: var(--ios-secondary-text);
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 440px;
+            animation: fadeIn 0.8s var(--transition-bounce);
         }
 
-        /* Action Buttons */
-        .action-bar { 
-            display: none; 
-            flex-direction: column; 
-            gap: 12px; 
-            margin-bottom: 24px; 
-            animation: slideUp 0.5s var(--bezier-ios);
+        .menu-card {
+            background: var(--ios-card-bg);
+            aspect-ratio: 1/1;
+            border-radius: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: all 0.3s var(--transition-bounce);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .btn-action { 
-            width: 100%; 
-            padding: 16px; 
-            border: none; 
-            border-radius: var(--radius-md); 
-            font-size: 16px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            color: white; 
-            transition: all 0.2s var(--bezier-ios);
+        .menu-card:active {
+            transform: scale(0.92);
+            background-color: #f2f2f7;
+        }
+
+        .menu-card .icon-wrapper {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            margin-bottom: 16px;
         }
 
-        .btn-action:active { transform: scale(0.96); opacity: 0.9; }
-        .btn-salary { background: linear-gradient(135deg, #34C759, #28a745); }
-        .btn-bonus { background: linear-gradient(135deg, #FF9500, #ff8000); }
-        .btn-penalty { background: linear-gradient(135deg, #FF3B30, #d93025); }
+        /* Icon Colors */
+        .menu-card:nth-child(1) .icon-wrapper { background: #34C759; } /* Green for Money */
+        .menu-card:nth-child(2) .icon-wrapper { background: #5856D6; } /* Indigo for Reward/Fine */
 
-        /* Table/List View */
-        #summary-table { 
-            width: 100%; 
-            border-collapse: separate; 
-            border-spacing: 0; 
-            display: none; 
+        .menu-card span {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1c1c1e;
         }
 
-        #summary-table tr { 
-            background: var(--ios-card); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--ios-border);
-            border-radius: var(--radius-lg); 
+        /* GIAO DIỆN CHỨC NĂNG (MAIN) */
+        #main-app {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #fff;
+            animation: slideInRight 0.4s var(--transition-bounce);
+        }
+
+        header {
+            background-color: var(--ios-tab-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 12px 16px;
+            padding-top: env(safe-area-inset-top);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 0.5px solid var(--ios-border);
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: var(--ios-blue);
+            font-size: 17px;
+            font-weight: 400;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .back-btn svg {
+            fill: none;
+            stroke: var(--ios-blue);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        header h1 {
+            font-size: 17px;
+            font-weight: 600;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #000;
+        }
+
+        .content-container {
+            flex: 1;
+            position: relative;
+            background-color: #fff;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Bottom Tab Bar */
+        .tab-bar {
+            height: 65px;
+            padding-bottom: env(safe-area-inset-bottom);
+            background: var(--ios-tab-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 0.5px solid var(--ios-border);
+        }
+
+        .tab-item {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 16px; 
-            margin-bottom: 12px; 
-            box-shadow: var(--shadow-soft);
-            animation: fadeIn 0.4s var(--bezier-ios) forwards;
+            align-items: center;
+            color: var(--ios-gray);
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            gap: 4px;
+            transition: color 0.2s;
         }
 
-        #summary-table td { 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 4px 0; 
-            font-size: 16px;
+        .tab-item.active {
+            color: var(--ios-blue);
         }
 
-        #summary-table td:first-child { color: var(--ios-secondary-text); font-size: 13px; font-weight: 600; text-transform: uppercase; }
-        #summary-table td:last-child { font-weight: 700; color: var(--ios-blue); font-size: 17px; }
-
-        .emp-name-btn { 
-            color: var(--ios-text) !important; 
-            font-weight: 700 !important; 
-            font-size: 20px !important;
-            cursor: pointer; 
-            text-decoration: none !important;
-            margin: 4px 0 8px 0;
+        .tab-icon {
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Modal / Overlays */
-        [id$="-overlay"] { 
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.3); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px); 
-            z-index: 1000; 
-            justify-content: center; 
-            align-items: flex-end; 
+        .tab-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
         }
-
-        #detail-overlay { align-items: center; }
-
-        .modal-content { 
-            background: white; 
-            width: 100%; 
-            max-width: 500px; 
-            max-height: 90vh; 
-            border-radius: var(--radius-xl) var(--radius-xl) 0 0; 
-            padding: 24px; 
-            position: relative; 
-            overflow-y: auto; 
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
-            animation: sheetUp 0.4s var(--bezier-ios);
-        }
-
-        #detail-overlay .modal-content {
-            width: 92%;
-            border-radius: var(--radius-xl);
-            animation: modalScale 0.3s var(--bezier-ios);
-        }
-
-        .close-btn { 
-            position: absolute; 
-            top: 16px; right: 20px; 
-            font-size: 28px; 
-            font-weight: 600;
-            cursor: pointer; 
-            color: #C7C7CC; 
-        }
-
-        /* Attendance Grid */
-        .attendance-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 8px; 
-            margin-bottom: 24px; 
-        }
-
-        .date-card { 
-            background: #F2F2F7; 
-            border-radius: var(--radius-md); 
-            padding: 8px 4px; 
-            text-align: center; 
-            border: 1px solid rgba(0,0,0,0.03); 
-        }
-
-        .date-label { font-size: 10px; font-weight: 700; color: var(--ios-secondary-text); display: block; margin-bottom: 2px; }
-        .time-label { font-size: 10px; color: var(--ios-blue); font-weight: 600; line-height: 1.2; display: block; }
-
-        /* Financial Box */
-        .financial-summary { 
-            background: #F9F9FB; 
-            padding: 20px; 
-            border-radius: var(--radius-lg); 
-            border: 1px solid var(--ios-border); 
-        }
-
-        .financial-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; font-weight: 500; }
-        .financial-row b { font-weight: 700; }
-        .final-total { 
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #E5E5EA; 
-            font-size: 19px; 
-            color: var(--ios-text);
-        }
-        .final-total span:last-child { color: var(--ios-blue); font-weight: 800; }
-
-        /* Form Inputs */
-        .input-table { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid var(--ios-border); 
-            border-radius: var(--radius-md); 
-            background: #F2F2F7;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .input-table:focus { border-color: var(--ios-blue); background: white; }
-
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; font-size: 12px; text-transform: uppercase; color: var(--ios-secondary-text); padding: 8px 4px; }
-        td { padding: 12px 4px; border-bottom: 1px solid #F2F2F7; }
 
         /* Animations */
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes modalScale { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #C7C7CC; border-radius: 10px; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* Icons SVG SF Style */
+        .sf-icon {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Chấm Công</h2>
-    <div id="date-range">Vui lòng tải file để xem dữ liệu</div>
-    <div class="upload-section">
-        <input type="file" id="file-input" accept=".xlsx, .xls" />
+    <div id="home-screen">
+        <div class="welcome-text">
+            <h2>Hệ Thống</h2>
+            <p>Chọn chức năng để bắt đầu</p>
+        </div>
+        <div class="menu-grid">
+            <div class="menu-card" onclick="openApp('t.html', 'Tính Lương', 0)">
+                <div class="icon-wrapper">
+                    <svg class="sf-icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.21 1.87 1.15 0 1.94-.51 1.94-1.44 0-.85-.43-1.34-2.19-1.8-2.4-.63-3.66-1.71-3.66-3.58 0-1.78 1.14-2.9 2.8-3.3V4.5h2.67v1.94c1.23.21 2.5 1.02 2.76 2.53h-1.94c-.16-.83-.73-1.37-1.84-1.37-1.12 0-1.66.55-1.66 1.25 0 .76.47 1.2 2.22 1.63 2.1.51 3.63 1.55 3.63 3.59 0 1.91-1.28 3.16-3.34 3.52z"/>
+                    </svg>
+                </div>
+                <span>Tính Lương</span>
+            </div>
+            <div class="menu-card" onclick="openApp('b.html', 'Thưởng Phạt', 1)">
+                <div class="icon-wrapper">
+                    <svg class="sf-icon" viewBox="0 0 24 24">
+                        <path d="M12 3L4 9v2c0 5.25 3.41 10.19 8 11.5 4.59-1.31 8-6.25 8-11.5V9l-8-6zm0 10h-2v-2h2v2zm0-4h-2V7h2v2zm4 4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+                    </svg>
+                </div>
+                <span>Thưởng Phạt</span>
+            </div>
+        </div>
     </div>
-    
-    <div class="action-bar" id="action-bar">
-        <button class="btn-action btn-salary" onclick="window.openSalaryModal()">💰 Nhập Đơn Giá Lương</button>
-        <button class="btn-action btn-bonus" onclick="window.openBonusModal()">🎁 Thưởng & Ghi Chú</button>
-        <button class="btn-action btn-penalty" onclick="window.openPenaltyModal()">🚨 Danh Sách Phạt Trễ</button>
+
+    <div id="main-app">
+        <header>
+            <button class="back-btn" onclick="goHome()">
+                <svg width="12" height="20" viewBox="0 0 12 20">
+                    <path d="M10 18L2 10L10 2" />
+                </svg>
+                Home
+            </button>
+            <h1 id="page-title">Tính Lương</h1>
+            <div style="width: 60px;"></div>
+        </header>
+
+        <div class="content-container">
+            <iframe id="display-frame" src="about:blank"></iframe>
+        </div>
+
+        <nav class="tab-bar">
+            <div class="tab-item" id="tab-0" onclick="switchTab('t.html', 'Tính Lương', 0)">
+                <div class="tab-icon">
+                    <svg viewBox="0 0 24 24"><path d="M11.8 2.02c-5.4 0-9.8 4.4-9.8 9.8s4.4 9.8 9.8 9.8 9.8-4.4 9.8-9.8-4.4-9.8-9.8-9.8zm.4 14.1v1.8h-1.8v-1.8c-1.3-.2-2.4-1.1-2.5-2.6h1.5c.1.8.6 1.4 1.7 1.4.9 0 1.5-.4 1.5-1.1 0-.7-.3-1-1.7-1.4-1.8-.5-2.8-1.3-2.8-2.7 0-1.4.9-2.2 2.1-2.5v-1.6h1.8v1.6c1 .2 1.9.8 2.1 2h-1.5c-.1-.6-.6-1-1.4-1-.8 0-1.3.4-1.3 1 0 .6.4.9 1.7 1.2 1.6.4 2.8 1.2 2.8 2.7.1 1.5-.9 2.5-2.5 2.8z"/></svg>
+                </div>
+                <span>Tính Lương</span>
+            </div>
+            <div class="tab-item" id="tab-1" onclick="switchTab('b.html', 'Thưởng Phạt', 1)">
+                <div class="tab-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L3 7v4.3c0 5.5 3.8 10.7 9 12.1 5.2-1.4 9-6.6 9-12.1V7l-9-5zm-1 14h2v2h-2v-2zm0-8h2v6h-2V8z"/></svg>
+                </div>
+                <span>Thưởng Phạt</span>
+            </div>
+        </nav>
     </div>
-    
-    <table id="summary-table">
-        <tbody id="summary-body"></tbody>
-    </table>
-</div>
 
-<div id="detail-overlay">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeAllModals()">&times;</span>
-        <h3 id="detail-title" style="text-align:center; font-size: 22px; margin-bottom: 20px;"></h3>
-        <div class="attendance-grid" id="detail-grid"></div>
-        <div class="financial-summary" id="detail-summary-box"></div>
-    </div>
-</div>
+    <script>
+        // GIỮ NGUYÊN TOÀN BỘ LOGIC GỐC
+        const homeScreen = document.getElementById('home-screen');
+        const mainApp = document.getElementById('main-app');
+        const frame = document.getElementById('display-frame');
+        const title = document.getElementById('page-title');
 
-<div id="salary-overlay">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeAllModals()">&times;</span>
-        <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Đơn Giá Lương</h3>
-        <table>
-            <thead><tr><th>Tên</th><th>Đơn giá (đ/h)</th></tr></thead>
-            <tbody id="salary-body"></tbody>
-        </table>
-    </div>
-</div>
+        function openApp(url, pageTitle, tabIndex) {
+            homeScreen.style.opacity = '0';
+            homeScreen.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                homeScreen.style.display = 'none';
+                mainApp.style.display = 'flex';
+                switchTab(url, pageTitle, tabIndex);
+            }, 300);
+        }
 
-<div id="bonus-overlay">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeAllModals()">&times;</span>
-        <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Thưởng & Ghi Chú</h3>
-        <table>
-            <thead><tr><th>Tên</th><th>Thưởng</th><th>Ghi chú</th></tr></thead>
-            <tbody id="bonus-body"></tbody>
-        </table>
-    </div>
-</div>
+        function switchTab(url, pageTitle, tabIndex) {
+            title.innerText = pageTitle;
+            frame.src = url;
 
-<div id="penalty-overlay">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeAllModals()">&times;</span>
-        <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Danh Sách Phạt Trễ</h3>
-        <table style="font-size:12px;">
-            <thead><tr><th>Tên nhân viên</th><th>Chi tiết vi phạm</th><th style="text-align:right">Tổng phạt</th></tr></thead>
-            <tbody id="penalty-body"></tbody>
-        </table>
-    </div>
-</div>
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabIndex).classList.add('active');
+        }
 
-<script>
-    /* PHẦN JAVASCRIPT GIỮ NGUYÊN 100% THEO YÊU CẦU */
-    let allEmployees = [];
-    let currentDateHeaders = [];
+        function goHome() {
+            homeScreen.style.display = 'flex';
+            setTimeout(() => {
+                homeScreen.style.opacity = '1';
+                homeScreen.style.transform = 'scale(1)';
+                mainApp.style.display = 'none';
+                frame.src = "about:blank";
+            }, 10);
+        }
 
-    document.getElementById('file-input').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            processAttendance(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: "" }));
-        };
-        reader.readAsArrayBuffer(file);
-    });
-
-    function processAttendance(data) {
-        allEmployees = [];
-        const headerRow = data.find(r => r.includes(1) && r.includes(2));
-        currentDateHeaders = headerRow || [];
-
-        data.forEach((row, i) => {
-            if (row.join(" ").includes("Ngày :")) document.getElementById('date-range').innerText = row.join(" ").trim();
-            if (row.some(c => String(c).includes("ID:"))) {
-                let emp = { 
-                    id: row[2], name: row[9], attendanceRecords: [], lateDetails: [],
-                    stats: { totalMinutes: 0, totalPenalty: 0, cloudPenalty: 0 }, 
-                    hourlyRate: 0, bonusAmount: 0, bonusNote: "" 
-                };
-                allEmployees.push(emp);
-                const nextRow = data[i+1];
-                if (nextRow) {
-                    nextRow.forEach((cell, colIdx) => {
-                        const times = String(cell).split(/[\s\n]+/).filter(t => t.includes(':'));
-                        if (times.length >= 2) {
-                            const firstTime = times[0];
-                            const [h, m] = firstTime.split(':').map(Number);
-                            const totalMins = h * 60 + m;
-                            const morningMark = 425; // 7:05
-                            const afternoonMark = 900; // 15:00
-                            const targetMark = Math.abs(totalMins - morningMark) < Math.abs(totalMins - afternoonMark) ? morningMark : afternoonMark;
-                            const diff = totalMins - targetMark;
-                            if (diff >= 1) {
-                                const fine = diff > 10 ? 200000 : 100000;
-                                emp.stats.totalPenalty += fine;
-                                emp.lateDetails.push(`Ngày ${currentDateHeaders[colIdx]}: Trễ ${diff}p (${firstTime}) - Phạt ${fine.toLocaleString()}đ`);
-                            }
-                            const [eH, eM] = times[times.length-1].split(':').map(Number);
-                            emp.stats.totalMinutes += (eH * 60 + eM) - totalMins;
-                            emp.attendanceRecords.push({ day: currentDateHeaders[colIdx], time: times[0] + "\n" + times[times.length-1] });
-                        }
-                    });
-                }
+        window.addEventListener('popstate', function() {
+            if (mainApp.style.display === 'flex') {
+                goHome();
             }
         });
-        syncDataAfterUpload();
-        displaySummary();
-    }
+    </script>
 
-    function syncDataAfterUpload() {
-        allEmployees.forEach(emp => {
-            const s = window.cloudSalaryData.find(c => c.name === emp.name);
-            if (s) emp.hourlyRate = s.hourlyRate;
-            const b = window.cloudBonusData.find(c => c.name === emp.name);
-            if (b) { emp.bonusAmount = b.bonusAmount; emp.bonusNote = b.bonusNote; }
-            if (window.cloudPenaltySummary[emp.name]) {
-                emp.stats.cloudPenalty = window.cloudPenaltySummary[emp.name].total;
-            }
-        });
-    }
-
-    function displaySummary() {
-        const tbody = document.getElementById('summary-body');
-        tbody.innerHTML = '';
-        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
-            tbody.innerHTML += `<tr><td>ID: ${emp.id}</td><td class="emp-name-btn" onclick="openDetailModal(${allEmployees.indexOf(emp)})">${emp.name}</td><td>${Math.floor(emp.stats.totalMinutes/60)} giờ công</td></tr>`;
-        });
-        document.getElementById('summary-table').style.display = 'table';
-        document.getElementById('action-bar').style.display = 'flex';
-    }
-
-    window.openDetailModal = function(idx) {
-        const emp = allEmployees[idx];
-        document.getElementById('detail-title').innerText = emp.name;
-        const grid = document.getElementById('detail-grid');
-        grid.innerHTML = '';
-        emp.attendanceRecords.forEach(rec => grid.innerHTML += `<div class="date-card"><span class="date-label">Ngày ${rec.day}</span><span class="time-label">${rec.time.replace("\n", "<br>")}</span></div>`);
-
-        const base = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
-        const totalFine = emp.stats.totalPenalty + (emp.stats.cloudPenalty || 0);
-        const final = base + (emp.bonusAmount || 0) - totalFine;
-        
-        document.getElementById('detail-summary-box').innerHTML = `
-            <div class="financial-row"><span>Đơn giá:</span> <b>${emp.hourlyRate.toLocaleString()} đ/h</b></div>
-            <div class="financial-row"><span>Thưởng:</span> <b style="color:#34C759">+${emp.bonusAmount.toLocaleString()} đ</b></div>
-            <div class="financial-row"><span>Phạt (Trễ):</span> <b style="color:#FF3B30">-${totalFine.toLocaleString()} đ</b></div>
-            <div class="financial-row"><span>Lương gốc:</span> <b>${base.toLocaleString()} đ</b></div>
-            <div class="financial-row final-total"><span>LƯƠNG CUỐI:</span> <span>${final.toLocaleString()} đ</span></div>
-        `;
-        document.getElementById('detail-overlay').style.display = 'flex';
-    };
-
-    window.openSalaryModal = function() {
-        const tbody = document.getElementById('salary-body');
-        tbody.innerHTML = '';
-        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach(emp => {
-            const idx = allEmployees.indexOf(emp);
-            tbody.innerHTML += `<tr><td><div style="font-weight:600">${emp.name}</div><div style="font-size:11px;color:#8E8E93">ID: ${emp.id}</div></td><td><input type="number" class="input-table" placeholder="Nhập số..." value="${emp.hourlyRate || ''}" oninput="allEmployees[${idx}].hourlyRate=parseFloat(this.value)||0"></td></tr>`;
-        });
-        document.getElementById('salary-overlay').style.display = 'flex';
-    };
-
-    window.openBonusModal = function() {
-        const tbody = document.getElementById('bonus-body');
-        tbody.innerHTML = '';
-        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach(emp => {
-            const idx = allEmployees.indexOf(emp);
-            tbody.innerHTML += `<tr><td><div style="font-weight:600">${emp.name}</div></td><td><input type="number" class="input-table" placeholder="Tiền..." value="${emp.bonusAmount || ''}" oninput="allEmployees[${idx}].bonusAmount=parseFloat(this.value)||0"></td><td><input type="text" class="input-table" placeholder="Lý do..." value="${emp.bonusNote || ''}" oninput="allEmployees[${idx}].bonusNote=this.value"></td></tr>`;
-        });
-        document.getElementById('bonus-overlay').style.display = 'flex';
-    };
-
-    function closeAllModals() { document.querySelectorAll('[id$="-overlay"]').forEach(m => m.style.display = 'none'); }
-</script>
 </body>
 </html>
