@@ -65,13 +65,11 @@
             syncDataAfterUpload();
         });
 
-        // HÀM SỬA ĐỔI: So sánh và cộng dồn nhân viên mới
         window.saveEmployeesToFirebase = async function() {
             const visibleEmployees = allEmployees.filter(emp => emp.stats.totalMinutes > 0);
             if (visibleEmployees.length === 0) return alert("Không có dữ liệu nhân viên hiển thị!");
 
             try {
-                // 1. Lấy danh sách mới nhất đang có trên Firebase
                 const snapshot = await get(query(ref(db, 'employee_list'), limitToLast(1)));
                 let existingRecords = [];
                 
@@ -80,7 +78,6 @@
                     existingRecords = lastBatch.records || [];
                 }
 
-                // 2. Lọc ra những nhân viên chưa có trong danh sách cũ (dựa trên ID)
                 const newEmployees = visibleEmployees.filter(visEmp => 
                     !existingRecords.some(exEmp => String(exEmp.id) === String(visEmp.id))
                 );
@@ -89,7 +86,6 @@
                     return alert("Không có nhân viên mới nào để thêm!");
                 }
 
-                // 3. Cộng dồn và lưu bản ghi mới
                 const updatedData = [...existingRecords, ...newEmployees.map(emp => ({ id: emp.id, name: emp.name }))];
                 
                 await set(ref(db, 'employee_list/List_' + Date.now()), { 
@@ -245,6 +241,42 @@
         .btn-penalty { background: linear-gradient(135deg, #FF3B30, #d93025); }
         .btn-save-cloud { background: #007AFF; margin-top: 10px; padding: 12px; font-size: 14px; }
 
+        .stats-container {
+            display: none;
+            background: var(--ios-card);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid var(--ios-border);
+            box-shadow: var(--shadow-soft);
+            animation: fadeIn 0.5s ease;
+        }
+        .stats-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--ios-border);
+        }
+        .stats-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .stats-label { font-size: 14px; font-weight: 600; color: var(--ios-secondary-text); }
+        .stats-value { font-size: 16px; font-weight: 700; color: var(--ios-text); }
+        .stats-list { font-size: 13px; color: var(--ios-text); line-height: 1.5; background: #F2F2F7; padding: 10px; border-radius: 8px; margin-top: 4px; }
+        .color-red { color: var(--ios-red) !important; }
+        .color-orange { color: var(--ios-orange) !important; }
+        .color-blue { color: var(--ios-blue) !important; }
+
+        .stat-detail-row {
+            margin-bottom: 6px;
+            border-bottom: 1px dashed #d1d1d6;
+            padding-bottom: 4px;
+        }
+        .stat-detail-row:last-child { border-bottom: none; margin-bottom: 0; }
+
         #summary-table { 
             width: 100%; 
             border-collapse: separate; 
@@ -309,7 +341,7 @@
             position: relative; 
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Để thanh cuộn nằm trong body modal */
+            overflow: hidden; 
             box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
             animation: sheetUp 0.4s var(--bezier-ios);
         }
@@ -320,7 +352,6 @@
             padding-bottom: 20px;
         }
 
-        /* Footer cố định cho modal */
         .modal-footer {
             padding: 16px 0 env(safe-area-inset-bottom);
             border-top: 1px solid var(--ios-border);
@@ -416,6 +447,31 @@
         <input type="file" id="file-input" accept=".xlsx, .xls" />
     </div>
     
+    <div class="stats-container" id="stats-container">
+        <h3 style="margin-top:0; font-size:18px;">Thống Kê Vi Phạm & Chuyên Cần</h3>
+        <div class="stats-item">
+            <div class="stats-header">
+                <span class="stats-label">🚨 Đi trễ:</span>
+                <span class="stats-value color-red" id="count-late">0 người</span>
+            </div>
+            <div class="stats-list" id="list-late">Chưa có dữ liệu</div>
+        </div>
+        <div class="stats-item">
+            <div class="stats-header">
+                <span class="stats-label">⚠️ Chỉ chấm công 1 lần (Mất công):</span>
+                <span class="stats-value color-orange" id="count-once">0 người</span>
+            </div>
+            <div class="stats-list" id="list-once">Chưa có dữ liệu</div>
+        </div>
+        <div class="stats-item">
+            <div class="stats-header">
+                <span class="stats-label">🚫 Chấm công từ 3 lần (Mất công):</span>
+                <span class="stats-value color-red" id="count-triple">0 người</span>
+            </div>
+            <div class="stats-list" id="list-triple">Chưa có dữ liệu</div>
+        </div>
+    </div>
+
     <div class="action-bar" id="action-bar">
         <button class="btn-action btn-salary" onclick="window.openSalaryModal()">💰 Nhập Đơn Giá Lương</button>
         <button class="btn-action btn-bonus" onclick="window.openBonusModal()">🎁 Thưởng & Ghi Chú</button>
@@ -513,7 +569,8 @@
             if (row.some(c => String(c).includes("ID:"))) {
                 let emp = { 
                     id: row[2], name: row[9], attendanceRecords: [], lateDetails: [],
-                    stats: { totalMinutes: 0, totalPenalty: 0, cloudPenalty: 0 }, 
+                    onceDays: [], tripleDays: [],
+                    stats: { totalMinutes: 0, totalPenalty: 0, cloudPenalty: 0, countOnce: 0, countTriple: 0 }, 
                     hourlyRate: 0, bonusAmount: 0, bonusNote: "" 
                 };
                 allEmployees.push(emp);
@@ -521,22 +578,33 @@
                 if (nextRow) {
                     nextRow.forEach((cell, colIdx) => {
                         const times = String(cell).split(/[\s\n]+/).filter(t => t.includes(':'));
-                        if (times.length >= 2) {
-                            const firstTime = times[0];
-                            const [h, m] = firstTime.split(':').map(Number);
-                            const totalMins = h * 60 + m;
-                            const morningMark = 425; // 7:05
-                            const afternoonMark = 900; // 15:00
-                            const targetMark = Math.abs(totalMins - morningMark) < Math.abs(totalMins - afternoonMark) ? morningMark : afternoonMark;
-                            const diff = totalMins - targetMark;
-                            if (diff >= 1) {
-                                const fine = diff > 10 ? 200000 : 100000;
-                                emp.stats.totalPenalty += fine;
-                                emp.lateDetails.push(`Ngày ${currentDateHeaders[colIdx]}: Trễ ${diff}p (${firstTime}) - Phạt ${fine.toLocaleString()}đ`);
+                        if (times.length > 0) {
+                            const dayNum = currentDateHeaders[colIdx];
+                            if (times.length === 2) {
+                                const firstTime = times[0];
+                                const [h, m] = firstTime.split(':').map(Number);
+                                const totalMins = h * 60 + m;
+                                const morningMark = 425; 
+                                const afternoonMark = 900; 
+                                const targetMark = Math.abs(totalMins - morningMark) < Math.abs(totalMins - afternoonMark) ? morningMark : afternoonMark;
+                                const diff = totalMins - targetMark;
+                                if (diff >= 1) {
+                                    const fine = diff > 10 ? 200000 : 100000;
+                                    emp.stats.totalPenalty += fine;
+                                    emp.lateDetails.push(`Ngày ${dayNum}: Trễ ${diff}p (${firstTime}) - Phạt ${fine.toLocaleString()}đ`);
+                                }
+                                const [eH, eM] = times[1].split(':').map(Number);
+                                emp.stats.totalMinutes += (eH * 60 + eM) - totalMins;
+                                emp.attendanceRecords.push({ day: dayNum, time: times[0] + "\n" + times[1] });
+                            } else if (times.length === 1) {
+                                emp.stats.countOnce++;
+                                emp.onceDays.push(`Ngày ${dayNum} (${times[0]})`);
+                                emp.attendanceRecords.push({ day: dayNum, time: times[0] + "\n(Mất công)" });
+                            } else if (times.length >= 3) {
+                                emp.stats.countTriple++;
+                                emp.tripleDays.push(`Ngày ${dayNum} (${times.length} lần)`);
+                                emp.attendanceRecords.push({ day: dayNum, time: times.length + " lần\n(Mất công)" });
                             }
-                            const [eH, eM] = times[times.length-1].split(':').map(Number);
-                            emp.stats.totalMinutes += (eH * 60 + eM) - totalMins;
-                            emp.attendanceRecords.push({ day: currentDateHeaders[colIdx], time: times[0] + "\n" + times[times.length-1] });
                         }
                     });
                 }
@@ -544,6 +612,57 @@
         });
         syncDataAfterUpload();
         displaySummary();
+        displayAdvancedStats();
+    }
+
+    function displayAdvancedStats() {
+        const lateEmps = allEmployees.filter(e => e.lateDetails.length > 0);
+        const onceEmps = allEmployees.filter(e => e.onceDays.length > 0);
+        const tripleEmps = allEmployees.filter(e => e.tripleDays.length > 0);
+
+        // Hiển thị danh sách đi trễ kèm ngày
+        const lateList = document.getElementById('list-late');
+        if (lateEmps.length > 0) {
+            lateList.innerHTML = lateEmps.map(e => `
+                <div class="stat-detail-row">
+                    <b>${e.name}:</b> ${e.lateDetails.map(d => d.split(':')[0]).join(", ")}
+                </div>
+            `).join("");
+            document.getElementById('count-late').innerText = lateEmps.length + " người";
+        } else {
+            lateList.innerText = "Không có";
+            document.getElementById('count-late').innerText = "0 người";
+        }
+
+        // Hiển thị danh sách 1 lần kèm ngày
+        const onceList = document.getElementById('list-once');
+        if (onceEmps.length > 0) {
+            onceList.innerHTML = onceEmps.map(e => `
+                <div class="stat-detail-row">
+                    <b>${e.name}:</b> ${e.onceDays.join(", ")}
+                </div>
+            `).join("");
+            document.getElementById('count-once').innerText = onceEmps.length + " người";
+        } else {
+            onceList.innerText = "Không có";
+            document.getElementById('count-once').innerText = "0 người";
+        }
+
+        // Hiển thị danh sách 3 lần kèm ngày
+        const tripleList = document.getElementById('list-triple');
+        if (tripleEmps.length > 0) {
+            tripleList.innerHTML = tripleEmps.map(e => `
+                <div class="stat-detail-row">
+                    <b>${e.name}:</b> ${e.tripleDays.join(", ")}
+                </div>
+            `).join("");
+            document.getElementById('count-triple').innerText = tripleEmps.length + " người";
+        } else {
+            tripleList.innerText = "Không có";
+            document.getElementById('count-triple').innerText = "0 người";
+        }
+
+        document.getElementById('stats-container').style.display = 'block';
     }
 
     function syncDataAfterUpload() {
@@ -561,7 +680,7 @@
     function displaySummary() {
         const tbody = document.getElementById('summary-body');
         tbody.innerHTML = '';
-        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach((emp) => {
+        allEmployees.filter(e => e.attendanceRecords.length > 0).forEach((emp) => {
             tbody.innerHTML += `<tr><td>ID: ${emp.id}</td><td class="emp-name-btn" onclick="openDetailModal(${allEmployees.indexOf(emp)})">${emp.name}</td><td>${Math.floor(emp.stats.totalMinutes/60)} giờ công</td></tr>`;
         });
         document.getElementById('summary-table').style.display = 'table';
@@ -592,7 +711,7 @@
     window.openSalaryModal = function() {
         const tbody = document.getElementById('salary-body');
         tbody.innerHTML = '';
-        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach(emp => {
+        allEmployees.filter(e => e.attendanceRecords.length > 0).forEach(emp => {
             const idx = allEmployees.indexOf(emp);
             tbody.innerHTML += `<tr><td><div style="font-weight:600">${emp.name}</div><div style="font-size:11px;color:#8E8E93">ID: ${emp.id}</div></td><td><input type="number" class="input-table" placeholder="Nhập số..." value="${emp.hourlyRate || ''}" oninput="allEmployees[${idx}].hourlyRate=parseFloat(this.value)||0"></td></tr>`;
         });
@@ -602,7 +721,7 @@
     window.openBonusModal = function() {
         const tbody = document.getElementById('bonus-body');
         tbody.innerHTML = '';
-        allEmployees.filter(e => e.stats.totalMinutes > 0).forEach(emp => {
+        allEmployees.filter(e => e.attendanceRecords.length > 0).forEach(emp => {
             const idx = allEmployees.indexOf(emp);
             tbody.innerHTML += `<tr><td><div style="font-weight:600">${emp.name}</div></td><td><input type="number" class="input-table" placeholder="Tiền..." value="${emp.bonusAmount || ''}" oninput="allEmployees[${idx}].bonusAmount=parseFloat(this.value)||0"></td><td><input type="text" class="input-table" placeholder="Lý do..." value="${emp.bonusNote || ''}" oninput="allEmployees[${idx}].bonusNote=this.value"></td></tr>`;
         });
