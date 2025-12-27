@@ -65,20 +65,45 @@
             syncDataAfterUpload();
         });
 
-        // HÀM SỬA ĐỔI: Chỉ lưu những nhân viên đang hiển thị trên web (có giờ công > 0)
-        window.saveEmployeesToFirebase = function() {
+        // HÀM SỬA ĐỔI: So sánh và cộng dồn nhân viên mới
+        window.saveEmployeesToFirebase = async function() {
             const visibleEmployees = allEmployees.filter(emp => emp.stats.totalMinutes > 0);
-            
             if (visibleEmployees.length === 0) return alert("Không có dữ liệu nhân viên hiển thị!");
-            
-            const data = visibleEmployees.map(emp => ({ id: emp.id, name: emp.name }));
-            
-            set(ref(db, 'employee_list/List_' + Date.now()), { 
-                records: data, 
-                createdAt: new Date().toLocaleString(),
-                total: data.length 
-            })
-            .then(() => alert("✅ Đã lưu danh sách nhân viên đang hiển thị!"));
+
+            try {
+                // 1. Lấy danh sách mới nhất đang có trên Firebase
+                const snapshot = await get(query(ref(db, 'employee_list'), limitToLast(1)));
+                let existingRecords = [];
+                
+                if (snapshot.exists()) {
+                    const lastBatch = Object.values(snapshot.val())[0];
+                    existingRecords = lastBatch.records || [];
+                }
+
+                // 2. Lọc ra những nhân viên chưa có trong danh sách cũ (dựa trên ID)
+                const newEmployees = visibleEmployees.filter(visEmp => 
+                    !existingRecords.some(exEmp => String(exEmp.id) === String(visEmp.id))
+                );
+
+                if (newEmployees.length === 0) {
+                    return alert("Không có nhân viên mới nào để thêm!");
+                }
+
+                // 3. Cộng dồn và lưu bản ghi mới
+                const updatedData = [...existingRecords, ...newEmployees.map(emp => ({ id: emp.id, name: emp.name }))];
+                
+                await set(ref(db, 'employee_list/List_' + Date.now()), { 
+                    records: updatedData, 
+                    createdAt: new Date().toLocaleString(),
+                    total: updatedData.length,
+                    addedCount: newEmployees.length
+                });
+
+                alert(`✅ Đã cộng dồn thêm ${newEmployees.length} nhân viên mới!`);
+            } catch (error) {
+                console.error(error);
+                alert("Lỗi khi lưu danh sách!");
+            }
         };
 
         window.saveSalaryToFirebase = function() {
@@ -282,9 +307,26 @@
             border-radius: var(--radius-xl) var(--radius-xl) 0 0; 
             padding: 24px; 
             position: relative; 
-            overflow-y: auto; 
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Để thanh cuộn nằm trong body modal */
             box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
             animation: sheetUp 0.4s var(--bezier-ios);
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            flex: 1;
+            padding-bottom: 20px;
+        }
+
+        /* Footer cố định cho modal */
+        .modal-footer {
+            padding: 16px 0 env(safe-area-inset-bottom);
+            border-top: 1px solid var(--ios-border);
+            background: white;
+            display: flex;
+            gap: 10px;
         }
 
         #detail-overlay .modal-content {
@@ -299,6 +341,7 @@
             font-size: 28px; 
             font-weight: 600;
             cursor: pointer; 
+            z-index: 10;
             color: #C7C7CC; 
         }
 
@@ -387,21 +430,25 @@
 <div id="detail-overlay">
     <div class="modal-content">
         <span class="close-btn" onclick="closeAllModals()">&times;</span>
-        <h3 id="detail-title" style="text-align:center; font-size: 22px; margin-bottom: 20px;"></h3>
-        <div class="attendance-grid" id="detail-grid"></div>
-        <div class="financial-summary" id="detail-summary-box"></div>
+        <div class="modal-body">
+            <h3 id="detail-title" style="text-align:center; font-size: 22px; margin-bottom: 20px;"></h3>
+            <div class="attendance-grid" id="detail-grid"></div>
+            <div class="financial-summary" id="detail-summary-box"></div>
+        </div>
     </div>
 </div>
 
 <div id="salary-overlay">
     <div class="modal-content">
         <span class="close-btn" onclick="closeAllModals()">&times;</span>
-        <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Đơn Giá Lương</h3>
-        <table>
-            <thead><tr><th>Tên</th><th>Đơn giá (đ/h)</th></tr></thead>
-            <tbody id="salary-body"></tbody>
-        </table>
-        <div style="display:flex; gap:10px;">
+        <div class="modal-body">
+            <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Đơn Giá Lương</h3>
+            <table>
+                <thead><tr><th>Tên</th><th>Đơn giá (đ/h)</th></tr></thead>
+                <tbody id="salary-body"></tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
             <button class="btn-action btn-save-cloud" style="flex:1" onclick="window.saveSalaryToFirebase()">💾 Lưu Đơn Giá</button>
             <button class="btn-action btn-save-cloud" style="flex:1; background:#5856D6;" onclick="window.saveEmployeesToFirebase()">👤 Lưu Danh Sách NV</button>
         </div>
@@ -411,24 +458,32 @@
 <div id="bonus-overlay">
     <div class="modal-content">
         <span class="close-btn" onclick="closeAllModals()">&times;</span>
-        <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Thưởng & Ghi Chú</h3>
-        <table>
-            <thead><tr><th>Tên</th><th>Thưởng</th><th>Ghi chú</th></tr></thead>
-            <tbody id="bonus-body"></tbody>
-        </table>
-        <button class="btn-action btn-save-cloud" onclick="window.saveBonusToFirebase()">💾 Lưu Thưởng</button>
+        <div class="modal-body">
+            <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Thưởng & Ghi Chú</h3>
+            <table>
+                <thead><tr><th>Tên</th><th>Thưởng</th><th>Ghi chú</th></tr></thead>
+                <tbody id="bonus-body"></tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-action btn-save-cloud" style="width:100%" onclick="window.saveBonusToFirebase()">💾 Lưu Thưởng</button>
+        </div>
     </div>
 </div>
 
 <div id="penalty-overlay">
     <div class="modal-content">
         <span class="close-btn" onclick="closeAllModals()">&times;</span>
-        <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Danh Sách Phạt Trễ</h3>
-        <table style="font-size:12px;">
-            <thead><tr><th>Tên nhân viên</th><th>Chi tiết vi phạm</th><th style="text-align:right">Tổng phạt</th></tr></thead>
-            <tbody id="penalty-body"></tbody>
-        </table>
-        <button class="btn-action btn-save-cloud" onclick="window.savePenaltyToFirebase()">💾 Chốt Phạt & Lưu Cloud</button>
+        <div class="modal-body">
+            <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Danh Sách Phạt Trễ</h3>
+            <table style="font-size:12px;">
+                <thead><tr><th>Tên nhân viên</th><th>Chi tiết vi phạm</th><th style="text-align:right">Tổng phạt</th></tr></thead>
+                <tbody id="penalty-body"></tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-action btn-save-cloud" style="width:100%" onclick="window.savePenaltyToFirebase()">💾 Chốt Phạt & Lưu Cloud</button>
+        </div>
     </div>
 </div>
 
