@@ -8,7 +8,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Quản Lý Lương">
     
-    <link rel="apple-touch-icon" href="https://via.placeholder.com/180">
+    <link rel="apple-touch-icon" href="icon.jpg">
+    <link rel="icon" type="image/jpeg" href="icon.jpg">
+    <link rel="shortcut icon" href="icon.jpg">
 
     <title>Quản Lý Lương & Thưởng Phạt</title>
     <style>
@@ -30,7 +32,6 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
-            /* Chống chọn văn bản để giống app hơn */
             -webkit-user-select: none;
             user-select: none;
         }
@@ -44,10 +45,9 @@
             flex-direction: column;
             overflow: hidden;
             -webkit-font-smoothing: antialiased;
-            position: fixed; /* Chống cuộn toàn trang */
+            position: fixed;
         }
 
-        /* MÀN HÌNH CHỌN (HOME) */
         #home-screen {
             display: flex;
             flex-direction: column;
@@ -125,7 +125,6 @@
             font-size: 15px;
         }
 
-        /* GIAO DIỆN CHỨC NĂNG (MAIN) */
         #main-app {
             display: none;
             flex-direction: column;
@@ -138,7 +137,6 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 10px 16px;
-            /* Quan trọng: Tránh tai thỏ */
             padding-top: env(safe-area-inset-top); 
             display: flex;
             align-items: center;
@@ -179,7 +177,6 @@
             border: none;
         }
 
-        /* Bottom Tab Bar cho iPhone tràn viền */
         .tab-bar {
             padding-bottom: env(safe-area-inset-bottom);
             height: calc(60px + env(safe-area-inset-bottom));
@@ -297,7 +294,6 @@
 
         function switchTab(url, pageTitle, tabIndex) {
             title.innerText = pageTitle;
-            // Tránh load lại nếu đang ở tab đó
             if(frame.src.indexOf(url) === -1) {
                 frame.src = url;
             }
@@ -315,7 +311,6 @@
             }, 10);
         }
 
-        // Chống kéo để reload (Pull-to-refresh) trên Safari
         document.body.addEventListener('touchmove', function(e) {
             if (e.touches.length > 1) e.preventDefault();
         }, {passive: false});
