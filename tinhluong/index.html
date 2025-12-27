@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Quản Lý Lương">
+    
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180">
+
     <title>Quản Lý Lương & Thưởng Phạt</title>
     <style>
         :root {
@@ -10,7 +17,7 @@
             --ios-gray: #8E8E93;
             --ios-bg: #F2F2F7;
             --ios-card-bg: #FFFFFF;
-            --ios-tab-bg: rgba(255, 255, 255, 0.85);
+            --ios-tab-bg: rgba(255, 255, 255, 0.88);
             --ios-border: rgba(0, 0, 0, 0.1);
             --ios-text: #000000;
             --ios-text-secondary: #636366;
@@ -23,16 +30,21 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            /* Chống chọn văn bản để giống app hơn */
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
             background-color: var(--ios-bg);
             color: var(--ios-text);
             height: 100vh;
+            width: 100vw;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             -webkit-font-smoothing: antialiased;
+            position: fixed; /* Chống cuộn toàn trang */
         }
 
         /* MÀN HÌNH CHỌN (HOME) */
@@ -43,6 +55,7 @@
             align-items: center;
             height: 100%;
             padding: 30px;
+            padding-top: env(safe-area-inset-top);
             background-color: var(--ios-bg);
             position: absolute;
             width: 100%;
@@ -57,65 +70,59 @@
         }
 
         .welcome-text h2 {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: #1c1c1e;
-            margin-bottom: 8px;
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #000;
         }
 
         .welcome-text p {
             color: var(--ios-text-secondary);
             font-size: 17px;
-            font-weight: 400;
         }
 
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 16px;
             width: 100%;
-            max-width: 440px;
-            animation: fadeIn 0.8s var(--transition-bounce);
+            max-width: 400px;
         }
 
         .menu-card {
             background: var(--ios-card-bg);
             aspect-ratio: 1/1;
-            border-radius: 28px;
+            border-radius: 22px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
             cursor: pointer;
-            transition: all 0.3s var(--transition-bounce);
-            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.2s;
         }
 
         .menu-card:active {
-            transform: scale(0.92);
-            background-color: #f2f2f7;
+            transform: scale(0.9);
+            background-color: #E5E5EA;
         }
 
-        .menu-card .icon-wrapper {
-            width: 64px;
-            height: 64px;
-            border-radius: 16px;
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
-        /* Icon Colors */
-        .menu-card:nth-child(1) .icon-wrapper { background: #34C759; } /* Green for Money */
-        .menu-card:nth-child(2) .icon-wrapper { background: #5856D6; } /* Indigo for Reward/Fine */
+        .menu-card:nth-child(1) .icon-wrapper { background: #34C759; }
+        .menu-card:nth-child(2) .icon-wrapper { background: #5856D6; }
 
         .menu-card span {
             font-weight: 600;
-            font-size: 16px;
-            color: #1c1c1e;
+            font-size: 15px;
         }
 
         /* GIAO DIỆN CHỨC NĂNG (MAIN) */
@@ -124,15 +131,15 @@
             flex-direction: column;
             height: 100vh;
             background-color: #fff;
-            animation: slideInRight 0.4s var(--transition-bounce);
         }
 
         header {
             background-color: var(--ios-tab-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 12px 16px;
-            padding-top: env(safe-area-inset-top);
+            padding: 10px 16px;
+            /* Quan trọng: Tránh tai thỏ */
+            padding-top: env(safe-area-inset-top); 
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -143,21 +150,12 @@
         .back-btn {
             color: var(--ios-blue);
             font-size: 17px;
-            font-weight: 400;
             background: none;
             border: none;
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 4px;
-        }
-
-        .back-btn svg {
-            fill: none;
-            stroke: var(--ios-blue);
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+            padding: 8px 0;
         }
 
         header h1 {
@@ -166,13 +164,13 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            color: #000;
+            bottom: 12px;
         }
 
         .content-container {
             flex: 1;
-            position: relative;
             background-color: #fff;
+            overflow: hidden;
         }
 
         iframe {
@@ -181,16 +179,17 @@
             border: none;
         }
 
-        /* Bottom Tab Bar */
+        /* Bottom Tab Bar cho iPhone tràn viền */
         .tab-bar {
-            height: 65px;
             padding-bottom: env(safe-area-inset-bottom);
+            height: calc(60px + env(safe-area-inset-bottom));
             background: var(--ios-tab-bg);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-around;
-            align-items: center;
+            align-items: flex-start;
+            padding-top: 10px;
             border-top: 0.5px solid var(--ios-border);
         }
 
@@ -202,9 +201,7 @@
             color: var(--ios-gray);
             font-size: 10px;
             font-weight: 500;
-            cursor: pointer;
             gap: 4px;
-            transition: color 0.2s;
         }
 
         .tab-item.active {
@@ -212,40 +209,15 @@
         }
 
         .tab-icon {
-            width: 26px;
-            height: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 24px;
+            height: 24px;
         }
 
-        .tab-icon svg {
-            width: 100%;
-            height: 100%;
-            fill: currentColor;
-        }
+        .tab-icon svg { width: 100%; height: 100%; fill: currentColor; }
 
-        /* Animations */
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideInRight {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-
-        /* Icons SVG SF Style */
-        .sf-icon {
-            width: 28px;
-            height: 28px;
-            fill: white;
         }
     </style>
 </head>
@@ -254,12 +226,12 @@
     <div id="home-screen">
         <div class="welcome-text">
             <h2>Hệ Thống</h2>
-            <p>Chọn chức năng để bắt đầu</p>
+            <p>Quản lý nội bộ Công ty</p>
         </div>
         <div class="menu-grid">
             <div class="menu-card" onclick="openApp('t.html', 'Tính Lương', 0)">
                 <div class="icon-wrapper">
-                    <svg class="sf-icon" viewBox="0 0 24 24">
+                    <svg style="width:30px;height:30px;fill:white" viewBox="0 0 24 24">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.21 1.87 1.15 0 1.94-.51 1.94-1.44 0-.85-.43-1.34-2.19-1.8-2.4-.63-3.66-1.71-3.66-3.58 0-1.78 1.14-2.9 2.8-3.3V4.5h2.67v1.94c1.23.21 2.5 1.02 2.76 2.53h-1.94c-.16-.83-.73-1.37-1.84-1.37-1.12 0-1.66.55-1.66 1.25 0 .76.47 1.2 2.22 1.63 2.1.51 3.63 1.55 3.63 3.59 0 1.91-1.28 3.16-3.34 3.52z"/>
                     </svg>
                 </div>
@@ -267,8 +239,8 @@
             </div>
             <div class="menu-card" onclick="openApp('b.html', 'Thưởng Phạt', 1)">
                 <div class="icon-wrapper">
-                    <svg class="sf-icon" viewBox="0 0 24 24">
-                        <path d="M12 3L4 9v2c0 5.25 3.41 10.19 8 11.5 4.59-1.31 8-6.25 8-11.5V9l-8-6zm0 10h-2v-2h2v2zm0-4h-2V7h2v2zm4 4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+                    <svg style="width:30px;height:30px;fill:white" viewBox="0 0 24 24">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14h2v2h-2v-2zm0-8h2v6h-2V7z"/>
                     </svg>
                 </div>
                 <span>Thưởng Phạt</span>
@@ -279,14 +251,13 @@
     <div id="main-app">
         <header>
             <button class="back-btn" onclick="goHome()">
-                <svg width="12" height="20" viewBox="0 0 12 20">
-                    <path d="M10 18L2 10L10 2" />
+                <svg width="12" height="21" viewBox="0 0 12 21" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 19L2 10.5L10 2" />
                 </svg>
-                Home
+                <span>Trở về</span>
             </button>
-            <h1 id="page-title">Tính Lương</h1>
-            <div style="width: 60px;"></div>
-        </header>
+            <h1 id="page-title">Tiêu đề</h1>
+            <div style="width: 70px;"></div> </header>
 
         <div class="content-container">
             <iframe id="display-frame" src="about:blank"></iframe>
@@ -309,7 +280,6 @@
     </div>
 
     <script>
-        // GIỮ NGUYÊN TOÀN BỘ LOGIC GỐC
         const homeScreen = document.getElementById('home-screen');
         const mainApp = document.getElementById('main-app');
         const frame = document.getElementById('display-frame');
@@ -317,18 +287,20 @@
 
         function openApp(url, pageTitle, tabIndex) {
             homeScreen.style.opacity = '0';
-            homeScreen.style.transform = 'scale(0.9)';
+            homeScreen.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 homeScreen.style.display = 'none';
                 mainApp.style.display = 'flex';
                 switchTab(url, pageTitle, tabIndex);
-            }, 300);
+            }, 250);
         }
 
         function switchTab(url, pageTitle, tabIndex) {
             title.innerText = pageTitle;
-            frame.src = url;
-
+            // Tránh load lại nếu đang ở tab đó
+            if(frame.src.indexOf(url) === -1) {
+                frame.src = url;
+            }
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + tabIndex).classList.add('active');
         }
@@ -343,12 +315,10 @@
             }, 10);
         }
 
-        window.addEventListener('popstate', function() {
-            if (mainApp.style.display === 'flex') {
-                goHome();
-            }
-        });
+        // Chống kéo để reload (Pull-to-refresh) trên Safari
+        document.body.addEventListener('touchmove', function(e) {
+            if (e.touches.length > 1) e.preventDefault();
+        }, {passive: false});
     </script>
-
 </body>
 </html>
