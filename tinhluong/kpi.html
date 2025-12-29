@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KPI Detail 2026</title>
+    <style>
+        :root {
+            --ios-blue: #007AFF;
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-secondary-text: #8E8E93;
+            --ios-separator: #C6C6C8;
+            --success: #34C759;
+            --warning: #FF9500;
+            --danger: #FF3B30;
+            --info: #5856D6;
+            --capy: #AF52DE;
+            --cat: #FF2D55;
+            --dog: #FF9500;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background: var(--ios-bg);
+            padding-bottom: 40px;
+        }
+
+        /* --- MÀN HÌNH CHÀO --- */
+        #welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--ios-bg);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+
+        .welcome-content {
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .welcome-logo { font-size: 60px; margin-bottom: 20px; }
+        .welcome-content h1 { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+        .welcome-content p { color: var(--ios-secondary-text); margin-bottom: 30px; }
+
+        /* --- NỘI DUNG CHÍNH --- */
+        #main-content { display: none; opacity: 0; transition: opacity 0.5s ease; }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(242, 242, 247, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px 16px 10px 16px;
+        }
+
+        .header h2 { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+
+        .staff-input-group { padding: 16px; }
+
+        label {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: var(--ios-secondary-text);
+            margin-bottom: 8px;
+            margin-left: 12px;
+            display: block;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            background: var(--ios-card);
+            border: none;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 17px;
+            margin-bottom: 4px;
+            box-sizing: border-box;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: var(--ios-secondary-text);
+            margin-left: 12px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .main-menu {
+            display: flex;
+            overflow-x: auto;
+            padding: 4px 16px 16px 16px;
+            gap: 8px;
+            scrollbar-width: none;
+        }
+        .main-menu::-webkit-scrollbar { display: none; }
+
+        .menu-btn {
+            white-space: nowrap;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: #E5E5EA;
+            color: var(--ios-text);
+            font-size: 14px;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .menu-btn.active {
+            background: var(--ios-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+
+        .form-section { padding: 0 16px; display: none; }
+        .form-section.active { display: block; animation: slideUp 0.4s ease-out; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reward-info {
+            background: #fff;
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            line-height: 1.4;
+            border-left: 4px solid var(--ios-blue);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .reward-spa { border-left-color: var(--success); }
+        .reward-media { border-left-color: var(--ios-blue); }
+        .reward-raccoon { border-left-color: var(--info); }
+        .reward-capy { border-left-color: var(--capy); }
+        .reward-cat { border-left-color: var(--cat); }
+        .reward-dog { border-left-color: var(--dog); }
+
+        .btn-add, .btn-continue {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-continue { background: var(--ios-blue); margin-top: 10px; }
+        .btn-add:active, .btn-continue:active { transform: scale(0.96); opacity: 0.8; }
+        
+        .btn-spa { background: var(--success); }
+        .btn-media { background: var(--ios-blue); }
+        .btn-raccoon { background: var(--info); }
+        .btn-capy { background: var(--capy); }
+        .btn-cat { background: var(--cat); }
+        .btn-dog { background: var(--dog); }
+
+        .summary { padding: 16px; }
+        .summary h3 { font-size: 22px; font-weight: 700; margin: 20px 0 12px 0; }
+
+        .staff-item {
+            background: var(--ios-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .staff-info { display: flex; justify-content: space-between; align-items: flex-start; }
+        .staff-name { font-size: 18px; font-weight: 700; }
+        .total-amount { font-size: 18px; font-weight: 800; color: var(--danger); }
+        .staff-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--ios-separator); }
+
+        .history { padding: 0 20px; margin-top: 10px; }
+        .history-item { font-size: 13px; color: var(--ios-secondary-text); margin-bottom: 4px; border-bottom: 0.5px solid var(--ios-separator); padding: 8px 0; }
+
+        .clear-btn { 
+            background: none; border: none; color: var(--danger); font-size: 13px; font-weight: 600; float: right; cursor: pointer; margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="welcome-screen">
+    <div class="welcome-content">
+        <div class="welcome-logo">📊</div>
+        <h1>Xin chào!</h1>
+        <p>Nhập tên nhân viên để bắt đầu.</p>
+        <input type="text" id="initialName" placeholder="Họ và tên..." style="text-align: center;">
+        <button class="btn-continue" onclick="startApp()">Tiếp tục</button>
+    </div>
+</div>
+
+<div class="container" id="main-content">
+    <div class="header">
+        <h2>KPI 2026</h2>
+    </div>
+
+    <div class="staff-input-group">
+        <label>NHÂN VIÊN:</label>
+        <input type="text" id="staffName" readonly style="background: transparent; box-shadow: none; font-weight: 700; padding-left: 12px; margin-bottom: 0;">
+    </div>
+
+    <div class="main-menu">
+        <button class="menu-btn active" onclick="showTab('spa-tab', this)">Spa & KS</button>
+        <button class="menu-btn" onclick="showTab('media-tab', this)">Media</button>
+        <button class="menu-btn" onclick="showTab('raccoon-tab', this)">Gấu Mèo</button>
+        <button class="menu-btn" onclick="showTab('capy-tab', this)">Capybara</button>
+        <button class="menu-btn" onclick="showTab('cat-tab', this)">Mèo (2%)</button>
+        <button class="menu-btn" onclick="showTab('dog-tab', this)">Chó (2-5%)</button>
+    </div>
+
+    <div id="spa-tab" class="form-section active">
+        <div class="reward-info reward-spa">🎁 <b>Thưởng:</b> Cắt tỉa 10%, Tắm 5-8%, KS 5%.</div>
+        <label>DỊCH VỤ</label>
+        <select id="spaService">
+            <option value="0.10">Cắt tỉa chó (10%)</option>
+            <option value="0.05">Tắm chó nhỏ < 10kg (5%)</option>
+            <option value="0.08">Tắm chó lớn > 10kg (8%)</option>
+            <option value="0.05">Khách sạn thú cưng (5%)</option>
+        </select>
+        <label>SỐ TIỀN THU</label>
+        <input type="number" id="spaAmount" placeholder="Ví dụ: 70000">
+        <span class="input-hint">🎯 KPI tối thiểu: 10 lượt Spa/tháng.</span>
+        <button class="btn-add btn-spa" onclick="addSpa()">+ Giao dịch Spa</button>
+    </div>
+
+    <div id="media-tab" class="form-section">
+        <div class="reward-info reward-media">🎬 <b>Thưởng:</b> 2Tr (~1Tr views), 4Tr (>2Tr views).</div>
+        <label>VIDEO ~1 TR VIEWS</label>
+        <input type="number" id="video1tr" value="0">
+        <span class="input-hint">Cộng 2.000.000đ mỗi video đạt mốc.</span>
+        <label>VIDEO >2 TR VIEWS</label>
+        <input type="number" id="video2tr" value="0">
+        <span class="input-hint">Cộng 4.000.000đ mỗi video đạt mốc.</span>
+        <button class="btn-add btn-media" onclick="addMedia()">+ Thưởng Video</button>
+    </div>
+
+    <div id="raccoon-tab" class="form-section">
+        <div class="reward-info reward-raccoon">🦝 <b>Hoa hồng:</b> 5% doanh thu bán Gấu Mèo.</div>
+        <label>DOANH THU</label>
+        <input type="number" id="raccoonAmount" placeholder="Ví dụ: 500000">
+        <span class="input-hint">🎯 KPI tối thiểu: 270 đơn hàng.</span>
+        <button class="btn-add btn-raccoon" onclick="addRaccoon()">+ Bán Gấu Mèo</button>
+    </div>
+
+    <div id="capy-tab" class="form-section">
+        <div class="reward-info reward-capy">🐹 <b>Hoa hồng:</b> 15% doanh thu Capybara.</div>
+        <label>DOANH THU</label>
+        <input type="number" id="capyAmount" placeholder="Ví dụ: 1000000">
+        <span class="input-hint">🎯 KPI tối thiểu: 14.000.000đ doanh thu.</span>
+        <button class="btn-add btn-capy" onclick="addCapy()">+ Doanh thu Capy</button>
+    </div>
+
+    <div id="cat-tab" class="form-section">
+        <div class="reward-info reward-cat">🐱 <b>Hoa hồng:</b> 2% doanh thu bán Mèo.</div>
+        <label>DOANH THU</label>
+        <input type="number" id="catAmount" placeholder="Ví dụ: 5000000">
+        <span class="input-hint">🎯 KPI tối thiểu: 15.000.000đ doanh thu.</span>
+        <button class="btn-add btn-cat" onclick="addCat()">+ Doanh thu Mèo</button>
+    </div>
+
+    <div id="dog-tab" class="form-section">
+        <div class="reward-info reward-dog">🐶 <b>Lũy tiến:</b> 40tr (2%) | Trên 65tr (5%).</div>
+        <label>DOANH THU</label>
+        <input type="number" id="dogAmount" placeholder="Ví dụ: 10000000">
+        <span class="input-hint">🎯 Điều kiện: Tối thiểu 40tr để nhận 2%, trên 65tr nhận 5%.</span>
+        <button class="btn-add btn-dog" onclick="addDog()">+ Doanh thu Chó</button>
+    </div>
+
+    <div class="summary">
+        <button class="clear-btn" onclick="clearData()">Xóa hết dữ liệu</button>
+        <h3>Danh sách tổng hợp</h3>
+        <div id="staffContainer" class="staff-list">
+            <p style="color: var(--ios-secondary-text); text-align: center;">Chưa có dữ liệu</p>
+        </div>
+    </div>
+
+    <div class="history" id="log">
+        <strong>LỊCH SỬ GẦN ĐÂY</strong>
+        <div id="logItems"></div>
+    </div>
+</div>
+
+<script>
+    // --- KHỞI TẠO DỮ LIỆU TỪ LOCALSTORAGE ---
+    let database = JSON.parse(localStorage.getItem('kpi_database_2026')) || {};
+
+    window.onload = function() {
+        updateUI();
+    };
+
+    function saveData() {
+        localStorage.setItem('kpi_database_2026', JSON.stringify(database));
+    }
+
+    function clearData() {
+        if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử?")) {
+            database = {};
+            saveData();
+            updateUI();
+            location.reload();
+        }
+    }
+
+    function startApp() {
+        const name = document.getElementById('initialName').value.trim();
+        if (!name) return alert("Vui lòng nhập tên!");
+        document.getElementById('staffName').value = name;
+        const welcome = document.getElementById('welcome-screen');
+        const main = document.getElementById('main-content');
+        welcome.style.opacity = '0';
+        setTimeout(() => {
+            welcome.style.display = 'none';
+            main.style.display = 'block';
+            setTimeout(() => { main.style.opacity = '1'; }, 50);
+        }, 500);
+    }
+
+    function showTab(tabId, btn) {
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    function format(n) { return n.toLocaleString('vi-VN'); }
+
+    function getStaffData(name) {
+        if (!name) return null;
+        const n = name.trim().toUpperCase();
+        if (!database[n]) {
+            database[n] = { 
+                spa:0, media:0, raccoon:0, capyHH:0, capyRev:0, 
+                catRev:0, catHH:0, dogRev:0, dogHH:0,
+                countSpa:0, countRac:0, history:[] 
+            };
+        }
+        return database[n];
+    }
+
+    function addSpa() {
+        const name = document.getElementById('staffName').value;
+        const amount = parseFloat(document.getElementById('spaAmount').value);
+        if(!name || !amount) return alert("Nhập đủ thông tin!");
+        const service = document.getElementById('spaService');
+        const hh = amount * parseFloat(service.value);
+        const staff = getStaffData(name);
+        staff.spa += hh;
+        if(!service.options[service.selectedIndex].text.includes("Khách sạn")) staff.countSpa += 1;
+        staff.history.push({msg: `${name} - Spa: +${format(hh)}đ (${new Date().toLocaleTimeString()})`});
+        saveData(); updateUI(); document.getElementById('spaAmount').value="";
+    }
+
+    function addMedia() {
+        const name = document.getElementById('staffName').value;
+        const v1 = parseInt(document.getElementById('video1tr').value)||0;
+        const v2 = parseInt(document.getElementById('video2tr').value)||0;
+        if(!name || (v1+v2===0)) return alert("Nhập số video!");
+        const bonus = (v1*2000000)+(v2*4000000);
+        const staff = getStaffData(name);
+        staff.media += bonus;
+        staff.history.push({msg: `${name} - Media: +${format(bonus)}đ (${new Date().toLocaleTimeString()})`});
+        saveData(); updateUI();
+        document.getElementById('video1tr').value = 0;
+        document.getElementById('video2tr').value = 0;
+    }
+
+    function addRaccoon() {
+        const name = document.getElementById('staffName').value;
+        const amount = parseFloat(document.getElementById('raccoonAmount').value);
+        if(!name || !amount) return alert("Nhập doanh thu!");
+        const staff = getStaffData(name);
+        staff.raccoon += (amount * 0.05);
+        staff.countRac += 1;
+        staff.history.push({msg: `${name} - Gấu mèo: +${format(amount*0.05)}đ`});
+        saveData(); updateUI(); document.getElementById('raccoonAmount').value="";
+    }
+
+    function addCapy() {
+        const name = document.getElementById('staffName').value;
+        const amount = parseFloat(document.getElementById('capyAmount').value);
+        if(!name || !amount) return alert("Nhập doanh thu!");
+        const staff = getStaffData(name);
+        staff.capyRev += amount;
+        staff.capyHH += (amount * 0.15);
+        staff.history.push({msg: `${name} - Capy: +${format(amount*0.15)}đ`});
+        saveData(); updateUI(); document.getElementById('capyAmount').value="";
+    }
+
+    function addCat() {
+        const name = document.getElementById('staffName').value;
+        const amount = parseFloat(document.getElementById('catAmount').value);
+        if(!name || !amount) return alert("Nhập doanh thu!");
+        const staff = getStaffData(name);
+        staff.catRev += amount;
+        staff.catHH += (amount * 0.02);
+        staff.history.push({msg: `${name} - Mèo: +${format(amount*0.02)}đ`});
+        saveData(); updateUI(); document.getElementById('catAmount').value="";
+    }
+
+    function addDog() {
+        const name = document.getElementById('staffName').value;
+        const amount = parseFloat(document.getElementById('dogAmount').value);
+        if(!name || !amount) return alert("Nhập doanh thu!");
+        const staff = getStaffData(name);
+        staff.dogRev += amount;
+        let rate = 0;
+        if (staff.dogRev >= 65000000) rate = 0.05;
+        else if (staff.dogRev >= 40000000) rate = 0.02;
+        staff.dogHH = staff.dogRev * rate;
+        staff.history.push({msg: `${name} - Chó: Thêm ${format(amount)}đ (HH: ${format(staff.dogHH)}đ)`});
+        saveData(); updateUI(); document.getElementById('dogAmount').value="";
+    }
+
+    function updateUI() {
+        const container = document.getElementById('staffContainer');
+        const logItems = document.getElementById('logItems');
+        container.innerHTML = "";
+        logItems.innerHTML = "";
+
+        let allHistory = [];
+
+        for (const [name, data] of Object.entries(database)) {
+            const total = data.spa + data.media + data.raccoon + data.capyHH + data.catHH + data.dogHH;
+            const detailId = `detail-${name.replace(/\s+/g, '')}`;
+            
+            // Gom lịch sử từ tất cả nhân viên
+            allHistory = allHistory.concat(data.history);
+
+            const staffBox = document.createElement('div');
+            staffBox.className = 'staff-item';
+            staffBox.style.padding = '16px';
+            staffBox.onclick = () => { 
+                const el = document.getElementById(detailId); 
+                el.style.display = el.style.display==='block'?'none':'block'; 
+            };
+            staffBox.innerHTML = `
+                <div class="staff-info">
+                    <div class="staff-name">${name}</div>
+                    <div class="total-amount">${format(total)} đ</div>
+                </div>
+                <div id="${detailId}" class="staff-details">
+                    <div>Spa: ${format(data.spa)}đ | Media: ${format(data.media)}đ</div>
+                    <div>Gấu: ${format(data.raccoon)}đ | Capy: ${format(data.capyHH)}đ</div>
+                    <div>Mèo: ${format(data.catHH)}đ | Chó: ${format(data.dogHH)}đ</div>
+                </div>`;
+            container.appendChild(staffBox);
+        }
+
+        // Hiển thị 10 mục lịch sử mới nhất
+        allHistory.slice(-10).reverse().forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerText = "• " + item.msg;
+            logItems.appendChild(div);
+        });
+
+        if (Object.keys(database).length === 0) {
+            container.innerHTML = '<p style="color: var(--ios-secondary-text); text-align: center;">Chưa có dữ liệu</p>';
+        }
+    }
+</script>
+</body>
+</html>
