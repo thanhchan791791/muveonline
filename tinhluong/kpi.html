@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KPI Detail 2026</title>
+    <title>KPI Detail 2026 - Firebase</title>
     <style>
         :root {
             --ios-blue: #007AFF;
@@ -216,6 +216,21 @@
 
         .history { padding: 0 20px; margin-top: 10px; }
         .history-item { font-size: 13px; color: var(--ios-secondary-text); margin-bottom: 4px; border-bottom: 0.5px solid var(--ios-separator); padding: 8px 0; }
+        
+        /* New Styles for Total Revenue Stats */
+        .revenue-stats {
+            background: #E5E5EA;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .revenue-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
 
         .clear-btn { 
             background: none; border: none; color: var(--danger); font-size: 13px; font-weight: 600; float: right; cursor: pointer; margin-top: 25px;
@@ -304,10 +319,10 @@
     </div>
 
     <div id="dog-tab" class="form-section">
-        <div class="reward-info reward-dog">🐶 <b>Lũy tiến:</b> 40tr (2%) | Trên 65tr (5%).</div>
+        <div class="reward-info reward-dog">🐶 <b>Lũy tiến:</b> 40tr (2%) | Trên 65tr (5% toàn bộ).</div>
         <label>DOANH THU</label>
         <input type="number" id="dogAmount" placeholder="Ví dụ: 10000000">
-        <span class="input-hint">🎯 Điều kiện: Tối thiểu 40tr để nhận 2%, trên 65tr nhận 5%.</span>
+        <span class="input-hint">🎯 Điều kiện: Từ 40tr nhận 2%, khi đạt trên 65tr tính lại 5% toàn bộ doanh thu.</span>
         <button class="btn-add btn-dog" onclick="addDog()">+ Doanh thu Chó</button>
     </div>
 
@@ -315,38 +330,58 @@
         <button class="clear-btn" onclick="clearData()">Xóa hết dữ liệu</button>
         <h3>Danh sách tổng hợp</h3>
         <div id="staffContainer" class="staff-list">
-            <p style="color: var(--ios-secondary-text); text-align: center;">Chưa có dữ liệu</p>
+            <p style="color: var(--ios-secondary-text); text-align: center;">Đang tải dữ liệu...</p>
         </div>
     </div>
 
     <div class="history" id="log">
-        <strong>LỊCH SỬ GẦN ĐÂY</strong>
+        <strong>THỐNG KÊ DOANH THU TÍCH LŨY</strong>
+        <div id="revenueSummary" style="margin-top: 10px;"></div>
+        
+        <strong style="display: block; margin-top: 20px;">LỊCH SỬ GẦN ĐÂY</strong>
         <div id="logItems"></div>
     </div>
 </div>
 
-<script>
-    // --- KHỞI TẠO DỮ LIỆU TỪ LOCALSTORAGE ---
-    let database = JSON.parse(localStorage.getItem('kpi_database_2026')) || {};
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    window.onload = function() {
-        updateUI();
+    const firebaseConfig = {
+        apiKey: "AIzaSyAV7r-rjXo6U62LX1AA7c7DAHb8GhOOOsg",
+        authDomain: "saigon-dalat.firebaseapp.com",
+        databaseURL: "https://saigon-dalat-default-rtdb.firebaseio.com",
+        projectId: "saigon-dalat",
+        storageBucket: "saigon-dalat.firebasestorage.app",
+        messagingSenderId: "339735183485",
+        appId: "1:339735183485:web:bc23cd740104d272577114",
+        measurementId: "G-FDLZXR2X8P"
     };
 
-    function saveData() {
-        localStorage.setItem('kpi_database_2026', JSON.stringify(database));
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, 'kpi_database_2026');
+
+    let database = {};
+
+    onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        database = data || {};
+        updateUI();
+    });
+
+    window.saveData = function() {
+        set(dbRef, database);
     }
 
-    function clearData() {
-        if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử?")) {
+    window.clearData = function() {
+        if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử trên hệ thống?")) {
             database = {};
-            saveData();
-            updateUI();
-            location.reload();
+            window.saveData();
         }
     }
 
-    function startApp() {
+    window.startApp = function() {
         const name = document.getElementById('initialName').value.trim();
         if (!name) return alert("Vui lòng nhập tên!");
         document.getElementById('staffName').value = name;
@@ -360,21 +395,21 @@
         }, 500);
     }
 
-    function showTab(tabId, btn) {
+    window.showTab = function(tabId, btn) {
         document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         btn.classList.add('active');
     }
 
-    function format(n) { return n.toLocaleString('vi-VN'); }
+    function format(n) { return n ? n.toLocaleString('vi-VN') : 0; }
 
     function getStaffData(name) {
         if (!name) return null;
         const n = name.trim().toUpperCase();
         if (!database[n]) {
             database[n] = { 
-                spa:0, media:0, raccoon:0, capyHH:0, capyRev:0, 
+                spa:0, spaRev:0, media:0, raccoon:0, racRev:0, capyHH:0, capyRev:0, 
                 catRev:0, catHH:0, dogRev:0, dogHH:0,
                 countSpa:0, countRac:0, history:[] 
             };
@@ -382,98 +417,115 @@
         return database[n];
     }
 
-    function addSpa() {
+    window.addSpa = function() {
         const name = document.getElementById('staffName').value;
         const amount = parseFloat(document.getElementById('spaAmount').value);
         if(!name || !amount) return alert("Nhập đủ thông tin!");
         const service = document.getElementById('spaService');
         const hh = amount * parseFloat(service.value);
         const staff = getStaffData(name);
-        staff.spa += hh;
-        if(!service.options[service.selectedIndex].text.includes("Khách sạn")) staff.countSpa += 1;
+        staff.spa = (staff.spa || 0) + hh;
+        staff.spaRev = (staff.spaRev || 0) + amount;
+        if(!service.options[service.selectedIndex].text.includes("Khách sạn")) staff.countSpa = (staff.countSpa || 0) + 1;
+        if(!staff.history) staff.history = [];
         staff.history.push({msg: `${name} - Spa: +${format(hh)}đ (${new Date().toLocaleTimeString()})`});
-        saveData(); updateUI(); document.getElementById('spaAmount').value="";
+        window.saveData(); 
+        document.getElementById('spaAmount').value="";
     }
 
-    function addMedia() {
+    window.addMedia = function() {
         const name = document.getElementById('staffName').value;
         const v1 = parseInt(document.getElementById('video1tr').value)||0;
         const v2 = parseInt(document.getElementById('video2tr').value)||0;
         if(!name || (v1+v2===0)) return alert("Nhập số video!");
         const bonus = (v1*2000000)+(v2*4000000);
         const staff = getStaffData(name);
-        staff.media += bonus;
+        staff.media = (staff.media || 0) + bonus;
+        if(!staff.history) staff.history = [];
         staff.history.push({msg: `${name} - Media: +${format(bonus)}đ (${new Date().toLocaleTimeString()})`});
-        saveData(); updateUI();
+        window.saveData();
         document.getElementById('video1tr').value = 0;
         document.getElementById('video2tr').value = 0;
     }
 
-    function addRaccoon() {
+    window.addRaccoon = function() {
         const name = document.getElementById('staffName').value;
         const amount = parseFloat(document.getElementById('raccoonAmount').value);
         if(!name || !amount) return alert("Nhập doanh thu!");
         const staff = getStaffData(name);
-        staff.raccoon += (amount * 0.05);
-        staff.countRac += 1;
+        staff.raccoon = (staff.raccoon || 0) + (amount * 0.05);
+        staff.racRev = (staff.racRev || 0) + amount;
+        staff.countRac = (staff.countRac || 0) + 1;
+        if(!staff.history) staff.history = [];
         staff.history.push({msg: `${name} - Gấu mèo: +${format(amount*0.05)}đ`});
-        saveData(); updateUI(); document.getElementById('raccoonAmount').value="";
+        window.saveData(); 
+        document.getElementById('raccoonAmount').value="";
     }
 
-    function addCapy() {
+    window.addCapy = function() {
         const name = document.getElementById('staffName').value;
         const amount = parseFloat(document.getElementById('capyAmount').value);
         if(!name || !amount) return alert("Nhập doanh thu!");
         const staff = getStaffData(name);
-        staff.capyRev += amount;
-        staff.capyHH += (amount * 0.15);
+        staff.capyRev = (staff.capyRev || 0) + amount;
+        staff.capyHH = (staff.capyRev * 0.15);
+        if(!staff.history) staff.history = [];
         staff.history.push({msg: `${name} - Capy: +${format(amount*0.15)}đ`});
-        saveData(); updateUI(); document.getElementById('capyAmount').value="";
+        window.saveData(); 
+        document.getElementById('capyAmount').value="";
     }
 
-    function addCat() {
+    window.addCat = function() {
         const name = document.getElementById('staffName').value;
         const amount = parseFloat(document.getElementById('catAmount').value);
         if(!name || !amount) return alert("Nhập doanh thu!");
         const staff = getStaffData(name);
-        staff.catRev += amount;
-        staff.catHH += (amount * 0.02);
+        staff.catRev = (staff.catRev || 0) + amount;
+        staff.catHH = (staff.catRev * 0.02);
+        if(!staff.history) staff.history = [];
         staff.history.push({msg: `${name} - Mèo: +${format(amount*0.02)}đ`});
-        saveData(); updateUI(); document.getElementById('catAmount').value="";
+        window.saveData(); 
+        document.getElementById('catAmount').value="";
     }
 
-    function addDog() {
+    window.addDog = function() {
         const name = document.getElementById('staffName').value;
         const amount = parseFloat(document.getElementById('dogAmount').value);
         if(!name || !amount) return alert("Nhập doanh thu!");
         const staff = getStaffData(name);
-        staff.dogRev += amount;
+        staff.dogRev = (staff.dogRev || 0) + amount;
         let rate = 0;
-        if (staff.dogRev >= 65000000) rate = 0.05;
-        else if (staff.dogRev >= 40000000) rate = 0.02;
+        if (staff.dogRev > 65000000) { rate = 0.05; } 
+        else if (staff.dogRev >= 40000000) { rate = 0.02; }
         staff.dogHH = staff.dogRev * rate;
-        staff.history.push({msg: `${name} - Chó: Thêm ${format(amount)}đ (HH: ${format(staff.dogHH)}đ)`});
-        saveData(); updateUI(); document.getElementById('dogAmount').value="";
+        if(!staff.history) staff.history = [];
+        staff.history.push({ msg: `${name} - Chó: +${format(amount)}đ (Tổng HH mới: ${format(staff.dogHH)}đ)` });
+        window.saveData(); 
+        document.getElementById('dogAmount').value="";
     }
 
     function updateUI() {
         const container = document.getElementById('staffContainer');
         const logItems = document.getElementById('logItems');
+        const revenueSummary = document.getElementById('revenueSummary');
+        if(!container || !logItems || !revenueSummary) return;
+        
         container.innerHTML = "";
         logItems.innerHTML = "";
+        revenueSummary.innerHTML = "";
 
         let allHistory = [];
 
         for (const [name, data] of Object.entries(database)) {
-            const total = data.spa + data.media + data.raccoon + data.capyHH + data.catHH + data.dogHH;
-            const detailId = `detail-${name.replace(/\s+/g, '')}`;
+            const totalCommission = (data.spa||0) + (data.media||0) + (data.raccoon||0) + (data.capyHH||0) + (data.catHH||0) + (data.dogHH||0);
+            const totalRev = (data.spaRev||0) + (data.racRev||0) + (data.capyRev||0) + (data.catRev||0) + (data.dogRev||0);
             
-            // Gom lịch sử từ tất cả nhân viên
-            allHistory = allHistory.concat(data.history);
+            const detailId = `detail-${name.replace(/\s+/g, '')}`;
+            if(data.history) allHistory = allHistory.concat(data.history);
 
+            // 1. Update Main List
             const staffBox = document.createElement('div');
             staffBox.className = 'staff-item';
-            staffBox.style.padding = '16px';
             staffBox.onclick = () => { 
                 const el = document.getElementById(detailId); 
                 el.style.display = el.style.display==='block'?'none':'block'; 
@@ -481,17 +533,29 @@
             staffBox.innerHTML = `
                 <div class="staff-info">
                     <div class="staff-name">${name}</div>
-                    <div class="total-amount">${format(total)} đ</div>
+                    <div class="total-amount">${format(totalCommission)} đ</div>
                 </div>
                 <div id="${detailId}" class="staff-details">
                     <div>Spa: ${format(data.spa)}đ | Media: ${format(data.media)}đ</div>
                     <div>Gấu: ${format(data.raccoon)}đ | Capy: ${format(data.capyHH)}đ</div>
                     <div>Mèo: ${format(data.catHH)}đ | Chó: ${format(data.dogHH)}đ</div>
+                    <div style="font-size:11px; color:var(--ios-secondary-text); margin-top:5px;">Tổng doanh thu đã nhập: ${format(totalRev)}đ</div>
                 </div>`;
             container.appendChild(staffBox);
+
+            // 2. Update Revenue Stats Section
+            const revBox = document.createElement('div');
+            revBox.className = 'revenue-stats';
+            revBox.innerHTML = `
+                <div class="revenue-row">
+                    <span>${name}</span>
+                    <span style="color:var(--ios-blue)">${format(totalRev)} đ</span>
+                </div>
+            `;
+            revenueSummary.appendChild(revBox);
         }
 
-        // Hiển thị 10 mục lịch sử mới nhất
+        // 3. Update Log
         allHistory.slice(-10).reverse().forEach(item => {
             const div = document.createElement('div');
             div.className = 'history-item';
@@ -501,6 +565,7 @@
 
         if (Object.keys(database).length === 0) {
             container.innerHTML = '<p style="color: var(--ios-secondary-text); text-align: center;">Chưa có dữ liệu</p>';
+            revenueSummary.innerHTML = '<p style="font-size:12px; color:var(--ios-secondary-text);">Chưa có thống kê</p>';
         }
     }
 </script>
