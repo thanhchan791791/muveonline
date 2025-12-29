@@ -18,12 +18,13 @@
             --ios-blue: #007AFF;
             --ios-gray: #8E8E93;
             --ios-bg: #F2F2F7;
-            --ios-card-bg: #FFFFFF;
+            --ios-card-bg: rgba(255, 255, 255, 0.94);
             --ios-tab-bg: rgba(255, 255, 255, 0.88);
-            --ios-border: rgba(0, 0, 0, 0.1);
+            --ios-border: rgba(0, 0, 0, 0.08);
             --ios-text: #000000;
-            --ios-text-secondary: #636366;
-            --transition-bounce: cubic-bezier(0.4, 0, 0.2, 1);
+            --ios-text-secondary: #8E8E93;
+            --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -48,72 +49,147 @@
             position: fixed;
         }
 
-        /* Login Screen Styles */
+        /* --- MODERN LOGIN SCREEN STYLES --- */
         #login-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--ios-bg);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             z-index: 1000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 30px;
+            padding: 20px;
+            transition: opacity 0.5s var(--transition-smooth), transform 0.5s var(--transition-smooth);
+        }
+
+        /* Background blur circles for modern look */
+        .bg-blur {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(0, 122, 255, 0.15);
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: -1;
+            animation: floating 8s infinite alternate;
+        }
+
+        @keyframes floating {
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(10%, 10%); }
         }
 
         .login-box {
             width: 100%;
-            max-width: 350px;
+            max-width: 380px;
             background: var(--ios-card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 40px 24px;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
             text-align: center;
+            border: 1px solid rgba(255,255,255,0.4);
+            animation: loginEntry 0.8s var(--transition-bounce);
+        }
+
+        @keyframes loginEntry {
+            from { opacity: 0; transform: translateY(40px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+            font-size: 40px;
         }
 
         .login-box h2 {
-            margin-bottom: 25px;
-            font-size: 24px;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .login-box p.subtitle {
+            color: var(--ios-text-secondary);
+            margin-bottom: 32px;
+            font-size: 15px;
         }
 
         .input-group {
-            margin-bottom: 15px;
-            text-align: left;
+            margin-bottom: 16px;
+            position: relative;
         }
 
         .input-group input {
             width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 1px solid var(--ios-border);
-            background: #f9f9f9;
-            font-size: 16px;
+            padding: 16px 20px;
+            border-radius: 14px;
+            border: 1px solid transparent;
+            background: rgba(0, 0, 0, 0.04);
+            font-size: 17px;
             outline: none;
+            transition: all 0.3s;
             -webkit-user-select: text;
             user-select: text;
         }
 
+        .input-group input:focus {
+            background: white;
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
         .login-btn {
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             background: var(--ios-blue);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
             font-size: 17px;
             font-weight: 600;
-            margin-top: 10px;
+            margin-top: 12px;
             cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 8px 16px rgba(0, 122, 255, 0.25);
         }
 
-        .login-btn:active { opacity: 0.8; }
+        .login-btn:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
 
-        /* Home Screen Styles */
+        #login-error {
+            color: #FF3B30;
+            font-size: 14px;
+            margin-top: 16px;
+            font-weight: 500;
+            display: none;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* --- HOME & MAIN APP STYLES --- */
         #home-screen {
-            display: none; /* Hidden by default */
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -124,7 +200,7 @@
             position: absolute;
             width: 100%;
             z-index: 200;
-            transition: all 0.4s var(--transition-bounce);
+            transition: all 0.5s var(--transition-smooth);
         }
 
         .welcome-text {
@@ -156,14 +232,15 @@
         .menu-card {
             background: var(--ios-card-bg);
             aspect-ratio: 1/1;
-            border-radius: 22px;
+            border-radius: 28px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.04);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.3s var(--transition-bounce), background-color 0.2s;
+            border: 0.5px solid var(--ios-border);
         }
 
         .menu-card:active {
@@ -172,22 +249,24 @@
         }
 
         .icon-wrapper {
-            width: 60px;
-            height: 60px;
-            border-radius: 14px;
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
 
-        .menu-card[data-type="salary"] .icon-wrapper { background: #34C759; }
-        .menu-card[data-type="bonus"] .icon-wrapper { background: #5856D6; }
-        .menu-card[data-type="kpi"] .icon-wrapper { background: #FF9500; }
+        .menu-card[data-type="salary"] .icon-wrapper { background: linear-gradient(135deg, #34C759, #30D158); }
+        .menu-card[data-type="bonus"] .icon-wrapper { background: linear-gradient(135deg, #5856D6, #5E5CE6); }
+        .menu-card[data-type="kpi"] .icon-wrapper { background: linear-gradient(135deg, #FF9500, #FF9F0A); }
 
         .menu-card span {
             font-weight: 600;
             font-size: 15px;
+            color: #1c1c1e;
         }
 
         #main-app {
@@ -219,6 +298,7 @@
             align-items: center;
             gap: 4px;
             padding: 8px 0;
+            font-weight: 500;
         }
 
         header h1 {
@@ -244,7 +324,7 @@
 
         .tab-bar {
             padding-bottom: env(safe-area-inset-bottom);
-            height: calc(60px + env(safe-area-inset-bottom));
+            height: calc(65px + env(safe-area-inset-bottom));
             background: var(--ios-tab-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -264,6 +344,7 @@
             font-size: 10px;
             font-weight: 500;
             gap: 4px;
+            transition: color 0.2s;
         }
 
         .tab-item.active {
@@ -271,8 +352,8 @@
         }
 
         .tab-icon {
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
         }
 
         .tab-icon svg { width: 100%; height: 100%; fill: currentColor; }
@@ -286,17 +367,25 @@
 <body>
 
     <div id="login-screen">
+        <div class="bg-blur" style="top: 10%; left: 10%;"></div>
+        <div class="bg-blur" style="bottom: 10%; right: 10%; background: rgba(88, 86, 214, 0.15);"></div>
+        
         <div class="login-box">
-            <h2 style="font-weight: 700;">Đăng Nhập</h2>
+            <div class="login-logo">💼</div>
+            <h2 style="font-weight: 800;">Xin chào!</h2>
+            <p class="subtitle">Đăng nhập để quản lý công việc</p>
+            
             <div class="input-group">
                 <input type="text" id="username" placeholder="Tài khoản" autocomplete="off">
             </div>
             <div class="input-group">
                 <input type="password" id="password" placeholder="Mật khẩu">
             </div>
-            <button class="login-btn" onclick="handleLogin()">Vào hệ thống</button>
-            <p id="login-error" style="color: #FF3B30; font-size: 13px; margin-top: 15px; display: none;">Tài khoản hoặc mật khẩu không đúng!</p>
+            
+            <button class="login-btn" onclick="handleLogin()">Đăng nhập</button>
+            <p id="login-error">Tài khoản hoặc mật khẩu không đúng!</p>
         </div>
+        <p style="margin-top: 24px; font-size: 13px; color: var(--ios-text-secondary); font-weight: 500;">HỆ THỐNG QUẢN LÝ NỘI BỘ V1.0</p>
     </div>
 
     <div id="home-screen">
@@ -304,8 +393,7 @@
             <h2>Hệ Thống</h2>
             <p id="role-text">Quản lý nội bộ Công ty</p>
         </div>
-        <div class="menu-grid" id="menu-container">
-            </div>
+        <div class="menu-grid" id="menu-container"></div>
     </div>
 
     <div id="main-app">
@@ -324,8 +412,7 @@
             <iframe id="display-frame" src="about:blank"></iframe>
         </div>
 
-        <nav class="tab-bar" id="tab-container">
-            </nav>
+        <nav class="tab-bar" id="tab-container"></nav>
     </div>
 
     <script>
@@ -344,19 +431,35 @@
 
             if (user === 'admin' && pass === 'cherry212') {
                 currentUser = 'admin';
-                showHome();
+                fadeOutLogin();
             } else if (user === 'nv' && pass === '1') {
                 currentUser = 'nv';
-                showHome();
+                fadeOutLogin();
             } else {
                 error.style.display = 'block';
+                // Trigger shake animation
+                error.style.animation = 'none';
+                error.offsetHeight; 
+                error.style.animation = null;
             }
         }
 
+        function fadeOutLogin() {
+            loginScreen.style.opacity = '0';
+            loginScreen.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                showHome();
+            }, 500);
+        }
+
         function showHome() {
-            loginScreen.style.display = 'none';
             homeScreen.style.display = 'flex';
-            renderUIByRole();
+            homeScreen.style.opacity = '0';
+            setTimeout(() => {
+                homeScreen.style.opacity = '1';
+                renderUIByRole();
+            }, 50);
         }
 
         function renderUIByRole() {
@@ -377,20 +480,18 @@
 
             items.forEach(item => {
                 if (item.roles.includes(currentUser)) {
-                    // Render Menu Card
                     const card = document.createElement('div');
                     card.className = 'menu-card';
                     card.setAttribute('data-type', item.type);
                     card.onclick = () => openApp(item.url, item.name, item.id);
                     card.innerHTML = `
                         <div class="icon-wrapper">
-                            <svg style="width:30px;height:30px;fill:white" viewBox="0 0 24 24"><path d="${item.icon}"/></svg>
+                            <svg style="width:32px;height:32px;fill:white" viewBox="0 0 24 24"><path d="${item.icon}"/></svg>
                         </div>
                         <span>${item.name}</span>
                     `;
                     menuContainer.appendChild(card);
 
-                    // Render Tab Item
                     const tab = document.createElement('div');
                     tab.className = 'tab-item';
                     tab.id = 'tab-' + item.id;
@@ -405,19 +506,18 @@
                 }
             });
             
-            // Nếu là nhân viên thì grid hiển thị 1 cột cho đẹp
             if(currentUser === 'nv') menuContainer.style.gridTemplateColumns = '1fr';
             else menuContainer.style.gridTemplateColumns = '1fr 1fr';
         }
 
         function openApp(url, pageTitle, tabIndex) {
             homeScreen.style.opacity = '0';
-            homeScreen.style.transform = 'scale(0.95)';
+            homeScreen.style.transform = 'scale(0.92)';
             setTimeout(() => {
                 homeScreen.style.display = 'none';
                 mainApp.style.display = 'flex';
                 switchTab(url, pageTitle, tabIndex);
-            }, 250);
+            }, 300);
         }
 
         function switchTab(url, pageTitle, tabIndex) {
@@ -432,12 +532,12 @@
 
         function goHome() {
             homeScreen.style.display = 'flex';
+            mainApp.style.display = 'none';
             setTimeout(() => {
                 homeScreen.style.opacity = '1';
                 homeScreen.style.transform = 'scale(1)';
-                mainApp.style.display = 'none';
                 frame.src = "about:blank";
-            }, 10);
+            }, 50);
         }
 
         document.body.addEventListener('touchmove', function(e) {
