@@ -2,307 +2,318 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KPI Detail 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Quản Lý Lương">
+    
+    <link rel="apple-touch-icon" href="icon.jpg">
+    <link rel="icon" type="image/jpeg" href="icon.jpg">
+    <link rel="shortcut icon" href="icon.jpg">
+
+    <title>Quản Lý Lương & Thưởng Phạt</title>
     <style>
         :root {
             --ios-blue: #007AFF;
+            --ios-gray: #8E8E93;
             --ios-bg: #F2F2F7;
-            --ios-card: #FFFFFF;
+            --ios-card-bg: #FFFFFF;
+            --ios-tab-bg: rgba(255, 255, 255, 0.88);
+            --ios-border: rgba(0, 0, 0, 0.1);
             --ios-text: #000000;
-            --ios-secondary-text: #8E8E93;
-            --ios-separator: #C6C6C8;
-            --success: #34C759;
-            --warning: #FF9500;
-            --danger: #FF3B30;
-            --info: #5856D6;
-            --capy: #AF52DE;
-            --cat: #FF2D55;
-            --dog: #FF9500;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --ios-text-secondary: #636366;
+            --transition-bounce: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
             background-color: var(--ios-bg);
             color: var(--ios-text);
-            margin: 0;
-            padding: 0;
+            height: 100vh;
+            width: 100vw;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            overflow: hidden;
             -webkit-font-smoothing: antialiased;
+            position: fixed;
         }
 
-        .container {
+        #home-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 30px;
+            padding-top: env(safe-area-inset-top);
+            background-color: var(--ios-bg);
+            position: absolute;
             width: 100%;
-            max-width: 430px;
-            min-height: 100vh;
-            background: var(--ios-bg);
-            padding-bottom: 40px;
+            z-index: 200;
+            transition: all 0.4s var(--transition-bounce);
         }
 
-        /* --- MÀN HÌNH CHÀO --- */
-        #welcome-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--ios-bg); z-index: 1000; display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px; box-sizing: border-box; transition: opacity 0.5s ease, visibility 0.5s;
+        .welcome-text {
+            margin-bottom: 50px;
+            text-align: center;
+            animation: slideUp 0.6s var(--transition-bounce);
         }
 
-        .welcome-content { width: 100%; max-width: 320px; text-align: center; animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        .welcome-logo { font-size: 60px; margin-bottom: 20px; }
-        #main-content { display: none; opacity: 0; transition: opacity 0.5s ease; }
+        .welcome-text h2 {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #000;
+        }
 
-        /* --- HEADER & INPUT --- */
-        .header { position: sticky; top: 0; z-index: 100; background: rgba(242, 242, 247, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 20px 16px 10px 16px; }
-        .header h2 { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
-        label { font-size: 13px; text-transform: uppercase; color: var(--ios-secondary-text); margin: 8px 12px; display: block; font-weight: 500; }
-        input, select { width: 100%; background: var(--ios-card); border: none; padding: 14px 16px; border-radius: 12px; font-size: 17px; margin-bottom: 4px; box-sizing: border-box; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .input-hint { font-size: 12px; color: var(--ios-secondary-text); margin-left: 12px; margin-bottom: 16px; display: block; }
+        .welcome-text p {
+            color: var(--ios-text-secondary);
+            font-size: 17px;
+        }
 
-        /* --- MENU --- */
-        .main-menu { display: flex; overflow-x: auto; padding: 4px 16px 16px 16px; gap: 8px; scrollbar-width: none; }
-        .main-menu::-webkit-scrollbar { display: none; }
-        .menu-btn { white-space: nowrap; padding: 8px 16px; border: none; border-radius: 20px; background: #E5E5EA; color: var(--ios-text); font-size: 14px; font-weight: 600; cursor: pointer; }
-        .menu-btn.active { background: var(--ios-blue); color: white; }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+            max-width: 400px;
+        }
 
-        /* --- SECTIONS --- */
-        .form-section { padding: 0 16px; display: none; }
-        .form-section.active { display: block; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .menu-card {
+            background: var(--ios-card-bg);
+            aspect-ratio: 1/1;
+            border-radius: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
 
-        /* --- KPI CHECKLIST STYLE --- */
-        .kpi-checklist { background: white; border-radius: 16px; padding: 10px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .check-item { display: flex; align-items: center; padding: 12px; border-bottom: 0.5px solid var(--ios-separator); cursor: pointer; }
-        .check-item:last-child { border-bottom: none; }
-        .check-item input[type="checkbox"] { width: 22px; height: 22px; margin-right: 12px; accent-color: var(--success); cursor: pointer; }
-        .check-item span { font-size: 16px; font-weight: 500; }
+        .menu-card:active {
+            transform: scale(0.9);
+            background-color: #E5E5EA;
+        }
 
-        /* --- IFRAME STYLE --- */
-        .iframe-container { width: 100%; height: 500px; border-radius: 16px; overflow: hidden; border: 1px solid var(--ios-separator); margin-top: 10px; background: #fff; }
-        iframe { width: 100%; height: 100%; border: none; }
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
 
-        /* --- BUTTONS --- */
-        .btn-add, .btn-continue { width: 100%; padding: 16px; border: none; border-radius: 16px; color: white; font-size: 17px; font-weight: 700; cursor: pointer; transition: var(--transition); }
-        .btn-continue { background: var(--ios-blue); margin-top: 10px; }
-        .btn-spa { background: var(--success); }
-        .btn-media { background: var(--ios-blue); }
-        .btn-raccoon { background: var(--info); }
-        .btn-capy { background: var(--capy); }
-        .btn-cat { background: var(--cat); }
-        .btn-dog { background: var(--dog); }
+        .menu-card:nth-child(1) .icon-wrapper { background: #34C759; }
+        .menu-card:nth-child(2) .icon-wrapper { background: #5856D6; }
 
-        .reward-info { background: #fff; padding: 12px 16px; border-radius: 14px; margin-bottom: 16px; font-size: 13px; border-left: 4px solid var(--ios-blue); }
-        .summary { padding: 16px; }
-        .staff-item { background: var(--ios-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .history { padding: 0 20px; margin-top: 10px; }
-        .history-item { font-size: 13px; color: var(--ios-secondary-text); padding: 8px 0; border-bottom: 0.5px solid var(--ios-separator); }
+        .menu-card span {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        #main-app {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #fff;
+        }
+
+        header {
+            background-color: var(--ios-tab-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 10px 16px;
+            padding-top: env(safe-area-inset-top); 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 0.5px solid var(--ios-border);
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: var(--ios-blue);
+            font-size: 17px;
+            background: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 0;
+        }
+
+        header h1 {
+            font-size: 17px;
+            font-weight: 600;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 12px;
+        }
+
+        .content-container {
+            flex: 1;
+            background-color: #fff;
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .tab-bar {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(60px + env(safe-area-inset-bottom));
+            background: var(--ios-tab-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 10px;
+            border-top: 0.5px solid var(--ios-border);
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--ios-gray);
+            font-size: 10px;
+            font-weight: 500;
+            gap: 4px;
+        }
+
+        .tab-item.active {
+            color: var(--ios-blue);
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .tab-icon svg { width: 100%; height: 100%; fill: currentColor; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
 
-<div id="welcome-screen">
-    <div class="welcome-content">
-        <div class="welcome-logo">📊</div>
-        <h1>Xin chào!</h1>
-        <p>Nhập tên nhân viên để bắt đầu.</p>
-        <input type="text" id="initialName" placeholder="Họ và tên..." style="text-align: center;">
-        <button class="btn-continue" onclick="startApp()">Tiếp tục</button>
-    </div>
-</div>
-
-<div class="container" id="main-content">
-    <div class="header">
-        <h2>KPI 2026</h2>
-    </div>
-
-    <div class="staff-input-group" style="padding: 16px;">
-        <label>NHÂN VIÊN:</label>
-        <input type="text" id="staffName" readonly style="background: transparent; box-shadow: none; font-weight: 700; font-size: 20px;">
-    </div>
-
-    <div class="main-menu">
-        <button class="menu-btn active" onclick="showTab('spa-tab', this)">Spa & KS</button>
-        <button class="menu-btn" onclick="showTab('media-tab', this)">Media</button>
-        <button class="menu-btn" onclick="showTab('raccoon-tab', this)">Gấu Mèo</button>
-        <button class="menu-btn" onclick="showTab('dog-tab', this)">Chó (2-5%)</button>
-        <button class="menu-btn" onclick="showTab('kpi-tab', this)" style="background: var(--warning); color: black;">📑 Tích KPI & File</button>
-    </div>
-
-    <div id="spa-tab" class="form-section active">
-        <div class="reward-info" style="border-left-color: var(--success);">🎁 10% Cắt tỉa, 5-8% Tắm, 5% KS.</div>
-        <select id="spaService">
-            <option value="0.10">Cắt tỉa chó (10%)</option>
-            <option value="0.05">Tắm chó nhỏ (5%)</option>
-            <option value="0.08">Tắm chó lớn (8%)</option>
-            <option value="0.05">Khách sạn (5%)</option>
-        </select>
-        <input type="number" id="spaAmount" placeholder="Số tiền thu">
-        <button class="btn-add btn-spa" onclick="addSpa()">+ Giao dịch Spa</button>
-    </div>
-
-    <div id="media-tab" class="form-section">
-        <div class="reward-info">🎬 Thưởng 2Tr (~1Tr view), 4Tr (>2Tr view).</div>
-        <label>Video ~1Tr view</label><input type="number" id="video1tr" value="0">
-        <label>Video >2Tr view</label><input type="number" id="video2tr" value="0">
-        <button class="btn-add btn-media" onclick="addMedia()">+ Thưởng Video</button>
-    </div>
-
-    <div id="raccoon-tab" class="form-section">
-        <div class="reward-info" style="border-left-color: var(--info);">🦝 Hoa hồng 5% doanh thu Gấu Mèo.</div>
-        <input type="number" id="raccoonAmount" placeholder="Doanh thu">
-        <button class="btn-add btn-raccoon" onclick="addRaccoon()">+ Bán Gấu Mèo</button>
-    </div>
-
-    <div id="dog-tab" class="form-section">
-        <div class="reward-info" style="border-left-color: var(--dog);">🐶 40tr (2%) | Trên 65tr (5%).</div>
-        <input type="number" id="dogAmount" placeholder="Doanh thu chó">
-        <button class="btn-add btn-dog" onclick="addDog()">+ Doanh thu Chó</button>
-    </div>
-
-    <div id="kpi-tab" class="form-section">
-        <label>DANH SÁCH TÍCH KPI</label>
-        <div class="kpi-checklist" id="kpiChecklist">
-            <label class="check-item">
-                <input type="checkbox" onchange="toggleKpi('Hoàn thành 10 lượt Spa', this)">
-                <span>Hoàn thành 10 lượt Spa</span>
-            </label>
-            <label class="check-item">
-                <input type="checkbox" onchange="toggleKpi('Đạt doanh thu Capy 14M', this)">
-                <span>Đạt doanh thu Capy 14M</span>
-            </label>
-            <label class="check-item">
-                <input type="checkbox" onchange="toggleKpi('Video đạt mốc triệu View', this)">
-                <span>Video đạt mốc triệu View</span>
-            </label>
-            <label class="check-item">
-                <input type="checkbox" onchange="toggleKpi('Bán đủ 270 đơn Gấu Mèo', this)">
-                <span>Bán đủ 270 đơn Gấu Mèo</span>
-            </label>
+    <div id="home-screen">
+        <div class="welcome-text">
+            <h2>Hệ Thống</h2>
+            <p>Quản lý nội bộ Công ty</p>
         </div>
-
-        <label>XEM CHI TIẾT FILE KPI.HTML</label>
-        <div class="iframe-container">
-            <iframe src="kpi.html"></iframe>
+        <div class="menu-grid">
+            <div class="menu-card" onclick="openApp('t.html', 'Tính Lương', 0)">
+                <div class="icon-wrapper">
+                    <svg style="width:30px;height:30px;fill:white" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.21 1.87 1.15 0 1.94-.51 1.94-1.44 0-.85-.43-1.34-2.19-1.8-2.4-.63-3.66-1.71-3.66-3.58 0-1.78 1.14-2.9 2.8-3.3V4.5h2.67v1.94c1.23.21 2.5 1.02 2.76 2.53h-1.94c-.16-.83-.73-1.37-1.84-1.37-1.12 0-1.66.55-1.66 1.25 0 .76.47 1.2 2.22 1.63 2.1.51 3.63 1.55 3.63 3.59 0 1.91-1.28 3.16-3.34 3.52z"/>
+                    </svg>
+                </div>
+                <span>Tính Lương</span>
+            </div>
+            <div class="menu-card" onclick="openApp('b.html', 'Thưởng Phạt', 1)">
+                <div class="icon-wrapper">
+                    <svg style="width:30px;height:30px;fill:white" viewBox="0 0 24 24">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14h2v2h-2v-2zm0-8h2v6h-2V7z"/>
+                    </svg>
+                </div>
+                <span>Thưởng Phạt</span>
+            </div>
         </div>
     </div>
 
-    <div class="summary">
-        <h3>Danh sách tổng hợp</h3>
-        <div id="staffContainer"></div>
+    <div id="main-app">
+        <header>
+            <button class="back-btn" onclick="goHome()">
+                <svg width="12" height="21" viewBox="0 0 12 21" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 19L2 10.5L10 2" />
+                </svg>
+                <span>Trở về</span>
+            </button>
+            <h1 id="page-title">Tiêu đề</h1>
+            <div style="width: 70px;"></div> </header>
+
+        <div class="content-container">
+            <iframe id="display-frame" src="about:blank"></iframe>
+        </div>
+
+        <nav class="tab-bar">
+            <div class="tab-item" id="tab-0" onclick="switchTab('t.html', 'Tính Lương', 0)">
+                <div class="tab-icon">
+                    <svg viewBox="0 0 24 24"><path d="M11.8 2.02c-5.4 0-9.8 4.4-9.8 9.8s4.4 9.8 9.8 9.8 9.8-4.4 9.8-9.8-4.4-9.8-9.8-9.8zm.4 14.1v1.8h-1.8v-1.8c-1.3-.2-2.4-1.1-2.5-2.6h1.5c.1.8.6 1.4 1.7 1.4.9 0 1.5-.4 1.5-1.1 0-.7-.3-1-1.7-1.4-1.8-.5-2.8-1.3-2.8-2.7 0-1.4.9-2.2 2.1-2.5v-1.6h1.8v1.6c1 .2 1.9.8 2.1 2h-1.5c-.1-.6-.6-1-1.4-1-.8 0-1.3.4-1.3 1 0 .6.4.9 1.7 1.2 1.6.4 2.8 1.2 2.8 2.7.1 1.5-.9 2.5-2.5 2.8z"/></svg>
+                </div>
+                <span>Tính Lương</span>
+            </div>
+            <div class="tab-item" id="tab-1" onclick="switchTab('b.html', 'Thưởng Phạt', 1)">
+                <div class="tab-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L3 7v4.3c0 5.5 3.8 10.7 9 12.1 5.2-1.4 9-6.6 9-12.1V7l-9-5zm-1 14h2v2h-2v-2zm0-8h2v6h-2V8z"/></svg>
+                </div>
+                <span>Thưởng Phạt</span>
+            </div>
+        </nav>
     </div>
 
-    <div class="history">
-        <strong>LỊCH SỬ GẦN ĐÂY</strong>
-        <div id="logItems"></div>
-    </div>
-</div>
+    <script>
+        const homeScreen = document.getElementById('home-screen');
+        const mainApp = document.getElementById('main-app');
+        const frame = document.getElementById('display-frame');
+        const title = document.getElementById('page-title');
 
-<script>
-    let database = JSON.parse(localStorage.getItem('kpi_database_2026')) || {};
-
-    function saveData() { localStorage.setItem('kpi_database_2026', JSON.stringify(database)); }
-
-    function startApp() {
-        const name = document.getElementById('initialName').value.trim();
-        if (!name) return alert("Vui lòng nhập tên!");
-        document.getElementById('staffName').value = name;
-        document.getElementById('welcome-screen').style.display = 'none';
-        const main = document.getElementById('main-content');
-        main.style.display = 'block'; setTimeout(() => main.style.opacity = '1', 50);
-        updateUI();
-    }
-
-    function showTab(tabId, btn) {
-        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        btn.classList.add('active');
-    }
-
-    function format(n) { return n.toLocaleString('vi-VN'); }
-
-    function getStaff(name) {
-        const n = name.trim().toUpperCase();
-        if (!database[n]) database[n] = { spa:0, media:0, raccoon:0, dogRev:0, dogHH:0, history:[] };
-        return database[n];
-    }
-
-    // --- LOGIC TÍCH KPI ---
-    function toggleKpi(task, checkbox) {
-        const name = document.getElementById('staffName').value;
-        const staff = getStaff(name);
-        const status = checkbox.checked ? "✅ ĐÃ TÍCH" : "❌ BỎ TÍCH";
-        staff.history.push({msg: `${name}: ${status} - ${task} (${new Date().toLocaleTimeString()})`});
-        saveData(); updateUI();
-    }
-
-    // --- LOGIC NHẬP LIỆU ---
-    function addSpa() {
-        const name = document.getElementById('staffName').value;
-        const amount = parseFloat(document.getElementById('spaAmount').value);
-        if(!amount) return;
-        const staff = getStaff(name);
-        const hh = amount * parseFloat(document.getElementById('spaService').value);
-        staff.spa += hh;
-        staff.history.push({msg: `${name}: +${format(hh)}đ Spa`});
-        saveData(); updateUI(); document.getElementById('spaAmount').value="";
-    }
-
-    function addMedia() {
-        const name = document.getElementById('staffName').value;
-        const v1 = parseInt(document.getElementById('video1tr').value)||0;
-        const v2 = parseInt(document.getElementById('video2tr').value)||0;
-        const bonus = (v1*2000000)+(v2*4000000);
-        const staff = getStaff(name);
-        staff.media += bonus;
-        staff.history.push({msg: `${name}: +${format(bonus)}đ Media`});
-        saveData(); updateUI();
-    }
-
-    function addRaccoon() {
-        const name = document.getElementById('staffName').value;
-        const amount = parseFloat(document.getElementById('raccoonAmount').value);
-        if(!amount) return;
-        const staff = getStaff(name);
-        staff.raccoon += (amount * 0.05);
-        staff.history.push({msg: `${name}: +${format(amount*0.05)}đ Gấu Mèo`});
-        saveData(); updateUI(); document.getElementById('raccoonAmount').value="";
-    }
-
-    function addDog() {
-        const name = document.getElementById('staffName').value;
-        const amount = parseFloat(document.getElementById('dogAmount').value);
-        if(!amount) return;
-        const staff = getStaff(name);
-        staff.dogRev += amount;
-        let rate = staff.dogRev >= 65000000 ? 0.05 : (staff.dogRev >= 40000000 ? 0.02 : 0);
-        staff.dogHH = staff.dogRev * rate;
-        staff.history.push({msg: `${name}: +${format(amount)}đ Chó (HH: ${format(staff.dogHH)}đ)`});
-        saveData(); updateUI(); document.getElementById('dogAmount').value="";
-    }
-
-    function updateUI() {
-        const container = document.getElementById('staffContainer');
-        const logItems = document.getElementById('logItems');
-        container.innerHTML = ""; logItems.innerHTML = "";
-        let allHist = [];
-
-        for (const [name, data] of Object.entries(database)) {
-            const total = data.spa + data.media + data.raccoon + (data.dogHH || 0);
-            allHist = allHist.concat(data.history);
-            const box = document.createElement('div');
-            box.className = 'staff-item';
-            box.innerHTML = `<div class="staff-info"><div class="staff-name">${name}</div><div class="total-amount">${format(total)} đ</div></div>`;
-            container.appendChild(box);
+        function openApp(url, pageTitle, tabIndex) {
+            homeScreen.style.opacity = '0';
+            homeScreen.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                homeScreen.style.display = 'none';
+                mainApp.style.display = 'flex';
+                switchTab(url, pageTitle, tabIndex);
+            }, 250);
         }
 
-        allHist.slice(-10).reverse().forEach(h => {
-            const div = document.createElement('div'); div.className = 'history-item';
-            div.innerText = "• " + h.msg; logItems.appendChild(div);
-        });
-    }
-</script>
+        function switchTab(url, pageTitle, tabIndex) {
+            title.innerText = pageTitle;
+            if(frame.src.indexOf(url) === -1) {
+                frame.src = url;
+            }
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabIndex).classList.add('active');
+        }
+
+        function goHome() {
+            homeScreen.style.display = 'flex';
+            setTimeout(() => {
+                homeScreen.style.opacity = '1';
+                homeScreen.style.transform = 'scale(1)';
+                mainApp.style.display = 'none';
+                frame.src = "about:blank";
+            }, 10);
+        }
+
+        document.body.addEventListener('touchmove', function(e) {
+            if (e.touches.length > 1) e.preventDefault();
+        }, {passive: false});
+    </script>
 </body>
 </html>
