@@ -3,34 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KPI Detail 2026 - Firebase</title>
+    <title>KPI Detail 2026 - Premium Edition</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         :root {
             --ios-blue: #007AFF;
-            --ios-bg: #F2F2F7;
+            --ios-bg: #F8F9FA;
             --ios-card: #FFFFFF;
-            --ios-text: #000000;
-            --ios-secondary-text: #8E8E93;
-            --ios-separator: #C6C6C8;
+            --ios-text: #1D1D1F;
+            --ios-secondary-text: #86868B;
+            --ios-separator: #D2D2D7;
             --success: #34C759;
             --warning: #FF9500;
             --danger: #FF3B30;
             --info: #5856D6;
-            --capy: #AF52DE;
-            --cat: #FF2D55;
-            --dog: #FF9500;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --accent: #AF52DE;
+            --shadow: 0 8px 30px rgba(0,0,0,0.08);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
             background-color: var(--ios-bg);
             color: var(--ios-text);
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
-            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         .container {
@@ -38,307 +39,271 @@
             max-width: 430px;
             min-height: 100vh;
             background: var(--ios-bg);
-            padding-bottom: 40px;
+            padding-bottom: 60px;
+            position: relative;
         }
 
-        /* --- MÀN HÌNH CHÀO --- */
+        /* --- MÀN HÌNH CHÀO (WELCOME) --- */
         #welcome-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--ios-bg);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #ffffff 0%, #f2f2f7 100%);
             z-index: 1000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-            transition: opacity 0.5s ease, visibility 0.5s;
+            padding: 24px;
+            transition: all 0.6s ease;
         }
 
-        .welcome-content {
-            width: 100%;
-            max-width: 320px;
-            text-align: center;
-            animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        .logo-wrapper {
+            width: 100px; height: 100px; background: white; border-radius: 24px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 30px; box-shadow: var(--shadow); color: var(--ios-blue);
         }
 
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .welcome-logo { font-size: 60px; margin-bottom: 20px; }
-        .welcome-content h1 { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
-        .welcome-content p { color: var(--ios-secondary-text); margin-bottom: 30px; }
-
-        /* --- NỘI DUNG CHÍNH --- */
-        #main-content { display: none; opacity: 0; transition: opacity 0.5s ease; }
-
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(242, 242, 247, 0.8);
+        /* --- THÔNG BÁO TÍCH XANH (SUCCESS TOAST) --- */
+        #success-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 20px 16px 10px 16px;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .header h2 { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
-
-        .staff-input-group { padding: 16px; }
-
-        label {
-            font-size: 13px;
-            text-transform: uppercase;
-            color: var(--ios-secondary-text);
-            margin-bottom: 8px;
-            margin-left: 12px;
-            display: block;
-            font-weight: 500;
+        #success-toast.show {
+            display: flex;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
         }
+
+        .check-icon-wrapper {
+            width: 70px; height: 70px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; margin-bottom: 15px;
+            animation: pulseSuccess 1.5s infinite;
+        }
+
+        @keyframes pulseSuccess {
+            0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(52, 199, 89, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+        }
+
+        /* --- GIAO DIỆN CHÍNH --- */
+        #main-content { display: none; opacity: 0; }
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(25px);
+            padding: 24px 20px 16px 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .btn-back {
+            background: rgba(0, 122, 255, 0.1); border: none; padding: 8px 14px;
+            border-radius: 12px; font-size: 14px; font-weight: 600; color: var(--ios-blue);
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+        }
+
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 20px; }
+        .menu-card {
+            background: var(--ios-card); padding: 30px 16px; border-radius: 24px;
+            text-align: center; box-shadow: var(--shadow); cursor: pointer;
+            transition: var(--transition); position: relative; overflow: hidden;
+        }
+        .menu-card:active { transform: scale(0.92); }
+        .icon-container { width: 54px; height: 54px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; }
+
+        .form-section { padding: 0 20px; display: none; }
+        .form-section.active { display: block; animation: fadeInUp 0.5s; }
 
         input, select {
-            width: 100%;
+            width: 100%; background: var(--ios-card); border: 1px solid transparent;
+            padding: 16px; border-radius: 14px; font-size: 16px; margin-bottom: 12px;
+            box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .btn-add {
+            width: 100%; padding: 18px; border: none; border-radius: 18px; color: white;
+            font-size: 17px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+
+        /* --- COLLAPSIBLE SECTIONS --- */
+        .collapsible-header {
+            background: white; padding: 20px; margin: 15px 20px 0 20px;
+            border-radius: 18px; box-shadow: var(--shadow);
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+        }
+        .collapsible-content { display: none; padding: 20px; animation: fadeIn 0.4s ease; }
+        .collapsible-content.active { display: block; }
+        .chevron-icon { transition: transform 0.3s ease; }
+        .collapsible-header.open .chevron-icon { transform: rotate(180deg); }
+
+        /* Colors */
+        .card-spa .icon-container { background: #E8F8EE; color: var(--success); }
+        .card-media .icon-container { background: #E5F1FF; color: var(--ios-blue); }
+        .card-raccoon .icon-container { background: #EEEBFF; color: var(--info); }
+        .card-capy .icon-container { background: #F6EAFF; color: var(--accent); }
+        .card-cat .icon-container { background: #FFEAF0; color: #FF2D55; }
+        .card-dog .icon-container { background: #FFF4E5; color: var(--warning); }
+        .btn-spa { background: var(--success); } .btn-media { background: var(--ios-blue); }
+        .btn-raccoon { background: var(--info); } .btn-capy { background: var(--accent); }
+        .btn-cat { background: #FF2D55; } .btn-dog { background: var(--warning); }
+
+        /* Lịch sử mới */
+        .history-item {
             background: var(--ios-card);
-            border: none;
-            padding: 14px 16px;
-            border-radius: 12px;
-            font-size: 17px;
-            margin-bottom: 4px;
-            box-sizing: border-box;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            transition: var(--transition);
-        }
-
-        .input-hint {
-            font-size: 12px;
-            color: var(--ios-secondary-text);
-            margin-left: 12px;
-            margin-bottom: 16px;
-            display: block;
-        }
-
-        .main-menu {
-            display: flex;
-            overflow-x: auto;
-            padding: 4px 16px 16px 16px;
-            gap: 8px;
-            scrollbar-width: none;
-        }
-        .main-menu::-webkit-scrollbar { display: none; }
-
-        .menu-btn {
-            white-space: nowrap;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 20px;
-            background: #E5E5EA;
-            color: var(--ios-text);
-            font-size: 14px;
-            font-weight: 600;
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        .menu-btn.active {
-            background: var(--ios-blue);
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-        }
-
-        .form-section { padding: 0 16px; display: none; }
-        .form-section.active { display: block; animation: slideUp 0.4s ease-out; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .reward-info {
-            background: #fff;
-            padding: 12px 16px;
-            border-radius: 14px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            line-height: 1.4;
-            border-left: 4px solid var(--ios-blue);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .reward-spa { border-left-color: var(--success); }
-        .reward-media { border-left-color: var(--ios-blue); }
-        .reward-raccoon { border-left-color: var(--info); }
-        .reward-capy { border-left-color: var(--capy); }
-        .reward-cat { border-left-color: var(--cat); }
-        .reward-dog { border-left-color: var(--dog); }
-
-        .btn-add, .btn-continue {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 16px;
-            color: white;
-            font-size: 17px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .btn-continue { background: var(--ios-blue); margin-top: 10px; }
-        .btn-add:active, .btn-continue:active { transform: scale(0.96); opacity: 0.8; }
-        
-        .btn-spa { background: var(--success); }
-        .btn-media { background: var(--ios-blue); }
-        .btn-raccoon { background: var(--info); }
-        .btn-capy { background: var(--capy); }
-        .btn-cat { background: var(--cat); }
-        .btn-dog { background: var(--dog); }
-
-        .summary { padding: 16px; }
-        .summary h3 { font-size: 22px; font-weight: 700; margin: 20px 0 12px 0; }
-
-        .staff-item {
-            background: var(--ios-card);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        .staff-info { display: flex; justify-content: space-between; align-items: flex-start; }
-        .staff-name { font-size: 18px; font-weight: 700; }
-        .total-amount { font-size: 18px; font-weight: 800; color: var(--danger); }
-        .staff-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--ios-separator); }
-
-        .history { padding: 0 20px; margin-top: 10px; }
-        .history-item { font-size: 13px; color: var(--ios-secondary-text); margin-bottom: 4px; border-bottom: 0.5px solid var(--ios-separator); padding: 8px 0; }
-        
-        /* New Styles for Total Revenue Stats */
-        .revenue-stats {
-            background: #E5E5EA;
-            border-radius: 12px;
             padding: 12px;
-            margin-bottom: 15px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border-left: 4px solid var(--ios-blue);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
-        .revenue-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            margin-bottom: 4px;
-            font-weight: 600;
-        }
+        .history-time { font-size: 11px; color: var(--ios-secondary-text); margin-bottom: 4px; display: block; }
+        .history-main { display: flex; justify-content: space-between; align-items: center; }
+        .history-label { font-size: 14px; font-weight: 600; }
+        .history-hh { color: var(--success); font-weight: 700; font-size: 14px; }
 
-        .clear-btn { 
-            background: none; border: none; color: var(--danger); font-size: 13px; font-weight: 600; float: right; cursor: pointer; margin-top: 25px;
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
+<div id="success-toast">
+    <div class="check-icon-wrapper">
+        <i data-lucide="check" style="width: 40px; height: 40px; stroke-width: 3;"></i>
+    </div>
+    <span style="font-weight: 800; font-size: 18px; color: var(--ios-text);">Đã Lưu Thành Công</span>
+    <span style="font-size: 14px; color: var(--ios-secondary-text); margin-top: 5px;">Dữ liệu đã được đồng bộ</span>
+</div>
+
 <div id="welcome-screen">
-    <div class="welcome-content">
-        <div class="welcome-logo">📊</div>
-        <h1>Xin chào!</h1>
-        <p>Nhập tên nhân viên để bắt đầu.</p>
-        <input type="text" id="initialName" placeholder="Họ và tên..." style="text-align: center;">
-        <button class="btn-continue" onclick="startApp()">Tiếp tục</button>
+    <div class="welcome-content animate__animated animate__fadeIn">
+        <div class="logo-wrapper"><i data-lucide="bar-chart-3" style="width: 48px; height: 48px;"></i></div>
+        <h1>KPI Detail</h1>
+        <p>Hệ thống quản lý hiệu suất 2026</p>
+        <input type="text" id="initialName" placeholder="Nhập họ tên nhân viên..." style="text-align: center;">
+        <button class="btn-add" style="background: var(--ios-blue);" onclick="startApp()">Tiếp tục <i data-lucide="arrow-right"></i></button>
     </div>
 </div>
 
 <div class="container" id="main-content">
     <div class="header">
         <h2>KPI 2026</h2>
+        <button class="btn-back" onclick="location.reload()"><i data-lucide="log-out"></i> Thoát</button>
     </div>
 
-    <div class="staff-input-group">
-        <label>NHÂN VIÊN:</label>
-        <input type="text" id="staffName" readonly style="background: transparent; box-shadow: none; font-weight: 700; padding-left: 12px; margin-bottom: 0;">
-    </div>
-
-    <div class="main-menu">
-        <button class="menu-btn active" onclick="showTab('spa-tab', this)">Spa & KS</button>
-        <button class="menu-btn" onclick="showTab('media-tab', this)">Media</button>
-        <button class="menu-btn" onclick="showTab('raccoon-tab', this)">Gấu Mèo</button>
-        <button class="menu-btn" onclick="showTab('capy-tab', this)">Capybara</button>
-        <button class="menu-btn" onclick="showTab('cat-tab', this)">Mèo (2%)</button>
-        <button class="menu-btn" onclick="showTab('dog-tab', this)">Chó (2-5%)</button>
-    </div>
-
-    <div id="spa-tab" class="form-section active">
-        <div class="reward-info reward-spa">🎁 <b>Thưởng:</b> Cắt tỉa 10%, Tắm 5-8%, KS 5%.</div>
-        <label>DỊCH VỤ</label>
-        <select id="spaService">
-            <option value="0.10">Cắt tỉa chó (10%)</option>
-            <option value="0.05">Tắm chó nhỏ < 10kg (5%)</option>
-            <option value="0.08">Tắm chó lớn > 10kg (8%)</option>
-            <option value="0.05">Khách sạn thú cưng (5%)</option>
-        </select>
-        <label>SỐ TIỀN THU</label>
-        <input type="number" id="spaAmount" placeholder="Ví dụ: 70000">
-        <span class="input-hint">🎯 KPI tối thiểu: 10 lượt Spa/tháng.</span>
-        <button class="btn-add btn-spa" onclick="addSpa()">+ Giao dịch Spa</button>
-    </div>
-
-    <div id="media-tab" class="form-section">
-        <div class="reward-info reward-media">🎬 <b>Thưởng:</b> 2Tr (~1Tr views), 4Tr (>2Tr views).</div>
-        <label>VIDEO ~1 TR VIEWS</label>
-        <input type="number" id="video1tr" value="0">
-        <span class="input-hint">Cộng 2.000.000đ mỗi video đạt mốc.</span>
-        <label>VIDEO >2 TR VIEWS</label>
-        <input type="number" id="video2tr" value="0">
-        <span class="input-hint">Cộng 4.000.000đ mỗi video đạt mốc.</span>
-        <button class="btn-add btn-media" onclick="addMedia()">+ Thưởng Video</button>
-    </div>
-
-    <div id="raccoon-tab" class="form-section">
-        <div class="reward-info reward-raccoon">🦝 <b>Hoa hồng:</b> 5% doanh thu bán Gấu Mèo.</div>
-        <label>DOANH THU</label>
-        <input type="number" id="raccoonAmount" placeholder="Ví dụ: 500000">
-        <span class="input-hint">🎯 KPI tối thiểu: 270 đơn hàng.</span>
-        <button class="btn-add btn-raccoon" onclick="addRaccoon()">+ Bán Gấu Mèo</button>
-    </div>
-
-    <div id="capy-tab" class="form-section">
-        <div class="reward-info reward-capy">🐹 <b>Hoa hồng:</b> 15% doanh thu Capybara.</div>
-        <label>DOANH THU</label>
-        <input type="number" id="capyAmount" placeholder="Ví dụ: 1000000">
-        <span class="input-hint">🎯 KPI tối thiểu: 14.000.000đ doanh thu.</span>
-        <button class="btn-add btn-capy" onclick="addCapy()">+ Doanh thu Capy</button>
-    </div>
-
-    <div id="cat-tab" class="form-section">
-        <div class="reward-info reward-cat">🐱 <b>Hoa hồng:</b> 2% doanh thu bán Mèo.</div>
-        <label>DOANH THU</label>
-        <input type="number" id="catAmount" placeholder="Ví dụ: 5000000">
-        <span class="input-hint">🎯 KPI tối thiểu: 15.000.000đ doanh thu.</span>
-        <button class="btn-add btn-cat" onclick="addCat()">+ Doanh thu Mèo</button>
-    </div>
-
-    <div id="dog-tab" class="form-section">
-        <div class="reward-info reward-dog">🐶 <b>Lũy tiến:</b> 40tr (2%) | Trên 65tr (5% toàn bộ).</div>
-        <label>DOANH THU</label>
-        <input type="number" id="dogAmount" placeholder="Ví dụ: 10000000">
-        <span class="input-hint">🎯 Điều kiện: Từ 40tr nhận 2%, khi đạt trên 65tr tính lại 5% toàn bộ doanh thu.</span>
-        <button class="btn-add btn-dog" onclick="addDog()">+ Doanh thu Chó</button>
-    </div>
-
-    <div class="summary">
-        <button class="clear-btn" onclick="clearData()">Xóa hết dữ liệu</button>
-        <h3>Danh sách tổng hợp</h3>
-        <div id="staffContainer" class="staff-list">
-            <p style="color: var(--ios-secondary-text); text-align: center;">Đang tải dữ liệu...</p>
+    <div class="staff-input-group" style="padding: 10px 20px;">
+        <label style="font-size: 12px; font-weight: 700; color: var(--ios-secondary-text); text-transform: uppercase;">Nhân viên</label>
+        <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 18px; margin-top: 5px;">
+            <i data-lucide="user" style="width: 20px; color: var(--ios-blue);"></i>
+            <span id="staffDisplayName">---</span>
         </div>
     </div>
 
-    <div class="history" id="log">
-        <strong>THỐNG KÊ DOANH THU TÍCH LŨY</strong>
-        <div id="revenueSummary" style="margin-top: 10px;"></div>
-        
-        <strong style="display: block; margin-top: 20px;">LỊCH SỬ GẦN ĐÂY</strong>
+    <div id="selection-menu" class="menu-grid animate__animated animate__fadeIn">
+        <div class="menu-card card-spa" onclick="openSection('spa-tab')">
+            <div class="icon-container"><i data-lucide="bath"></i></div>
+            <span>Spa & Hotel</span>
+        </div>
+        <div class="menu-card card-media" onclick="openSection('media-tab')">
+            <div class="icon-container"><i data-lucide="play-circle"></i></div>
+            <span>Media Video</span>
+        </div>
+        <div class="menu-card card-raccoon" onclick="openSection('raccoon-tab')">
+            <div class="icon-container"><i data-lucide="box"></i></div>
+            <span>Gấu Mèo</span>
+        </div>
+        <div class="menu-card card-capy" onclick="openSection('capy-tab')">
+            <div class="icon-container"><i data-lucide="smile"></i></div>
+            <span>Capybara</span>
+        </div>
+        <div class="menu-card card-cat" onclick="openSection('cat-tab')">
+            <div class="icon-container"><i data-lucide="heart"></i></div>
+            <span>Bán Mèo</span>
+        </div>
+        <div class="menu-card card-dog" onclick="openSection('dog-tab')">
+            <div class="icon-container"><i data-lucide="dog"></i></div>
+            <span>Bán Chó</span>
+        </div>
+    </div>
+
+    <div id="spa-tab" class="form-section">
+        <button onclick="backToMenu()" style="background:none; border:none; color:var(--ios-blue); font-weight:700; margin-bottom:15px; display:flex; align-items:center; gap:5px;"><i data-lucide="chevron-left"></i> Quay lại</button>
+        <label>Dịch vụ thực hiện</label>
+        <select id="spaService">
+            <option value="0.10">Cắt tỉa (10%)</option>
+            <option value="0.05">Tắm < 10kg (5%)</option>
+            <option value="0.08">Tắm > 10kg (8%)</option>
+            <option value="0.05">Khách sạn (5%)</option>
+        </select>
+        <input type="text" id="spaAmount" class="currency-input" placeholder="Nhập số tiền...">
+        <button class="btn-add btn-spa" onclick="addSpa()"><i data-lucide="plus-circle"></i> Lưu giao dịch</button>
+    </div>
+
+    <div id="media-tab" class="form-section">
+        <button onclick="backToMenu()" style="background:none; border:none; color:var(--ios-blue); font-weight:700; margin-bottom:15px; display:flex; align-items:center; gap:5px;"><i data-lucide="chevron-left"></i> Quay lại</button>
+        <label>Video ~1 Tr view</label><input type="number" id="video1tr" value="0">
+        <label>Video >2 Tr view</label><input type="number" id="video2tr" value="0">
+        <button class="btn-add btn-media" onclick="addMedia()"><i data-lucide="save"></i> Lưu thưởng</button>
+    </div>
+
+    <div id="raccoon-tab" class="form-section">
+        <button onclick="backToMenu()" style="background:none; border:none; color:var(--ios-blue); font-weight:700; margin-bottom:15px; display:flex; align-items:center; gap:5px;"><i data-lucide="chevron-left"></i> Quay lại</button>
+        <label>Doanh thu Gấu mèo</label><input type="text" id="raccoonAmount" class="currency-input" placeholder="0">
+        <button class="btn-add btn-raccoon" onclick="addRaccoon()"><i data-lucide="save"></i> Lưu</button>
+    </div>
+    <div id="capy-tab" class="form-section">
+        <button onclick="backToMenu()" style="background:none; border:none; color:var(--ios-blue); font-weight:700; margin-bottom:15px; display:flex; align-items:center; gap:5px;"><i data-lucide="chevron-left"></i> Quay lại</button>
+        <label>Doanh thu Capy</label><input type="text" id="capyAmount" class="currency-input" placeholder="0">
+        <button class="btn-add btn-capy" onclick="addCapy()"><i data-lucide="save"></i> Lưu</button>
+    </div>
+    <div id="cat-tab" class="form-section">
+        <button onclick="backToMenu()" style="background:none; border:none; color:var(--ios-blue); font-weight:700; margin-bottom:15px; display:flex; align-items:center; gap:5px;"><i data-lucide="chevron-left"></i> Quay lại</button>
+        <label>Doanh thu Bán Mèo</label><input type="text" id="catAmount" class="currency-input" placeholder="0">
+        <button class="btn-add btn-cat" onclick="addCat()"><i data-lucide="save"></i> Lưu</button>
+    </div>
+    <div id="dog-tab" class="form-section">
+        <button onclick="backToMenu()" style="background:none; border:none; color:var(--ios-blue); font-weight:700; margin-bottom:15px; display:flex; align-items:center; gap:5px;"><i data-lucide="chevron-left"></i> Quay lại</button>
+        <label>Doanh thu Bán Chó</label><input type="text" id="dogAmount" class="currency-input" placeholder="0">
+        <button class="btn-add btn-dog" onclick="addDog()"><i data-lucide="save"></i> Lưu</button>
+    </div>
+
+    <div class="collapsible-header" onclick="toggleSection('summary-content', this)">
+        <h3><i data-lucide="list"></i> Thống kê hoa hồng</h3>
+        <i data-lucide="chevron-down" class="chevron-icon"></i>
+    </div>
+    <div id="summary-content" class="collapsible-content">
+        <div id="staffContainer"></div>
+        <button onclick="clearData()" style="color:var(--danger); background:none; border:none; width:100%; margin-top:15px; font-weight:700;">Xóa toàn bộ dữ liệu</button>
+    </div>
+
+    <div class="collapsible-header" onclick="toggleSection('stats-content', this)">
+        <h3><i data-lucide="trending-up"></i> Thống kê doanh thu</h3>
+        <i data-lucide="chevron-down" class="chevron-icon"></i>
+    </div>
+    <div id="stats-content" class="collapsible-content"><div id="revenueSummary"></div></div>
+
+    <div class="collapsible-header" onclick="toggleSection('history-content', this)">
+        <h3><i data-lucide="history"></i> Lịch sử chi tiết</h3>
+        <i data-lucide="chevron-down" class="chevron-icon"></i>
+    </div>
+    <div id="history-content" class="collapsible-content">
+        <input type="text" id="historySearch" placeholder="Tìm tên nhân viên..." oninput="updateUI()">
         <div id="logItems"></div>
     </div>
 </div>
@@ -347,6 +312,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+    lucide.createIcons();
+
     const firebaseConfig = {
         apiKey: "AIzaSyAV7r-rjXo6U62LX1AA7c7DAHb8GhOOOsg",
         authDomain: "saigon-dalat.firebaseapp.com",
@@ -354,220 +321,195 @@
         projectId: "saigon-dalat",
         storageBucket: "saigon-dalat.firebasestorage.app",
         messagingSenderId: "339735183485",
-        appId: "1:339735183485:web:bc23cd740104d272577114",
-        measurementId: "G-FDLZXR2X8P"
+        appId: "1:339735183485:web:bc23cd740104d272577114"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const dbRef = ref(db, 'kpi_database_2026');
-
     let database = {};
 
-    onValue(dbRef, (snapshot) => {
-        const data = snapshot.val();
-        database = data || {};
-        updateUI();
+    window.showSuccess = function() {
+        const toast = document.getElementById('success-toast');
+        toast.style.display = 'flex';
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.style.display = 'none', 400);
+        }, 2200);
+    }
+
+    window.toggleSection = function(id, headerEl) {
+        const content = document.getElementById(id);
+        const isOpen = content.classList.contains('active');
+        if(isOpen) { content.classList.remove('active'); headerEl.classList.remove('open'); }
+        else { content.classList.add('active'); headerEl.classList.add('open'); }
+    }
+
+    document.querySelectorAll('.currency-input').forEach(input => {
+        input.addEventListener('input', e => {
+            let v = e.target.value.replace(/\./g, '');
+            if(!isNaN(v) && v !== "") e.target.value = parseInt(v).toLocaleString('vi-VN').replace(/,/g, '.');
+        });
     });
 
-    window.saveData = function() {
-        set(dbRef, database);
-    }
+    onValue(dbRef, snap => { database = snap.val() || {}; updateUI(); });
 
-    window.clearData = function() {
-        if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử trên hệ thống?")) {
-            database = {};
-            window.saveData();
-        }
-    }
-
+    window.saveData = function() { set(dbRef, database); showSuccess(); }
+    
     window.startApp = function() {
         const name = document.getElementById('initialName').value.trim();
-        if (!name) return alert("Vui lòng nhập tên!");
-        document.getElementById('staffName').value = name;
-        const welcome = document.getElementById('welcome-screen');
-        const main = document.getElementById('main-content');
-        welcome.style.opacity = '0';
-        setTimeout(() => {
-            welcome.style.display = 'none';
-            main.style.display = 'block';
-            setTimeout(() => { main.style.opacity = '1'; }, 50);
-        }, 500);
+        if(!name) return alert("Nhập tên!");
+        document.getElementById('staffDisplayName').innerText = name;
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        setTimeout(() => document.getElementById('main-content').style.opacity = '1', 50);
     }
 
-    window.showTab = function(tabId, btn) {
+    window.openSection = (id) => {
+        document.getElementById('selection-menu').style.display = 'none';
+        document.getElementById(id).classList.add('active');
+    }
+    window.backToMenu = () => {
         document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        btn.classList.add('active');
+        document.getElementById('selection-menu').style.display = 'grid';
     }
 
-    function format(n) { return n ? n.toLocaleString('vi-VN') : 0; }
+    function format(n) { return n ? n.toLocaleString('vi-VN').replace(/,/g, '.') : "0"; }
+    function getCleanValue(id) { return parseFloat(document.getElementById(id).value.replace(/\./g, '')) || 0; }
+    
+    // Hàm lấy thời gian hiện tại
+    function getCurrentTime() {
+        const now = new Date();
+        return now.toLocaleString('vi-VN', { 
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            day: '2-digit', month: '2-digit', year: 'numeric' 
+        });
+    }
 
-    function getStaffData(name) {
-        if (!name) return null;
+    function getStaff(name) {
         const n = name.trim().toUpperCase();
-        if (!database[n]) {
-            database[n] = { 
-                spa:0, spaRev:0, media:0, raccoon:0, racRev:0, capyHH:0, capyRev:0, 
-                catRev:0, catHH:0, dogRev:0, dogHH:0,
-                countSpa:0, countRac:0, history:[] 
-            };
-        }
+        if(!database[n]) database[n] = { spa:0, spaRev:0, media:0, raccoon:0, racRev:0, capyHH:0, capyRev:0, catRev:0, catHH:0, dogRev:0, dogHH:0, history:[] };
         return database[n];
     }
 
-    window.addSpa = function() {
-        const name = document.getElementById('staffName').value;
-        const amount = parseFloat(document.getElementById('spaAmount').value);
-        if(!name || !amount) return alert("Nhập đủ thông tin!");
-        const service = document.getElementById('spaService');
-        const hh = amount * parseFloat(service.value);
-        const staff = getStaffData(name);
-        staff.spa = (staff.spa || 0) + hh;
-        staff.spaRev = (staff.spaRev || 0) + amount;
-        if(!service.options[service.selectedIndex].text.includes("Khách sạn")) staff.countSpa = (staff.countSpa || 0) + 1;
-        if(!staff.history) staff.history = [];
-        staff.history.push({msg: `${name} - Spa: +${format(hh)}đ (${new Date().toLocaleTimeString()})`});
-        window.saveData(); 
-        document.getElementById('spaAmount').value="";
-    }
-
-    window.addMedia = function() {
-        const name = document.getElementById('staffName').value;
-        const v1 = parseInt(document.getElementById('video1tr').value)||0;
-        const v2 = parseInt(document.getElementById('video2tr').value)||0;
-        if(!name || (v1+v2===0)) return alert("Nhập số video!");
-        const bonus = (v1*2000000)+(v2*4000000);
-        const staff = getStaffData(name);
-        staff.media = (staff.media || 0) + bonus;
-        if(!staff.history) staff.history = [];
-        staff.history.push({msg: `${name} - Media: +${format(bonus)}đ (${new Date().toLocaleTimeString()})`});
-        window.saveData();
-        document.getElementById('video1tr').value = 0;
-        document.getElementById('video2tr').value = 0;
-    }
-
-    window.addRaccoon = function() {
-        const name = document.getElementById('staffName').value;
-        const amount = parseFloat(document.getElementById('raccoonAmount').value);
-        if(!name || !amount) return alert("Nhập doanh thu!");
-        const staff = getStaffData(name);
-        staff.raccoon = (staff.raccoon || 0) + (amount * 0.05);
-        staff.racRev = (staff.racRev || 0) + amount;
-        staff.countRac = (staff.countRac || 0) + 1;
-        if(!staff.history) staff.history = [];
-        staff.history.push({msg: `${name} - Gấu mèo: +${format(amount*0.05)}đ`});
-        window.saveData(); 
-        document.getElementById('raccoonAmount').value="";
-    }
-
-    window.addCapy = function() {
-        const name = document.getElementById('staffName').value;
-        const amount = parseFloat(document.getElementById('capyAmount').value);
-        if(!name || !amount) return alert("Nhập doanh thu!");
-        const staff = getStaffData(name);
-        staff.capyRev = (staff.capyRev || 0) + amount;
-        staff.capyHH = (staff.capyRev * 0.15);
-        if(!staff.history) staff.history = [];
-        staff.history.push({msg: `${name} - Capy: +${format(amount*0.15)}đ`});
-        window.saveData(); 
-        document.getElementById('capyAmount').value="";
-    }
-
-    window.addCat = function() {
-        const name = document.getElementById('staffName').value;
-        const amount = parseFloat(document.getElementById('catAmount').value);
-        if(!name || !amount) return alert("Nhập doanh thu!");
-        const staff = getStaffData(name);
-        staff.catRev = (staff.catRev || 0) + amount;
-        staff.catHH = (staff.catRev * 0.02);
-        if(!staff.history) staff.history = [];
-        staff.history.push({msg: `${name} - Mèo: +${format(amount*0.02)}đ`});
-        window.saveData(); 
-        document.getElementById('catAmount').value="";
-    }
-
-    window.addDog = function() {
-        const name = document.getElementById('staffName').value;
-        const amount = parseFloat(document.getElementById('dogAmount').value);
-        if(!name || !amount) return alert("Nhập doanh thu!");
-        const staff = getStaffData(name);
-        staff.dogRev = (staff.dogRev || 0) + amount;
-        let rate = 0;
-        if (staff.dogRev > 65000000) { rate = 0.05; } 
-        else if (staff.dogRev >= 40000000) { rate = 0.02; }
-        staff.dogHH = staff.dogRev * rate;
-        if(!staff.history) staff.history = [];
-        staff.history.push({ msg: `${name} - Chó: +${format(amount)}đ (Tổng HH mới: ${format(staff.dogHH)}đ)` });
-        window.saveData(); 
-        document.getElementById('dogAmount').value="";
-    }
-
-    function updateUI() {
-        const container = document.getElementById('staffContainer');
-        const logItems = document.getElementById('logItems');
-        const revenueSummary = document.getElementById('revenueSummary');
-        if(!container || !logItems || !revenueSummary) return;
-        
-        container.innerHTML = "";
-        logItems.innerHTML = "";
-        revenueSummary.innerHTML = "";
-
-        let allHistory = [];
-
-        for (const [name, data] of Object.entries(database)) {
-            const totalCommission = (data.spa||0) + (data.media||0) + (data.raccoon||0) + (data.capyHH||0) + (data.catHH||0) + (data.dogHH||0);
-            const totalRev = (data.spaRev||0) + (data.racRev||0) + (data.capyRev||0) + (data.catRev||0) + (data.dogRev||0);
-            
-            const detailId = `detail-${name.replace(/\s+/g, '')}`;
-            if(data.history) allHistory = allHistory.concat(data.history);
-
-            // 1. Update Main List
-            const staffBox = document.createElement('div');
-            staffBox.className = 'staff-item';
-            staffBox.onclick = () => { 
-                const el = document.getElementById(detailId); 
-                el.style.display = el.style.display==='block'?'none':'block'; 
-            };
-            staffBox.innerHTML = `
-                <div class="staff-info">
-                    <div class="staff-name">${name}</div>
-                    <div class="total-amount">${format(totalCommission)} đ</div>
-                </div>
-                <div id="${detailId}" class="staff-details">
-                    <div>Spa: ${format(data.spa)}đ | Media: ${format(data.media)}đ</div>
-                    <div>Gấu: ${format(data.raccoon)}đ | Capy: ${format(data.capyHH)}đ</div>
-                    <div>Mèo: ${format(data.catHH)}đ | Chó: ${format(data.dogHH)}đ</div>
-                    <div style="font-size:11px; color:var(--ios-secondary-text); margin-top:5px;">Tổng doanh thu đã nhập: ${format(totalRev)}đ</div>
-                </div>`;
-            container.appendChild(staffBox);
-
-            // 2. Update Revenue Stats Section
-            const revBox = document.createElement('div');
-            revBox.className = 'revenue-stats';
-            revBox.innerHTML = `
-                <div class="revenue-row">
-                    <span>${name}</span>
-                    <span style="color:var(--ios-blue)">${format(totalRev)} đ</span>
-                </div>
-            `;
-            revenueSummary.appendChild(revBox);
-        }
-
-        // 3. Update Log
-        allHistory.slice(-10).reverse().forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'history-item';
-            div.innerText = "• " + item.msg;
-            logItems.appendChild(div);
+    // CÁC HÀM XỬ LÝ LƯU (Có thêm ghi log thời gian và hoa hồng)
+    window.addSpa = () => {
+        const name = document.getElementById('staffDisplayName').innerText;
+        const amt = getCleanValue('spaAmount');
+        const rate = parseFloat(document.getElementById('spaService').value);
+        const hh = amt * rate;
+        const staff = getStaff(name);
+        staff.spa += hh; staff.spaRev += amt;
+        staff.history.push({
+            time: getCurrentTime(), 
+            label: `Spa: +${format(amt)}đ`, 
+            hh: `+${format(hh)}đ`, 
+            staffName: name
         });
-
-        if (Object.keys(database).length === 0) {
-            container.innerHTML = '<p style="color: var(--ios-secondary-text); text-align: center;">Chưa có dữ liệu</p>';
-            revenueSummary.innerHTML = '<p style="font-size:12px; color:var(--ios-secondary-text);">Chưa có thống kê</p>';
-        }
+        window.saveData(); document.getElementById('spaAmount').value="";
     }
+    window.addMedia = () => {
+        const name = document.getElementById('staffDisplayName').innerText;
+        const bonus = (parseInt(document.getElementById('video1tr').value)||0)*2000000 + (parseInt(document.getElementById('video2tr').value)||0)*4000000;
+        const staff = getStaff(name); 
+        staff.media += bonus;
+        staff.history.push({
+            time: getCurrentTime(), 
+            label: `Media (Thưởng view)`, 
+            hh: `+${format(bonus)}đ`, 
+            staffName: name
+        });
+        window.saveData();
+    }
+    window.addRaccoon = () => {
+        const name = document.getElementById('staffDisplayName').innerText;
+        const amt = getCleanValue('raccoonAmount');
+        const hh = amt * 0.05;
+        const staff = getStaff(name); 
+        staff.raccoon += hh; staff.racRev += amt;
+        staff.history.push({
+            time: getCurrentTime(), 
+            label: `Gấu mèo: +${format(amt)}đ`, 
+            hh: `+${format(hh)}đ`, 
+            staffName: name
+        });
+        window.saveData(); document.getElementById('raccoonAmount').value="";
+    }
+    window.addCapy = () => {
+        const name = document.getElementById('staffDisplayName').innerText;
+        const amt = getCleanValue('capyAmount');
+        const hh = amt * 0.15;
+        const staff = getStaff(name); 
+        staff.capyRev += amt; staff.capyHH = staff.capyRev * 0.15;
+        staff.history.push({
+            time: getCurrentTime(), 
+            label: `Capy: +${format(amt)}đ`, 
+            hh: `+${format(hh)}đ`, 
+            staffName: name
+        });
+        window.saveData(); document.getElementById('capyAmount').value="";
+    }
+    window.addCat = () => {
+        const name = document.getElementById('staffDisplayName').innerText;
+        const amt = getCleanValue('catAmount');
+        const hh = amt * 0.02;
+        const staff = getStaff(name); 
+        staff.catRev += amt; staff.catHH = staff.catRev * 0.02;
+        staff.history.push({
+            time: getCurrentTime(), 
+            label: `Bán Mèo: +${format(amt)}đ`, 
+            hh: `+${format(hh)}đ`, 
+            staffName: name
+        });
+        window.saveData(); document.getElementById('catAmount').value="";
+    }
+    window.addDog = () => {
+        const name = document.getElementById('staffDisplayName').innerText;
+        const amt = getCleanValue('dogAmount');
+        const staff = getStaff(name); 
+        staff.dogRev += amt;
+        const rate = staff.dogRev > 65000000 ? 0.05 : 0.02;
+        const hh = amt * rate;
+        staff.dogHH = staff.dogRev * rate;
+        staff.history.push({
+            time: getCurrentTime(), 
+            label: `Bán Chó: +${format(amt)}đ`, 
+            hh: `+${format(hh)}đ`, 
+            staffName: name
+        });
+        window.saveData(); document.getElementById('dogAmount').value="";
+    }
+
+    window.updateUI = () => {
+        const container = document.getElementById('staffContainer');
+        const log = document.getElementById('logItems');
+        const rev = document.getElementById('revenueSummary');
+        const search = document.getElementById('historySearch').value.toLowerCase();
+        container.innerHTML = ""; log.innerHTML = ""; rev.innerHTML = "";
+        let allHist = [];
+        for (const [name, data] of Object.entries(database)) {
+            const commission = (data.spa||0) + (data.media||0) + (data.raccoon||0) + (data.capyHH||0) + (data.catHH||0) + (data.dogHH||0);
+            const totalRev = (data.spaRev||0) + (data.racRev||0) + (data.capyRev||0) + (data.catRev||0) + (data.dogRev||0);
+            if(data.history) data.history.forEach(h => allHist.push(h));
+            container.innerHTML += `<div style="background:var(--ios-card); padding:15px; border-radius:15px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.05); display:flex; justify-content:space-between;"><b>${name}</b><b style="color:var(--danger)">${format(commission)} đ</b></div>`;
+            rev.innerHTML += `<div style="padding:10px; border-bottom:1px solid var(--ios-separator); display:flex; justify-content:space-between;"><span>${name}</span><span style="color:var(--ios-blue)">${format(totalRev)} đ</span></div>`;
+        }
+        
+        // Hiển thị lịch sử chi tiết
+        allHist.reverse().filter(h => h.staffName.toLowerCase().includes(search)).slice(0,25).forEach(h => {
+            log.innerHTML += `
+                <div class="history-item">
+                    <span class="history-time">${h.time} - ${h.staffName}</span>
+                    <div class="history-main">
+                        <span class="history-label">${h.label}</span>
+                        <span class="history-hh">${h.hh}</span>
+                    </div>
+                </div>`;
+        });
+        lucide.createIcons();
+    }
+    window.clearData = () => { if(confirm("Xóa sạch dữ liệu?")) { database = {}; set(dbRef, {}); } }
 </script>
 </body>
 </html>
