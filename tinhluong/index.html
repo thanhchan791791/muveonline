@@ -66,7 +66,6 @@
             transition: opacity 0.5s var(--transition-smooth), transform 0.5s var(--transition-smooth);
         }
 
-        /* Background blur circles for modern look */
         .bg-blur {
             position: absolute;
             width: 300px;
@@ -201,6 +200,20 @@
             width: 100%;
             z-index: 200;
             transition: all 0.5s var(--transition-smooth);
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: calc(15px + env(safe-area-inset-top));
+            right: 20px;
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         .welcome-text {
@@ -389,6 +402,7 @@
     </div>
 
     <div id="home-screen">
+        <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
         <div class="welcome-text">
             <h2>Hệ Thống</h2>
             <p id="role-text">Quản lý nội bộ Công ty</p>
@@ -424,6 +438,16 @@
         const frame = document.getElementById('display-frame');
         const title = document.getElementById('page-title');
 
+        // Kiểm tra phiên đăng nhập khi vừa tải trang
+        window.onload = function() {
+            const savedUser = localStorage.getItem('loggedUser');
+            if (savedUser) {
+                currentUser = savedUser;
+                loginScreen.style.display = 'none';
+                showHome();
+            }
+        };
+
         function handleLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
@@ -431,17 +455,24 @@
 
             if (user === 'admin' && pass === 'cherry212') {
                 currentUser = 'admin';
+                localStorage.setItem('loggedUser', 'admin'); // Lưu phiên
                 fadeOutLogin();
             } else if (user === 'nv' && pass === '1') {
                 currentUser = 'nv';
+                localStorage.setItem('loggedUser', 'nv'); // Lưu phiên
                 fadeOutLogin();
             } else {
                 error.style.display = 'block';
-                // Trigger shake animation
                 error.style.animation = 'none';
                 error.offsetHeight; 
                 error.style.animation = null;
             }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('loggedUser'); // Xóa phiên
+            currentUser = null;
+            location.reload(); // Tải lại trang để về màn hình login
         }
 
         function fadeOutLogin() {
