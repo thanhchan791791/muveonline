@@ -289,7 +289,6 @@
     </div>
     <div id="summary-content" class="collapsible-content">
         <div id="staffContainer"></div>
-        <button onclick="clearData()" style="color:var(--danger); background:none; border:none; width:100%; margin-top:15px; font-weight:700;">Xóa toàn bộ dữ liệu</button>
     </div>
 
     <div class="collapsible-header" onclick="toggleSection('stats-content', this)">
@@ -378,7 +377,6 @@
     function format(n) { return n ? n.toLocaleString('vi-VN').replace(/,/g, '.') : "0"; }
     function getCleanValue(id) { return parseFloat(document.getElementById(id).value.replace(/\./g, '')) || 0; }
     
-    // Hàm lấy thời gian hiện tại
     function getCurrentTime() {
         const now = new Date();
         return now.toLocaleString('vi-VN', { 
@@ -393,7 +391,6 @@
         return database[n];
     }
 
-    // CÁC HÀM XỬ LÝ LƯU (Có thêm ghi log thời gian và hoa hồng)
     window.addSpa = () => {
         const name = document.getElementById('staffDisplayName').innerText;
         const amt = getCleanValue('spaAmount');
@@ -496,7 +493,6 @@
             rev.innerHTML += `<div style="padding:10px; border-bottom:1px solid var(--ios-separator); display:flex; justify-content:space-between;"><span>${name}</span><span style="color:var(--ios-blue)">${format(totalRev)} đ</span></div>`;
         }
         
-        // Hiển thị lịch sử chi tiết
         allHist.reverse().filter(h => h.staffName.toLowerCase().includes(search)).slice(0,25).forEach(h => {
             log.innerHTML += `
                 <div class="history-item">
@@ -509,7 +505,6 @@
         });
         lucide.createIcons();
     }
-    window.clearData = () => { if(confirm("Xóa sạch dữ liệu?")) { database = {}; set(dbRef, {}); } }
 </script>
 </body>
 </html>
