@@ -138,7 +138,7 @@
                 const total = emp.stats.totalPenalty + cloudData.total;
                 const allDetails = [...new Set([...cloudData.details, ...emp.lateDetails])];
                 if (total > 0) {
-                    tbody.innerHTML += `<tr><td style="font-weight:600; padding:12px 8px;">${emp.name}</td><td style="font-size:11px; color:#8E8E93;">${allDetails.join('<br>')}</td><td style="color:#FF3B30; font-weight:700; text-align:right;">${total.toLocaleString()}đ</td></tr>`;
+                    tbody.innerHTML += `<tr style="border-bottom: 1px solid var(--ios-border);"><td style="font-weight:600; padding:15px 8px; vertical-align:top;">${emp.name}</td><td style="font-size:11px; color:#8E8E93; padding:15px 8px;">${allDetails.join('<br>')}</td><td style="color:#FF3B30; font-weight:700; text-align:right; padding:15px 8px; vertical-align:top;">${total.toLocaleString()}đ</td></tr>`;
                 }
             });
             document.getElementById('penalty-overlay').style.display = 'flex';
@@ -519,7 +519,7 @@
             <i data-lucide="frown"></i> Danh Sách Phạt
         </h3>
         <div style="max-height:50vh; overflow-y:auto;">
-            <table style="width:100%">
+            <table style="width:100%; border-collapse: collapse;">
                 <tbody id="penalty-body"></tbody>
             </table>
         </div>
