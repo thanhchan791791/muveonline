@@ -698,24 +698,67 @@
         document.getElementById('detail-title').innerText = emp.name;
         const grid = document.getElementById('detail-grid');
         grid.innerHTML = '';
-        emp.attendanceRecords.forEach(rec => {
-            grid.innerHTML += `
-                <div class="date-card">
-                    <span class="day-label">Ngày ${rec.day}</span>
-                    <span class="time-label">${rec.time}</span>
-                </div>`;
-        });
+        
+        // Xác định số ngày trong tháng từ tiêu đề file Excel (thường đến ngày 31)
+        const dayNumbers = currentDateHeaders.filter(n => typeof n === 'number' && n > 0);
+        const daysInMonth = dayNumbers.length > 0 ? Math.max(...dayNumbers) : 31;
+        
+        let absentDays = [];
+
+        // Chạy vòng lặp hiển thị ĐỦ tất cả các ngày trong tháng
+        for (let d = 1; d <= daysInMonth; d++) {
+            const rec = emp.attendanceRecords.find(r => r.day === d);
+            if (rec) {
+                grid.innerHTML += `
+                    <div class="date-card">
+                        <span class="day-label">Ngày ${rec.day}</span>
+                        <span class="time-label">${rec.time}</span>
+                    </div>`;
+            } else {
+                absentDays.push(d);
+                grid.innerHTML += `
+                    <div class="date-card" style="background: #FFF5F5; border-color: #FEB2B2;">
+                        <span class="day-label">Ngày ${d}</span>
+                        <span class="time-label" style="color: #E53E3E; font-weight: bold;">Nghỉ</span>
+                    </div>`;
+            }
+        }
 
         const base = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
-        const totalFine = emp.stats.totalPenalty + (emp.stats.cloudPenalty || 0);
+        const cloudPenalty = window.cloudPenaltySummary[emp.name] ? window.cloudPenaltySummary[emp.name].total : 0;
+        const cloudDetails = window.cloudPenaltySummary[emp.name] ? window.cloudPenaltySummary[emp.name].details : [];
+        const totalFine = emp.stats.totalPenalty + cloudPenalty;
+        
+        // Gộp tất cả chi tiết phạt (từ file hiện tại + từ dữ liệu đám mây)
+        const allPenaltyDetails = [...new Set([...cloudDetails, ...emp.lateDetails])];
         const final = base + (emp.bonusAmount || 0) - totalFine;
         
         document.getElementById('detail-summary-box').innerHTML = `
             <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;"><span>Đơn giá:</span> <b>${emp.hourlyRate.toLocaleString()} đ/h</b></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px; color:var(--ios-green)"><span>Thưởng:</span> <b>+${emp.bonusAmount.toLocaleString()} đ</b></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px; color:var(--ios-red)"><span>Phạt:</span> <b>-${totalFine.toLocaleString()} đ</b></div>
-            <div class="final-total" style="display:flex; justify-content:space-between; font-weight:800; padding-top:10px; border-top:1px solid #eee;">
-                <span>LƯƠNG:</span> 
+            
+            <div style="margin-top:12px; border-top: 1px dashed #eee; padding-top:8px;">
+                <div style="display:flex; justify-content:space-between; color:var(--ios-green); font-weight:700;">
+                    <span>Thưởng:</span> <span>+${emp.bonusAmount.toLocaleString()} đ</span>
+                </div>
+                ${emp.bonusNote ? `<div style="font-size:11px; color:#666; margin-top:2px;">• Ghi chú: ${emp.bonusNote}</div>` : ''}
+            </div>
+
+            <div style="margin-top:12px; border-top: 1px dashed #eee; padding-top:8px;">
+                <div style="display:flex; justify-content:space-between; color:var(--ios-red); font-weight:700;">
+                    <span>Phạt vi phạm:</span> <span>-${totalFine.toLocaleString()} đ</span>
+                </div>
+                ${allPenaltyDetails.length > 0 ? `<div style="font-size:11px; color:#666; margin-top:2px; max-height:80px; overflow-y:auto;">${allPenaltyDetails.map(d => '• ' + d).join('<br>')}</div>` : ''}
+            </div>
+
+            <div style="margin-top:12px; background:#F2F2F7; padding:10px; border-radius:12px;">
+                <div style="font-size:13px; font-weight:700; color:#8E8E93; margin-bottom:4px;">Tổng số ngày nghỉ (${absentDays.length} ngày):</div>
+                <div style="font-size:11px; color:#8E8E93; line-height:1.4;">
+                    ${absentDays.length > 0 ? 'Ngày: ' + absentDays.join(', ') : 'Không nghỉ ngày nào'}
+                </div>
+            </div>
+
+            <div class="final-total" style="display:flex; justify-content:space-between; font-weight:800; padding-top:10px; border-top:2px solid #eee; margin-top:15px;">
+                <span>THỰC NHẬN:</span> 
                 <span style="color:var(--ios-blue)">${final.toLocaleString()} đ</span>
             </div>
         `;
