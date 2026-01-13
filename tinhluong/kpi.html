@@ -45,16 +45,21 @@
 
         /* --- MÀN HÌNH CHÀO (WELCOME) --- */
         #welcome-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute;
+            top: 0; left: 0; width: 100%; min-height: 100vh;
             background: linear-gradient(135deg, #ffffff 0%, #f2f2f7 100%);
             z-index: 1000;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
+            padding: 40px 0;
             transition: all 0.6s ease;
+            overflow-y: auto;
+        }
+
+        .welcome-content {
+            padding: 0 24px;
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         .logo-wrapper {
@@ -199,6 +204,29 @@
         <input type="text" id="initialName" placeholder="Nhập họ tên nhân viên..." style="text-align: center;">
         <button class="btn-add" style="background: var(--ios-blue);" onclick="startApp()">Tiếp tục <i data-lucide="arrow-right"></i></button>
     </div>
+
+    <div class="collapsible-header" onclick="toggleSection('summary-content', this)">
+        <h3><i data-lucide="list"></i> Hoa hồng nhận được</h3>
+        <i data-lucide="chevron-down" class="chevron-icon"></i>
+    </div>
+    <div id="summary-content" class="collapsible-content">
+        <div id="staffContainer"></div>
+    </div>
+
+    <div class="collapsible-header" onclick="toggleSection('stats-content', this)">
+        <h3><i data-lucide="trending-up"></i> Thống kê doanh thu</h3>
+        <i data-lucide="chevron-down" class="chevron-icon"></i>
+    </div>
+    <div id="stats-content" class="collapsible-content"><div id="revenueSummary"></div></div>
+
+    <div class="collapsible-header" onclick="toggleSection('history-content', this)">
+        <h3><i data-lucide="history"></i> Lịch sử chi tiết</h3>
+        <i data-lucide="chevron-down" class="chevron-icon"></i>
+    </div>
+    <div id="history-content" class="collapsible-content">
+        <input type="text" id="historySearch" placeholder="Tìm tên nhân viên..." oninput="updateUI()">
+        <div id="logItems"></div>
+    </div>
 </div>
 
 <div class="container" id="main-content">
@@ -281,29 +309,6 @@
         <button onclick="backToMenu()" style="background:none; border:none; color:var(--ios-blue); font-weight:700; margin-bottom:15px; display:flex; align-items:center; gap:5px;"><i data-lucide="chevron-left"></i> Quay lại</button>
         <label>Doanh thu Bán Chó</label><input type="text" id="dogAmount" class="currency-input" placeholder="0">
         <button class="btn-add btn-dog" onclick="addDog()"><i data-lucide="save"></i> Lưu</button>
-    </div>
-
-    <div class="collapsible-header" onclick="toggleSection('summary-content', this)">
-        <h3><i data-lucide="list"></i> Thống kê hoa hồng</h3>
-        <i data-lucide="chevron-down" class="chevron-icon"></i>
-    </div>
-    <div id="summary-content" class="collapsible-content">
-        <div id="staffContainer"></div>
-    </div>
-
-    <div class="collapsible-header" onclick="toggleSection('stats-content', this)">
-        <h3><i data-lucide="trending-up"></i> Thống kê doanh thu</h3>
-        <i data-lucide="chevron-down" class="chevron-icon"></i>
-    </div>
-    <div id="stats-content" class="collapsible-content"><div id="revenueSummary"></div></div>
-
-    <div class="collapsible-header" onclick="toggleSection('history-content', this)">
-        <h3><i data-lucide="history"></i> Lịch sử chi tiết</h3>
-        <i data-lucide="chevron-down" class="chevron-icon"></i>
-    </div>
-    <div id="history-content" class="collapsible-content">
-        <input type="text" id="historySearch" placeholder="Tìm tên nhân viên..." oninput="updateUI()">
-        <div id="logItems"></div>
     </div>
 </div>
 
@@ -482,15 +487,42 @@
         const container = document.getElementById('staffContainer');
         const log = document.getElementById('logItems');
         const rev = document.getElementById('revenueSummary');
-        const search = document.getElementById('historySearch').value.toLowerCase();
+        const searchInput = document.getElementById('historySearch');
+        const search = searchInput ? searchInput.value.toLowerCase() : "";
+        
+        if(!container || !log || !rev) return;
+
         container.innerHTML = ""; log.innerHTML = ""; rev.innerHTML = "";
         let allHist = [];
+        let grandTotalCommission = 0;
+        let grandTotalRevenue = 0;
+
         for (const [name, data] of Object.entries(database)) {
             const commission = (data.spa||0) + (data.media||0) + (data.raccoon||0) + (data.capyHH||0) + (data.catHH||0) + (data.dogHH||0);
             const totalRev = (data.spaRev||0) + (data.racRev||0) + (data.capyRev||0) + (data.catRev||0) + (data.dogRev||0);
+            
+            grandTotalCommission += commission;
+            grandTotalRevenue += totalRev;
+
             if(data.history) data.history.forEach(h => allHist.push(h));
+            
             container.innerHTML += `<div style="background:var(--ios-card); padding:15px; border-radius:15px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.05); display:flex; justify-content:space-between;"><b>${name}</b><b style="color:var(--danger)">${format(commission)} đ</b></div>`;
             rev.innerHTML += `<div style="padding:10px; border-bottom:1px solid var(--ios-separator); display:flex; justify-content:space-between;"><span>${name}</span><span style="color:var(--ios-blue)">${format(totalRev)} đ</span></div>`;
+        }
+
+        // Thêm phần TỔNG CỘNG cho Hoa hồng
+        if (Object.keys(database).length > 0) {
+            container.innerHTML += `
+                <div style="background:var(--ios-blue); color:white; padding:15px; border-radius:15px; margin-top:15px; display:flex; justify-content:space-between; box-shadow: 0 4px 15px rgba(0,122,255,0.3);">
+                    <b style="font-size: 16px;">TỔNG CỘNG</b>
+                    <b style="font-size: 18px;">${format(grandTotalCommission)} đ</b>
+                </div>`;
+            
+            rev.innerHTML += `
+                <div style="padding:12px 10px; background:rgba(0,122,255,0.05); margin-top:10px; border-radius:10px; display:flex; justify-content:space-between; border: 1px dashed var(--ios-blue);">
+                    <span style="font-weight:800; color:var(--ios-text);">TỔNG DOANH THU</span>
+                    <span style="color:var(--ios-blue); font-weight:900; font-size:16px;">${format(grandTotalRevenue)} đ</span>
+                </div>`;
         }
         
         allHist.reverse().filter(h => h.staffName.toLowerCase().includes(search)).slice(0,25).forEach(h => {
