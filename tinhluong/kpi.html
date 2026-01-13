@@ -59,16 +59,45 @@
         .welcome-content {
             padding: 0 24px;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .logo-wrapper {
-            width: 100px; height: 100px; background: white; border-radius: 24px;
+            width: 80px; height: 80px; background: white; border-radius: 20px;
             display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 30px; box-shadow: var(--shadow); color: var(--ios-blue);
+            margin: 0 auto 20px; box-shadow: var(--shadow); color: var(--ios-blue);
         }
 
-        /* --- THÔNG BÁO TÍCH XANH (SUCCESS TOAST) --- */
+        /* Thẻ tổng quan bên ngoài */
+        .summary-outer-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 25px;
+        }
+        .outer-card {
+            background: white;
+            padding: 15px 10px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .outer-card label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--ios-secondary-text);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .outer-card span {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        /* --- THÔNG BÁO TÍCH XANH --- */
         #success-toast {
             position: fixed;
             top: 50%;
@@ -201,6 +230,20 @@
         <div class="logo-wrapper"><i data-lucide="bar-chart-3" style="width: 48px; height: 48px;"></i></div>
         <h1>KPI Detail</h1>
         <p>Hệ thống quản lý hiệu suất 2026</p>
+    </div>
+
+    <div class="summary-outer-cards animate__animated animate__fadeInUp">
+        <div class="outer-card">
+            <label>Tổng Hoa Hồng</label>
+            <span id="outer-total-commission" style="color: var(--danger);">0 đ</span>
+        </div>
+        <div class="outer-card">
+            <label>Tổng Doanh Thu</label>
+            <span id="outer-total-revenue" style="color: var(--ios-blue);">0 đ</span>
+        </div>
+    </div>
+
+    <div class="welcome-content">
         <input type="text" id="initialName" placeholder="Nhập họ tên nhân viên..." style="text-align: center;">
         <button class="btn-add" style="background: var(--ios-blue);" onclick="startApp()">Tiếp tục <i data-lucide="arrow-right"></i></button>
     </div>
@@ -487,6 +530,8 @@
         const container = document.getElementById('staffContainer');
         const log = document.getElementById('logItems');
         const rev = document.getElementById('revenueSummary');
+        const outerComm = document.getElementById('outer-total-commission');
+        const outerRev = document.getElementById('outer-total-revenue');
         const searchInput = document.getElementById('historySearch');
         const search = searchInput ? searchInput.value.toLowerCase() : "";
         
@@ -510,7 +555,11 @@
             rev.innerHTML += `<div style="padding:10px; border-bottom:1px solid var(--ios-separator); display:flex; justify-content:space-between;"><span>${name}</span><span style="color:var(--ios-blue)">${format(totalRev)} đ</span></div>`;
         }
 
-        // Thêm phần TỔNG CỘNG cho Hoa hồng
+        // Cập nhật giá trị hiển thị bên ngoài
+        if(outerComm) outerComm.innerText = format(grandTotalCommission) + " đ";
+        if(outerRev) outerRev.innerText = format(grandTotalRevenue) + " đ";
+
+        // Thêm phần TỔNG CỘNG cho Hoa hồng trong mục rút gọn
         if (Object.keys(database).length > 0) {
             container.innerHTML += `
                 <div style="background:var(--ios-blue); color:white; padding:15px; border-radius:15px; margin-top:15px; display:flex; justify-content:space-between; box-shadow: 0 4px 15px rgba(0,122,255,0.3);">
