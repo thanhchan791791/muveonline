@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Hệ Thống Quản Lý Nội Bộ</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --ios-blue: #007AFF;
+            --ios-bg: #F2F2F7;
+            --ios-card-bg: rgba(255, 255, 255, 0.85);
+            --ios-text: #000000;
+            --ios-secondary-text: #8E8E93;
+            --blur-val: 25px;
+            /* Hiệu ứng Spring đặc trưng iOS */
+            --spring-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-main: all 0.5s var(--spring-easing);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- iOS Header --- */
+        .top-bar {
+            height: 110px;
+            padding: 40px 24px 10px 24px;
+            background: var(--ios-card-bg);
+            backdrop-filter: blur(var(--blur-val));
+            -webkit-backdrop-filter: blur(var(--blur-val));
+            border-bottom: 0.5px solid rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .top-bar h3 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            transition: var(--transition-main);
+        }
+
+        /* --- Layout --- */
+        .app-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar (Desktop) --- */
+        .sidebar {
+            width: 300px;
+            background: var(--ios-bg);
+            border-right: 0.5px solid rgba(0,0,0,0.1);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding-left: 12px;
+        }
+
+        .menu-item { list-style: none; }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            color: var(--ios-text);
+            text-decoration: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            transition: var(--transition-main);
+            gap: 14px;
+            cursor: pointer;
+        }
+
+        .menu-item a:hover {
+            background-color: rgba(0,0,0,0.03);
+            transform: translateX(5px);
+        }
+
+        .menu-item a:active {
+            transform: scale(0.94);
+            background-color: rgba(0,0,0,0.08);
+        }
+
+        .menu-item a.active {
+            background-color: white;
+            color: var(--ios-blue);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        }
+
+        /* Icon Container với Gradient */
+        .icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: var(--ios-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .iframe-container {
+            flex: 1;
+            width: 100%;
+            border-radius: 28px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.7);
+            animation: iosEntry 0.8s var(--spring-easing);
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* --- Mobile Nav --- */
+        .mobile-nav {
+            display: none;
+            height: 90px;
+            background: var(--ios-card-bg);
+            backdrop-filter: blur(var(--blur-val));
+            -webkit-backdrop-filter: blur(var(--blur-val));
+            border-top: 0.5px solid rgba(0,0,0,0.1);
+            padding-bottom: env(safe-area-inset-bottom);
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--ios-secondary-text);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            gap: 6px;
+            transition: var(--transition-main);
+            width: 20%;
+        }
+
+        .nav-item.active {
+            color: var(--ios-blue);
+            transform: translateY(-5px);
+        }
+
+        .nav-item i { transition: var(--transition-main); }
+        .nav-item.active i { transform: scale(1.2); }
+
+        /* --- Toast Notification iOS --- */
+        #toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: 0.5s var(--spring-easing);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #toast.show { top: 60px; }
+
+        /* --- Animations --- */
+        @keyframes iosEntry {
+            from { opacity: 0; transform: scale(0.92) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .mobile-nav { display: flex; }
+            .top-bar { height: 100px; padding-top: 50px; }
+            .top-bar h3 { font-size: 28px; }
+            .main-content { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast">
+        <i data-lucide="check-circle" style="width:18px"></i> Đã sao chép link menu!
+    </div>
+
+    <div class="top-bar">
+        <h3 id="current-title">Tổng quan</h3>
+    </div>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">Quản trị hệ thống</div>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="https://thanhchan791791.github.io/lichnghi/quanlynhansu/" target="content-frame" onclick="updateTitle('Nhân sự')">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #007AFF, #00C7FF);">
+                            <i data-lucide="users"></i>
+                        </div> Nhân sự
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="https://cherrybooking.io.vn/tinhluong/kpi.html" target="content-frame" onclick="updateTitle('KPI Thưởng')">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #34C759, #30D158);">
+                            <i data-lucide="bar-chart-3"></i>
+                        </div> KPI
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="https://cherrybooking.io.vn/tinhluong/b.html" target="content-frame" onclick="updateTitle('Kỷ luật')">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #FF3B30, #FF453A);">
+                            <i data-lucide="gavel"></i>
+                        </div> Phạt
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="https://thanhchan791791.github.io/lichnghi/admin.html" target="content-frame" onclick="updateTitle('Lịch nghỉ')">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #FF9500, #FFB340);">
+                            <i data-lucide="calendar-days"></i>
+                        </div> Lịch nghỉ
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a onclick="copyMenuLink(); updateTitle('Ẩm thực')">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #AF52DE, #BF5AF2);">
+                            <i data-lucide="copy"></i>
+                        </div> Copy Menu
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="iframe-container">
+                <iframe name="content-frame" src="https://cherrybooking.io.vn/tinhluong/kpi.html" id="main-iframe"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <nav class="mobile-nav">
+        <a href="https://thanhchan791791.github.io/lichnghi/quanlynhansu/" target="content-frame" class="nav-item" onclick="updateTitle('Nhân sự')">
+            <i data-lucide="users" style="color: #007AFF"></i> Nhân sự
+        </a>
+        <a href="https://cherrybooking.io.vn/tinhluong/kpi.html" target="content-frame" class="nav-item active" onclick="updateTitle('KPI')">
+            <i data-lucide="bar-chart-3" style="color: #34C759"></i> KPI
+        </a>
+        <a href="https://cherrybooking.io.vn/tinhluong/b.html" target="content-frame" class="nav-item" onclick="updateTitle('Phạt')">
+            <i data-lucide="gavel" style="color: #FF3B30"></i> Phạt
+        </a>
+        <a href="https://thanhchan791791.github.io/lichnghi/admin.html" target="content-frame" class="nav-item" onclick="updateTitle('Lịch nghỉ')">
+            <i data-lucide="calendar-days" style="color: #FF9500"></i> Lịch nghỉ
+        </a>
+        <a class="nav-item" onclick="copyMenuLink(); updateTitle('Ẩm thực')">
+            <i data-lucide="copy" style="color: #AF52DE"></i> Menu
+        </a>
+    </nav>
+
+    <script>
+        // Khởi tạo icon
+        lucide.createIcons();
+
+        function copyMenuLink() {
+            const menuLink = "https://amthuamthucbuonme.vn/danhgia/menu.html";
+            navigator.clipboard.writeText(menuLink).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2500);
+            });
+        }
+
+        function updateTitle(title) {
+            const titleEl = document.getElementById('current-title');
+            titleEl.style.opacity = '0';
+            titleEl.style.transform = 'translateY(15px) scale(0.9)';
+            
+            setTimeout(() => {
+                titleEl.innerText = title;
+                titleEl.style.opacity = '1';
+                titleEl.style.transform = 'translateY(0) scale(1)';
+            }, 250);
+            
+            // Cập nhật Active State
+            document.querySelectorAll('.menu-item a, .nav-item').forEach(link => {
+                link.classList.remove('active');
+                if(link.innerText.includes(title) || link.textContent.includes(title)) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Hiệu ứng reload iframe
+            if (!title.includes('Ẩm thực')) {
+                const container = document.querySelector('.iframe-container');
+                container.style.animation = 'none';
+                void container.offsetWidth; 
+                container.style.animation = 'iosEntry 0.8s var(--spring-easing)';
+            }
+        }
+    </script>
+</body>
+</html>
