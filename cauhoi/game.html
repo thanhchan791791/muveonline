@@ -17,7 +17,7 @@
             --system-gray: #8E8E93;
             --success: #34C759;
             --danger: #FF3B30;
-            --warning: #FF9500; /* Màu chờ đợi */
+            --warning: #FF9500; 
             --ease: cubic-bezier(0.4, 0, 0.2, 1);
             --help-color: #5856D6;
         }
@@ -161,7 +161,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
-        /* Các class trạng thái */
         .waiting { background-color: var(--warning) !important; color: white !important; animation: blink 0.5s infinite; }
         .correct { background-color: var(--success) !important; color: white !important; }
         .wrong { background-color: var(--danger) !important; color: white !important; }
@@ -213,7 +212,7 @@
                 <h2 style="margin:0; font-size: 20px;">Quyền trợ giúp</h2>
                 <div class="help-options">
                     <button class="opt-btn" id="h-wife" onclick="useHelp('wife')">
-                        <i data-lucide="phone-call"></i> Gọi Nhà thông thái
+                        <i data-lucide="phone-call"></i> Gọi Nhà thông thái
                     </button>
                     <button class="opt-btn" id="h-rel" onclick="useHelp('relative')">
                         <i data-lucide="users"></i> Người thân
@@ -240,7 +239,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, get, update, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAMycdJcRR1Kl53wrJQbQ9dw-xSfpOym_4",
@@ -268,18 +267,47 @@
             try {
                 const snapshot = await get(ref(db, 'questions'));
                 if (snapshot.exists()) {
-                    selectedQuestions = Object.values(snapshot.val()).sort(() => 0.5 - Math.random()).slice(0, 5);
+                    let allData = snapshot.val();
+                    // Chuyển object sang array kèm theo Key để cập nhật sau này
+                    let list = Object.keys(allData).map(key => ({
+                        id: key,
+                        ...allData[key],
+                        appearCount: allData[key].appearCount || 0
+                    }));
+
+                    // Sắp xếp: Ưu tiên câu có số lần xuất hiện (appearCount) ít nhất, sau đó mới ngẫu nhiên
+                    selectedQuestions = list.sort((a, b) => {
+                        if (a.appearCount !== b.appearCount) {
+                            return a.appearCount - b.appearCount;
+                        }
+                        return 0.5 - Math.random();
+                    }).slice(0, 5);
+
                     document.getElementById('start-screen').classList.add('hidden');
                     document.getElementById('quiz-screen').classList.remove('hidden');
                     document.getElementById('fab-btn').classList.remove('hidden');
                     renderCurrentQuestion();
                 }
-            } catch (e) { alert("Lỗi kết nối!"); }
+            } catch (e) { 
+                console.error(e);
+                alert("Lỗi kết nối!"); 
+            }
         };
 
-        window.renderCurrentQuestion = () => {
+        window.renderCurrentQuestion = async () => {
             if (currentIndex >= selectedQuestions.length) { showResult(); return; }
+            
             const q = selectedQuestions[currentIndex];
+
+            // Cập nhật số lần xuất hiện lên Firebase ngay khi câu hỏi hiện ra
+            try {
+                const updates = {};
+                updates[`questions/${q.id}/appearCount`] = increment(1);
+                await update(ref(db), updates);
+            } catch (err) {
+                console.warn("Không thể cập nhật số lần xuất hiện");
+            }
+
             document.getElementById('progress').innerText = `CÂU ${currentIndex + 1}/5`;
             document.getElementById('question-text').innerText = q.question;
             document.getElementById('status').innerText = '';
@@ -303,12 +331,10 @@
             btns.forEach(b => b.disabled = true);
             const status = document.getElementById('status');
             
-            // Bước 1: Hiển thị trạng thái chờ đợi
             selectedBtn.classList.add('waiting');
             status.innerText = "ĐANG KIỂM TRA...";
             status.style.color = "var(--warning)";
 
-            // Bước 2: Chờ 3 giây sau đó mới hiển thị kết quả
             setTimeout(() => {
                 selectedBtn.classList.remove('waiting');
                 
@@ -332,7 +358,7 @@
                     setTimeout(() => nextBtn.classList.add('show'), 10);
                     currentIndex++;
                 }, 1000);
-            }, 3000); // 3000ms = 3 giây
+            }, 3000);
         }
 
         window.toggleHelpModal = (show) => {
