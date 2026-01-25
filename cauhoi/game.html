@@ -17,6 +17,7 @@
             --system-gray: #8E8E93;
             --success: #34C759;
             --danger: #FF3B30;
+            --warning: #FF9500; /* Màu chờ đợi */
             --ease: cubic-bezier(0.4, 0, 0.2, 1);
             --help-color: #5856D6;
         }
@@ -86,7 +87,6 @@
             font-weight: 600;
         }
 
-        /* Nút trợ giúp tròn ở góc phải */
         .fab-help {
             position: fixed;
             bottom: 30px;
@@ -107,7 +107,6 @@
             100% { box-shadow: 0 0 0 0 rgba(88, 86, 214, 0); }
         }
 
-        /* Modal trợ giúp */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -162,8 +161,16 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
+        /* Các class trạng thái */
+        .waiting { background-color: var(--warning) !important; color: white !important; animation: blink 0.5s infinite; }
         .correct { background-color: var(--success) !important; color: white !important; }
         .wrong { background-color: var(--danger) !important; color: white !important; }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
 
         #next-btn {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, 100px);
@@ -296,26 +303,36 @@
             btns.forEach(b => b.disabled = true);
             const status = document.getElementById('status');
             
-            if (isCorrect) {
-                selectedBtn.classList.add('correct');
-                status.innerText = "CHÍNH XÁC ✨";
-                status.style.color = "var(--success)";
-                score++;
-            } else {
-                selectedBtn.classList.add('wrong');
-                status.innerText = "SAI RỒI 😢";
-                status.style.color = "var(--danger)";
-                btns.forEach((b, i) => { if(allAnswers[i].isCorrect) b.classList.add('correct'); });
-            }
-            
+            // Bước 1: Hiển thị trạng thái chờ đợi
+            selectedBtn.classList.add('waiting');
+            status.innerText = "ĐANG KIỂM TRA...";
+            status.style.color = "var(--warning)";
+
+            // Bước 2: Chờ 3 giây sau đó mới hiển thị kết quả
             setTimeout(() => {
-                document.getElementById('answer-list').style.opacity = "0.2";
-                const nextBtn = document.getElementById('next-btn');
-                nextBtn.classList.remove('hidden');
-                nextBtn.innerText = currentIndex === 4 ? "KẾT QUẢ 🏆" : "TIẾP THEO →";
-                setTimeout(() => nextBtn.classList.add('show'), 10);
-                currentIndex++;
-            }, 1000);
+                selectedBtn.classList.remove('waiting');
+                
+                if (isCorrect) {
+                    selectedBtn.classList.add('correct');
+                    status.innerText = "CHÍNH XÁC ✨";
+                    status.style.color = "var(--success)";
+                    score++;
+                } else {
+                    selectedBtn.classList.add('wrong');
+                    status.innerText = "SAI RỒI 😢";
+                    status.style.color = "var(--danger)";
+                    btns.forEach((b, i) => { if(allAnswers[i].isCorrect) b.classList.add('correct'); });
+                }
+                
+                setTimeout(() => {
+                    document.getElementById('answer-list').style.opacity = "0.2";
+                    const nextBtn = document.getElementById('next-btn');
+                    nextBtn.classList.remove('hidden');
+                    nextBtn.innerText = currentIndex === 4 ? "KẾT QUẢ 🏆" : "TIẾP THEO →";
+                    setTimeout(() => nextBtn.classList.add('show'), 10);
+                    currentIndex++;
+                }, 1000);
+            }, 3000); // 3000ms = 3 giây
         }
 
         window.toggleHelpModal = (show) => {
@@ -340,7 +357,6 @@
                 const p = prompt("Nhập số điện thoại người thân:");
                 if(p) { usedHelp.relative = true; window.location.href = `tel:${p}`; }
             } else if (type === 'crowd') {
-                // ĐÃ CẬP NHẬT THÔNG BÁO THEO YÊU CẦU
                 alert("Đã chọn trợ giúp thành công mời bạn hỏi mọi người.");
                 usedHelp.crowd = true;
             } else if (type === '5050') {
