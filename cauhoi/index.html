@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Quản lý Câu hỏi</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-text: #000000;
+            --ios-secondary-text: #8E8E93;
+            --ios-border: rgba(0,0,0,0.1);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+            --easing: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            animation: slideUp 0.6s var(--easing);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin: 0 0 24px 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card {
+            background: var(--ios-card);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.7);
+            backdrop-filter: blur(20px);
+        }
+
+        .form-group { margin-bottom: 24px; }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--ios-secondary-text);
+            margin-bottom: 10px;
+            display: block;
+            padding-left: 4px;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            border: none;
+            background: var(--ios-bg);
+            border-radius: 14px;
+            padding: 14px 16px;
+            font-size: 16px;
+            color: var(--ios-text);
+            transition: all 0.3s var(--easing);
+            outline: none;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            background: #E5E5EA;
+            box-shadow: inset 0 0 0 1px var(--ios-blue);
+        }
+
+        #answersContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .answer-item {
+            display: flex;
+            align-items: center;
+            background: var(--ios-bg);
+            border-radius: 16px;
+            padding: 4px 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .answer-item:focus-within {
+            transform: scale(1.02);
+            background: #FFF;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Custom Radio Styling */
+        input[type="radio"] {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #C7C7CC;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s var(--easing);
+            flex-shrink: 0;
+        }
+
+        input[type="radio"]:checked {
+            border-color: var(--ios-blue);
+            background: var(--ios-blue);
+        }
+
+        input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .answer-input {
+            background: transparent !important;
+            font-weight: 500;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: var(--ios-blue);
+            color: white;
+            border: none;
+            border-radius: 100px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s var(--easing);
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s var(--easing);
+        }
+
+        .status.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-bg: #000000;
+                --ios-card: #1C1C1E;
+                --ios-text: #FFFFFF;
+                --ios-border: rgba(255,255,255,0.1);
+            }
+            .card { border: 1px solid rgba(255,255,255,0.05); }
+            textarea, input[type="text"], .answer-item { background: #2C2C2E; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2><i data-lucide="plus-circle" style="color: var(--ios-blue)"></i> Soạn câu hỏi</h2>
+    
+    <div class="card">
+        <div class="form-group">
+            <label>Nội dung câu hỏi</label>
+            <textarea id="questionText" rows="3" placeholder="Nhập câu hỏi..."></textarea>
+        </div>
+
+        <div id="answersContainer">
+            <label>Các phương án trả lời</label>
+            
+            <div class="answer-item">
+                <input type="radio" name="correctAnswer" value="0" checked title="Chọn câu đúng">
+                <input type="text" class="answer-input" placeholder="Đáp án A">
+            </div>
+            <div class="answer-item">
+                <input type="radio" name="correctAnswer" value="1" title="Chọn câu đúng">
+                <input type="text" class="answer-input" placeholder="Đáp án B">
+            </div>
+            <div class="answer-item">
+                <input type="radio" name="correctAnswer" value="2" title="Chọn câu đúng">
+                <input type="text" class="answer-input" placeholder="Đáp án C">
+            </div>
+            <div class="answer-item">
+                <input type="radio" name="correctAnswer" value="3" title="Chọn câu đúng">
+                <input type="text" class="answer-input" placeholder="Đáp án D">
+            </div>
+        </div>
+
+        <button id="btnSave">
+            <span>Lưu dữ liệu</span>
+            <i data-lucide="arrow-right-circle" size="20"></i>
+        </button>
+        
+        <div id="status" class="status"></div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAMycdJcRR1Kl53wrJQbQ9dw-xSfpOym_4",
+        authDomain: "lichnghi2.firebaseapp.com",
+        databaseURL: "https://lichnghi2-default-rtdb.firebaseio.com",
+        projectId: "lichnghi2",
+        storageBucket: "lichnghi2.firebasestorage.app",
+        messagingSenderId: "534827443513",
+        appId: "1:534827443513:web:003b8b9d8132f9e6cc74e8",
+        measurementId: "G-SHSCW5H652"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Init Lucide icons
+    lucide.createIcons();
+
+    document.getElementById('btnSave').addEventListener('click', async () => {
+        const questionText = document.getElementById('questionText').value;
+        const answerInputs = document.querySelectorAll('.answer-input');
+        const correctIndex = document.querySelector('input[name="correctAnswer"]:checked').value;
+        const statusDiv = document.getElementById('status');
+        const btn = document.getElementById('btnSave');
+
+        if (!questionText.trim()) {
+            statusDiv.innerText = "Vui lòng nhập câu hỏi";
+            statusDiv.style.color = "var(--ios-red)";
+            statusDiv.classList.add('show');
+            return;
+        }
+
+        const answers = Array.from(answerInputs).map((input, index) => ({
+            text: input.value,
+            isCorrect: index == correctIndex
+        }));
+
+        try {
+            btn.style.opacity = "0.7";
+            btn.innerText = "Đang xử lý...";
+            
+            const questionsRef = ref(db, 'questions');
+            const newQuestionRef = push(questionsRef);
+            
+            await set(newQuestionRef, {
+                question: questionText,
+                answers: answers,
+                createdAt: Date.now()
+            });
+
+            statusDiv.innerHTML = '<i data-lucide="check-circle-2"></i> Lưu thành công!';
+            statusDiv.style.color = "var(--ios-green)";
+            statusDiv.classList.add('show');
+            lucide.createIcons();
+            
+            // Haptic-like reset
+            setTimeout(() => {
+                document.getElementById('questionText').value = "";
+                answerInputs.forEach(input => input.value = "");
+                statusDiv.classList.remove('show');
+                btn.innerHTML = '<span>Lưu dữ liệu</span> <i data-lucide="arrow-right-circle" size="20"></i>';
+                btn.style.opacity = "1";
+                lucide.createIcons();
+            }, 2000);
+            
+        } catch (error) {
+            statusDiv.innerText = "Lỗi: " + error.message;
+            statusDiv.style.color = "var(--ios-red)";
+            statusDiv.classList.add('show');
+            btn.style.opacity = "1";
+        }
+    });
+</script>
+
+</body>
+</html>
