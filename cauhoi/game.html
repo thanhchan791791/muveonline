@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trắc Nghiệm</title>
+    <title>Trắc Nghiệm Cherry</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --system-background: #F2F2F7;
@@ -17,6 +18,7 @@
             --success: #34C759;
             --danger: #FF3B30;
             --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --help-color: #5856D6;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -30,10 +32,7 @@
             }
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
@@ -47,25 +46,7 @@
             overflow: hidden;
         }
 
-        .container {
-            width: 100%;
-            max-width: 430px;
-            padding: 20px;
-            perspective: 1000px;
-        }
-
-        /* Style cho Logo */
-        .logo-container {
-            margin-bottom: 20px;
-        }
-        
-        .logo-img {
-            width: 80px; /* Bạn có thể điều chỉnh kích thước tùy ý */
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+        .container { width: 100%; max-width: 430px; padding: 20px; perspective: 1000px; }
 
         .card {
             position: relative;
@@ -85,51 +66,15 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
 
-        h1, h2, h3 {
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-top: 0;
-        }
+        .logo-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; }
 
-        h1 { font-size: 28px; margin-bottom: 8px; }
-        p { font-size: 17px; color: var(--label-secondary); line-height: 1.4; margin-bottom: 32px; }
+        .progress { font-size: 13px; font-weight: 600; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
 
-        .progress {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
+        #question-text { font-size: 22px; margin-bottom: 24px; line-height: 1.3; font-weight: 700; }
 
-        #question-text {
-            font-size: 22px;
-            margin-bottom: 24px;
-            line-height: 1.3;
-        }
-
-        button {
-            appearance: none;
-            border: none;
-            font-family: inherit;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s var(--ease);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        button:active {
-            transform: scale(0.96);
-            opacity: 0.8;
-        }
+        button { border: none; font-family: inherit; cursor: pointer; transition: all 0.2s var(--ease); display: flex; align-items: center; justify-content: center; }
 
         .btn-primary {
             background-color: var(--accent);
@@ -137,132 +82,149 @@
             padding: 16px 32px;
             border-radius: 999px;
             width: 100%;
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            font-size: 17px;
+            font-weight: 600;
         }
 
-        .answer-list {
+        /* Nút trợ giúp tròn ở góc phải */
+        .fab-help {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--help-color);
+            color: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(88, 86, 214, 0.4);
+            z-index: 99;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(88, 86, 214, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(88, 86, 214, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(88, 86, 214, 0); }
+        }
+
+        /* Modal trợ giúp */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            z-index: 100;
             display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 24px;
-            position: relative;
-            transition: opacity 0.5s var(--ease);
+            justify-content: center;
+            align-items: flex-end;
         }
 
+        .help-menu {
+            background: var(--secondary-background);
+            padding: 24px;
+            border-radius: 30px 30px 0 0;
+            width: 100%;
+            max-width: 430px;
+            transform: translateY(100%);
+            animation: slideUp 0.4s var(--ease) forwards;
+        }
+
+        @keyframes slideUp { to { transform: translateY(0); } }
+
+        .help-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+
+        .opt-btn {
+            background: var(--system-background);
+            color: var(--label-primary);
+            flex-direction: column;
+            padding: 20px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            gap: 10px;
+        }
+
+        .opt-btn i { color: var(--help-color); }
+        .opt-btn:disabled { opacity: 0.3; filter: grayscale(1); }
+
+        .close-modal { margin-top: 25px; color: var(--system-gray); font-size: 15px; width: 100%; padding: 10px; }
+
+        .answer-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
         .answer-btn {
             background: var(--secondary-background);
             color: var(--label-primary);
-            padding: 20px 24px;
+            padding: 18px 24px;
             border-radius: 18px;
             text-align: left;
             justify-content: flex-start;
-            border: 2px solid transparent;
             font-weight: 600;
-            font-size: 19px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-            100% { transform: scale(1); }
-        }
-
-        .correct {
-            background-color: var(--success) !important;
-            color: #FFFFFF !important;
-            animation: pop 0.4s ease;
-        }
-
-        .wrong {
-            background-color: var(--danger) !important;
-            color: #FFFFFF !important;
-            animation: shake 0.4s ease;
-        }
-
-        /* Hiệu ứng trượt lên cho nút Tiếp theo */
-        #next-btn {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, 100px); /* Bắt đầu từ dưới */
-            opacity: 0;
-            z-index: 20;
-            background: var(--label-primary);
-            color: var(--system-background);
-            padding: 20px 40px;
-            border-radius: 999px;
-            width: 85%;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-            font-size: 20px;
-            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        #next-btn.show {
-            opacity: 1;
-            transform: translate(-50%, -50%); /* Trượt lên chính giữa */
-        }
-
-        #status {
-            font-size: 17px;
-            font-weight: 600;
-            margin: 16px 0;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .score-text {
-            font-size: 64px;
-            font-weight: 800;
-            color: var(--accent);
-            margin: 20px 0;
-            letter-spacing: -2px;
-        }
-
-        #result-msg {
             font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
+
+        .correct { background-color: var(--success) !important; color: white !important; }
+        .wrong { background-color: var(--danger) !important; color: white !important; }
+
+        #next-btn {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, 100px);
+            opacity: 0; z-index: 20; background: var(--label-primary); color: var(--system-background);
+            padding: 18px 35px; border-radius: 999px; width: 80%; font-size: 18px; font-weight: 700;
+            transition: all 0.5s var(--ease);
+        }
+        #next-btn.show { opacity: 1; transform: translate(-50%, -50%); }
+
+        #status { font-size: 17px; font-weight: 700; margin: 15px 0; height: 24px; }
+        .score-text { font-size: 60px; font-weight: 800; color: var(--accent); margin: 15px 0; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="card" id="start-screen">
-            <div class="logo-container">
-                <img src="logocherry.jpg" alt="Logo" class="logo-img">
-            </div>
-            <h1>Sẵn sàng chưa?</h1>
-            <p>Hệ thống sẽ lấy ngẫu nhiên 5 câu hỏi không trùng lặp.</p>
-            <button class="btn-primary" onclick="startGame()">Bắt đầu ngay</button>
+            <img src="logocherry.jpg" alt="Logo" class="logo-img">
+            <h1>Thử thách ngay</h1>
+            <p>Vượt qua 5 câu hỏi để nhận phần quà hấp dẫn.</p>
+            <button class="btn-primary" onclick="startGame()">Bắt đầu</button>
         </div>
 
         <div class="card hidden" id="quiz-screen">
-            <div class="progress" id="progress">Câu hỏi 1/5</div>
+            <div class="progress" id="progress">CÂU 1/5</div>
             <h3 id="question-text">Đang tải...</h3>
-            
-            <div style="position: relative; min-height: 200px;">
+            <div style="position: relative; min-height: 250px;">
                 <div class="answer-list" id="answer-list"></div>
-                <button id="next-btn" class="hidden" onclick="renderCurrentQuestion()">Tiếp theo</button>
+                <button id="next-btn" class="hidden" onclick="renderCurrentQuestion()">Kế tiếp</button>
             </div>
-
             <div id="status"></div>
         </div>
 
-        <div class="card hidden" id="result-screen">
-            <div class="logo-container">
-                <img src="logocherry.jpg" alt="Logo" class="logo-img">
+        <button class="fab-help hidden" id="fab-btn" onclick="toggleHelpModal(true)">
+            <i data-lucide="life-buoy"></i>
+        </button>
+
+        <div class="modal-overlay hidden" id="help-modal">
+            <div class="help-menu">
+                <h2 style="margin:0; font-size: 20px;">Quyền trợ giúp</h2>
+                <div class="help-options">
+                    <button class="opt-btn" id="h-wife" onclick="useHelp('wife')">
+                        <i data-lucide="phone-call"></i> Gọi Vợ Chủ
+                    </button>
+                    <button class="opt-btn" id="h-rel" onclick="useHelp('relative')">
+                        <i data-lucide="users"></i> Người thân
+                    </button>
+                    <button class="opt-btn" id="h-crowd" onclick="useHelp('crowd')">
+                        <i data-lucide="messages-square"></i> Khán giả
+                    </button>
+                    <button class="opt-btn" id="h-5050" onclick="useHelp('5050')">
+                        <i data-lucide="split"></i> 50/50
+                    </button>
+                </div>
+                <button class="close-modal" onclick="toggleHelpModal(false)">Bỏ qua</button>
             </div>
-            <h1>Kết quả của bạn</h1>
+        </div>
+
+        <div class="card hidden" id="result-screen">
+            <img src="logocherry.jpg" alt="Logo" class="logo-img">
+            <h1>Kết quả</h1>
             <div class="score-text" id="final-score">0/5</div>
             <p id="result-msg"></p>
             <button class="btn-primary" onclick="location.reload()">Chơi lại</button>
@@ -289,55 +251,40 @@
         let selectedQuestions = []; 
         let currentIndex = 0;
         let score = 0;
+        let usedHelp = { wife: false, relative: false, crowd: false, "5050": false };
+
+        lucide.createIcons();
 
         window.startGame = async () => {
             const startBtn = document.querySelector('#start-screen button');
             startBtn.innerText = "Đang tải...";
-            startBtn.disabled = true;
-
             try {
-                const dbRef = ref(db, 'questions');
-                const snapshot = await get(dbRef);
-                
+                const snapshot = await get(ref(db, 'questions'));
                 if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    let all = Object.values(data);
-                    selectedQuestions = all.sort(() => 0.5 - Math.random()).slice(0, 5);
-                    
+                    selectedQuestions = Object.values(snapshot.val()).sort(() => 0.5 - Math.random()).slice(0, 5);
                     document.getElementById('start-screen').classList.add('hidden');
                     document.getElementById('quiz-screen').classList.remove('hidden');
+                    document.getElementById('fab-btn').classList.remove('hidden');
                     renderCurrentQuestion();
-                } else {
-                    alert("Database trống!");
                 }
-            } catch (e) {
-                console.error(e);
-                alert("Lỗi kết nối Firebase!");
-            }
+            } catch (e) { alert("Lỗi kết nối!"); }
         };
 
         window.renderCurrentQuestion = () => {
-            if (currentIndex >= selectedQuestions.length) {
-                showResult();
-                return;
-            }
-
+            if (currentIndex >= selectedQuestions.length) { showResult(); return; }
             const q = selectedQuestions[currentIndex];
-            document.getElementById('progress').innerText = `Câu hỏi ${currentIndex + 1}/5`;
+            document.getElementById('progress').innerText = `CÂU ${currentIndex + 1}/5`;
             document.getElementById('question-text').innerText = q.question;
             document.getElementById('status').innerText = '';
+            document.getElementById('next-btn').className = 'hidden';
             
-            const nextBtn = document.getElementById('next-btn');
-            nextBtn.classList.add('hidden');
-            nextBtn.classList.remove('show');
-
             const answerList = document.getElementById('answer-list');
             answerList.innerHTML = '';
             answerList.style.opacity = "1";
-
-            q.answers.forEach((ans) => {
+            q.answers.forEach((ans, idx) => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn';
+                btn.id = `ans-${idx}`;
                 btn.innerText = ans.text;
                 btn.onclick = () => checkAnswer(btn, ans.isCorrect, q.answers);
                 answerList.appendChild(btn);
@@ -347,50 +294,72 @@
         function checkAnswer(selectedBtn, isCorrect, allAnswers) {
             const btns = document.querySelectorAll('.answer-btn');
             btns.forEach(b => b.disabled = true);
-
             const status = document.getElementById('status');
-            const answerList = document.getElementById('answer-list');
-            const nextBtn = document.getElementById('next-btn');
-
-            // Hiển thị hiệu ứng đúng/sai ngay lập tức
+            
             if (isCorrect) {
                 selectedBtn.classList.add('correct');
-                status.innerText = "Chính xác! ✨";
+                status.innerText = "CHÍNH XÁC ✨";
                 status.style.color = "var(--success)";
                 score++;
             } else {
                 selectedBtn.classList.add('wrong');
-                status.innerText = "Sai mất rồi! 😢";
+                status.innerText = "SAI RỒI 😢";
                 status.style.color = "var(--danger)";
-                btns.forEach((b, idx) => {
-                    if (allAnswers[idx].isCorrect) b.classList.add('correct');
-                });
+                btns.forEach((b, i) => { if(allAnswers[i].isCorrect) b.classList.add('correct'); });
             }
-
-            // Đợi 1 giây rồi mới hiển thị nút Tiếp theo
+            
             setTimeout(() => {
-                answerList.style.opacity = "0.2"; // Làm mờ câu hỏi
-                
+                document.getElementById('answer-list').style.opacity = "0.2";
+                const nextBtn = document.getElementById('next-btn');
                 nextBtn.classList.remove('hidden');
-                if (currentIndex === 4) { // currentIndex bắt đầu từ 0
-                    nextBtn.innerText = "Xem kết quả 🏆";
-                } else {
-                    nextBtn.innerText = "Tiếp theo →";
-                }
-
-                // Thêm class show để kích hoạt hiệu ứng trượt lên
+                nextBtn.innerText = currentIndex === 4 ? "KẾT QUẢ 🏆" : "TIẾP THEO →";
                 setTimeout(() => nextBtn.classList.add('show'), 10);
-                
                 currentIndex++;
             }, 1000);
         }
 
+        window.toggleHelpModal = (show) => {
+            const modal = document.getElementById('help-modal');
+            if(show) {
+                modal.classList.remove('hidden');
+                document.getElementById('h-wife').disabled = usedHelp.wife;
+                document.getElementById('h-rel').disabled = usedHelp.relative;
+                document.getElementById('h-crowd').disabled = usedHelp.crowd;
+                document.getElementById('h-5050').disabled = usedHelp["5050"];
+            } else modal.classList.add('hidden');
+        };
+
+        window.useHelp = (type) => {
+            toggleHelpModal(false);
+            if (type === 'wife') {
+                if(confirm("Xác nhận gọi cho vợ anh chủ?")) { 
+                    usedHelp.wife = true; 
+                    window.location.href = "tel:0815155989"; 
+                }
+            } else if (type === 'relative') {
+                const p = prompt("Nhập số điện thoại người thân:");
+                if(p) { usedHelp.relative = true; window.location.href = `tel:${p}`; }
+            } else if (type === 'crowd') {
+                // ĐÃ CẬP NHẬT THÔNG BÁO THEO YÊU CẦU
+                alert("Đã chọn trợ giúp thành công mời bạn hỏi mọi người.");
+                usedHelp.crowd = true;
+            } else if (type === '5050') {
+                usedHelp["5050"] = true;
+                const q = selectedQuestions[currentIndex];
+                let w = []; q.answers.forEach((a,i) => { if(!a.isCorrect) w.push(i); });
+                w.sort(() => 0.5-Math.random()).slice(0,2).forEach(i => {
+                    const b = document.getElementById(`ans-${i}`);
+                    if(b) { b.style.visibility = 'hidden'; b.disabled = true; }
+                });
+            }
+        };
+
         function showResult() {
             document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('fab-btn').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
             document.getElementById('final-score').innerText = `${score}/5`;
-            const msg = score >= 3 ? "Làm tốt lắm! 👏" : "Cố gắng hơn lần sau nhé! 💪";
-            document.getElementById('result-msg').innerText = msg;
+            document.getElementById('result-msg').innerText = score >= 3 ? "BẠN QUÁ XUẤT SẮC! 👏" : "HẸN BẠN LẦN SAU NHÉ! 💪";
         }
     </script>
 </body>
