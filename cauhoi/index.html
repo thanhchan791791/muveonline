@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Quản lý Câu hỏi</title>
+    <title>Quản lý Câu hỏi iOS</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -14,8 +14,7 @@
             --ios-red: #FF3B30;
             --ios-text: #000000;
             --ios-secondary-text: #8E8E93;
-            --ios-border: rgba(0,0,0,0.1);
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --ios-border: rgba(0,0,0,0.05);
             --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
             --easing: cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -23,241 +22,198 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
             background-color: var(--ios-bg);
             color: var(--ios-text);
             margin: 0;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 20px;
-            line-height: 1.5;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 420px;
-            animation: slideUp 0.6s var(--easing);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        h2 {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin: 0 0 24px 8px;
-            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
+            padding: 20px;
+            min-height: 100vh;
         }
+
+        .container { width: 100%; max-width: 450px; animation: fadeIn 0.5s var(--easing); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-size: 24px; font-weight: 700; margin: 20px 0 15px 10px; display: flex; align-items: center; gap: 8px; }
 
         .card {
             background: var(--ios-card);
-            border-radius: 24px;
-            padding: 24px;
+            border-radius: 20px;
+            padding: 20px;
             box-shadow: var(--shadow-lg);
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.7);
-            backdrop-filter: blur(20px);
+            margin-bottom: 25px;
         }
 
-        .form-group { margin-bottom: 24px; }
+        .form-group { margin-bottom: 20px; }
+        label { font-size: 12px; font-weight: 600; color: var(--ios-secondary-text); text-transform: uppercase; margin-bottom: 8px; display: block; padding-left: 4px; }
 
-        label {
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--ios-secondary-text);
-            margin-bottom: 10px;
-            display: block;
-            padding-left: 4px;
+        /* Segmented Control iOS Style */
+        .segmented-control {
+            display: flex;
+            background: #E3E3E8;
+            padding: 2px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .segmented-control input { display: none; }
+        .segmented-control label {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            margin: 0;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ios-text);
+            text-transform: none;
+            transition: all 0.2s;
+        }
+        .segmented-control input:checked + label {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         textarea, input[type="text"] {
-            width: 100%;
-            border: none;
-            background: var(--ios-bg);
-            border-radius: 14px;
-            padding: 14px 16px;
-            font-size: 16px;
-            color: var(--ios-text);
-            transition: all 0.3s var(--easing);
-            outline: none;
+            width: 100%; border: none; background: #F2F2F7; border-radius: 12px; padding: 12px 15px;
+            font-size: 16px; color: var(--ios-text); outline: none; transition: 0.2s;
         }
 
-        textarea:focus, input[type="text"]:focus {
-            background: #E5E5EA;
-            box-shadow: inset 0 0 0 1px var(--ios-blue);
-        }
-
-        #answersContainer {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .answer-item {
-            display: flex;
-            align-items: center;
-            background: var(--ios-bg);
-            border-radius: 16px;
-            padding: 4px 12px;
-            transition: transform 0.2s ease;
-        }
-
-        .answer-item:focus-within {
-            transform: scale(1.02);
-            background: #FFF;
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* Custom Radio Styling */
-        input[type="radio"] {
-            appearance: none;
-            width: 24px;
-            height: 24px;
-            border: 2px solid #C7C7CC;
-            border-radius: 50%;
-            cursor: pointer;
+        /* Search Bar Style */
+        .search-container {
             position: relative;
-            transition: all 0.2s var(--easing);
-            flex-shrink: 0;
+            margin-bottom: 15px;
+            padding: 0 10px;
         }
-
-        input[type="radio"]:checked {
-            border-color: var(--ios-blue);
-            background: var(--ios-blue);
-        }
-
-        input[type="radio"]:checked::after {
-            content: '';
+        .search-container i {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            background: white;
-            border-radius: 50%;
+            left: 22px;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateY(-50%);
+            color: var(--ios-secondary-text);
+        }
+        #searchInput {
+            padding-left: 40px;
+            background: #E3E3E8;
+            border-radius: 10px;
+            height: 36px;
         }
 
-        .answer-input {
-            background: transparent !important;
-            font-weight: 500;
+        /* Đáp án trắc nghiệm */
+        #multipleChoiceArea { display: block; }
+        .answer-item { display: flex; align-items: center; background: #F2F2F7; border-radius: 12px; padding: 4px 12px; margin-bottom: 8px; }
+        
+        input[type="radio"] {
+            appearance: none; width: 22px; height: 22px; border: 2px solid #C7C7CC; border-radius: 50%;
+            position: relative; cursor: pointer; transition: 0.2s; flex-shrink: 0;
         }
+        input[type="radio"]:checked { border-color: var(--ios-blue); background: var(--ios-blue); }
+        input[type="radio"]:checked::after {
+            content: ''; position: absolute; width: 8px; height: 8px; background: white; border-radius: 50%;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+
+        /* Đáp án tự luận */
+        #writtenArea { display: none; }
 
         button {
-            width: 100%;
-            padding: 18px;
-            background: var(--ios-blue);
-            color: white;
-            border: none;
-            border-radius: 100px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s var(--easing);
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
+            width: 100%; padding: 16px; border: none; border-radius: 100px; font-weight: 600; font-size: 16px;
+            cursor: pointer; transition: 0.3s var(--easing); display: flex; justify-content: center; align-items: center; gap: 8px;
         }
+        #btnSave { background: var(--ios-blue); color: white; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
+        button:active { transform: scale(0.96); opacity: 0.8; }
 
-        button:active {
-            transform: scale(0.96);
-            opacity: 0.9;
+        /* List Style */
+        .q-list { display: flex; flex-direction: column; gap: 10px; }
+        .q-card {
+            background: var(--ios-card); border-radius: 16px; overflow: hidden;
+            transition: all 0.3s var(--easing); border: 1px solid transparent;
         }
+        .q-header { padding: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .q-title { font-weight: 600; font-size: 16px; flex: 1; padding-right: 10px; }
+        .type-badge { font-size: 10px; background: #E5E5EA; padding: 2px 8px; border-radius: 6px; margin-right: 8px; color: #666; }
+        
+        .q-details { 
+            max-height: 0; overflow: hidden; transition: max-height 0.4s var(--easing);
+            background: #FAFAFA; padding: 0 16px;
+        }
+        .q-card.open .q-details { max-height: 800px; padding: 16px; border-top: 1px solid var(--ios-bg); }
+        
+        .ans-row { 
+            padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; font-size: 14px;
+            background: white; border: 1px solid #EEE; display: flex; align-items: center; gap: 8px;
+        }
+        .ans-row.correct { border-color: var(--ios-green); background: #F2FBF4; color: #1A7F37; }
+        .written-content { background: white; padding: 12px; border-radius: 12px; border: 1px solid #EEE; font-size: 14px; white-space: pre-wrap; }
 
-        .status {
-            margin-top: 20px;
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: 600;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.4s var(--easing);
-        }
+        .actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-edit { background: #E5E5EA; color: var(--ios-text); padding: 10px; flex: 1; border-radius: 10px; }
+        .btn-delete { background: #FFE5E5; color: var(--ios-red); padding: 10px; flex: 1; border-radius: 10px; }
 
-        .status.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
+        #status { text-align: center; margin-top: 15px; font-size: 14px; font-weight: 500; }
 
         @media (prefers-color-scheme: dark) {
-            :root {
-                --ios-bg: #000000;
-                --ios-card: #1C1C1E;
-                --ios-text: #FFFFFF;
-                --ios-border: rgba(255,255,255,0.1);
-            }
-            .card { border: 1px solid rgba(255,255,255,0.05); }
-            textarea, input[type="text"], .answer-item { background: #2C2C2E; }
+            :root { --ios-bg: #000000; --ios-card: #1C1C1E; --ios-text: #FFFFFF; }
+            textarea, input[type="text"], .answer-item, .q-details, .segmented-control { background: #2C2C2E; }
+            #searchInput { background: #1C1C1E; border: 1px solid #333; }
+            .ans-row, .written-content { background: #1C1C1E; border-color: #333; }
+            .segmented-control label { color: #BBB; }
+            .segmented-control input:checked + label { background: #444; color: white; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2><i data-lucide="plus-circle" style="color: var(--ios-blue)"></i> Soạn câu hỏi</h2>
+    <h2><i data-lucide="plus-circle" size="24"></i> Thêm nội dung</h2>
     
     <div class="card">
+        <label>Thể loại câu hỏi</label>
+        <div class="segmented-control">
+            <input type="radio" name="qType" id="typeQuiz" value="quiz" checked>
+            <label for="typeQuiz">Trắc nghiệm</label>
+            <input type="radio" name="qType" id="typeWritten" value="written">
+            <label for="typeWritten">Tự luận / Liệt kê</label>
+        </div>
+
         <div class="form-group">
             <label>Nội dung câu hỏi</label>
-            <textarea id="questionText" rows="3" placeholder="Nhập câu hỏi..."></textarea>
+            <textarea id="questionText" rows="3" placeholder="Ví dụ: Kể tên 4 dịch vụ của CherryPet..."></textarea>
         </div>
 
-        <div id="answersContainer">
-            <label>Các phương án trả lời</label>
-            
-            <div class="answer-item">
-                <input type="radio" name="correctAnswer" value="0" checked title="Chọn câu đúng">
-                <input type="text" class="answer-input" placeholder="Đáp án A">
-            </div>
-            <div class="answer-item">
-                <input type="radio" name="correctAnswer" value="1" title="Chọn câu đúng">
-                <input type="text" class="answer-input" placeholder="Đáp án B">
-            </div>
-            <div class="answer-item">
-                <input type="radio" name="correctAnswer" value="2" title="Chọn câu đúng">
-                <input type="text" class="answer-input" placeholder="Đáp án C">
-            </div>
-            <div class="answer-item">
-                <input type="radio" name="correctAnswer" value="3" title="Chọn câu đúng">
-                <input type="text" class="answer-input" placeholder="Đáp án D">
-            </div>
+        <div id="multipleChoiceArea">
+            <label>Đáp án (Chọn nút tròn cho câu đúng)</label>
+            <div class="answer-item"><input type="radio" name="correctAnswer" value="0" checked><input type="text" class="answer-input" placeholder="Đáp án A"></div>
+            <div class="answer-item"><input type="radio" name="correctAnswer" value="1"><input type="text" class="answer-input" placeholder="Đáp án B"></div>
+            <div class="answer-item"><input type="radio" name="correctAnswer" value="2"><input type="text" class="answer-input" placeholder="Đáp án C"></div>
+            <div class="answer-item"><input type="radio" name="correctAnswer" value="3"><input type="text" class="answer-input" placeholder="Đáp án D"></div>
         </div>
 
-        <button id="btnSave">
-            <span>Lưu dữ liệu</span>
-            <i data-lucide="arrow-right-circle" size="20"></i>
-        </button>
-        
-        <div id="status" class="status"></div>
+        <div id="writtenArea">
+            <label>Nội dung câu trả lời liệt kê</label>
+            <textarea id="writtenAnswer" rows="4" placeholder="Nhập các ý trả lời tại đây..."></textarea>
+        </div>
+
+        <button id="btnSave" style="margin-top:20px"><i data-lucide="cloud-upload"></i> Lưu vào hệ thống</button>
+        <div id="status"></div>
     </div>
+
+    <h2><i data-lucide="list" size="24"></i> Danh sách đã lưu</h2>
+    
+    <div class="search-container">
+        <i data-lucide="search" size="18"></i>
+        <input type="text" id="searchInput" placeholder="Tìm kiếm câu hỏi...">
+    </div>
+
+    <div id="questionList" class="q-list"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAMycdJcRR1Kl53wrJQbQ9dw-xSfpOym_4",
@@ -272,64 +228,156 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    let editingId = null;
+    let allQuestions = {}; // Biến lưu trữ toàn bộ data để lọc
 
-    // Init Lucide icons
-    lucide.createIcons();
+    // Toggle UI dựa trên Type
+    const typeRadios = document.querySelectorAll('input[name="qType"]');
+    typeRadios.forEach(r => r.addEventListener('change', (e) => {
+        const isQuiz = e.target.value === 'quiz';
+        document.getElementById('multipleChoiceArea').style.display = isQuiz ? 'block' : 'none';
+        document.getElementById('writtenArea').style.display = isQuiz ? 'none' : 'block';
+    }));
 
-    document.getElementById('btnSave').addEventListener('click', async () => {
-        const questionText = document.getElementById('questionText').value;
-        const answerInputs = document.querySelectorAll('.answer-input');
-        const correctIndex = document.querySelector('input[name="correctAnswer"]:checked').value;
-        const statusDiv = document.getElementById('status');
-        const btn = document.getElementById('btnSave');
+    // Hàm hiển thị danh sách (được tách ra để dùng cho cả Load và Search)
+    const renderList = (data) => {
+        const listDiv = document.getElementById('questionList');
+        listDiv.innerHTML = '';
+        
+        if (!data || Object.keys(data).length === 0) {
+            return listDiv.innerHTML = '<p style="text-align:center; color:#8E8E93">Trống hoặc không tìm thấy</p>';
+        }
 
-        if (!questionText.trim()) {
-            statusDiv.innerText = "Vui lòng nhập câu hỏi";
-            statusDiv.style.color = "var(--ios-red)";
-            statusDiv.classList.add('show');
+        Object.keys(data).reverse().forEach(id => {
+            const q = data[id];
+            const isQuiz = q.type === 'quiz' || !q.type;
+            
+            const qCard = document.createElement('div');
+            qCard.className = 'q-card';
+            qCard.innerHTML = `
+                <div class="q-header" onclick="this.parentElement.classList.toggle('open')">
+                    <span class="q-title"><span class="type-badge">${isQuiz ? 'Trắc nghiệm' : 'Tự luận'}</span>${q.question}</span>
+                    <i data-lucide="chevron-down" size="18"></i>
+                </div>
+                <div class="q-details">
+                    ${isQuiz ? 
+                        q.answers.map(a => `<div class="ans-row ${a.isCorrect ? 'correct' : ''}"><i data-lucide="${a.isCorrect ? 'check-circle' : 'circle'}" size="14"></i>${a.text || ''}</div>`).join('') 
+                        : `<div class="written-content">${q.writtenAnswer}</div>`
+                    }
+                    <div class="actions">
+                        <button class="btn-edit" onclick="editQuestion('${id}')"><i data-lucide="edit-3" size="16"></i> Sửa</button>
+                        <button class="btn-delete" onclick="deleteQuestion('${id}')"><i data-lucide="trash-2" size="16"></i> Xóa</button>
+                    </div>
+                </div>
+            `;
+            listDiv.appendChild(qCard);
+        });
+        lucide.createIcons();
+    };
+
+    // Load Data ban đầu
+    onValue(ref(db, 'questions'), (snapshot) => {
+        allQuestions = snapshot.val() || {};
+        renderList(allQuestions);
+    });
+
+    // Sự kiện Tìm kiếm (Lọc tới đâu hiện tới đó)
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const keyword = e.target.value.toLowerCase().trim();
+        if (!keyword) {
+            renderList(allQuestions);
             return;
         }
 
-        const answers = Array.from(answerInputs).map((input, index) => ({
-            text: input.value,
-            isCorrect: index == correctIndex
-        }));
+        const filtered = {};
+        Object.keys(allQuestions).forEach(id => {
+            const q = allQuestions[id];
+            // Tìm trong câu hỏi hoặc nội dung trả lời tự luận
+            const inQuestion = q.question.toLowerCase().includes(keyword);
+            const inWritten = q.writtenAnswer && q.writtenAnswer.toLowerCase().includes(keyword);
+            
+            if (inQuestion || inWritten) {
+                filtered[id] = q;
+            }
+        });
+        renderList(filtered);
+    });
+
+    // Save/Update
+    document.getElementById('btnSave').addEventListener('click', async () => {
+        const qType = document.querySelector('input[name="qType"]:checked').value;
+        const questionText = document.getElementById('questionText').value;
+        const status = document.getElementById('status');
+        
+        if (!questionText.trim()) return alert("Nhập câu hỏi");
+
+        let payload = { 
+            type: qType, 
+            question: questionText, 
+            updatedAt: Date.now() 
+        };
+
+        if (qType === 'quiz') {
+            const answerInputs = document.querySelectorAll('.answer-input');
+            const correctIndex = document.querySelector('input[name="correctAnswer"]:checked').value;
+            payload.answers = Array.from(answerInputs).map((input, index) => ({
+                text: input.value,
+                isCorrect: index == correctIndex
+            }));
+        } else {
+            payload.writtenAnswer = document.getElementById('writtenAnswer').value;
+        }
 
         try {
-            btn.style.opacity = "0.7";
-            btn.innerText = "Đang xử lý...";
+            if (editingId) {
+                await update(ref(db, `questions/${editingId}`), payload);
+                editingId = null;
+                document.getElementById('btnSave').innerHTML = '<i data-lucide="cloud-upload"></i> Lưu vào hệ thống';
+            } else {
+                payload.createdAt = Date.now();
+                await push(ref(db, 'questions'), payload);
+            }
             
-            const questionsRef = ref(db, 'questions');
-            const newQuestionRef = push(questionsRef);
-            
-            await set(newQuestionRef, {
-                question: questionText,
-                answers: answers,
-                createdAt: Date.now()
-            });
-
-            statusDiv.innerHTML = '<i data-lucide="check-circle-2"></i> Lưu thành công!';
-            statusDiv.style.color = "var(--ios-green)";
-            statusDiv.classList.add('show');
-            lucide.createIcons();
-            
-            // Haptic-like reset
-            setTimeout(() => {
-                document.getElementById('questionText').value = "";
-                answerInputs.forEach(input => input.value = "");
-                statusDiv.classList.remove('show');
-                btn.innerHTML = '<span>Lưu dữ liệu</span> <i data-lucide="arrow-right-circle" size="20"></i>';
-                btn.style.opacity = "1";
-                lucide.createIcons();
-            }, 2000);
-            
-        } catch (error) {
-            statusDiv.innerText = "Lỗi: " + error.message;
-            statusDiv.style.color = "var(--ios-red)";
-            statusDiv.classList.add('show');
-            btn.style.opacity = "1";
-        }
+            // Reset Form
+            document.getElementById('questionText').value = '';
+            document.getElementById('writtenAnswer').value = '';
+            document.querySelectorAll('.answer-input').forEach(i => i.value = '');
+            status.innerText = "Đã lưu!";
+            setTimeout(() => status.innerText = "", 2000);
+        } catch (e) { alert(e.message); }
     });
+
+    window.deleteQuestion = (id) => confirm("Xóa câu hỏi này?") && remove(ref(db, `questions/${id}`));
+
+    window.editQuestion = (id) => {
+        onValue(ref(db, `questions/${id}`), (snapshot) => {
+            const q = snapshot.val();
+            if(!q) return;
+            
+            const isQuiz = q.type === 'quiz' || !q.type;
+            document.getElementById(isQuiz ? 'typeQuiz' : 'typeWritten').checked = true;
+            document.getElementById('multipleChoiceArea').style.display = isQuiz ? 'block' : 'none';
+            document.getElementById('writtenArea').style.display = isQuiz ? 'none' : 'block';
+            
+            document.getElementById('questionText').value = q.question;
+            if (isQuiz) {
+                const inputs = document.querySelectorAll('.answer-input');
+                const radios = document.querySelectorAll('input[name="correctAnswer"]');
+                q.answers.forEach((a, i) => {
+                    inputs[i].value = a.text;
+                    if(a.isCorrect) radios[i].checked = true;
+                });
+            } else {
+                document.getElementById('writtenAnswer').value = q.writtenAnswer || "";
+            }
+            
+            editingId = id;
+            document.getElementById('btnSave').innerHTML = '<i data-lucide="save"></i> Cập nhật thay đổi';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, { onlyOnce: true });
+    };
+
+    lucide.createIcons();
 </script>
 
 </body>
