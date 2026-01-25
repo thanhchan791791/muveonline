@@ -54,6 +54,19 @@
             perspective: 1000px;
         }
 
+        /* Style cho Logo */
+        .logo-container {
+            margin-bottom: 20px;
+        }
+        
+        .logo-img {
+            width: 80px; /* Bạn có thể điều chỉnh kích thước tùy ý */
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
         .card {
             position: relative;
             background: var(--card-bg);
@@ -225,6 +238,9 @@
 
     <div class="container">
         <div class="card" id="start-screen">
+            <div class="logo-container">
+                <img src="logocherry.jpg" alt="Logo" class="logo-img">
+            </div>
             <h1>Sẵn sàng chưa?</h1>
             <p>Hệ thống sẽ lấy ngẫu nhiên 5 câu hỏi không trùng lặp.</p>
             <button class="btn-primary" onclick="startGame()">Bắt đầu ngay</button>
@@ -243,6 +259,9 @@
         </div>
 
         <div class="card hidden" id="result-screen">
+            <div class="logo-container">
+                <img src="logocerry.jpg" alt="Logo" class="logo-img">
+            </div>
             <h1>Kết quả của bạn</h1>
             <div class="score-text" id="final-score">0/5</div>
             <p id="result-msg"></p>
