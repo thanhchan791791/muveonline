@@ -55,6 +55,7 @@
         }
 
         .card {
+            position: relative;
             background: var(--card-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -129,36 +130,70 @@
         .answer-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
             margin-bottom: 24px;
+            position: relative;
+            transition: opacity 0.5s var(--ease);
         }
 
         .answer-btn {
             background: var(--secondary-background);
             color: var(--label-primary);
-            padding: 16px 20px;
-            border-radius: 16px;
+            padding: 20px 24px;
+            border-radius: 18px;
             text-align: left;
             justify-content: flex-start;
-            border: 1px solid transparent;
-            font-weight: 500;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 2px solid transparent;
+            font-weight: 600;
+            font-size: 19px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
 
-        .answer-btn:disabled {
-            cursor: default;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
         }
 
         .correct {
             background-color: var(--success) !important;
             color: #FFFFFF !important;
-            border-color: var(--success);
+            animation: pop 0.4s ease;
         }
 
         .wrong {
             background-color: var(--danger) !important;
             color: #FFFFFF !important;
-            border-color: var(--danger);
+            animation: shake 0.4s ease;
+        }
+
+        /* Hiệu ứng trượt lên cho nút Tiếp theo */
+        #next-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 100px); /* Bắt đầu từ dưới */
+            opacity: 0;
+            z-index: 20;
+            background: var(--label-primary);
+            color: var(--system-background);
+            padding: 20px 40px;
+            border-radius: 999px;
+            width: 85%;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            font-size: 20px;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #next-btn.show {
+            opacity: 1;
+            transform: translate(-50%, -50%); /* Trượt lên chính giữa */
         }
 
         #status {
@@ -169,12 +204,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s var(--ease);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         .score-text {
@@ -183,15 +212,6 @@
             color: var(--accent);
             margin: 20px 0;
             letter-spacing: -2px;
-        }
-
-        #next-btn {
-            margin-top: 10px;
-            background: var(--label-primary);
-            color: var(--system-background);
-            padding: 14px;
-            border-radius: 999px;
-            width: 100%;
         }
 
         #result-msg {
@@ -213,9 +233,13 @@
         <div class="card hidden" id="quiz-screen">
             <div class="progress" id="progress">Câu hỏi 1/5</div>
             <h3 id="question-text">Đang tải...</h3>
-            <div class="answer-list" id="answer-list"></div>
+            
+            <div style="position: relative; min-height: 200px;">
+                <div class="answer-list" id="answer-list"></div>
+                <button id="next-btn" class="hidden" onclick="renderCurrentQuestion()">Tiếp theo</button>
+            </div>
+
             <div id="status"></div>
-            <button id="next-btn" class="hidden" onclick="renderCurrentQuestion()">Tiếp theo</button>
         </div>
 
         <div class="card hidden" id="result-screen">
@@ -283,10 +307,14 @@
             document.getElementById('progress').innerText = `Câu hỏi ${currentIndex + 1}/5`;
             document.getElementById('question-text').innerText = q.question;
             document.getElementById('status').innerText = '';
-            document.getElementById('next-btn').classList.add('hidden');
+            
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.classList.add('hidden');
+            nextBtn.classList.remove('show');
 
             const answerList = document.getElementById('answer-list');
             answerList.innerHTML = '';
+            answerList.style.opacity = "1";
 
             q.answers.forEach((ans) => {
                 const btn = document.createElement('button');
@@ -302,6 +330,10 @@
             btns.forEach(b => b.disabled = true);
 
             const status = document.getElementById('status');
+            const answerList = document.getElementById('answer-list');
+            const nextBtn = document.getElementById('next-btn');
+
+            // Hiển thị hiệu ứng đúng/sai ngay lập tức
             if (isCorrect) {
                 selectedBtn.classList.add('correct');
                 status.innerText = "Chính xác! ✨";
@@ -316,11 +348,22 @@
                 });
             }
 
-            currentIndex++;
-            document.getElementById('next-btn').classList.remove('hidden');
-            if (currentIndex === 5) {
-                document.getElementById('next-btn').innerText = "Xem kết quả";
-            }
+            // Đợi 1 giây rồi mới hiển thị nút Tiếp theo
+            setTimeout(() => {
+                answerList.style.opacity = "0.2"; // Làm mờ câu hỏi
+                
+                nextBtn.classList.remove('hidden');
+                if (currentIndex === 4) { // currentIndex bắt đầu từ 0
+                    nextBtn.innerText = "Xem kết quả 🏆";
+                } else {
+                    nextBtn.innerText = "Tiếp theo →";
+                }
+
+                // Thêm class show để kích hoạt hiệu ứng trượt lên
+                setTimeout(() => nextBtn.classList.add('show'), 10);
+                
+                currentIndex++;
+            }, 1000);
         }
 
         function showResult() {
