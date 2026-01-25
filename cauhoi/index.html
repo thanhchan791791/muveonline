@@ -50,7 +50,6 @@
         .form-group { margin-bottom: 20px; }
         label { font-size: 12px; font-weight: 600; color: var(--ios-secondary-text); text-transform: uppercase; margin-bottom: 8px; display: block; padding-left: 4px; }
 
-        /* Segmented Control iOS Style */
         .segmented-control {
             display: flex;
             background: #E3E3E8;
@@ -77,12 +76,11 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        textarea, input[type="text"] {
+        textarea, input[type="text"], input[type="number"] {
             width: 100%; border: none; background: #F2F2F7; border-radius: 12px; padding: 12px 15px;
             font-size: 16px; color: var(--ios-text); outline: none; transition: 0.2s;
         }
 
-        /* Search Bar Style */
         .search-container {
             position: relative;
             margin-bottom: 15px;
@@ -102,7 +100,6 @@
             height: 36px;
         }
 
-        /* Đáp án trắc nghiệm */
         #multipleChoiceArea { display: block; }
         .answer-item { display: flex; align-items: center; background: #F2F2F7; border-radius: 12px; padding: 4px 12px; margin-bottom: 8px; }
         
@@ -116,7 +113,6 @@
             top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
 
-        /* Đáp án tự luận */
         #writtenArea { display: none; }
 
         button {
@@ -126,7 +122,6 @@
         #btnSave { background: var(--ios-blue); color: white; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
         button:active { transform: scale(0.96); opacity: 0.8; }
 
-        /* List Style */
         .q-list { display: flex; flex-direction: column; gap: 10px; }
         .q-card {
             background: var(--ios-card); border-radius: 16px; overflow: hidden;
@@ -135,6 +130,7 @@
         .q-header { padding: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .q-title { font-weight: 600; font-size: 16px; flex: 1; padding-right: 10px; }
         .type-badge { font-size: 10px; background: #E5E5EA; padding: 2px 8px; border-radius: 6px; margin-right: 8px; color: #666; }
+        .appear-badge { font-size: 10px; background: #FF950020; padding: 2px 8px; border-radius: 6px; color: #FF9500; margin-right: 8px; font-weight: bold; }
         
         .q-details { 
             max-height: 0; overflow: hidden; transition: max-height 0.4s var(--easing);
@@ -157,11 +153,12 @@
 
         @media (prefers-color-scheme: dark) {
             :root { --ios-bg: #000000; --ios-card: #1C1C1E; --ios-text: #FFFFFF; }
-            textarea, input[type="text"], .answer-item, .q-details, .segmented-control { background: #2C2C2E; }
+            textarea, input[type="text"], input[type="number"], .answer-item, .q-details, .segmented-control { background: #2C2C2E; }
             #searchInput { background: #1C1C1E; border: 1px solid #333; }
             .ans-row, .written-content { background: #1C1C1E; border-color: #333; }
             .segmented-control label { color: #BBB; }
             .segmented-control input:checked + label { background: #444; color: white; }
+            .appear-badge { background: #FF950040; }
         }
     </style>
 </head>
@@ -184,6 +181,11 @@
             <textarea id="questionText" rows="3" placeholder="Ví dụ: Kể tên 4 dịch vụ của CherryPet..."></textarea>
         </div>
 
+        <div class="form-group">
+            <label>Số lần đã hiển thị (appearCount)</label>
+            <input type="number" id="appearCount" value="0" min="0">
+        </div>
+
         <div id="multipleChoiceArea">
             <label>Đáp án (Chọn nút tròn cho câu đúng)</label>
             <div class="answer-item"><input type="radio" name="correctAnswer" value="0" checked><input type="text" class="answer-input" placeholder="Đáp án A"></div>
@@ -201,7 +203,7 @@
         <div id="status"></div>
     </div>
 
-    <h2><i data-lucide="list" size="24"></i> Danh sách đã lưu</h2>
+    <h2><i data-lucide="list" size="24"></i> Danh sách (Ưu tiên hiện nhiều)</h2>
     
     <div class="search-container">
         <i data-lucide="search" size="18"></i>
@@ -229,9 +231,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     let editingId = null;
-    let allQuestions = {}; // Biến lưu trữ toàn bộ data để lọc
+    let allQuestions = {};
 
-    // Toggle UI dựa trên Type
     const typeRadios = document.querySelectorAll('input[name="qType"]');
     typeRadios.forEach(r => r.addEventListener('change', (e) => {
         const isQuiz = e.target.value === 'quiz';
@@ -239,7 +240,6 @@
         document.getElementById('writtenArea').style.display = isQuiz ? 'none' : 'block';
     }));
 
-    // Hàm hiển thị danh sách (được tách ra để dùng cho cả Load và Search)
     const renderList = (data) => {
         const listDiv = document.getElementById('questionList');
         listDiv.innerHTML = '';
@@ -248,15 +248,23 @@
             return listDiv.innerHTML = '<p style="text-align:center; color:#8E8E93">Trống hoặc không tìm thấy</p>';
         }
 
-        Object.keys(data).reverse().forEach(id => {
-            const q = data[id];
+        // Chuyển sang array và sắp xếp theo appearCount (giảm dần)
+        const sortedData = Object.keys(data).map(id => ({ id, ...data[id] }))
+            .sort((a, b) => (Number(b.appearCount) || 0) - (Number(a.appearCount) || 0));
+
+        sortedData.forEach(q => {
             const isQuiz = q.type === 'quiz' || !q.type;
+            const count = q.appearCount || 0;
             
             const qCard = document.createElement('div');
             qCard.className = 'q-card';
             qCard.innerHTML = `
                 <div class="q-header" onclick="this.parentElement.classList.toggle('open')">
-                    <span class="q-title"><span class="type-badge">${isQuiz ? 'Trắc nghiệm' : 'Tự luận'}</span>${q.question}</span>
+                    <span class="q-title">
+                        <span class="type-badge">${isQuiz ? 'Trắc nghiệm' : 'Tự luận'}</span>
+                        <span class="appear-badge">Hiện: ${count}</span>
+                        ${q.question}
+                    </span>
                     <i data-lucide="chevron-down" size="18"></i>
                 </div>
                 <div class="q-details">
@@ -265,8 +273,8 @@
                         : `<div class="written-content">${q.writtenAnswer}</div>`
                     }
                     <div class="actions">
-                        <button class="btn-edit" onclick="editQuestion('${id}')"><i data-lucide="edit-3" size="16"></i> Sửa</button>
-                        <button class="btn-delete" onclick="deleteQuestion('${id}')"><i data-lucide="trash-2" size="16"></i> Xóa</button>
+                        <button class="btn-edit" onclick="editQuestion('${q.id}')"><i data-lucide="edit-3" size="16"></i> Sửa</button>
+                        <button class="btn-delete" onclick="deleteQuestion('${q.id}')"><i data-lucide="trash-2" size="16"></i> Xóa</button>
                     </div>
                 </div>
             `;
@@ -275,13 +283,11 @@
         lucide.createIcons();
     };
 
-    // Load Data ban đầu
     onValue(ref(db, 'questions'), (snapshot) => {
         allQuestions = snapshot.val() || {};
         renderList(allQuestions);
     });
 
-    // Sự kiện Tìm kiếm (Lọc tới đâu hiện tới đó)
     document.getElementById('searchInput').addEventListener('input', (e) => {
         const keyword = e.target.value.toLowerCase().trim();
         if (!keyword) {
@@ -292,21 +298,17 @@
         const filtered = {};
         Object.keys(allQuestions).forEach(id => {
             const q = allQuestions[id];
-            // Tìm trong câu hỏi hoặc nội dung trả lời tự luận
             const inQuestion = q.question.toLowerCase().includes(keyword);
             const inWritten = q.writtenAnswer && q.writtenAnswer.toLowerCase().includes(keyword);
-            
-            if (inQuestion || inWritten) {
-                filtered[id] = q;
-            }
+            if (inQuestion || inWritten) filtered[id] = q;
         });
         renderList(filtered);
     });
 
-    // Save/Update
     document.getElementById('btnSave').addEventListener('click', async () => {
         const qType = document.querySelector('input[name="qType"]:checked').value;
         const questionText = document.getElementById('questionText').value;
+        const appearCountVal = parseInt(document.getElementById('appearCount').value) || 0;
         const status = document.getElementById('status');
         
         if (!questionText.trim()) return alert("Nhập câu hỏi");
@@ -314,6 +316,7 @@
         let payload = { 
             type: qType, 
             question: questionText, 
+            appearCount: appearCountVal,
             updatedAt: Date.now() 
         };
 
@@ -338,9 +341,9 @@
                 await push(ref(db, 'questions'), payload);
             }
             
-            // Reset Form
             document.getElementById('questionText').value = '';
             document.getElementById('writtenAnswer').value = '';
+            document.getElementById('appearCount').value = '0';
             document.querySelectorAll('.answer-input').forEach(i => i.value = '');
             status.innerText = "Đã lưu!";
             setTimeout(() => status.innerText = "", 2000);
@@ -360,6 +363,8 @@
             document.getElementById('writtenArea').style.display = isQuiz ? 'none' : 'block';
             
             document.getElementById('questionText').value = q.question;
+            document.getElementById('appearCount').value = q.appearCount || 0;
+            
             if (isQuiz) {
                 const inputs = document.querySelectorAll('.answer-input');
                 const radios = document.querySelectorAll('input[name="correctAnswer"]');
