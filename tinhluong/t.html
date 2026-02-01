@@ -107,9 +107,14 @@
             if (allEmployees.length === 0) return alert("Không có dữ liệu!");
             const data = allEmployees
                 .filter(emp => emp.hourlyRate > 0)
-                .map(emp => ({ id: emp.id, name: emp.name, hourlyRate: emp.hourlyRate }));
+                .map(emp => ({ 
+                    id: emp.id, 
+                    name: emp.name, 
+                    hourlyRate: emp.hourlyRate,
+                    isFixedSalary: emp.isFixedSalary || false 
+                }));
             set(ref(db, 'salary_config/Salary_' + Date.now()), { records: data, createdAt: new Date().toLocaleString() })
-            .then(() => alert("✅ Đã lưu!"));
+            .then(() => alert("✅ Đã lưu cấu hình lương!"));
         };
 
         window.saveBonusToFirebase = function() {
@@ -298,7 +303,6 @@
             border: 1px solid rgba(0,0,0,0.02);
         }
 
-        /* Monthly Summary Table Styling */
         .monthly-summary-card {
             display: none;
             background: #fff;
@@ -419,6 +423,22 @@
             font-size: 22px; 
         }
 
+        /* Custom switch for fixed salary */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--ios-secondary-text);
+            margin-top: 5px;
+        }
+
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--ios-blue);
+        }
+
         @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes modalScale { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -535,17 +555,17 @@
     <div class="modal-content" style="width:100%; max-width:600px;">
         <span class="close-btn" onclick="closeAllModals()" style="position:absolute; top:20px; right:20px; font-size:30px; cursor:pointer;">&times;</span>
         <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px; display:flex; align-items:center; gap:8px;">
-            <i data-lucide="dollar-sign"></i> Đơn Giá Lương
+            <i data-lucide="dollar-sign"></i> Thiết Lập Lương
         </h3>
         <div style="max-height:50vh; overflow-y:auto;">
             <table style="width:100%">
-                <thead><tr style="text-align:left; color:#8e8e93; font-size:12px;"><th>NHÂN VIÊN</th><th>ĐƠN GIÁ (Đ/H)</th></tr></thead>
+                <thead><tr style="text-align:left; color:#8e8e93; font-size:12px;"><th>NHÂN VIÊN</th><th>GIÁ TRỊ (VNĐ)</th></tr></thead>
                 <tbody id="salary-body"></tbody>
             </table>
         </div>
         <div class="modal-footer" style="display:flex; gap:10px; margin-top:20px;">
             <button class="btn-action btn-save-cloud" style="flex:1" onclick="window.saveSalaryToFirebase()">
-                <i data-lucide="save"></i> Lưu Đơn Giá
+                <i data-lucide="save"></i> Lưu Cấu Hình
             </button>
             <button class="btn-action btn-save-cloud" style="flex:1; background:#5856D6;" onclick="window.saveEmployeesToFirebase()">
                 <i data-lucide="users"></i> Lưu DS Mới
@@ -629,7 +649,8 @@
                     id: row[2], name: empName, attendanceRecords: [], lateDetails: [],
                     onceDays: [], tripleDays: [],
                     stats: { totalMinutes: 0, totalPenalty: 0, cloudPenalty: 0, countOnce: 0, countTriple: 0 }, 
-                    hourlyRate: 0, bonusAmount: 0, bonusNote: "" 
+                    hourlyRate: 0, bonusAmount: 0, bonusNote: "",
+                    isFixedSalary: false 
                 };
                 allEmployees.push(emp);
                 const nextRow = data[i+1];
@@ -724,17 +745,19 @@
     function syncDataAfterUpload() {
         allEmployees.forEach(emp => {
             const s = window.cloudSalaryData.find(c => c.name === emp.name);
-            if (s) emp.hourlyRate = s.hourlyRate;
+            if (s) {
+                emp.hourlyRate = s.hourlyRate;
+                emp.isFixedSalary = s.isFixedSalary || false;
+            }
             const b = window.cloudBonusData.find(c => c.name === emp.name);
             if (b) { emp.bonusAmount = b.bonusAmount; emp.bonusNote = b.bonusNote; }
             if (window.cloudPenaltySummary[emp.name]) {
                 emp.stats.cloudPenalty = window.cloudPenaltySummary[emp.name].total;
             }
         });
-        calculateMonthlyTotals(); // Cập nhật bảng tổng tài chính
+        calculateMonthlyTotals();
     }
 
-    // HÀM MỚI: Tính toán tổng tiền cả tháng
     function calculateMonthlyTotals() {
         let totalSalary = 0;
         let totalBonus = 0;
@@ -742,7 +765,13 @@
 
         allEmployees.forEach(emp => {
             if (emp.attendanceRecords.length > 0) {
-                totalSalary += Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
+                let baseSalary = 0;
+                if(emp.isFixedSalary) {
+                    baseSalary = emp.hourlyRate; // Giá trị nhập vào chính là tổng lương khoán
+                } else {
+                    baseSalary = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
+                }
+                totalSalary += baseSalary;
                 totalBonus += (emp.bonusAmount || 0);
                 totalPenalty += (emp.stats.totalPenalty + (emp.stats.cloudPenalty || 0));
             }
@@ -811,7 +840,15 @@
             }
         }
 
-        const base = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
+        let base = 0;
+        let labelBase = "Lương công (giờ):";
+        if(emp.isFixedSalary) {
+            base = emp.hourlyRate;
+            labelBase = "Lương khoán tháng:";
+        } else {
+            base = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
+        }
+
         const cloudPenalty = window.cloudPenaltySummary[emp.name] ? window.cloudPenaltySummary[emp.name].total : 0;
         const cloudDetails = window.cloudPenaltySummary[emp.name] ? window.cloudPenaltySummary[emp.name].details : [];
         const totalFine = emp.stats.totalPenalty + cloudPenalty;
@@ -820,7 +857,10 @@
         const final = base + (emp.bonusAmount || 0) - totalFine;
         
         document.getElementById('detail-summary-box').innerHTML = `
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;"><span>Đơn giá:</span> <b>${emp.hourlyRate.toLocaleString()} đ/h</b></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
+                <span>${labelBase}</span> <b>${base.toLocaleString()} đ</b>
+            </div>
+            ${!emp.isFixedSalary ? `<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px; color:#8E8E93"><span>Đơn giá:</span> <span>${emp.hourlyRate.toLocaleString()} đ/h</span></div>` : ''}
             
             <div style="margin-top:12px; border-top: 1px dashed #eee; padding-top:8px;">
                 <div style="display:flex; justify-content:space-between; color:var(--ios-green); font-weight:700;">
@@ -856,7 +896,19 @@
         tbody.innerHTML = '';
         allEmployees.filter(e => e.attendanceRecords.length > 0).forEach(emp => {
             const idx = allEmployees.indexOf(emp);
-            tbody.innerHTML += `<tr><td style="padding:15px 0"><div style="font-weight:600">${emp.name}</div><div style="font-size:11px;color:#8E8E93">ID: ${emp.id}</div></td><td><input type="number" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.hourlyRate || ''}" oninput="allEmployees[${idx}].hourlyRate=parseFloat(this.value)||0; calculateMonthlyTotals();"></td></tr>`;
+            tbody.innerHTML += `
+                <tr style="border-bottom: 1px solid #f2f2f7;">
+                    <td style="padding:15px 0">
+                        <div style="font-weight:600">${emp.name}</div>
+                        <div class="switch-container">
+                            <input type="checkbox" id="fixed-${idx}" ${emp.isFixedSalary ? 'checked' : ''} onchange="allEmployees[${idx}].isFixedSalary=this.checked; calculateMonthlyTotals();">
+                            <label for="fixed-${idx}">Lương khoán</label>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="number" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.hourlyRate || ''}" placeholder="${emp.isFixedSalary ? 'Tổng lương khoán' : 'Giá mỗi giờ'}" oninput="allEmployees[${idx}].hourlyRate=parseFloat(this.value)||0; calculateMonthlyTotals();">
+                    </td>
+                </tr>`;
         });
         document.getElementById('salary-overlay').style.display = 'flex';
         initIcons();
