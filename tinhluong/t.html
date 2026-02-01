@@ -298,6 +298,43 @@
             border: 1px solid rgba(0,0,0,0.02);
         }
 
+        /* Monthly Summary Table Styling */
+        .monthly-summary-card {
+            display: none;
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--ios-border);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .summary-box {
+            padding: 12px;
+            border-radius: 14px;
+            background: #f8f8fa;
+        }
+
+        .summary-box label {
+            display: block;
+            font-size: 11px;
+            color: #8e8e93;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .summary-box span {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
         #summary-table { width: 100%; border-collapse: separate; border-spacing: 0; display: none; }
         #summary-table tr { 
             background: white; 
@@ -324,7 +361,6 @@
             justify-content: space-between;
         }
 
-        /* Modals */
         .modal-content { 
             background: white; 
             border-radius: var(--radius-xl) var(--radius-xl) 0 0; 
@@ -401,6 +437,30 @@
         <i data-lucide="cloud-upload" style="width: 48px; height: 48px; color: var(--ios-blue); margin-bottom: 10px;"></i>
         <br>
         <input type="file" id="file-input" accept=".xlsx, .xls" />
+    </div>
+
+    <div class="monthly-summary-card" id="monthly-summary-card">
+        <h3 style="margin-top:0; font-size:18px; display:flex; align-items:center; gap:8px;">
+            <i data-lucide="pie-chart" style="color:var(--ios-blue)"></i> Tổng Kết Tài Chính Tháng
+        </h3>
+        <div class="summary-grid">
+            <div class="summary-box">
+                <label>Tổng Lương Công</label>
+                <span id="total-month-salary">0đ</span>
+            </div>
+            <div class="summary-box">
+                <label>Tổng Thưởng</label>
+                <span id="total-month-bonus" style="color:var(--ios-green)">0đ</span>
+            </div>
+            <div class="summary-box">
+                <label>Tổng Phạt</label>
+                <span id="total-month-penalty" style="color:var(--ios-red)">0đ</span>
+            </div>
+            <div class="summary-box" style="background: #eef7ff; border: 1px solid #cce5ff;">
+                <label style="color:#0056b3">Thực Trả (Tổng)</label>
+                <span id="total-month-final" style="color:var(--ios-blue); font-size:18px;">0đ</span>
+            </div>
+        </div>
     </div>
     
     <div class="stats-container" id="stats-container">
@@ -584,19 +644,21 @@
                                 const [h2, m2] = times[1].split(':').map(Number);
                                 const totalMins = h1 * 60 + m1;
                                 
+                                let isLate = false;
                                 if (!isThua) {
                                     const morningMark = 425; 
                                     const afternoonMark = 900; 
                                     const targetMark = Math.abs(totalMins - morningMark) < Math.abs(totalMins - afternoonMark) ? morningMark : afternoonMark;
                                     const diff = totalMins - targetMark;
                                     if (diff >= 1) {
+                                        isLate = true;
                                         const fine = diff > 10 ? 200000 : 100000;
                                         emp.stats.totalPenalty += fine;
                                         emp.lateDetails.push(`Ngày ${dayNum}: Trễ ${diff}p (${times[0]}) - Phạt ${fine.toLocaleString()}đ`);
                                     }
                                 }
                                 emp.stats.totalMinutes += (h2 * 60 + m2) - (h1 * 60 + m1);
-                                emp.attendanceRecords.push({ day: dayNum, time: times[0] + "\n" + times[1] });
+                                emp.attendanceRecords.push({ day: dayNum, time: times[0] + "\n" + times[1], isLate: isLate });
                             } 
                             else if (times.length === 4) {
                                 const [h1, m1] = times[0].split(':').map(Number);
@@ -604,11 +666,13 @@
                                 const [h3, m3] = times[2].split(':').map(Number);
                                 const [h4, m4] = times[3].split(':').map(Number);
 
+                                let isLate = false;
                                 if (!isThua) {
                                     const firstInMins = h1 * 60 + m1;
                                     const morningMark = 425; 
                                     const diff = firstInMins - morningMark;
                                     if (diff >= 1) {
+                                        isLate = true;
                                         const fine = diff > 10 ? 200000 : 100000;
                                         emp.stats.totalPenalty += fine;
                                         emp.lateDetails.push(`Ngày ${dayNum}: Trễ ${diff}p (${times[0]}) - Phạt ${fine.toLocaleString()}đ`);
@@ -618,17 +682,17 @@
                                 const shift1 = (h2 * 60 + m2) - (h1 * 60 + m1);
                                 const shift2 = (h4 * 60 + m4) - (h3 * 60 + m3);
                                 emp.stats.totalMinutes += (shift1 + shift2);
-                                emp.attendanceRecords.push({ day: dayNum, time: times[0] + "→" + times[1] + "\n" + times[2] + "→" + times[3] });
+                                emp.attendanceRecords.push({ day: dayNum, time: times[0] + "→" + times[1] + "\n" + times[2] + "→" + times[3], isLate: isLate });
                             }
                             else if (times.length === 1) {
                                 emp.stats.countOnce++;
                                 emp.onceDays.push(`Ngày ${dayNum} (${times[0]})`);
-                                emp.attendanceRecords.push({ day: dayNum, time: times[0] + "\n(Mất công)" });
+                                emp.attendanceRecords.push({ day: dayNum, time: times[0] + "\n(Mất công)", isLate: false });
                             } 
                             else {
                                 emp.stats.countTriple++;
                                 emp.tripleDays.push(`Ngày ${dayNum} (${times.length} lần)`);
-                                emp.attendanceRecords.push({ day: dayNum, time: times.length + " lần\n(Mất công)" });
+                                emp.attendanceRecords.push({ day: dayNum, time: times.length + " lần\n(Mất công)", isLate: false });
                             }
                         }
                     });
@@ -667,6 +731,29 @@
                 emp.stats.cloudPenalty = window.cloudPenaltySummary[emp.name].total;
             }
         });
+        calculateMonthlyTotals(); // Cập nhật bảng tổng tài chính
+    }
+
+    // HÀM MỚI: Tính toán tổng tiền cả tháng
+    function calculateMonthlyTotals() {
+        let totalSalary = 0;
+        let totalBonus = 0;
+        let totalPenalty = 0;
+
+        allEmployees.forEach(emp => {
+            if (emp.attendanceRecords.length > 0) {
+                totalSalary += Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
+                totalBonus += (emp.bonusAmount || 0);
+                totalPenalty += (emp.stats.totalPenalty + (emp.stats.cloudPenalty || 0));
+            }
+        });
+
+        document.getElementById('total-month-salary').innerText = totalSalary.toLocaleString() + "đ";
+        document.getElementById('total-month-bonus').innerText = "+" + totalBonus.toLocaleString() + "đ";
+        document.getElementById('total-month-penalty').innerText = "-" + totalPenalty.toLocaleString() + "đ";
+        document.getElementById('total-month-final').innerText = (totalSalary + totalBonus - totalPenalty).toLocaleString() + "đ";
+        
+        document.getElementById('monthly-summary-card').style.display = 'block';
     }
 
     function displaySummary() {
@@ -691,6 +778,7 @@
         document.getElementById('summary-table').style.display = 'table';
         document.getElementById('action-bar').style.display = 'flex';
         initIcons();
+        calculateMonthlyTotals();
     }
 
     window.openDetailModal = function(idx) {
@@ -699,20 +787,19 @@
         const grid = document.getElementById('detail-grid');
         grid.innerHTML = '';
         
-        // Xác định số ngày trong tháng từ tiêu đề file Excel (thường đến ngày 31)
         const dayNumbers = currentDateHeaders.filter(n => typeof n === 'number' && n > 0);
         const daysInMonth = dayNumbers.length > 0 ? Math.max(...dayNumbers) : 31;
         
         let absentDays = [];
 
-        // Chạy vòng lặp hiển thị ĐỦ tất cả các ngày trong tháng
         for (let d = 1; d <= daysInMonth; d++) {
             const rec = emp.attendanceRecords.find(r => r.day === d);
             if (rec) {
+                const bgStyle = rec.isLate ? 'background: #FFD60A; border-color: #E6B800;' : '';
                 grid.innerHTML += `
-                    <div class="date-card">
+                    <div class="date-card" style="${bgStyle}">
                         <span class="day-label">Ngày ${rec.day}</span>
-                        <span class="time-label">${rec.time}</span>
+                        <span class="time-label" style="${rec.isLate ? 'color:#000' : ''}">${rec.time}</span>
                     </div>`;
             } else {
                 absentDays.push(d);
@@ -729,7 +816,6 @@
         const cloudDetails = window.cloudPenaltySummary[emp.name] ? window.cloudPenaltySummary[emp.name].details : [];
         const totalFine = emp.stats.totalPenalty + cloudPenalty;
         
-        // Gộp tất cả chi tiết phạt (từ file hiện tại + từ dữ liệu đám mây)
         const allPenaltyDetails = [...new Set([...cloudDetails, ...emp.lateDetails])];
         const final = base + (emp.bonusAmount || 0) - totalFine;
         
@@ -770,7 +856,7 @@
         tbody.innerHTML = '';
         allEmployees.filter(e => e.attendanceRecords.length > 0).forEach(emp => {
             const idx = allEmployees.indexOf(emp);
-            tbody.innerHTML += `<tr><td style="padding:15px 0"><div style="font-weight:600">${emp.name}</div><div style="font-size:11px;color:#8E8E93">ID: ${emp.id}</div></td><td><input type="number" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.hourlyRate || ''}" oninput="allEmployees[${idx}].hourlyRate=parseFloat(this.value)||0"></td></tr>`;
+            tbody.innerHTML += `<tr><td style="padding:15px 0"><div style="font-weight:600">${emp.name}</div><div style="font-size:11px;color:#8E8E93">ID: ${emp.id}</div></td><td><input type="number" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.hourlyRate || ''}" oninput="allEmployees[${idx}].hourlyRate=parseFloat(this.value)||0; calculateMonthlyTotals();"></td></tr>`;
         });
         document.getElementById('salary-overlay').style.display = 'flex';
         initIcons();
@@ -781,7 +867,7 @@
         tbody.innerHTML = '';
         allEmployees.filter(e => e.attendanceRecords.length > 0).forEach(emp => {
             const idx = allEmployees.indexOf(emp);
-            tbody.innerHTML += `<tr><td style="padding:15px 0"><b>${emp.name}</b></td><td><input type="number" style="width:80px; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.bonusAmount || ''}" oninput="allEmployees[${idx}].bonusAmount=parseFloat(this.value)||0"></td><td><input type="text" style="width:100px; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.bonusNote || ''}" oninput="allEmployees[${idx}].bonusNote=this.value"></td></tr>`;
+            tbody.innerHTML += `<tr><td style="padding:15px 0"><b>${emp.name}</b></td><td><input type="number" style="width:80px; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.bonusAmount || ''}" oninput="allEmployees[${idx}].bonusAmount=parseFloat(this.value)||0; calculateMonthlyTotals();"></td><td><input type="text" style="width:100px; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.bonusNote || ''}" oninput="allEmployees[${idx}].bonusNote=this.value"></td></tr>`;
         });
         document.getElementById('bonus-overlay').style.display = 'flex';
         initIcons();
