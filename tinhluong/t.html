@@ -673,6 +673,7 @@
                                     const diff = totalMins - targetMark;
                                     if (diff >= 1) {
                                         isLate = true;
+                                        // LOGIC CẬP NHẬT: Trễ > 10p phạt 200k, còn lại 100k
                                         const fine = diff > 10 ? 200000 : 100000;
                                         emp.stats.totalPenalty += fine;
                                         emp.lateDetails.push(`Ngày ${dayNum}: Trễ ${diff}p (${times[0]}) - Phạt ${fine.toLocaleString()}đ`);
@@ -694,6 +695,7 @@
                                     const diff = firstInMins - morningMark;
                                     if (diff >= 1) {
                                         isLate = true;
+                                        // LOGIC CẬP NHẬT: Trễ > 10p phạt 200k, còn lại 100k
                                         const fine = diff > 10 ? 200000 : 100000;
                                         emp.stats.totalPenalty += fine;
                                         emp.lateDetails.push(`Ngày ${dayNum}: Trễ ${diff}p (${times[0]}) - Phạt ${fine.toLocaleString()}đ`);
@@ -767,7 +769,7 @@
             if (emp.attendanceRecords.length > 0) {
                 let baseSalary = 0;
                 if(emp.isFixedSalary) {
-                    baseSalary = emp.hourlyRate; // Giá trị nhập vào chính là tổng lương khoán
+                    baseSalary = emp.hourlyRate; 
                 } else {
                     baseSalary = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
                 }
@@ -934,4 +936,4 @@
     }
 </script>
 </body>
-</html>
+</html> 
