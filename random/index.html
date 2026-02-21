@@ -209,7 +209,6 @@
             animation: teleIn 0.8s var(--spring) forwards;
         }
 
-        /* ĐÃ CHỈNH SỬA: Ảnh ôm trọn khung hình */
         .dog-image-container {
             width: 100%;
             height: 400px; 
@@ -224,7 +223,7 @@
         .dog-image {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* CHỈNH SỬA: Ảnh sẽ phủ kín container */
+            object-fit: cover;
             z-index: 2;
             position: relative;
         }
@@ -342,7 +341,7 @@
 
             <div class="dog-card" id="dogCard">
                 <div class="dog-image-container" id="imgContainer">
-                    <img src="" class="dog-image" id="dogImg" alt="Lucky Dog">
+                    <img class="dog-image" id="dogImg" alt="Lucky Dog">
                 </div>
                 <div class="dog-details">
                     <div class="dog-name" id="dogName">Lucky</div>
@@ -375,6 +374,7 @@
         const dimmer = document.getElementById('dimmer');
         const flash = document.getElementById('flash');
         const particleLayer = document.getElementById('particleLayer');
+        const dogImgElement = document.getElementById('dogImg');
 
         function createSpark() {
             const spark = document.createElement('div');
@@ -431,65 +431,77 @@
             }
         }
 
-        summonBtn.addEventListener('click', async () => {
+        summonBtn.addEventListener('click', () => {
             if(summonBtn.disabled) return;
             summonBtn.disabled = true;
 
+            // 1. Ẩn nút ngay lập tức
             btnWrapper.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
             btnWrapper.style.opacity = '0';
             btnWrapper.style.transform = 'translate(-50%, -50%) scale(0.5)';
-            
-            setTimeout(() => {
-                btnWrapper.style.display = 'none';
-            }, 300);
+            setTimeout(() => btnWrapper.style.display = 'none', 300);
 
+            // 2. Hiển thị Portal và làm tối màn hình
             dogCard.classList.remove('active');
             dimmer.style.opacity = '1';
             dogPortal.style.display = 'flex';
-            
             dogPortal.animate([
                 { transform: 'scale(0) rotate(0deg)', opacity: 0 },
                 { transform: 'scale(1) rotate(180deg)', opacity: 1 }
             ], { duration: 600, fill: 'forwards', easing: 'ease-out' });
 
             const sparkInterval = setInterval(createSpark, 40);
-            
-            setTimeout(() => {
-                flash.style.opacity = '1';
-                document.querySelector('.app-shell').style.animation = 'shake 0.25s 3';
-                
-                setTimeout(() => {
-                    flash.style.opacity = '0';
-                    clearInterval(sparkInterval);
-                    createHeartFirework();
 
-                    const randomDog = dogs[Math.floor(Math.random() * dogs.length)];
-                    const finalImg = randomDog.image !== "" ? randomDog.image : `https://placedog.net/500/500?id=${Math.floor(Math.random() * 100)}`;
-                    
-                    const dogImgElement = document.getElementById('dogImg');
-                    dogImgElement.src = finalImg;
-                    
+            // 3. Chọn ngẫu nhiên một chú chó
+            const randomDog = dogs[Math.floor(Math.random() * dogs.length)];
+            const imageUrl = randomDog.image !== "" ? randomDog.image : `https://placedog.net/500/500?id=${Math.floor(Math.random() * 100)}`;
+
+            // 4. KỸ THUẬT QUAN TRỌNG: Tải trước ảnh trong bộ nhớ
+            const imgLoader = new Image();
+            imgLoader.src = imageUrl;
+
+            // Đợi tối thiểu 2 giây để Portal xoay đẹp mắt, cộng thêm thời gian đợi ảnh load xong
+            const startTime = Date.now();
+
+            imgLoader.onload = () => {
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 2000 - elapsedTime);
+
+                // Chỉ thực hiện bước tiếp theo khi đã đủ 2s portal và ảnh đã load xong
+                setTimeout(() => {
+                    // Cập nhật thông tin vào DOM
+                    dogImgElement.src = imageUrl;
                     document.getElementById('dogName').textContent = randomDog.name;
                     document.getElementById('dogInfo').textContent = `${randomDog.age} • ${randomDog.personality}`;
                     document.getElementById('dogStars').textContent = "⭐".repeat(randomDog.friendliness);
 
-                    dogCard.classList.add('active');
+                    // Hiệu ứng Flash trắng khi xuất hiện
+                    flash.style.opacity = '1';
+                    document.querySelector('.app-shell').style.animation = 'shake 0.25s 3';
                     
-                    dogPortal.animate([
-                        { transform: 'scale(1)', opacity: 1 },
-                        { transform: 'scale(1.6)', opacity: 0 }
-                    ], { duration: 600, fill: 'forwards' });
-
                     setTimeout(() => {
-                        dogPortal.style.display = 'none';
-                        dimmer.style.opacity = '0';
-                        document.querySelector('.app-shell').style.animation = '';
-                    }, 600);
+                        flash.style.opacity = '0';
+                        clearInterval(sparkInterval);
+                        createHeartFirework();
 
-                }, 100);
-            }, 2000); 
+                        // Hiển thị Card và ẩn Portal
+                        dogCard.classList.add('active');
+                        dogPortal.animate([
+                            { transform: 'scale(1)', opacity: 1 },
+                            { transform: 'scale(1.6)', opacity: 0 }
+                        ], { duration: 600, fill: 'forwards' });
+
+                        setTimeout(() => {
+                            dogPortal.style.display = 'none';
+                            dimmer.style.opacity = '0';
+                            document.querySelector('.app-shell').style.animation = '';
+                        }, 600);
+                    }, 100);
+                }, remainingTime);
+            };
         });
 
+        // Hạt nền
         setInterval(() => {
             if(Math.random() > 0.6) {
                 const p = document.createElement('div');
