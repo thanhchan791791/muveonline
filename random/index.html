@@ -170,6 +170,30 @@
             animation: rotatePortalReverse 1.5s linear infinite;
         }
 
+        /* KHUNG XÁO TRỘN ẢNH - Chỉnh xoay chậm và giữ hướng */
+        .portal-shuffler {
+            width: 65%;
+            height: 65%;
+            border-radius: 50%;
+            overflow: hidden;
+            z-index: 16;
+            position: absolute;
+            border: 2px solid rgba(255,255,255,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            /* Animation đảo hướng xoay chậm (tốc độ 8s để trôi nhẹ) */
+            animation: rotatePortalReverse 8s linear infinite; 
+        }
+
+        .portal-shuffler img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.9) contrast(1.1);
+        }
+
         .ring-inner {
             width: 70%; height: 70%;
             background: radial-gradient(circle, rgba(255,116,140,0.4) 0%, transparent 70%);
@@ -336,6 +360,9 @@
             <div class="portal" id="dogPortal">
                 <div class="portal-ring ring-outer"></div>
                 <div class="portal-ring ring-mid"></div>
+                <div class="portal-shuffler">
+                    <img id="shuffleImg" src="" alt="">
+                </div>
                 <div class="portal-ring ring-inner"></div>
             </div>
 
@@ -375,6 +402,7 @@
         const flash = document.getElementById('flash');
         const particleLayer = document.getElementById('particleLayer');
         const dogImgElement = document.getElementById('dogImg');
+        const shuffleImg = document.getElementById('shuffleImg');
 
         function createSpark() {
             const spark = document.createElement('div');
@@ -435,13 +463,11 @@
             if(summonBtn.disabled) return;
             summonBtn.disabled = true;
 
-            // 1. Ẩn nút ngay lập tức
             btnWrapper.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
             btnWrapper.style.opacity = '0';
             btnWrapper.style.transform = 'translate(-50%, -50%) scale(0.5)';
             setTimeout(() => btnWrapper.style.display = 'none', 300);
 
-            // 2. Hiển thị Portal và làm tối màn hình
             dogCard.classList.remove('active');
             dimmer.style.opacity = '1';
             dogPortal.style.display = 'flex';
@@ -452,30 +478,31 @@
 
             const sparkInterval = setInterval(createSpark, 40);
 
-            // 3. Chọn ngẫu nhiên một chú chó
+            // HIỆU ỨNG XÁO TRỘN TRONG 2 GIÂY
+            const shuffleInterval = setInterval(() => {
+                const randomIdx = Math.floor(Math.random() * dogs.length);
+                shuffleImg.src = dogs[randomIdx].image;
+            }, 120);
+
             const randomDog = dogs[Math.floor(Math.random() * dogs.length)];
             const imageUrl = randomDog.image !== "" ? randomDog.image : `https://placedog.net/500/500?id=${Math.floor(Math.random() * 100)}`;
 
-            // 4. KỸ THUẬT QUAN TRỌNG: Tải trước ảnh trong bộ nhớ
             const imgLoader = new Image();
             imgLoader.src = imageUrl;
 
-            // Đợi tối thiểu 2 giây để Portal xoay đẹp mắt, cộng thêm thời gian đợi ảnh load xong
             const startTime = Date.now();
 
             imgLoader.onload = () => {
                 const elapsedTime = Date.now() - startTime;
-                const remainingTime = Math.max(0, 2000 - elapsedTime);
+                const remainingTime = Math.max(0, 4000 - elapsedTime); 
 
-                // Chỉ thực hiện bước tiếp theo khi đã đủ 2s portal và ảnh đã load xong
                 setTimeout(() => {
-                    // Cập nhật thông tin vào DOM
+                    clearInterval(shuffleInterval); 
                     dogImgElement.src = imageUrl;
                     document.getElementById('dogName').textContent = randomDog.name;
                     document.getElementById('dogInfo').textContent = `${randomDog.age} • ${randomDog.personality}`;
                     document.getElementById('dogStars').textContent = "⭐".repeat(randomDog.friendliness);
 
-                    // Hiệu ứng Flash trắng khi xuất hiện
                     flash.style.opacity = '1';
                     document.querySelector('.app-shell').style.animation = 'shake 0.25s 3';
                     
@@ -484,7 +511,6 @@
                         clearInterval(sparkInterval);
                         createHeartFirework();
 
-                        // Hiển thị Card và ẩn Portal
                         dogCard.classList.add('active');
                         dogPortal.animate([
                             { transform: 'scale(1)', opacity: 1 },
@@ -501,7 +527,6 @@
             };
         });
 
-        // Hạt nền
         setInterval(() => {
             if(Math.random() > 0.6) {
                 const p = document.createElement('div');
