@@ -154,25 +154,22 @@
             border: 2px solid transparent;
         }
 
-        /* 1. ĐIỀU CHỈNH TỐC ĐỘ VÒNG NGOÀI (hiện tại 1s) */
         .ring-outer {
             width: 100%; height: 100%;
             border-top: 4px solid var(--portal-main);
             border-bottom: 4px solid var(--portal-accent);
             filter: blur(1px);
             box-shadow: 0 0 35px var(--portal-main), inset 0 0 30px var(--portal-accent);
-            animation: rotatePortal 2s linear infinite; /* Thay 1s bằng số lớn hơn để chậm lại */
+            animation: rotatePortal 2s linear infinite;
         }
 
-        /* 2. ĐIỀU CHỈNH TỐC ĐỘ VÒNG GIỮA (hiện tại 1.5s) */
         .ring-mid {
             width: 85%; height: 85%;
             border-left: 3px solid #ffffff;
             border-right: 3px solid var(--portal-sub);
-            animation: rotatePortalReverse 2.5s linear infinite; /* Thay 1.5s bằng số lớn hơn để chậm lại */
+            animation: rotatePortalReverse 2.5s linear infinite;
         }
 
-        /* 3. ĐIỀU CHỈNH TỐC ĐỘ KHÔNG XOAY DẤU ? (Phải khớp với tốc độ JavaScript rotate) */
         .portal-shuffler {
             width: 65%;
             height: 65%;
@@ -182,7 +179,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Lưu ý: Tốc độ này (1s) phải khớp với tốc độ rotatePortal trong thẻ .portal khi JS chạy */
             animation: rotatePortalReverse 1s linear infinite; 
             pointer-events: none;
         }
@@ -214,7 +210,6 @@
         @keyframes rotatePortalReverse { to { transform: rotate(-360deg); } }
         @keyframes pulsePortal { from { transform: scale(1); opacity: 0.5; } to { transform: scale(1.1); opacity: 1; } }
 
-        /* ... Các phần CSS khác giữ nguyên ... */
         .flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; z-index: 100; pointer-events: none; }
         .dog-card { width: 100%; background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.25); overflow: hidden; display: none; transform: scale(0.2); opacity: 0; z-index: 20; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
         .dog-card.active { display: block; animation: teleIn 0.8s var(--spring) forwards; }
@@ -278,11 +273,11 @@
 
     <script>
         const dogs = [
-            { name: "BƠ BÉO", age: "3 Tuổi", personality: "Siêu Đáng Yêu", friendliness: 5, image: "BO.JPG" },
-            { name: "VẢI THIỀU", age: "2 Tuổi", personality: "Năng động", friendliness: 5, image: "VAITHIEU.JPG" },
-            { name: "NGÁO", age: "3 Tuổi", personality: "Hiền lành", friendliness: 5, image: "NGAO.JPG" },
-            { name: "HAPPY", age: "1.5 Tuổi", personality: "HAM ĂN", friendliness: 5, image: "HAPPY.JPG" },
-            { name: "MẮT XANH", age: "2 Tuổi", personality: "QUẬY SỐ 1", friendliness: 4, image: "MATXANH.JPG" }
+            { id: "BOBEO", name: "BƠ BÉO", age: "3 Tuổi", personality: "Siêu Đáng Yêu", friendliness: 5, image: "BO.JPG" },
+            { id: "VAITHIEU", name: "VẢI THIỀU", age: "2 Tuổi", personality: "Năng động", friendliness: 5, image: "VAITHIEU.JPG" },
+            { id: "NGAO", name: "NGÁO", age: "3 Tuổi", personality: "Hiền lành", friendliness: 5, image: "NGAO.JPG" },
+            { id: "HAPPY", name: "HAPPY", age: "1.5 Tuổi", personality: "HAM ĂN", friendliness: 5, image: "HAPPY.JPG" },
+            { id: "MATXANH", name: "MẮT XANH", age: "2 Tuổi", personality: "QUẬY SỐ 1", friendliness: 4, image: "MATXANH.JPG" }
         ];
 
         const summonBtn = document.getElementById('summonBtn');
@@ -338,15 +333,22 @@
             dimmer.style.opacity = '1';
             dogPortal.style.display = 'flex';
 
-            // 4. TỐC ĐỘ XOAY KHI BẮT ĐẦU HIỆN PORTAL (Đang là 0.6s)
-            // Nếu bạn thay đổi thời gian xoay ở đây, hãy thay đổi thời gian ở .portal-shuffler phía trên cho khớp.
             dogPortal.animate([
                 { transform: 'scale(0) rotate(0deg)', opacity: 0 },
                 { transform: 'scale(1) rotate(180deg)', opacity: 1 }
             ], { duration: 600, fill: 'forwards', easing: 'ease-out' });
 
             const sparkInterval = setInterval(createSpark, 40);
-            const randomDog = dogs[Math.floor(Math.random() * dogs.length)];
+
+            // LOGIC CHỌN CHÓ: Ưu tiên mã hash trên URL
+            const hash = window.location.hash.substring(1).toUpperCase(); // Lấy chữ sau dấu # và viết hoa
+            let randomDog = dogs.find(d => d.id === hash);
+            
+            // Nếu không tìm thấy chú chó theo tên trên URL, chọn ngẫu nhiên
+            if (!randomDog) {
+                randomDog = dogs[Math.floor(Math.random() * dogs.length)];
+            }
+
             const imageUrl = randomDog.image;
             const imgLoader = new Image();
             imgLoader.src = imageUrl;
