@@ -44,8 +44,12 @@
         .history-main { display: flex; justify-content: space-between; align-items: center; }
         .history-label { font-size: 14px; font-weight: 600; }
         .history-hh { color: var(--success); font-weight: 700; font-size: 14px; }
-        .filter-group { display: flex; gap: 8px; margin-bottom: 12px; }
-        .filter-group input { margin-bottom: 0; padding: 12px; font-size: 14px; }
+        .filter-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+        .filter-row { display: flex; gap: 8px; }
+        .filter-group input, .filter-group select { margin-bottom: 0; padding: 12px; font-size: 14px; }
+        .filtered-stats { background: #f0f0f7; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px dashed var(--ios-blue); }
+        .stat-line { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+        .stat-line b { color: var(--ios-blue); }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -78,9 +82,18 @@
     <div class="collapsible-header" onclick="toggleSection('history-content', this)"><h3><i data-lucide="history"></i> Lịch sử chi tiết</h3><i data-lucide="chevron-down" class="chevron-icon"></i></div>
     <div id="history-content" class="collapsible-content">
         <div class="filter-group">
-            <input type="text" id="historySearch" placeholder="Tên NV..." oninput="updateUI()">
-            <input type="date" id="historyDate" oninput="updateUI()">
+            <select id="historySearchSelect" onchange="updateUI()"><option value="">-- Tất cả nhân viên --</option></select>
+            <div class="filter-row">
+                <input type="date" id="historyStartDate" oninput="updateUI()">
+                <input type="date" id="historyEndDate" oninput="updateUI()">
+            </div>
         </div>
+        
+        <div id="filtered-stats-box" class="filtered-stats">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; color: var(--ios-secondary-text);">Kết quả lọc</div>
+            <div class="stat-line"><span>Tổng hoa hồng lọc:</span> <b id="filtered-com" style="color: var(--danger);">0 đ</b></div>
+        </div>
+
         <div id="logItems"></div>
     </div>
 </div>
@@ -130,31 +143,58 @@
     window.showSuccess = () => { const t = document.getElementById('success-toast'); t.style.display = 'flex'; setTimeout(() => t.classList.add('show'), 10); setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.style.display = 'none', 400); }, 2200); }
     window.toggleSection = (id, h) => { const c = document.getElementById(id); if(c.classList.contains('active')){ c.classList.remove('active'); h.classList.remove('open'); } else { c.classList.add('active'); h.classList.add('open'); } }
     document.querySelectorAll('.currency-input').forEach(i => i.addEventListener('input', e => { let v = e.target.value.replace(/\./g, ''); if(!isNaN(v) && v !== "") e.target.value = parseInt(v).toLocaleString('vi-VN').replace(/,/g, '.'); }));
-    onValue(dbRef, snap => { database = snap.val() || {}; updateUI(); });
+    onValue(dbRef, snap => { database = snap.val() || {}; updateUI(); updateStaffList(); });
     window.saveData = () => { set(dbRef, database); showSuccess(); }
     window.startApp = () => { const n = document.getElementById('initialName').value.trim(); if(!n) return alert("Nhập tên!"); document.getElementById('staffDisplayName').innerText = n; document.getElementById('welcome-screen').style.display = 'none'; document.getElementById('main-content').style.display = 'block'; setTimeout(() => document.getElementById('main-content').style.opacity = '1', 50); }
     window.openSection = id => { document.getElementById('selection-menu').style.display = 'none'; document.getElementById(id).classList.add('active'); }
     window.backToMenu = () => { document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active')); document.getElementById('selection-menu').style.display = 'grid'; }
-    function format(n) { return n ? n.toLocaleString('vi-VN').replace(/,/g, '.') : "0"; }
+    function format(n) { return n ? Math.round(n).toLocaleString('vi-VN').replace(/,/g, '.') : "0"; }
     function getCleanValue(id) { return parseFloat(document.getElementById(id).value.replace(/\./g, '')) || 0; }
-    function getTime() { const n = new Date(); return n.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }); }
+    
+    function getTime() { 
+        const n = new Date(); 
+        const t = n.toLocaleTimeString('vi-VN', { hour12: false });
+        const d = n.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return `${t} ${d}`; 
+    }
+
+    function parseDateObj(timeStr) {
+        try {
+            const datePart = timeStr.split(' ')[1];
+            const p = datePart.split('/');
+            return new Date(p[2], p[1]-1, p[0]);
+        } catch(e) { return new Date(0); }
+    }
+
     function getStaff(name) { const n = name.trim().toUpperCase(); if(!database[n]) database[n] = { spa:0, spaRev:0, media:0, raccoon:0, racRev:0, capyHH:0, capyRev:0, catRev:0, catHH:0, dogRev:0, dogHH:0, history:[] }; return database[n]; }
-    window.addSpa = () => { const n = document.getElementById('staffDisplayName').innerText, a = getCleanValue('spaAmount'), r = parseFloat(document.getElementById('spaService').value), h = a*r, s = getStaff(n); s.spa += h; s.spaRev += a; s.history.push({time:getTime(), label:`Spa: +${format(a)}đ`, hh:`+${format(h)}đ`, staffName:n}); window.saveData(); document.getElementById('spaAmount').value=""; }
-    window.addMedia = () => { const n = document.getElementById('staffDisplayName').innerText, b = (parseInt(document.getElementById('video1tr').value)||0)*2000000 + (parseInt(document.getElementById('video2tr').value)||0)*4000000, s = getStaff(n); s.media += b; s.history.push({time:getTime(), label:`Media`, hh:`+${format(b)}đ`, staffName:n}); window.saveData(); }
-    window.addRaccoon = () => { const n = document.getElementById('staffDisplayName').innerText, a = getCleanValue('raccoonAmount'), h = a*0.05, s = getStaff(n); s.raccoon += h; s.racRev += a; s.history.push({time:getTime(), label:`Gấu mèo: +${format(a)}đ`, hh:`+${format(h)}đ`, staffName:n}); window.saveData(); document.getElementById('raccoonAmount').value=""; }
-    window.addCapy = () => { const n = document.getElementById('staffDisplayName').innerText, a = getCleanValue('capyAmount'), h = a*0.15, s = getStaff(n); s.capyRev += a; s.capyHH = s.capyRev*0.15; s.history.push({time:getTime(), label:`Capy: +${format(a)}đ`, hh:`+${format(h)}đ`, staffName:n}); window.saveData(); document.getElementById('capyAmount').value=""; }
-    window.addCat = () => { const n = document.getElementById('staffDisplayName').innerText, a = getCleanValue('catAmount'), h = a*0.02, s = getStaff(n); s.catRev += a; s.catHH = s.catRev*0.02; s.history.push({time:getTime(), label:`Bán Mèo: +${format(a)}đ`, hh:`+${format(h)}đ`, staffName:n}); window.saveData(); document.getElementById('catAmount').value=""; }
-    window.addDog = () => { const n = document.getElementById('staffDisplayName').innerText, a = getCleanValue('dogAmount'), s = getStaff(n); s.dogRev += a; const rt = s.dogRev > 65000000 ? 0.05 : 0.02, h = a*rt; s.dogHH = s.dogRev*rt; s.history.push({time:getTime(), label:`Bán Chó: +${format(a)}đ`, hh:`+${format(h)}đ`, staffName:n}); window.saveData(); document.getElementById('dogAmount').value=""; }
+    window.addSpa = () => { const n = document.getElementById('staffDisplayName').innerText, a = getCleanValue('spaAmount'), r = parseFloat(document.getElementById('spaService').value), h = a*r, s = getStaff(n); s.spa += h; s.spaRev += a; s.history.push({time:getTime(), label:`Spa: +${format(a)}đ`, hh:`+${format(h)}đ`, staffName:n, revVal: a, hhVal: h}); window.saveData(); document.getElementById('spaAmount').value=""; }
+    window.addMedia = () => { const n = document.getElementById('staffDisplayName').innerText, b = (parseInt(document.getElementById('video1tr').value)||0)*2000000 + (parseInt(document.getElementById('video2tr').value)||0)*4000000, s = getStaff(n); s.media += b; s.history.push({time:getTime(), label:`Media`, hh:`+${format(b)}đ`, staffName:n, revVal: 0, hhVal: b}); window.saveData(); }
+    window.addRaccoon = () => { const n = document.getElementById('staffDisplayName').innerText, a = getCleanValue('raccoonAmount'), h = a*0.05, s = getStaff(n); s.raccoon += h; s.racRev += a; s.history.push({time:getTime(), label:`Gấu mèo: +${format(a)}đ`, hh:`+${format(h)}đ`, staffName:n, revVal: a, hhVal: h}); window.saveData(); document.getElementById('raccoonAmount').value=""; }
+    window.addCapy = () => { const n = document.getElementById('staffDisplayName').innerText, a = getCleanValue('capyAmount'), h = a*0.15, s = getStaff(n); s.capyRev += a; s.capyHH = s.capyRev*0.15; s.history.push({time:getTime(), label:`Capy: +${format(a)}đ`, hh:`+${format(h)}đ`, staffName:n, revVal: a, hhVal: h}); window.saveData(); document.getElementById('capyAmount').value=""; }
+    window.addCat = () => { const n = document.getElementById('staffDisplayName').innerText, a = getCleanValue('catAmount'), h = a*0.02, s = getStaff(n); s.catRev += a; s.catHH = s.catRev*0.02; s.history.push({time:getTime(), label:`Bán Mèo: +${format(a)}đ`, hh:`+${format(h)}đ`, staffName:n, revVal: a, hhVal: h}); window.saveData(); document.getElementById('catAmount').value=""; }
+    window.addDog = () => { const n = document.getElementById('staffDisplayName').innerText, a = getCleanValue('dogAmount'), s = getStaff(n); s.dogRev += a; const rt = s.dogRev > 65000000 ? 0.05 : 0.02, h = a*rt; s.dogHH = s.dogRev*rt; s.history.push({time:getTime(), label:`Bán Chó: +${format(a)}đ`, hh:`+${format(h)}đ`, staffName:n, revVal: a, hhVal: h}); window.saveData(); document.getElementById('dogAmount').value=""; }
+
+    function updateStaffList() {
+        const sel = document.getElementById('historySearchSelect');
+        const current = sel.value;
+        sel.innerHTML = '<option value="">-- Tất cả nhân viên --</option>';
+        Object.keys(database).sort().forEach(name => {
+            sel.innerHTML += `<option value="${name.toLowerCase()}">${name}</option>`;
+        });
+        sel.value = current;
+    }
 
     window.updateUI = () => {
         const container = document.getElementById('staffContainer'), log = document.getElementById('logItems'), rev = document.getElementById('revenueSummary');
         const oC = document.getElementById('outer-total-commission'), oR = document.getElementById('outer-total-revenue');
-        const searchName = document.getElementById('historySearch').value.toLowerCase();
-        const searchDateInput = document.getElementById('historyDate').value;
-        const searchDate = searchDateInput ? searchDateInput.split('-').reverse().join('/') : "";
+        
+        const searchName = document.getElementById('historySearchSelect').value;
+        const sDate = document.getElementById('historyStartDate').value;
+        const eDate = document.getElementById('historyEndDate').value;
 
         container.innerHTML = ""; log.innerHTML = ""; rev.innerHTML = "";
         let allHist = [], gC = 0, gR = 0;
+
         for (const [name, data] of Object.entries(database)) {
             const c = (data.spa||0) + (data.media||0) + (data.raccoon||0) + (data.capyHH||0) + (data.catHH||0) + (data.dogHH||0);
             const r = (data.spaRev||0) + (data.racRev||0) + (data.capyRev||0) + (data.catRev||0) + (data.dogRev||0);
@@ -163,11 +203,42 @@
             container.innerHTML += `<div style="background:var(--ios-card); padding:15px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between;"><b>${name}</b><b style="color:var(--danger)">${format(c)} đ</b></div>`;
             rev.innerHTML += `<div style="padding:10px; border-bottom:1px solid var(--ios-separator); display:flex; justify-content:space-between;"><span>${name}</span><span style="color:var(--ios-blue)">${format(r)} đ</span></div>`;
         }
-        if(oC) oC.innerText = format(gC) + " đ"; if(oR) oR.innerText = format(gR) + " đ";
         
-        allHist.reverse().filter(h => h.staffName.toLowerCase().includes(searchName) && h.time.includes(searchDate)).slice(0,50).forEach(h => {
-            log.innerHTML += `<div class="history-item"><span class="history-time">${h.time} - ${h.staffName}</span><div class="history-main"><span class="history-label">${h.label}</span><span class="history-hh">${h.hh}</span></div></div>`;
+        if(oC) oC.innerText = format(gC) + " đ"; 
+        if(oR) oR.innerText = format(gR) + " đ";
+        
+        let fCom = 0;
+        const filtered = allHist.reverse().filter(h => {
+            const matchName = !searchName || h.staffName.toLowerCase() === searchName;
+            let matchDate = true;
+            if(sDate || eDate) {
+                const d = parseDateObj(h.time);
+                if(sDate) { let start = new Date(sDate); start.setHours(0,0,0,0); if(d < start) matchDate = false; }
+                if(eDate) { let end = new Date(eDate); end.setHours(23,59,59,999); if(d > end) matchDate = false; }
+            }
+            return matchName && matchDate;
         });
+
+        filtered.forEach(h => {
+            // Tự sửa lỗi dữ liệu cũ: Nếu hhVal không có, tách số từ chuỗi hh
+            let val = h.hhVal;
+            if (val === undefined || val === null) {
+                val = parseInt(h.hh.toString().replace(/[^0-9]/g, '')) || 0;
+            }
+            fCom += val;
+
+            // HIỂN THỊ CHI TIẾT TRONG DANH SÁCH (Fix lỗi dấu ...)
+            log.innerHTML += `
+                <div class="history-item">
+                    <span class="history-time" style="color: #86868B; font-size: 11px;">${h.time} - ${h.staffName}</span>
+                    <div class="history-main">
+                        <span class="history-label">${h.label}</span>
+                        <span class="history-hh">${h.hh}</span>
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById('filtered-com').innerText = format(fCom) + " đ";
         lucide.createIcons();
     }
 </script>
