@@ -618,6 +618,18 @@
     }
     initIcons();
 
+    // Hàm format số khi nhập liệu
+    function formatCurrencyInput(input, callback) {
+        let value = input.value.replace(/\D/g, "");
+        if (value !== "") {
+            let formattedValue = Number(value).toLocaleString('vi-VN');
+            input.value = formattedValue;
+            callback(parseFloat(value));
+        } else {
+            callback(0);
+        }
+    }
+
     document.getElementById('file-input').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -673,7 +685,6 @@
                                     const diff = totalMins - targetMark;
                                     if (diff >= 1) {
                                         isLate = true;
-                                        // LOGIC CẬP NHẬT: Trễ > 10p phạt 200k, còn lại 100k
                                         const fine = diff > 10 ? 200000 : 100000;
                                         emp.stats.totalPenalty += fine;
                                         emp.lateDetails.push(`Ngày ${dayNum}: Trễ ${diff}p (${times[0]}) - Phạt ${fine.toLocaleString()}đ`);
@@ -695,7 +706,6 @@
                                     const diff = firstInMins - morningMark;
                                     if (diff >= 1) {
                                         isLate = true;
-                                        // LOGIC CẬP NHẬT: Trễ > 10p phạt 200k, còn lại 100k
                                         const fine = diff > 10 ? 200000 : 100000;
                                         emp.stats.totalPenalty += fine;
                                         emp.lateDetails.push(`Ngày ${dayNum}: Trễ ${diff}p (${times[0]}) - Phạt ${fine.toLocaleString()}đ`);
@@ -908,7 +918,7 @@
                         </div>
                     </td>
                     <td>
-                        <input type="number" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.hourlyRate || ''}" placeholder="${emp.isFixedSalary ? 'Tổng lương khoán' : 'Giá mỗi giờ'}" oninput="allEmployees[${idx}].hourlyRate=parseFloat(this.value)||0; calculateMonthlyTotals();">
+                        <input type="text" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.hourlyRate ? emp.hourlyRate.toLocaleString('vi-VN') : ''}" placeholder="${emp.isFixedSalary ? 'Tổng lương khoán' : 'Giá mỗi giờ'}" oninput="formatCurrencyInput(this, (val) => { allEmployees[${idx}].hourlyRate=val; calculateMonthlyTotals(); })">
                     </td>
                 </tr>`;
         });
@@ -921,7 +931,7 @@
         tbody.innerHTML = '';
         allEmployees.filter(e => e.attendanceRecords.length > 0).forEach(emp => {
             const idx = allEmployees.indexOf(emp);
-            tbody.innerHTML += `<tr><td style="padding:15px 0"><b>${emp.name}</b></td><td><input type="number" style="width:80px; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.bonusAmount || ''}" oninput="allEmployees[${idx}].bonusAmount=parseFloat(this.value)||0; calculateMonthlyTotals();"></td><td><input type="text" style="width:100px; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.bonusNote || ''}" oninput="allEmployees[${idx}].bonusNote=this.value"></td></tr>`;
+            tbody.innerHTML += `<tr><td style="padding:15px 0"><b>${emp.name}</b></td><td><input type="text" style="width:100px; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.bonusAmount ? emp.bonusAmount.toLocaleString('vi-VN') : ''}" oninput="formatCurrencyInput(this, (val) => { allEmployees[${idx}].bonusAmount=val; calculateMonthlyTotals(); })"></td><td><input type="text" style="width:100px; padding:10px; border-radius:10px; border:1px solid #ddd;" value="${emp.bonusNote || ''}" oninput="allEmployees[${idx}].bonusNote=this.value"></td></tr>`;
         });
         document.getElementById('bonus-overlay').style.display = 'flex';
         initIcons();
@@ -936,4 +946,4 @@
     }
 </script>
 </body>
-</html> 
+</html>
