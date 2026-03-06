@@ -339,6 +339,35 @@
             font-weight: 700;
         }
 
+        /* Bảng tổng kết lương nhanh CSS */
+        .quick-salary-card {
+            display: none;
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--ios-border);
+        }
+        .quick-salary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .quick-salary-table th {
+            text-align: left;
+            color: #8e8e93;
+            padding: 10px 5px;
+            font-weight: 600;
+            border-bottom: 1px solid #f2f2f7;
+        }
+        .quick-salary-table td {
+            padding: 12px 5px;
+            border-bottom: 1px solid #f2f2f7;
+        }
+        .text-right { text-align: right; }
+
         #summary-table { width: 100%; border-collapse: separate; border-spacing: 0; display: none; }
         #summary-table tr { 
             background: white; 
@@ -528,6 +557,24 @@
     <table id="summary-table">
         <tbody id="summary-body"></tbody>
     </table>
+
+    <div class="quick-salary-card" id="quick-salary-card">
+        <h3 style="margin-top:0; font-size:18px; display:flex; align-items:center; gap:8px;">
+            <i data-lucide="table-2" style="color:var(--ios-blue)"></i> Bảng Lương Rút Gọn
+        </h3>
+        <table class="quick-salary-table">
+            <thead>
+                <tr>
+                    <th>Tên nhân viên</th>
+                    <th class="text-right">Lương</th>
+                    <th class="text-right">Thưởng/Phạt</th>
+                    <th class="text-right">Thực nhận</th>
+                </tr>
+            </thead>
+            <tbody id="quick-salary-body">
+                </tbody>
+        </table>
+    </div>
 </div>
 
 <div id="quick-stats-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); backdrop-filter:blur(10px); z-index:2000; align-items:center; justify-content:center;">
@@ -774,6 +821,8 @@
         let totalSalary = 0;
         let totalBonus = 0;
         let totalPenalty = 0;
+        const quickBody = document.getElementById('quick-salary-body');
+        quickBody.innerHTML = '';
 
         allEmployees.forEach(emp => {
             if (emp.attendanceRecords.length > 0) {
@@ -783,9 +832,27 @@
                 } else {
                     baseSalary = Math.round((emp.stats.totalMinutes / 60) * emp.hourlyRate);
                 }
+                
+                const curPenalty = (emp.stats.totalPenalty + (emp.stats.cloudPenalty || 0));
+                const curBonus = (emp.bonusAmount || 0);
+                const curFinal = baseSalary + curBonus - curPenalty;
+
                 totalSalary += baseSalary;
-                totalBonus += (emp.bonusAmount || 0);
-                totalPenalty += (emp.stats.totalPenalty + (emp.stats.cloudPenalty || 0));
+                totalBonus += curBonus;
+                totalPenalty += curPenalty;
+
+                // Cập nhật bảng tổng kết nhanh
+                quickBody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600">${emp.name}</td>
+                        <td class="text-right">${baseSalary.toLocaleString()}</td>
+                        <td class="text-right">
+                            <span style="color:var(--ios-green)">+${curBonus.toLocaleString()}</span> / 
+                            <span style="color:var(--ios-red)">-${curPenalty.toLocaleString()}</span>
+                        </td>
+                        <td class="text-right" style="font-weight:700; color:var(--ios-blue)">${curFinal.toLocaleString()}</td>
+                    </tr>
+                `;
             }
         });
 
@@ -795,6 +862,7 @@
         document.getElementById('total-month-final').innerText = (totalSalary + totalBonus - totalPenalty).toLocaleString() + "đ";
         
         document.getElementById('monthly-summary-card').style.display = 'block';
+        document.getElementById('quick-salary-card').style.display = 'block';
     }
 
     function displaySummary() {
