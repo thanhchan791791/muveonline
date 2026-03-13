@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHERRYPET COFFEE 2 - Bar Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        :root {
+            --primary-orange: #f37021;
+            --bg-body: #f0f2f5;
+            --text-dark: #2d3436;
+            --text-gray: #636e72;
+            --card-white: #ffffff;
+            --success-green: #2ecc71;
+        }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .brand { display: flex; align-items: center; gap: 15px; }
+        .brand img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .brand-info h1 { margin: 0; font-size: 1.2rem; text-transform: uppercase; color: var(--text-dark); }
+        .brand-info span { font-size: 0.8rem; color: var(--primary-orange); font-weight: 600; }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 30px 0 15px 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dark);
+        }
+
+        #order-container, #history-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .order-card {
+            background: var(--card-white);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+
+        .order-id { font-weight: 700; color: var(--text-dark); }
+        .order-time { color: var(--text-gray); font-size: 0.85rem; }
+
+        .item-list { list-style: none; padding: 0; margin: 0 0 20px 0; flex-grow: 1; }
+        .item-list li {
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            border-bottom: 1px dashed #f5f5f5;
+        }
+        .item-list li b { color: var(--primary-orange); }
+
+        .btn-complete {
+            background-color: var(--primary-orange);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .order-card.done { border-top: 4px solid var(--success-green); opacity: 0.8; }
+        .done-label {
+            color: var(--success-green);
+            text-align: center;
+            font-weight: 700;
+            padding: 10px;
+            background: #f0fff4;
+            border-radius: 8px;
+        }
+
+        #empty-msg { grid-column: 1/-1; text-align: center; padding: 30px; color: var(--text-gray); font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <img src="logocherry.png" alt="Logo" onerror="this.src='https://via.placeholder.com/50'">
+            <div class="brand-info">
+                <h1>Cherrypet coffee 2</h1>
+                <span id="order-count">ĐANG CHỜ: 0 ĐƠN</span>
+            </div>
+        </div>
+        <div style="font-weight: 600; color: var(--text-gray);" id="live-clock">--:--:--</div>
+    </header>
+
+    <div class="section-title">🕒 ĐƠN HÀNG MỚI</div>
+    <div id="order-container">
+        <div id="empty-msg">Chưa có đơn hàng nào...</div>
+    </div>
+
+    <div class="section-title">✅ LỊCH SỬ HOÀN THÀNH (HÔM NAY)</div>
+    <div id="history-container"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onChildAdded, onChildChanged, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB8Wf1_UDl804EDFmEKFE5cZvjJSEfWVg8",
+            authDomain: "xedua-86b46.firebaseapp.com",
+            databaseURL: "https://xedua-86b46-default-rtdb.firebaseio.com",
+            projectId: "xedua-86b46",
+            storageBucket: "xedua-86b46.firebasestorage.app",
+            messagingSenderId: "769715162274",
+            appId: "1:769715162274:web:b85463e0bcffbefa841bfb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const ordersRef = ref(db, 'orders');
+
+        let activeOrders = 0;
+
+        // Hàm lấy ngày hiện tại định dạng YYYY-MM-DD
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function updateClock() {
+            document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('vi-VN');
+        }
+        setInterval(updateClock, 1000);
+
+        function createOrderCard(id, data) {
+            const isDone = data.status === 'completed';
+            const items = data.items || [];
+            let itemsHtml = '';
+            
+            Object.values(items).forEach(item => {
+                itemsHtml += `<li><span>${item.name || 'Sản phẩm'}</span> <b>x${item.quantity || 1}</b></li>`;
+            });
+
+            const card = document.createElement('div');
+            card.id = `order-${id}`;
+            card.className = `order-card animate__animated ${isDone ? 'done animate__fadeIn' : 'animate__zoomIn'}`;
+            
+            card.innerHTML = `
+                <div class="order-header">
+                    <span class="order-id">#${id.slice(-5).toUpperCase()}</span>
+                    <span class="order-time">${new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}</span>
+                </div>
+                <ul class="item-list">${itemsHtml}</ul>
+                ${isDone ? '<div class="done-label">ĐÃ HOÀN THÀNH</div>' : `<button class="btn-complete" onclick="completeOrder('${id}')">XONG MÓN</button>`}
+            `;
+            return card;
+        }
+
+        onChildAdded(ordersRef, (snapshot) => {
+            const data = snapshot.val();
+            const id = snapshot.key;
+            
+            // Lấy ngày của đơn hàng (giả định Firebase có timestamp, nếu không ta dùng ngày hiện tại khi thêm)
+            const orderDate = data.date || getTodayDate(); 
+
+            if (data.status === 'completed') {
+                // Chỉ thêm vào lịch sử nếu là đơn của ngày hôm nay
+                if (orderDate === getTodayDate()) {
+                    document.getElementById('history-container').prepend(createOrderCard(id, data));
+                }
+            } else {
+                document.getElementById('empty-msg').style.display = 'none';
+                document.getElementById('order-container').prepend(createOrderCard(id, data));
+                activeOrders++;
+                updateBadge();
+            }
+        });
+
+        onChildChanged(ordersRef, (snapshot) => {
+            const data = snapshot.val();
+            const id = snapshot.key;
+            const oldCard = document.getElementById(`order-${id}`);
+
+            if (data.status === 'completed' && oldCard && oldCard.parentElement.id === 'order-container') {
+                oldCard.classList.add('animate__fadeOutLeft');
+                setTimeout(() => {
+                    oldCard.remove();
+                    activeOrders--;
+                    updateBadge();
+                    if(activeOrders === 0) document.getElementById('empty-msg').style.display = 'block';
+                    
+                    // Khi vừa bấm xong, nó luôn là của ngày hôm nay nên hiện vào lịch sử
+                    document.getElementById('history-container').prepend(createOrderCard(id, data));
+                }, 500);
+            }
+        });
+
+        window.completeOrder = (id) => {
+            update(ref(db, `orders/${id}`), { 
+                status: 'completed',
+                date: getTodayDate() // Lưu ngày hoàn thành để lọc
+            });
+        };
+
+        function updateBadge() {
+            document.getElementById('order-count').innerText = `ĐANG CHỜ: ${activeOrders} ĐƠN`;
+        }
+    </script>
+</body>
+</html>
