@@ -277,7 +277,8 @@
             { id: "VAITHIEU", name: "VẢI THIỀU", age: "2 Tuổi", personality: "Năng động", friendliness: 5, image: "VAITHIEU.JPG" },
             { id: "NGAO", name: "NGÁO", age: "3 Tuổi", personality: "Hiền lành", friendliness: 5, image: "NGAO.JPG" },
             { id: "HAPPY", name: "HAPPY", age: "1.5 Tuổi", personality: "HAM ĂN", friendliness: 5, image: "HAPPY.JPG" },
-            { id: "MATXANH", name: "MẮT XANH", age: "2 Tuổi", personality: "QUẬY SỐ 1", friendliness: 4, image: "MATXANH.JPG" }
+            { id: "MATXANH", name: "MẮT XANH", age: "2 Tuổi", personality: "QUẬY SỐ 1", friendliness: 4, image: "MATXANH.JPG" },
+            { id: "DAN", name: "ĐẦN", age: "4 Tuổi", personality: "Thân thiện thích nựng", friendliness: 5, image: "dan.jpg" }
         ];
 
         const summonBtn = document.getElementById('summonBtn');
@@ -340,11 +341,9 @@
 
             const sparkInterval = setInterval(createSpark, 40);
 
-            // LOGIC CHỌN CHÓ: Ưu tiên mã hash trên URL
-            const hash = window.location.hash.substring(1).toUpperCase(); // Lấy chữ sau dấu # và viết hoa
+            const hash = window.location.hash.substring(1).toUpperCase(); 
             let randomDog = dogs.find(d => d.id === hash);
             
-            // Nếu không tìm thấy chú chó theo tên trên URL, chọn ngẫu nhiên
             if (!randomDog) {
                 randomDog = dogs[Math.floor(Math.random() * dogs.length)];
             }
@@ -377,6 +376,17 @@
                         }, 600);
                     }, 100);
                 }, remainingTime);
+            };
+            
+            imgLoader.onerror = () => {
+                // Fallback nếu ảnh dan.png không tồn tại
+                console.error("Không tải được ảnh cho: " + randomDog.name);
+                // Thực hiện quy trình cũ nhưng bỏ qua việc chờ ảnh
+                setTimeout(() => {
+                    dogImgElement.alt = "Ảnh " + randomDog.name;
+                    document.getElementById('dogName').textContent = randomDog.name;
+                    // ... các bước hiện card khác
+                }, 1000);
             };
         });
 
