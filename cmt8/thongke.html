@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cherrypet coffee 2 - POS Analytics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --ios-blue: #007AFF;
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-secondary: #8E8E93;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --radius-xl: 28px;
+            --radius-lg: 22px;
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.06);
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body { 
+            background-color: var(--ios-bg); 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--ios-text);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            margin: 0;
+            padding-bottom: 50px;
+        }
+
+        .app-container {
+            max-width: 420px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--ios-bg);
+            position: relative;
+            animation: fadeIn 0.6s ease-out;
+            padding-top: 20px;
+        }
+
+        @media (min-width: 992px) {
+            .app-container {
+                max-width: 1200px;
+                padding: 30px;
+            }
+            .desktop-layout {
+                display: grid;
+                grid-template-columns: 350px 1fr;
+                gap: 30px;
+                align-items: start;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+                margin: 0 0 30px 0 !important;
+            }
+            .stat-mini-card.hero {
+                grid-column: span 1 !important;
+            }
+            .stat-mini-card {
+                height: auto !important;
+                min-height: 120px;
+            }
+            .filter-section {
+                margin: 0 !important;
+                position: sticky;
+                top: 100px;
+            }
+            .content-area {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .table-container {
+                margin: 0 0 24px 0 !important;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .navbar {
+            background: rgba(242, 242, 247, 0.8) !important;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border: none;
+            padding: 15px 0 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px !important;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .main-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            border: 3px solid white;
+            background: white;
+            transition: var(--transition);
+        }
+
+        .navbar-brand {
+            color: var(--ios-text) !important;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin: 5px 0 0 0 !important;
+        }
+
+        .ios-card {
+            background: var(--ios-card);
+            border-radius: var(--radius-lg);
+            border: none;
+            box-shadow: var(--shadow-soft);
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .filter-section {
+            margin: 0 16px 24px 16px;
+        }
+
+        .preset-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-preset {
+            flex: 1;
+            border: none;
+            background: #E5E5EA;
+            color: var(--ios-text);
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: var(--transition);
+            min-width: 80px;
+        }
+
+        .btn-preset.active {
+            background: var(--ios-blue);
+            color: white;
+        }
+
+        .btn-report {
+            background: #5856D6 !important;
+            color: white !important;
+            margin-top: 8px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--ios-secondary);
+            margin-left: 4px;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            border: 1px solid #E5E5EA;
+            padding: 12px 16px;
+            background-color: #FFF;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 0 16px 24px 16px;
+        }
+
+        .stat-mini-card {
+            background: var(--ios-card);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-mini-card.hero {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #007AFF, #5AC8FA);
+            color: white;
+            padding: 20px;
+        }
+
+        .stat-mini-card .label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            opacity: 0.8;
+        }
+
+        .stat-mini-card .value {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-mini-card.hero .value {
+            font-size: 28px;
+        }
+
+        .payment-details {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .stat-mini-card.hero .payment-details {
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        .pay-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .pay-item span:first-child { opacity: 0.7; }
+
+        .btn-filter {
+            background: var(--ios-blue);
+            color: white;
+            border-radius: 999px;
+            padding: 14px;
+            font-weight: 600;
+            border: none;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+            margin-top: 10px;
+        }
+
+        .table-container {
+            margin: 0 16px 24px 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            padding-left: 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            color: var(--ios-blue);
+            margin-right: 10px;
+        }
+
+        .product-rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: #F2F2F7;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .top-1 { background: #FFD700; color: #8B6914; }
+
+        .clickable-row {
+            padding: 16px;
+            margin-bottom: 12px;
+            background: white;
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .clickable-row:hover {
+            transform: scale(1.01);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .order-id { font-weight: 700; color: var(--ios-blue); }
+        .order-time { font-size: 13px; color: var(--ios-secondary); }
+        .order-amount { font-weight: 700; font-size: 16px; }
+
+        .modal-content { border-radius: 30px; border: none; }
+        .modal-total-box { background: var(--ios-bg); border-radius: 20px; padding: 20px; margin-top: 20px; }
+        
+        .table { --bs-table-bg: transparent; margin-bottom: 0; }
+        .table > :not(caption) > * > * { border-bottom-width: 0; padding: 12px 8px; }
+
+       /* PRINT STYLE UPDATE */
+@media print {
+    @page {
+        size: 80mm auto;
+        margin: 0;
+    }
+    html, body {
+        width: 80mm;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white;
+        font-family: Arial, sans-serif !important;
+        /* Giảm độ đậm chung để chữ thanh thoát hơn */
+        -webkit-print-color-adjust: exact;
+    }
+    .no-print, .modal-header, .modal-footer, .btn-close, .navbar, .app-container, .modal-backdrop {
+        display: none !important;
+    }
+    .modal {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        display: block !important;
+        width: 80mm !important;
+    }
+    .modal-content {
+        border: none !important;
+        width: 80mm !important;
+        padding: 1mm 2mm !important;
+    }
+    .modal-body {
+        padding: 0 !important;
+        width: 100% !important;
+    }
+    
+    /* Cấu hình tiêu đề */
+    h4 { 
+        font-size: 15px !important; 
+        margin: 5px 0 !important; 
+        text-transform: uppercase; 
+        font-weight: 700 !important; /* Đậm hơn thân bài một chút để làm nổi bật */
+    }
+    .report-title { 
+        font-size: 13px !important; 
+        margin: 4px 0 !important; 
+    }
+    #report-time-range { 
+        font-size: 11px !important; 
+        margin-bottom: 8px !important; 
+        font-weight: 400 !important; /* Giữ ngày tháng thanh mảnh */
+    }
+
+    /* Cấu hình bảng dữ liệu */
+    .table {
+        width: 100% !important;
+        table-layout: fixed;
+        margin: 0 !important;
+        border-collapse: collapse !important;
+    }
+    .table td, .table th {
+        padding: 4px 0 !important; /* Tăng từ 1px lên 4px để thưa dòng */
+        font-size: 12px !important;
+        line-height: 1.4 !important; /* Tăng độ giãn dòng để dễ đọc */
+        border-bottom: 0.5px solid #000 !important;
+        vertical-align: middle !important;
+    }
+
+    /* ĐIỀU CHỈNH ĐỘ DÀY CHỮ: Thay 900 bằng 600 */
+    .fw-bold, b, th, td, span, h4, .report-title, #report-total-amount, .payment-report-section span {
+        font-weight: 600 !important; 
+        color: #000 !important;
+    }
+
+    .table th:nth-child(1), .table td:nth-child(1) { width: 55%; text-align: left; }
+    .table th:nth-child(2), .table td:nth-child(2) { width: 10%; text-align: center; }
+    .table th:nth-child(3), .table td:nth-child(3) { width: 35%; text-align: right; }
+    
+    /* Tổng cộng */
+    .total-row {
+        border-top: 1.5px solid #000 !important;
+        margin-top: 8px !important;
+        padding-top: 5px !important;
+    }
+    #report-total-amount {
+        font-size: 16px !important; /* Tăng nhẹ kích thước để dễ nhìn số tiền */
+        font-weight: 700 !important;
+    }
+    
+    .payment-report-section {
+        border-top: 0.5px dashed #000;
+        margin-top: 10px;
+        padding-top: 8px;
+    }
+    .extra-info-section {
+        margin-top: 8px;
+        border-bottom: 0.5px dashed #000;
+        padding-bottom: 8px;
+    }
+}
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <nav class="navbar">
+        <div class="logo-container">
+    <img src="logocherry.png" alt="Logo" class="main-logo">
+    <h1 class="navbar-brand">CHERRYPET COFFEE 2</h1>
+    
+    <div style="margin-top: 15px;">
+        <a href="order.html" class="btn-order">
+            <i class="fas fa-shopping-cart"></i> Đặt món (Order)
+        </a>
+    </div>
+</div>
+        <div class="container-fluid justify-content-center">
+            <span class="navbar-brand">Cherrypet coffee 2</span>
+        </div>
+    </nav>
+
+    <div class="stats-grid">
+        <div class="stat-mini-card hero">
+            <div class="label">Tổng doanh thu hệ thống</div>
+            <div class="value" id="total-revenue-all">0đ</div>
+            <div class="payment-details">
+                <div class="pay-item"><span>TM:</span> <span id="all-tm">0đ</span></div>
+                <div class="pay-item"><span>CK:</span> <span id="all-ck">0đ</span></div>
+                <div class="pay-item"><span>Cà thẻ:</span> <span id="all-card">0đ</span></div>
+            </div>
+        </div>
+        <div class="stat-mini-card">
+            <div class="label">Hôm nay</div>
+            <div class="value" id="total-revenue-today" style="color: var(--ios-blue)">0đ</div>
+            <div class="payment-details">
+                <div class="pay-item"><span>TM:</span> <span id="today-tm">0đ</span></div>
+                <div class="pay-item"><span>CK:</span> <span id="today-ck">0đ</span></div>
+                <div class="pay-item"><span>Cà thẻ:</span> <span id="today-card">0đ</span></div>
+            </div>
+        </div>
+        <div class="stat-mini-card">
+            <div class="label">Tuần này</div>
+            <div class="value" id="total-revenue-week" style="color: var(--ios-green)">0đ</div>
+            <div class="payment-details">
+                <div class="pay-item"><span>TM:</span> <span id="week-tm">0đ</span></div>
+                <div class="pay-item"><span>CK:</span> <span id="week-ck">0đ</span></div>
+                <div class="pay-item"><span>Cà thẻ:</span> <span id="week-card">0đ</span></div>
+            </div>
+        </div>
+        <div class="stat-mini-card">
+            <div class="label">Tháng này</div>
+            <div class="value" id="total-revenue-month" style="color: var(--ios-red)">0đ</div>
+            <div class="payment-details">
+                <div class="pay-item"><span>TM:</span> <span id="month-tm">0đ</span></div>
+                <div class="pay-item"><span>CK:</span> <span id="month-ck">0đ</span></div>
+                <div class="pay-item"><span>Cà thẻ:</span> <span id="month-card">0đ</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="desktop-layout">
+        <aside class="filter-section ios-card">
+            <div class="section-title"><i class="fas fa-filter"></i>Bộ lọc</div>
+            <div class="preset-filters">
+                <button class="btn-preset active" onclick="setPreset('all', this)">Tất cả</button>
+                <button class="btn-preset" onclick="setPreset('today', this)">Hôm nay</button>
+                <button class="btn-preset" onclick="setPreset('week', this)">Tuần này</button>
+                <button class="btn-preset" onclick="setPreset('month', this)">Tháng này</button>
+                <button class="btn-preset btn-report" onclick="showDailyReport()"><i class="fas fa-file-invoice-dollar me-1"></i>Báo cáo cuối ngày</button>
+            </div>
+            <div class="row g-2">
+                <div class="col-6 col-lg-12">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" id="startDate" class="form-control">
+                </div>
+                <div class="col-6 col-lg-12">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" id="endDate" class="form-control">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-filter" onclick="filterData()">Xem chi tiết lọc</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <div class="table-container">
+                <div class="section-title"><i class="fas fa-chart-bar"></i>Biểu đồ doanh thu</div>
+                <div class="ios-card p-3">
+                    <canvas id="revenueChart" style="min-height: 250px;"></canvas>
+                </div>
+            </div>
+
+            <div class="row g-0 g-lg-4">
+                <div class="col-12 col-lg-5">
+                    <div class="table-container mx-0">
+                        <div class="section-title"><i class="fas fa-medal"></i>Bán chạy</div>
+                        <div class="ios-card">
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle">
+                                    <tbody id="product-summary-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-7">
+                    <div class="table-container mx-0">
+                        <div class="section-title"><i class="fas fa-receipt"></i>Lịch sử hóa đơn</div>
+                        <div id="order-table-body"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Chi tiết hóa đơn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Mã đơn:</span>
+                    <span id="m-id" class="fw-bold"></span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted small">Thời gian:</span>
+                    <span id="m-date" class="small"></span>
+                </div>
+                <ul id="m-items" class="list-group list-group-flush mb-2"></ul>
+                <div class="modal-total-box d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Tổng cộng</span>
+                    <h4 id="m-total" class="text-primary fw-bold mb-0">0đ</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dailyReportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header no-print">
+                <h5 class="modal-title fw-bold">Báo cáo doanh thu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+           <div class="modal-body">
+    <div class="text-center">
+        <h4 class="fw-bold">CHERRYPET COFFEE 2</h4>
+        <p class="report-title fw-bold">BÁO CÁO CUỐI NGÀY</p>
+        <div style="border-bottom: 1.5px solid #000; margin-bottom: 3px;"></div>
+        <p id="report-time-range" class="fw-bold" style="font-size: 11px; margin: 0;"></p>
+    </div>
+
+    <div class="extra-info-section py-2">
+        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
+            <span>Tổng số đơn:</span>
+            <span id="report-total-orders">0</span>
+        </div>
+        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
+            <span>Tổng chiết khấu:</span>
+            <span id="report-total-discount">0đ</span>
+        </div>
+        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
+            <span>Tổng VAT:</span>
+            <span id="report-total-vat">0đ</span>
+        </div>
+    </div>
+
+    <table class="table table-borderless">
+        <thead>
+            <tr style="border-bottom: 1.5px solid #000;">
+                <th style="font-size: 12px; text-align: left;">Tên món</th>
+                <th class="text-center" style="font-size: 12px;">SL</th>
+                <th class="text-end" style="font-size: 12px;">T.Tiền</th>
+            </tr>
+        </thead>
+        <tbody id="report-table-body"></tbody>
+    </table>
+
+    <div class="payment-report-section" style="border-bottom: 0.5px dashed #000; padding-bottom: 8px;">
+        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
+            <span>Tiền mặt:</span>
+            <span id="report-cash-amount">0đ</span>
+        </div>
+        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
+            <span>Chuyển khoản:</span>
+            <span id="report-transfer-amount">0đ</span>
+        </div>
+        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
+            <span>Cà thẻ:</span>
+            <span id="report-card-amount">0đ</span>
+        </div>
+    </div>
+
+    <div class="total-row" style="border-top: none; margin-top: 10px;">
+        <div class="d-flex justify-content-between fw-bold">
+            <span>TỔNG CỘNG:</span>
+            <span id="report-total-amount" style="font-size: 18px;">0đ</span>
+        </div>
+    </div>
+</div>
+            <div class="modal-footer no-print">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>In Báo Cáo (K80)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB8Wf1_UDl804EDFmEKFE5cZvjJSEfWVg8",
+        authDomain: "xedua-86b46.firebaseapp.com",
+        databaseURL: "https://xedua-86b46-default-rtdb.firebaseio.com",
+        projectId: "xedua-86b46",
+        storageBucket: "xedua-86b46.firebasestorage.app",
+        messagingSenderId: "769715162274",
+        appId: "1:769715162274:web:b85463e0bcffbefa841bfb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const ordersRef = ref(db, 'orders');
+
+    let rawData = {};
+    let myChart;
+    const orderModal = new bootstrap.Modal(document.getElementById('orderModal'));
+    const dailyReportModal = new bootstrap.Modal(document.getElementById('dailyReportModal'));
+
+    onValue(ordersRef, (snapshot) => {
+        rawData = snapshot.val();
+        if (rawData) {
+            calculateFixedStats();
+            filterData();
+        }
+    });
+
+    function normalizeDate(dateObj) {
+        return dateObj.getFullYear() + '-' + 
+               String(dateObj.getMonth() + 1).padStart(2, '0') + '-' + 
+               String(dateObj.getDate()).padStart(2, '0');
+    }
+
+    function calculateFixedStats() {
+        const now = new Date();
+        const todayStr = normalizeDate(now);
+        const day = now.getDay();
+        const diffToMonday = now.getDate() - (day === 0 ? 6 : day - 1);
+        const startWeek = new Date(new Date(now).setDate(diffToMonday));
+        startWeek.setHours(0,0,0,0);
+        const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        startMonth.setHours(0,0,0,0);
+
+        const stats = {
+            all: { t: 0, tm: 0, ck: 0, card: 0 },
+            today: { t: 0, tm: 0, ck: 0, card: 0 },
+            week: { t: 0, tm: 0, ck: 0, card: 0 },
+            month: { t: 0, tm: 0, ck: 0, card: 0 }
+        };
+
+        Object.values(rawData).forEach(order => {
+            const amount = order.financials?.totalFinal || 0;
+            const method = (order.payment?.method || 'TM').toUpperCase();
+            const orderDate = new Date(order.timestamp);
+            const orderDateStr = normalizeDate(orderDate);
+            
+            const addMoney = (obj) => {
+                obj.t += amount;
+                if (method.includes('CK') || method.includes('CHUYỂN KHOẢN')) obj.ck += amount;
+                else if (method.includes('CÀ THẺ') || method.includes('CARD')) obj.card += amount;
+                else obj.tm += amount; 
+            };
+
+            addMoney(stats.all);
+            if (orderDateStr === todayStr) addMoney(stats.today);
+            if (orderDate >= startWeek) addMoney(stats.week);
+            if (orderDate >= startMonth) addMoney(stats.month);
+        });
+
+        const updateUI = (prefix, data) => {
+            document.getElementById(`total-revenue-${prefix}`).innerText = data.t.toLocaleString() + 'đ';
+            document.getElementById(`${prefix}-tm`).innerText = data.tm.toLocaleString() + 'đ';
+            document.getElementById(`${prefix}-ck`).innerText = data.ck.toLocaleString() + 'đ';
+            document.getElementById(`${prefix}-card`).innerText = data.card.toLocaleString() + 'đ';
+        };
+
+        updateUI('all', stats.all);
+        updateUI('today', stats.today);
+        updateUI('week', stats.week);
+        updateUI('month', stats.month);
+    }
+
+    window.setPreset = function(type, btn) {
+        const now = new Date();
+        let start = "", end = "";
+
+        document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (type === 'today') {
+            start = normalizeDate(now);
+            end = start;
+        } else if (type === 'week') {
+            const day = now.getDay(); 
+            const diff = now.getDate() - (day === 0 ? 6 : day - 1);
+            const mon = new Date(new Date(now).setDate(diff));
+            const sun = new Date(new Date(mon).setDate(mon.getDate() + 6));
+            start = normalizeDate(mon);
+            end = normalizeDate(sun);
+        } else if (type === 'month') {
+            const monStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const monEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            start = normalizeDate(monStart);
+            end = normalizeDate(monEnd);
+        }
+
+        document.getElementById('startDate').value = start;
+        document.getElementById('endDate').value = end;
+        filterData();
+    };
+
+    window.filterData = function() {
+        const start = document.getElementById('startDate').value;
+        const end = document.getElementById('endDate').value;
+        
+        let tableHtml = '';
+        const chartData = {};
+        const productCounts = {};
+
+        const sortedOrders = Object.entries(rawData).sort((a, b) => b[1].timestamp - a[1].timestamp);
+
+        sortedOrders.forEach(([key, order]) => {
+            const orderDate = new Date(order.timestamp);
+            const orderDateStr = normalizeDate(orderDate);
+            
+            let isMatch = true;
+            if (start && orderDateStr < start) isMatch = false;
+            if (end && orderDateStr > end) isMatch = false;
+
+            if (isMatch) {
+                const amount = order.financials?.totalFinal || 0;
+                chartData[orderDateStr] = (chartData[orderDateStr] || 0) + amount;
+
+                if (order.items) {
+                    const items = Array.isArray(order.items) ? order.items : Object.values(order.items);
+                    items.forEach(it => {
+                        const name = typeof it === 'object' ? it.name : it;
+                        const qty = (typeof it === 'object' && it.quantity) ? parseInt(it.quantity) : 1;
+                        if (name) productCounts[name] = (productCounts[name] || 0) + qty;
+                    });
+                }
+
+                tableHtml += `
+                    <div class="clickable-row" onclick="viewDetail('${key}')">
+                        <div>
+                            <div class="order-id">#${order.orderId || 'N/A'}</div>
+                            <div class="order-time">${order.dateString} • ${order.payment?.method || 'TM'}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="order-amount">${amount.toLocaleString()}đ</div>
+                        </div>
+                    </div>`;
+            }
+        });
+
+        const sortedProducts = Object.entries(productCounts).sort((a, b) => b[1] - a[1]);
+        let productHtml = '';
+        sortedProducts.forEach((item, index) => {
+            productHtml += `
+                <tr>
+                    <td style="width: 50px"><div class="product-rank ${index === 0 ? 'top-1' : ''}">${index + 1}</div></td>
+                    <td><span class="fw-bold" style="font-size: 14px">${item[0]}</span></td>
+                    <td class="text-end fw-bold text-primary" style="font-size: 14px">${item[1]}</td>
+                </tr>`;
+        });
+
+        document.getElementById('product-summary-body').innerHTML = productHtml || '<tr><td colspan="3" class="text-center py-4 text-muted">Trống</td></tr>';
+        document.getElementById('order-table-body').innerHTML = tableHtml || '<div class="text-center py-5 text-muted">Không có dữ liệu hóa đơn trong khoảng này</div>';
+        
+        updateChart(chartData);
+    };
+
+    window.viewDetail = function(key) {
+        const order = rawData[key];
+        document.getElementById('m-id').innerText = order.orderId || 'N/A';
+        document.getElementById('m-date').innerText = order.dateString + " " + (order.payment?.timeString || '');
+        document.getElementById('m-total').innerText = (order.financials?.totalFinal || 0).toLocaleString() + 'đ';
+
+        let itemsHtml = '';
+        const items = Array.isArray(order.items) ? order.items : Object.values(order.items);
+        items.forEach((it, i) => {
+            itemsHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>${typeof it === 'object' ? (it.name || 'Món ' + (i+1)) : 'Mục ' + it}</span>
+                <span class="fw-bold text-primary">${typeof it === 'object' ? (it.price || 0).toLocaleString() : ''}đ</span>
+            </li>`;
+        });
+        document.getElementById('m-items').innerHTML = itemsHtml;
+        orderModal.show();
+    }
+
+    window.showDailyReport = function() {
+        const now = new Date();
+        const todayStr = normalizeDate(now);
+        const reportData = {};
+        let dayTotal = 0;
+        let dayCash = 0;
+        let dayTransfer = 0;
+        let dayCard = 0;
+        
+        // Biến bổ sung
+        let dayOrderCount = 0;
+        let dayTotalDiscount = 0;
+        let dayTotalVAT = 0;
+
+        Object.values(rawData).forEach(order => {
+            const orderDate = new Date(order.timestamp);
+            if (normalizeDate(orderDate) === todayStr) {
+                dayOrderCount++; // Tăng số đơn
+                
+                const amount = (order.financials?.totalFinal || 0);
+                const discount = (order.financials?.discountAmount || 0);
+                const vat = (order.financials?.vatAmount || 0);
+                const method = (order.payment?.method || 'TM').toUpperCase();
+                
+                dayTotal += amount;
+                dayTotalDiscount += discount;
+                dayTotalVAT += vat;
+                
+                if (method.includes('CK') || method.includes('CHUYỂN KHOẢN')) dayTransfer += amount;
+                else if (method.includes('CÀ THẺ') || method.includes('CARD')) dayCard += amount;
+                else dayCash += amount;
+
+                const items = Array.isArray(order.items) ? order.items : Object.values(order.items);
+                items.forEach(it => {
+                    const name = typeof it === 'object' ? it.name : it;
+                    const qty = (typeof it === 'object' && it.quantity) ? parseInt(it.quantity) : 1;
+                    const price = (typeof it === 'object' && it.price) ? parseInt(it.price) : 0;
+                    
+                    if (!reportData[name]) {
+                        reportData[name] = { qty: 0, total: 0 };
+                    }
+                    reportData[name].qty += qty;
+                    reportData[name].total += (price * qty);
+                });
+            }
+        });
+
+        let reportHtml = '';
+        Object.entries(reportData).forEach(([name, info]) => {
+            reportHtml += `
+                <tr>
+                    <td class="fw-bold" style="font-size: 12px;">${name}</td>
+                    <td class="text-center fw-bold" style="font-size: 12px;">${info.qty}</td>
+                    <td class="text-end fw-bold" style="font-size: 12px;">${info.total.toLocaleString()}</td>
+                </tr>`;
+        });
+
+        // Đổ dữ liệu vào UI Báo cáo
+        document.getElementById('report-total-orders').innerText = dayOrderCount;
+        document.getElementById('report-total-discount').innerText = dayTotalDiscount.toLocaleString() + 'đ';
+        document.getElementById('report-total-vat').innerText = dayTotalVAT.toLocaleString() + 'đ';
+
+        document.getElementById('report-table-body').innerHTML = reportHtml || '<tr><td colspan="3" class="text-center py-2 fw-bold">Trống</td></tr>';
+        document.getElementById('report-total-amount').innerText = dayTotal.toLocaleString() + 'đ';
+        
+        document.getElementById('report-cash-amount').innerText = dayCash.toLocaleString() + 'đ';
+        document.getElementById('report-transfer-amount').innerText = dayTransfer.toLocaleString() + 'đ';
+        document.getElementById('report-card-amount').innerText = dayCard.toLocaleString() + 'đ';
+
+        document.getElementById('report-time-range').innerText = "Ngày: " + now.toLocaleDateString('vi-VN') + " - " + now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+        
+        dailyReportModal.show();
+    }
+
+    function updateChart(data) {
+        const labels = Object.keys(data).sort();
+        const values = labels.map(l => data[l]);
+        if (myChart) myChart.destroy();
+        
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ 
+                    label: 'Doanh thu', 
+                    data: values, 
+                    backgroundColor: '#007AFF',
+                    borderRadius: 8,
+                    maxBarThickness: 30
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        ticks: { callback: function(v) { return (v/1000) + 'k'; }, font: { size: 10 } },
+                        grid: { color: '#E5E5EA' }
+                    },
+                    x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#8E8E93' } }
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
