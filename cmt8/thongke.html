@@ -819,11 +819,21 @@
 
         let itemsHtml = '';
         const items = Array.isArray(order.items) ? order.items : Object.values(order.items);
+        
         items.forEach((it, i) => {
-            itemsHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>${typeof it === 'object' ? (it.name || 'Món ' + (i+1)) : 'Mục ' + it}</span>
-                <span class="fw-bold text-primary">${typeof it === 'object' ? (it.price || 0).toLocaleString() : ''}đ</span>
-            </li>`;
+            // Lấy thông tin tên, giá và số lượng
+            const name = typeof it === 'object' ? (it.name || 'Món ' + (i+1)) : 'Mục ' + it;
+            const price = typeof it === 'object' ? (it.price || 0) : 0;
+            const qty = (typeof it === 'object' && it.quantity) ? it.quantity : 1; // Mặc định là 1 nếu không có số lượng
+
+            itemsHtml += `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div d-flex flex-column>
+                        <span class="fw-bold">${name}</span>
+                        <div class="text-muted small">SL: ${qty} x ${price.toLocaleString()}đ</div>
+                    </div>
+                    <span class="fw-bold text-primary">${(price * qty).toLocaleString()}đ</span>
+                </li>`;
         });
         document.getElementById('m-items').innerHTML = itemsHtml;
         orderModal.show();
