@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cherrypet - Pet Food POS</title>
+    <title>Cherrypet - POS All Categories</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
@@ -43,9 +44,18 @@
         }
         ::-webkit-scrollbar { display: none; }
         
-        /* Hiệu ứng logo */
         .logo-container img {
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+        }
+
+        .category-pill {
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .category-pill.active {
+            background-color: #000;
+            color: #fff;
+            transform: scale(1.05);
         }
     </style>
 </head>
@@ -57,23 +67,27 @@
                 <img src="logocherry.png" alt="Cherrypet Logo" class="h-16 w-auto object-contain">
             </div>
             <div class="flex justify-between items-center w-full">
-                <h1 class="text-xl font-extrabold tracking-tight text-black italic">THỨC ĂN PET 🐾</h1>
+                <h1 class="text-xl font-extrabold tracking-tight text-black italic">THỰC ĐƠN TỔNG 🐾</h1>
                 <span id="order-count-badge" class="bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg shadow-orange-200">0</span>
             </div>
         </div>
         
-        <div>
-            <input type="text" id="search-pet" oninput="renderPetMenu()" placeholder="Tìm đồ ăn cho bé..." 
+        <div class="space-y-4">
+            <input type="text" id="search-pet" oninput="renderPetMenu()" placeholder="Tìm món nhanh..." 
                 class="w-full bg-[#E3E3E6] border-none rounded-2xl px-5 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-orange-400 transition-all">
+            
+            <div id="category-list" class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                <button onclick="filterByCategory('all')" id="cat-all" class="category-pill active bg-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm border border-slate-100">Tất cả</button>
+            </div>
         </div>
     </header>
 
     <main id="pet-grid" class="flex-1 overflow-y-auto px-6 py-6 grid grid-cols-2 gap-4 pb-72">
-        </main>
+    </main>
 
     <footer class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-100 px-6 pt-4 pb-8 shadow-[0_-10px_40px_rgba(0,0,0,0.08)] z-30">
         <div id="mini-cart" class="max-h-36 overflow-y-auto mb-4 space-y-2 border-b border-slate-50 pb-4 hidden">
-            </div>
+        </div>
 
         <div class="flex justify-between items-end mb-4">
             <div>
@@ -117,23 +131,51 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let categories = {}, allItems = [], cart = [];
+        let categories = {}, allItems = [], cart = [], currentCategory = 'all';
 
-        onValue(ref(db, 'categories'), s => { categories = s.val() || {}; });
+        onValue(ref(db, 'categories'), s => { 
+            categories = s.val() || {}; 
+            renderCategories();
+        });
+
         onValue(ref(db, 'menu'), s => {
-            const data = s.val() ? Object.values(s.val()) : [];
-            allItems = data.filter(item => {
-                const catName = (categories[item.categoryId]?.name || "").toLowerCase();
-                return catName.includes('pet') || catName.includes('thức ăn') || catName.includes('hạt') || catName.includes('cát');
-            });
+            allItems = s.val() ? Object.values(s.val()) : [];
             renderPetMenu();
         });
 
-        function renderPetMenu() {
+        function renderCategories() {
+            const container = document.getElementById('category-list');
+            container.innerHTML = `<button onclick="window.filterByCategory('all')" id="cat-all" class="category-pill active bg-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm border border-slate-100">Tất cả</button>`;
+            
+            Object.keys(categories).forEach(id => {
+                const btn = document.createElement('button');
+                btn.id = `cat-${id}`;
+                btn.className = "category-pill bg-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm border border-slate-100";
+                btn.innerText = categories[id].name;
+                btn.onclick = () => window.filterByCategory(id);
+                container.appendChild(btn);
+            });
+        }
+
+        window.filterByCategory = (id) => {
+            currentCategory = id;
+            document.querySelectorAll('.category-pill').forEach(btn => btn.classList.remove('active', 'bg-black', 'text-white'));
+            const activeBtn = document.getElementById(`cat-${id}`);
+            if(activeBtn) activeBtn.classList.add('active', 'bg-black', 'text-white');
+            renderPetMenu();
+        };
+
+        window.renderPetMenu = () => {
             const grid = document.getElementById('pet-grid');
             const search = document.getElementById('search-pet').value.toLowerCase();
             grid.innerHTML = '';
-            allItems.filter(i => i.name.toLowerCase().includes(search)).forEach(item => {
+
+            let filtered = allItems;
+            if(currentCategory !== 'all') {
+                filtered = filtered.filter(i => i.categoryId === currentCategory);
+            }
+
+            filtered.filter(i => i.name.toLowerCase().includes(search)).forEach(item => {
                 const card = document.createElement('div');
                 card.className = "product-card p-5 flex flex-col justify-between h-44 shadow-sm";
                 card.onclick = () => addToCart(item);
@@ -146,7 +188,7 @@
                 `;
                 grid.appendChild(card);
             });
-        }
+        };
 
         window.addToCart = (item) => {
             const exists = cart.find(i => i.name === item.name);
@@ -213,6 +255,7 @@
                 const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
                 const orderData = {
                     orderId: orderRef.key.slice(-6).toUpperCase(),
+                    source: "Bar order",
                     items: cart,
                     financials: { subtotal: total, totalFinal: total, discount: {amount:0}, vat: {amount:0} },
                     payment: { method: method, status: "Completed" },
@@ -226,7 +269,7 @@
                 cart = [];
                 updateUI();
                 document.getElementById('search-pet').value = '';
-                renderPetMenu();
+                window.filterByCategory('all');
             } catch (e) { alert("Lỗi hệ thống: " + e.message); }
         };
     </script>
