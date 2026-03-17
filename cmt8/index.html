@@ -33,7 +33,6 @@
             margin: 0;
             padding: 0;
             height: 100vh;
-            /* Hỗ trợ các dòng máy có tai thỏ/vạch điều hướng */
             height: -webkit-fill-available; 
             background: linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 100%);
             color: #1D1D1F;
@@ -148,7 +147,6 @@
 
         header {
             padding: 12px 20px;
-            /* Quan trọng: Tránh khuất bởi Dynamic Island/Tai thỏ */
             padding-top: calc(12px + env(safe-area-inset-top)); 
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(15px);
@@ -174,7 +172,6 @@
         .logout-btn-top {
             position: absolute;
             right: 15px;
-            /* Căn giữa theo Safe Area */
             top: calc(50% + (env(safe-area-inset-top) / 2));
             transform: translateY(-50%);
             background: rgba(255, 59, 48, 0.1);
@@ -202,7 +199,6 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             padding: 25px;
-            /* Tránh khuất bởi vạch điều hướng phía dưới */
             padding-bottom: calc(25px + env(safe-area-inset-bottom));
             overflow-y: auto;
             flex-grow: 1;
@@ -280,29 +276,38 @@
             border: none;
         }
 
+        /* --- BACK BUTTON (UPDATED) --- */
         .back-btn {
             position: absolute;
             top: 15px;
-            left: 15px;
+            right: 15px; /* Chuyển sang bên phải */
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: white;
-            padding: 10px 18px;
-            border-radius: 100px;
-            font-size: 14px;
-            font-weight: 600;
+            width: 44px; /* Kích thước nút vuông/tròn */
+            height: 44px;
+            border-radius: 50%; /* Làm nút tròn cho hiện đại */
             z-index: 100;
             border: none;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+        }
+
+        .back-btn i {
+            font-size: 18px;
         }
 
         .back-btn:hover {
             background: rgba(0,0,0,0.8);
-            transform: scale(1.05);
+            transform: scale(1.1);
+        }
+
+        .back-btn:active {
+            transform: scale(0.9);
         }
 
         /* --- SUCCESS STATE --- */
@@ -372,8 +377,7 @@
 
         <div class="iframe-container" id="iframe-container">
             <button class="back-btn" onclick="closeIframe()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                Quay lại
+                <i class="fas fa-reply"></i>
             </button>
             <iframe id="app-frame" src=""></iframe>
         </div>
