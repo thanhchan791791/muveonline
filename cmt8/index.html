@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Cherry Pet Coffee - Hệ Thống Quản Lý</title>
+    
+    <link rel="icon" type="image/png" href="logocherry.png">
+    <link rel="apple-touch-icon" href="logocherry.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Cherry Coffee">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --ios-blue: #007AFF;
+            --ios-system-bg: #F2F2F7;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --card-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            --inner-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4);
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 100%);
+            color: #1D1D1F;
+            overflow: hidden;
+        }
+
+        /* --- LOGIN SCREEN --- */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            background: radial-gradient(circle at top left, #EEF2FF 0%, #E0E7FF 100%);
+            transition: var(--transition);
+        }
+
+        .login-card {
+            width: 90%;
+            max-width: 400px;
+            padding: 40px 30px;
+            border-radius: 32px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            animation: cardAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes cardAppear {
+            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 24px;
+            border-radius: 24px;
+            object-fit: cover;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 3px solid #fff;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #1e293b, #475569);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 20px;
+            margin: 10px 0;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
+            transform: translateY(-1px);
+        }
+
+        button.btn-login {
+            width: 100%;
+            padding: 16px;
+            margin-top: 24px;
+            border: none;
+            border-radius: 16px;
+            background: var(--primary-gradient);
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+            transition: var(--transition);
+        }
+
+        button.btn-login:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        button.btn-login:active {
+            transform: scale(0.97);
+        }
+
+        /* --- MAIN APP --- */
+        #main-app {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            opacity: 0;
+            transform: scale(1.05);
+            transition: var(--transition);
+        }
+
+        header {
+            padding: 16px 20px;
+            padding-top: env(safe-area-inset-top, 20px);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #1D1D1F;
+            text-transform: uppercase;
+        }
+
+        /* Nút đăng xuất nhỏ phía trên */
+        .logout-btn-top {
+            position: absolute;
+            right: 15px;
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+
+        .logout-btn-top:active {
+            transform: scale(0.9);
+            background: rgba(255, 59, 48, 0.2);
+        }
+
+        /* --- MENU GRID --- */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 25px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        @media (min-width: 768px) {
+            .menu-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .menu-item {
+            background: #FFFFFF;
+            padding: 24px 15px;
+            border-radius: 28px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+
+        .menu-item:active {
+            transform: scale(0.94);
+            background: #F2F2F7;
+        }
+
+        .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: #4f46e5;
+            transition: var(--transition);
+        }
+
+        .menu-item:hover .icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .menu-item span {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1D1D1F;
+        }
+
+        /* --- IFRAME CONTAINER --- */
+        .iframe-container {
+            flex-grow: 1;
+            position: relative;
+            background: #fff;
+            display: none;
+            margin: 10px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 100;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover {
+            background: rgba(0,0,0,0.8);
+            transform: scale(1.05);
+        }
+
+        /* --- SUCCESS STATE --- */
+        .show-app {
+            display: flex !important;
+            opacity: 1 !important;
+            transform: scale(1) !important;
+        }
+
+        /* Shake Animation for Errors */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-card">
+            <img src="logocherry.png" alt="Logo" class="logo" onerror="this.src='https://ui-avatars.com/api/?name=Cherry+Coffee&background=6366f1&color=fff&size=128'">
+            <h2>Hệ Thống Quản Lý</h2>
+            <input type="text" id="username" placeholder="Tên đăng nhập" autocomplete="off">
+            <input type="password" id="password" placeholder="Mật khẩu">
+            <button class="btn-login" onclick="handleLogin()">Đăng nhập</button>
+            <p id="error-msg" style="color: #FF3B30; font-size: 14px; margin-top: 15px; font-weight: 500; display: none;">Thông tin đăng nhập không chính xác</p>
+        </div>
+    </div>
+
+    <div id="main-app">
+        <header>
+            <h1>Cherry Pet Coffee</h1>
+            <button class="logout-btn-top" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Thoát
+            </button>
+        </header>
+
+        <div class="menu-grid" id="menu-grid">
+            <div class="menu-item" onclick="loadPage('thongke.html')">
+                <div class="icon"><i class="fas fa-chart-bar"></i></div>
+                <span>Thống kê</span>
+            </div>
+            <div class="menu-item" onclick="loadPage('menu.html')">
+                <div class="icon"><i class="fas fa-utensils"></i></div>
+                <span>Thực đơn</span>
+            </div>
+            <div class="menu-item" onclick="loadPage('orderbar.html')">
+                <div class="icon"><i class="fas fa-cocktail"></i></div>
+                <span>Order Bar</span>
+            </div>
+            <div class="menu-item" onclick="loadPage('kho.html')">
+                <div class="icon"><i class="fas fa-warehouse"></i></div>
+                <span>Kho hàng</span>
+            </div>
+            
+            <div class="menu-item" onclick="loadPage('thuchi.html')">
+                <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+                <span>Thu chi</span>
+            </div>
+            <div class="menu-item" onclick="loadPage('viduytri.html')">
+                <div class="icon"><i class="fas fa-credit-card"></i></div>
+                <span>Ví duy trì</span>
+            </div>
+        </div>
+
+        <div class="iframe-container" id="iframe-container">
+            <button class="back-btn" onclick="closeIframe()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Quay lại
+            </button>
+            <iframe id="app-frame" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Kiểm tra trạng thái đăng nhập khi vừa tải trang
+        window.onload = function() {
+            const isLoggedIn = localStorage.getItem('cherry_isLoggedIn');
+            if (isLoggedIn === 'true') {
+                showMainApp(true); // show ngay lập tức không hiệu ứng
+            }
+        };
+
+        function showMainApp(immediate = false) {
+            const loginScreen = document.getElementById('login-screen');
+            const mainApp = document.getElementById('main-app');
+            
+            if (immediate) {
+                loginScreen.style.display = 'none';
+                mainApp.classList.add('show-app');
+            } else {
+                loginScreen.style.opacity = '0';
+                loginScreen.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    loginScreen.style.display = 'none';
+                    mainApp.classList.add('show-app');
+                }, 400);
+            }
+        }
+
+        function handleLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const error = document.getElementById('error-msg');
+            const loginCard = document.querySelector('.login-card');
+
+            if (user === 'admin' && pass === 'cherrypetcoffeecmt8') {
+                // Lưu trạng thái vào trình duyệt
+                localStorage.setItem('cherry_isLoggedIn', 'true');
+                showMainApp();
+            } else {
+                error.style.display = 'block';
+                loginCard.style.animation = 'none';
+                void loginCard.offsetWidth; // Trigger reflow
+                loginCard.style.animation = 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both';
+            }
+        }
+
+        function handleLogout() {
+            // Xóa trạng thái đăng nhập
+            localStorage.removeItem('cherry_isLoggedIn');
+            // Tải lại trang để về màn hình đăng nhập
+            location.reload();
+        }
+
+        function loadPage(url) {
+            const frame = document.getElementById('app-frame');
+            const container = document.getElementById('iframe-container');
+            const grid = document.getElementById('menu-grid');
+
+            frame.src = url;
+            grid.style.display = 'none';
+            container.style.display = 'block';
+        }
+
+        function closeIframe() {
+            const container = document.getElementById('iframe-container');
+            const grid = document.getElementById('menu-grid');
+            const frame = document.getElementById('app-frame');
+
+            container.style.display = 'none';
+            grid.style.display = 'grid';
+            frame.src = ""; 
+        }
+
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                handleLogin();
+            }
+        });
+    </script>
+</body>
+</html>
