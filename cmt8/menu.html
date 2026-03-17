@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>iMenu Admin Pro - Cherrypet</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-gray: #8E8E93;
+            --ios-bg: #F2F2F7;
+            --ios-card: rgba(255, 255, 255, 0.9);
+            --radius-lg: 20px;
+            --radius-md: 12px;
+        }
+
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+        }
+
+        body { background-color: var(--ios-bg); color: #000; padding-bottom: 50px; }
+
+        header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(242, 242, 247, 0.8);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 20px 16px 10px;
+            border-bottom: 0.5px solid rgba(0,0,0,0.1);
+        }
+
+        .header-top { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+
+        .container { 
+            max-width: 600px; 
+            margin: auto; 
+            padding: 16px; 
+            transition: max-width 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .container { max-width: 1000px; }
+            .menu-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .admin-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin-bottom: 24px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .menu-list { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .ios-section { margin-bottom: 24px; animation: fadeIn 0.4s ease; }
+        .ios-section-title {
+            font-size: 13px; font-weight: 600; color: var(--ios-gray);
+            text-transform: uppercase; margin: 0 0 8px 16px;
+        }
+
+        .ios-card {
+            background: var(--ios-card); border-radius: var(--radius-lg);
+            padding: 4px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .form-row {
+            display: flex; align-items: center; padding: 12px 0;
+            border-bottom: 0.5px solid rgba(0,0,0,0.05);
+        }
+        .form-row:last-child { border-bottom: none; }
+        .form-row label { width: 110px; font-size: 16px; }
+        
+        input, select {
+            flex: 1; border: none; background: transparent;
+            font-size: 16px; outline: none; color: var(--ios-blue); text-align: right;
+        }
+
+        .btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 14px; border-radius: var(--radius-md); border: none;
+            font-size: 17px; font-weight: 600; cursor: pointer; transition: 0.2s;
+            margin: 12px 0; width: 100%;
+        }
+        .btn:active { transform: scale(0.97); opacity: 0.8; }
+        .btn-primary { background: var(--ios-blue); color: white; }
+        .btn-secondary { background: #E5F1FF; color: var(--ios-blue); }
+        
+        .item-row {
+            background: white; padding: 14px 16px; border-radius: var(--radius-md);
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px; transition: 0.3s;
+            border: 0.5px solid rgba(0,0,0,0.05);
+        }
+
+        .item-info { display: flex; flex-direction: column; gap: 2px; }
+        .item-name { font-weight: 600; font-size: 17px; }
+        .item-price { color: var(--ios-gray); font-size: 14px; }
+
+        .item-actions { display: flex; gap: 8px; }
+        .action-btn {
+            width: 36px; height: 36px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-edit { background: #E5F1FF; color: var(--ios-blue); }
+        .btn-delete { background: #FFE5E5; color: var(--ios-red); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        #editModal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content { width: 90%; max-width: 400px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-top">
+        <h1>Thực đơn</h1>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-edit action-btn" id="btnAutoSetup" title="Cập nhật giá 40k"><i data-lucide="refresh-cw" size="18"></i></button>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="admin-grid">
+        <div class="ios-section">
+            <p class="ios-section-title">Quản lý Danh mục</p>
+            <div class="ios-card">
+                <div class="form-row">
+                    <label>Tên danh mục</label>
+                    <input type="text" id="newCateName" placeholder="VD: Nước ép...">
+                </div>
+            </div>
+            <button class="btn btn-secondary" id="btnAddCate">Tạo danh mục mới</button>
+        </div>
+
+        <div class="ios-section">
+            <p class="ios-section-title">Thêm món mới</p>
+            <div class="ios-card">
+                <div class="form-row">
+                    <label>Danh mục</label>
+                    <select id="selectCate"></select>
+                </div>
+                <div class="form-row">
+                    <label>Tên món</label>
+                    <input type="text" id="itemName" placeholder="Tên sản phẩm...">
+                </div>
+                <div class="form-row">
+                    <label>Giá (VNĐ)</label>
+                    <input type="text" id="itemPrice" placeholder="0" inputmode="numeric">
+                </div>
+            </div>
+            <button class="btn btn-primary" id="btnSaveItem">Thêm vào thực đơn</button>
+        </div>
+    </div>
+
+    <div id="displayMenu"></div>
+</div>
+
+<div id="editModal">
+    <div class="modal-content">
+        <div class="ios-section">
+            <p class="ios-section-title" style="color: white;">Chỉnh sửa món</p>
+            <div class="ios-card">
+                <input type="hidden" id="editItemId">
+                <div class="form-row">
+                    <label>Tên món</label>
+                    <input type="text" id="editName">
+                </div>
+                <div class="form-row">
+                    <label>Giá</label>
+                    <input type="text" id="editPrice" inputmode="numeric">
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" style="background: #ccc; color: black;" onclick="closeModal()">Hủy</button>
+                <button class="btn btn-primary" id="btnUpdateItem">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, push, onValue, remove, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB8Wf1_UDl804EDFmEKFE5cZvjJSEfWVg8",
+        authDomain: "xedua-86b46.firebaseapp.com",
+        databaseURL: "https://xedua-86b46-default-rtdb.firebaseio.com",
+        projectId: "xedua-86b46",
+        storageBucket: "xedua-86b46.firebasestorage.app",
+        messagingSenderId: "769715162274",
+        appId: "1:769715162274:web:b85463e0bcffbefa841bfb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    lucide.createIcons();
+
+    const formatCurrencyInput = (el) => {
+        el.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, "");
+            if (value !== "") {
+                value = parseInt(value).toLocaleString('de-DE');
+                e.target.value = value;
+            }
+        });
+    };
+
+    formatCurrencyInput(document.getElementById('itemPrice'));
+    formatCurrencyInput(document.getElementById('editPrice'));
+
+    const getRawValue = (val) => parseInt(val.replace(/\./g, "")) || 0;
+
+    onValue(ref(db, 'categories'), (cateSnap) => {
+        const cates = cateSnap.val() || {};
+        const selectCate = document.getElementById('selectCate');
+        selectCate.innerHTML = '<option value="">Chọn danh mục...</option>';
+
+        onValue(ref(db, 'menu'), (menuSnap) => {
+            const items = menuSnap.val() || {};
+            const displayMenu = document.getElementById('displayMenu');
+            displayMenu.innerHTML = "";
+
+            Object.keys(cates).sort().forEach(cateId => {
+                let opt = document.createElement('option');
+                opt.value = cateId;
+                opt.textContent = cates[cateId].name;
+                selectCate.appendChild(opt);
+
+                let section = document.createElement('div');
+                section.className = 'ios-section';
+                let htmlItems = '';
+                
+                Object.keys(items).forEach(itemId => {
+                    if(items[itemId].categoryId === cateId) {
+                        htmlItems += `
+                            <div class="item-row">
+                                <div class="item-info">
+                                    <span class="item-name">${items[itemId].name}</span>
+                                    <span class="item-price">${items[itemId].price.toLocaleString('de-DE')} VNĐ</span>
+                                </div>
+                                <div class="item-actions">
+                                    <button class="action-btn btn-edit" onclick="openEdit('${itemId}', '${items[itemId].name}', ${items[itemId].price})">
+                                        <i data-lucide="pencil" size="16"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete" onclick="deleteItem('${itemId}')">
+                                        <i data-lucide="trash-2" size="16"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                section.innerHTML = `
+                    <p class="ios-section-title">
+                        ${cates[cateId].name} 
+                        <span style="color:var(--ios-red); cursor:pointer; margin-left:10px; font-size:10px;" onclick="deleteCategory('${cateId}')">[XÓA DANH MỤC]</span>
+                    </p>
+                    <div class="menu-list">${htmlItems || '<p style="padding:16px; color:#ccc; font-size:14px;">Chưa có món nào</p>'}</div>
+                `;
+                displayMenu.appendChild(section);
+            });
+            lucide.createIcons();
+        });
+    });
+
+    document.getElementById('btnAddCate').addEventListener('click', () => {
+        const name = document.getElementById('newCateName').value.trim();
+        if(name) {
+            push(ref(db, 'categories'), { name: name })
+            .then(() => {
+                document.getElementById('newCateName').value = "";
+            });
+        }
+    });
+
+    window.deleteCategory = (cateId) => {
+        if(confirm("Xóa danh mục này?")) remove(ref(db, `categories/${cateId}`));
+    };
+
+    document.getElementById('btnSaveItem').addEventListener('click', () => {
+        const cateId = document.getElementById('selectCate').value;
+        const name = document.getElementById('itemName').value.trim();
+        const price = getRawValue(document.getElementById('itemPrice').value);
+        if(cateId && name && price !== undefined) {
+            push(ref(db, 'menu'), { categoryId: cateId, name, price: price })
+            .then(() => {
+                document.getElementById('itemName').value = "";
+                document.getElementById('itemPrice').value = "";
+            });
+        }
+    });
+
+    window.deleteItem = (id) => {
+        if(confirm("Xóa món này?")) remove(ref(db, `menu/${id}`));
+    };
+
+    window.openEdit = (id, name, price) => {
+        document.getElementById('editItemId').value = id;
+        document.getElementById('editName').value = name;
+        document.getElementById('editPrice').value = price.toLocaleString('de-DE');
+        document.getElementById('editModal').style.display = 'flex';
+    };
+
+    window.closeModal = () => document.getElementById('editModal').style.display = 'none';
+
+    document.getElementById('btnUpdateItem').addEventListener('click', () => {
+        const id = document.getElementById('editItemId').value;
+        const name = document.getElementById('editName').value;
+        const price = getRawValue(document.getElementById('editPrice').value);
+        update(ref(db, `menu/${id}`), { name, price }).then(() => closeModal());
+    });
+
+    // NÚT CẬP NHẬT GIÁ 0Đ -> 40.000Đ (NGOẠI TRỪ CÁC MỤC ĐÃ CHỈ ĐỊNH)
+    document.getElementById('btnAutoSetup').addEventListener('click', async () => {
+        if(!confirm("Hệ thống sẽ cập nhật tất cả món đang có giá 0đ thành 40.000đ (trừ Vé, Thức ăn pet, Đặc biệt, Topping). Tiếp tục?")) return;
+
+        try {
+            const catesSnap = await get(ref(db, 'categories'));
+            const menuSnap = await get(ref(db, 'menu'));
+            
+            const categories = catesSnap.val() || {};
+            const menuItems = menuSnap.val() || {};
+            
+            const excludeNames = ["VÉ", "THỨC ĂN PET", "ĐẶC BIỆT", "TOPPING"];
+            let updateData = {};
+            let count = 0;
+
+            Object.keys(menuItems).forEach(itemId => {
+                const item = menuItems[itemId];
+                const category = categories[item.categoryId];
+                
+                // Chỉ sửa nếu giá hiện tại là 0
+                if (category && item.price === 0) {
+                    const cateNameUpper = category.name.toUpperCase();
+                    const isExcluded = excludeNames.some(ex => cateNameUpper.includes(ex));
+                    
+                    if (!isExcluded) {
+                        updateData[`menu/${itemId}/price`] = 40000;
+                        count++;
+                    }
+                }
+            });
+
+            if (count > 0) {
+                await update(ref(db), updateData);
+                alert(`Đã cập nhật thành công ${count} món lên giá 40.000đ!`);
+            } else {
+                alert("Không tìm thấy món nào có giá 0đ cần cập nhật.");
+            }
+            
+        } catch (error) {
+            console.error(error);
+            alert("Lỗi khi kết nối Firebase!");
+        }
+    });
+</script>
+</body>
+</html>
