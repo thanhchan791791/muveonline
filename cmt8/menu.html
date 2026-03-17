@@ -139,9 +139,6 @@
 <header>
     <div class="header-top">
         <h1>Thực đơn</h1>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn-edit action-btn" id="btnAutoSetup" title="Cập nhật giá 40k"><i data-lucide="refresh-cw" size="18"></i></button>
-        </div>
     </div>
 </header>
 
@@ -336,50 +333,6 @@
         const name = document.getElementById('editName').value;
         const price = getRawValue(document.getElementById('editPrice').value);
         update(ref(db, `menu/${id}`), { name, price }).then(() => closeModal());
-    });
-
-    // NÚT CẬP NHẬT GIÁ 0Đ -> 40.000Đ (NGOẠI TRỪ CÁC MỤC ĐÃ CHỈ ĐỊNH)
-    document.getElementById('btnAutoSetup').addEventListener('click', async () => {
-        if(!confirm("Hệ thống sẽ cập nhật tất cả món đang có giá 0đ thành 40.000đ (trừ Vé, Thức ăn pet, Đặc biệt, Topping). Tiếp tục?")) return;
-
-        try {
-            const catesSnap = await get(ref(db, 'categories'));
-            const menuSnap = await get(ref(db, 'menu'));
-            
-            const categories = catesSnap.val() || {};
-            const menuItems = menuSnap.val() || {};
-            
-            const excludeNames = ["VÉ", "THỨC ĂN PET", "ĐẶC BIỆT", "TOPPING"];
-            let updateData = {};
-            let count = 0;
-
-            Object.keys(menuItems).forEach(itemId => {
-                const item = menuItems[itemId];
-                const category = categories[item.categoryId];
-                
-                // Chỉ sửa nếu giá hiện tại là 0
-                if (category && item.price === 0) {
-                    const cateNameUpper = category.name.toUpperCase();
-                    const isExcluded = excludeNames.some(ex => cateNameUpper.includes(ex));
-                    
-                    if (!isExcluded) {
-                        updateData[`menu/${itemId}/price`] = 40000;
-                        count++;
-                    }
-                }
-            });
-
-            if (count > 0) {
-                await update(ref(db), updateData);
-                alert(`Đã cập nhật thành công ${count} món lên giá 40.000đ!`);
-            } else {
-                alert("Không tìm thấy món nào có giá 0đ cần cập nhật.");
-            }
-            
-        } catch (error) {
-            console.error(error);
-            alert("Lỗi khi kết nối Firebase!");
-        }
     });
 </script>
 </body>
