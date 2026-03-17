@@ -33,6 +33,8 @@
             margin: 0;
             padding: 0;
             height: 100vh;
+            /* Hỗ trợ các dòng máy có tai thỏ/vạch điều hướng */
+            height: -webkit-fill-available; 
             background: linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 100%);
             color: #1D1D1F;
             overflow: hidden;
@@ -145,8 +147,9 @@
         }
 
         header {
-            padding: 16px 20px;
-            padding-top: env(safe-area-inset-top, 20px);
+            padding: 12px 20px;
+            /* Quan trọng: Tránh khuất bởi Dynamic Island/Tai thỏ */
+            padding-top: calc(12px + env(safe-area-inset-top)); 
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -168,10 +171,12 @@
             text-transform: uppercase;
         }
 
-        /* Nút đăng xuất nhỏ phía trên */
         .logout-btn-top {
             position: absolute;
             right: 15px;
+            /* Căn giữa theo Safe Area */
+            top: calc(50% + (env(safe-area-inset-top) / 2));
+            transform: translateY(-50%);
             background: rgba(255, 59, 48, 0.1);
             color: #FF3B30;
             border: none;
@@ -187,7 +192,7 @@
         }
 
         .logout-btn-top:active {
-            transform: scale(0.9);
+            transform: translateY(-50%) scale(0.9);
             background: rgba(255, 59, 48, 0.2);
         }
 
@@ -197,6 +202,8 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             padding: 25px;
+            /* Tránh khuất bởi vạch điều hướng phía dưới */
+            padding-bottom: calc(25px + env(safe-area-inset-bottom));
             overflow-y: auto;
             flex-grow: 1;
         }
@@ -255,6 +262,7 @@
             background: #fff;
             display: none;
             margin: 10px;
+            margin-bottom: calc(10px + env(safe-area-inset-bottom));
             border-radius: 24px;
             overflow: hidden;
             box-shadow: var(--card-shadow);
@@ -304,7 +312,6 @@
             transform: scale(1) !important;
         }
 
-        /* Shake Animation for Errors */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             20% { transform: translateX(-8px); }
@@ -373,11 +380,10 @@
     </div>
 
     <script>
-        // Kiểm tra trạng thái đăng nhập khi vừa tải trang
         window.onload = function() {
             const isLoggedIn = localStorage.getItem('cherry_isLoggedIn');
             if (isLoggedIn === 'true') {
-                showMainApp(true); // show ngay lập tức không hiệu ứng
+                showMainApp(true);
             }
         };
 
@@ -405,21 +411,18 @@
             const loginCard = document.querySelector('.login-card');
 
             if (user === 'admin' && pass === 'cherrypetcoffeecmt8') {
-                // Lưu trạng thái vào trình duyệt
                 localStorage.setItem('cherry_isLoggedIn', 'true');
                 showMainApp();
             } else {
                 error.style.display = 'block';
                 loginCard.style.animation = 'none';
-                void loginCard.offsetWidth; // Trigger reflow
+                void loginCard.offsetWidth;
                 loginCard.style.animation = 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both';
             }
         }
 
         function handleLogout() {
-            // Xóa trạng thái đăng nhập
             localStorage.removeItem('cherry_isLoggedIn');
-            // Tải lại trang để về màn hình đăng nhập
             location.reload();
         }
 
