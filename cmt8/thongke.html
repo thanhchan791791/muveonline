@@ -318,9 +318,52 @@
         
         .table { --bs-table-bg: transparent; margin-bottom: 0; }
         .table > :not(caption) > * > * { border-bottom-width: 0; padding: 12px 8px; }
+
+        /* Style cho thẻ kết quả lọc mới */
+        .filter-summary-card {
+            background: linear-gradient(135deg, #1d1d1f, #3a3a3c);
+            color: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-soft);
+        }
+        .filter-summary-card .title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 5px;
+        }
+        .filter-summary-card .main-value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+        .filter-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .filter-summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-summary-item .label {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-bottom: 2px;
+        }
+        .filter-summary-item .value {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
 @media print {
     @page {
-        /* Thiết lập khổ giấy 80mm, chiều dài tự động (auto) */
         size: 80mm auto;
         margin: 0;
     }
@@ -330,17 +373,14 @@
         margin: 0 !important;
         padding: 0 !important;
         background: white;
-        /* Loại bỏ hiện tượng tràn ngang trên một số trình duyệt */
         overflow: hidden; 
     }
 
-    /* Ẩn các thành phần không cần thiết khi in */
     .no-print, .modal-header, .modal-footer, .btn-close, .navbar, 
     .app-container, .modal-backdrop, .btn-print-bill {
         display: none !important;
     }
     
-    /* Ép Modal hiển thị toàn màn hình in */
     .modal.show {
         position: relative !important;
         display: block !important;
@@ -365,13 +405,11 @@
     }
 
     .modal-body {
-        /* Đưa nội dung sát mép trên, lề trái phải 2mm để không mất chữ */
         padding: 0 2mm 5mm 2mm !important; 
         width: 80mm !important;
         margin: 0 !important;
     }
 
-    /* Tối ưu bảng cho khổ 80mm */
     table {
         width: 100% !important;
         table-layout: fixed;
@@ -381,7 +419,6 @@
         word-wrap: break-word;
     }
 
-    /* Đảm bảo text-center trong in ấn */
     .text-center { text-align: center !important; }
 }
     </style>
@@ -489,6 +526,26 @@
                 <div class="col-12 col-lg-7">
                     <div class="table-container mx-0">
                         <div class="section-title"><i class="fas fa-receipt"></i>Lịch sử hóa đơn</div>
+                        
+                        <div class="filter-summary-card">
+                            <div class="title">Tổng kết theo bộ lọc</div>
+                            <div class="main-value" id="filter-total">0đ</div>
+                            <div class="filter-summary-grid">
+                                <div class="filter-summary-item">
+                                    <span class="label">Tiền mặt</span>
+                                    <span class="value" id="filter-tm">0đ</span>
+                                </div>
+                                <div class="filter-summary-item">
+                                    <span class="label">Chuyển khoản</span>
+                                    <span class="value" id="filter-ck">0đ</span>
+                                </div>
+                                <div class="filter-summary-item">
+                                    <span class="label">Cà thẻ</span>
+                                    <span class="value" id="filter-card">0đ</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="order-table-body"></div>
                     </div>
                 </div>
@@ -767,6 +824,12 @@
         const chartData = {};
         const productCounts = {};
 
+        // Biến lưu tổng kết cho bộ lọc
+        let filterTotal = 0;
+        let filterTM = 0;
+        let filterCK = 0;
+        let filterCard = 0;
+
         const sortedOrders = Object.entries(rawData).sort((a, b) => b[1].timestamp - a[1].timestamp);
 
         sortedOrders.forEach(([key, order]) => {
@@ -779,6 +842,14 @@
 
             if (isMatch) {
                 const amount = order.financials?.totalFinal || 0;
+                const method = (order.payment?.method || 'TM').toUpperCase();
+                
+                // Cộng dồn vào biến filter
+                filterTotal += amount;
+                if (method.includes('CK') || method.includes('CHUYỂN KHOẢN')) filterCK += amount;
+                else if (method.includes('CÀ THẺ') || method.includes('CARD')) filterCard += amount;
+                else filterTM += amount;
+
                 chartData[orderDateStr] = (chartData[orderDateStr] || 0) + amount;
 
                 if (order.items) {
@@ -802,6 +873,12 @@
                     </div>`;
             }
         });
+
+        // Cập nhật giao diện thẻ tổng kết bộ lọc
+        document.getElementById('filter-total').innerText = filterTotal.toLocaleString() + 'đ';
+        document.getElementById('filter-tm').innerText = filterTM.toLocaleString() + 'đ';
+        document.getElementById('filter-ck').innerText = filterCK.toLocaleString() + 'đ';
+        document.getElementById('filter-card').innerText = filterCard.toLocaleString() + 'đ';
 
         const sortedProducts = Object.entries(productCounts).sort((a, b) => b[1] - a[1]);
         let productHtml = '';
