@@ -346,20 +346,32 @@
         .filter-summary-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 15px;
         }
         .filter-summary-item {
             display: flex;
             flex-direction: column;
+            padding: 8px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
         }
         .filter-summary-item .label {
             font-size: 10px;
             opacity: 0.7;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
         .filter-summary-item .value {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
+        }
+        .sub-group-title {
+            grid-column: span 3;
+            font-size: 11px;
+            font-weight: 800;
+            color: #5AC8FA;
+            margin-top: 5px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 8px;
         }
 
 @media print {
@@ -542,6 +554,34 @@
                                 <div class="filter-summary-item">
                                     <span class="label">Cà thẻ</span>
                                     <span class="value" id="filter-card">0đ</span>
+                                </div>
+
+                                <div class="sub-group-title">CHI TIẾT: QUẦY BAR</div>
+                                <div class="filter-summary-item">
+                                    <span class="label">Tiền mặt</span>
+                                    <span class="value" id="bar-tm">0đ</span>
+                                </div>
+                                <div class="filter-summary-item">
+                                    <span class="label">Chuyển khoản</span>
+                                    <span class="value" id="bar-ck">0đ</span>
+                                </div>
+                                <div class="filter-summary-item">
+                                    <span class="label">Cà thẻ</span>
+                                    <span class="value" id="bar-card">0đ</span>
+                                </div>
+
+                                <div class="sub-group-title">CHI TIẾT: QUẢN TRỊ VIÊN</div>
+                                <div class="filter-summary-item">
+                                    <span class="label">Tiền mặt</span>
+                                    <span class="value" id="admin-tm">0đ</span>
+                                </div>
+                                <div class="filter-summary-item">
+                                    <span class="label">Chuyển khoản</span>
+                                    <span class="value" id="admin-ck">0đ</span>
+                                </div>
+                                <div class="filter-summary-item">
+                                    <span class="label">Cà thẻ</span>
+                                    <span class="value" id="admin-card">0đ</span>
                                 </div>
                             </div>
                         </div>
@@ -824,11 +864,15 @@
         const chartData = {};
         const productCounts = {};
 
-        // Biến lưu tổng kết cho bộ lọc
+        // 1. Biến lưu tổng kết cho bộ lọc (Tất cả)
         let filterTotal = 0;
-        let filterTM = 0;
-        let filterCK = 0;
-        let filterCard = 0;
+        let filterTM = 0; let filterCK = 0; let filterCard = 0;
+
+        // 2. Biến lưu cho Quầy bar
+        let barTM = 0; let barCK = 0; let barCard = 0;
+
+        // 3. Biến lưu cho Quản trị viên
+        let adminTM = 0; let adminCK = 0; let adminCard = 0;
 
         const sortedOrders = Object.entries(rawData).sort((a, b) => b[1].timestamp - a[1].timestamp);
 
@@ -843,12 +887,24 @@
             if (isMatch) {
                 const amount = order.financials?.totalFinal || 0;
                 const method = (order.payment?.method || 'TM').toUpperCase();
+                const location = order.location || "Quản trị viên";
                 
-                // Cộng dồn vào biến filter
+                // Cộng dồn tổng hệ thống
                 filterTotal += amount;
                 if (method.includes('CK') || method.includes('CHUYỂN KHOẢN')) filterCK += amount;
                 else if (method.includes('CÀ THẺ') || method.includes('CARD')) filterCard += amount;
                 else filterTM += amount;
+
+                // Cộng dồn theo location
+                if (location === "Quầy bar") {
+                    if (method.includes('CK') || method.includes('CHUYỂN KHOẢN')) barCK += amount;
+                    else if (method.includes('CÀ THẺ') || method.includes('CARD')) barCard += amount;
+                    else barTM += amount;
+                } else {
+                    if (method.includes('CK') || method.includes('CHUYỂN KHOẢN')) adminCK += amount;
+                    else if (method.includes('CÀ THẺ') || method.includes('CARD')) adminCard += amount;
+                    else adminTM += amount;
+                }
 
                 chartData[orderDateStr] = (chartData[orderDateStr] || 0) + amount;
 
@@ -865,7 +921,7 @@
                     <div class="clickable-row" onclick="viewDetail('${key}')">
                         <div>
                             <div class="order-id">#${order.orderId || 'N/A'}</div>
-                            <div class="order-time">${order.dateString} • ${order.payment?.method || 'TM'}</div>
+                            <div class="order-time">${order.dateString} • ${order.payment?.method || 'TM'} • ${location}</div>
                         </div>
                         <div class="text-end">
                             <div class="order-amount">${amount.toLocaleString()}đ</div>
@@ -874,11 +930,19 @@
             }
         });
 
-        // Cập nhật giao diện thẻ tổng kết bộ lọc
+        // Cập nhật UI thẻ tổng kết
         document.getElementById('filter-total').innerText = filterTotal.toLocaleString() + 'đ';
         document.getElementById('filter-tm').innerText = filterTM.toLocaleString() + 'đ';
         document.getElementById('filter-ck').innerText = filterCK.toLocaleString() + 'đ';
         document.getElementById('filter-card').innerText = filterCard.toLocaleString() + 'đ';
+
+        document.getElementById('bar-tm').innerText = barTM.toLocaleString() + 'đ';
+        document.getElementById('bar-ck').innerText = barCK.toLocaleString() + 'đ';
+        document.getElementById('bar-card').innerText = barCard.toLocaleString() + 'đ';
+
+        document.getElementById('admin-tm').innerText = adminTM.toLocaleString() + 'đ';
+        document.getElementById('admin-ck').innerText = adminCK.toLocaleString() + 'đ';
+        document.getElementById('admin-card').innerText = adminCard.toLocaleString() + 'đ';
 
         const sortedProducts = Object.entries(productCounts).sort((a, b) => b[1] - a[1]);
         let productHtml = '';
@@ -907,7 +971,6 @@
         document.getElementById('m-date').innerText = order.dateString;
         document.getElementById('m-time').innerText = timeStr;
 
-        // Cập nhật thu ngân dựa trên location
         const cashierName = order.location === "Quầy bar" ? "Quầy bar" : "Quản trị viên";
         document.getElementById('m-cashier').innerText = cashierName;
 
