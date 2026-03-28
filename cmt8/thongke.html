@@ -576,7 +576,7 @@
                         <span>Ngày: <span id="m-date"></span></span>
                         <span id="m-time"></span>
                     </div>
-                    <p class="mb-0">Thu ngân: Quản trị viên</p>
+                    <p class="mb-0">Thu ngân: <span id="m-cashier">Quản trị viên</span></p>
                 </div>
 
                 <div style="border-bottom: 1px solid black; margin: 8px 0;"></div>
@@ -906,6 +906,10 @@
         document.getElementById('m-id').innerText = '#' + (order.orderId || '000000');
         document.getElementById('m-date').innerText = order.dateString;
         document.getElementById('m-time').innerText = timeStr;
+
+        // Cập nhật thu ngân dựa trên location
+        const cashierName = order.location === "Quầy bar" ? "Quầy bar" : "Quản trị viên";
+        document.getElementById('m-cashier').innerText = cashierName;
 
         const subtotal = order.financials?.totalBeforeDiscount || 0;
         const discount = order.financials?.discountAmount || 0;
