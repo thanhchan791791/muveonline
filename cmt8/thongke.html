@@ -817,14 +817,30 @@
         const updateUI = (prefix, data) => {
             document.getElementById(`total-revenue-${prefix}`).innerText = data.t.toLocaleString() + 'đ';
             document.getElementById(`${prefix}-tm`).innerText = data.tm.toLocaleString() + 'đ';
-            document.getElementById(`${prefix}-ck`).innerText = data.ck.toLocaleString() + 'đ';
+            document.getElementById(`${prefix}-inner-ck` ? `${prefix}-inner-ck` : `${prefix}-ck`).innerText = data.ck.toLocaleString() + 'đ';
             document.getElementById(`${prefix}-card`).innerText = data.card.toLocaleString() + 'đ';
         };
 
-        updateUI('all', stats.all);
-        updateUI('today', stats.today);
-        updateUI('week', stats.week);
-        updateUI('month', stats.month);
+        // Fix ID mismatch for week and today if needed, but use original code structure
+        document.getElementById(`total-revenue-all`).innerText = stats.all.t.toLocaleString() + 'đ';
+        document.getElementById(`all-tm`).innerText = stats.all.tm.toLocaleString() + 'đ';
+        document.getElementById(`all-ck`).innerText = stats.all.ck.toLocaleString() + 'đ';
+        document.getElementById(`all-card`).innerText = stats.all.card.toLocaleString() + 'đ';
+
+        document.getElementById(`total-revenue-today`).innerText = stats.today.t.toLocaleString() + 'đ';
+        document.getElementById(`today-tm`).innerText = stats.today.tm.toLocaleString() + 'đ';
+        document.getElementById(`today-ck`).innerText = stats.today.ck.toLocaleString() + 'đ';
+        document.getElementById(`today-card`).innerText = stats.today.card.toLocaleString() + 'đ';
+
+        document.getElementById(`total-revenue-week`).innerText = stats.week.t.toLocaleString() + 'đ';
+        document.getElementById(`week-tm`).innerText = stats.week.tm.toLocaleString() + 'đ';
+        document.getElementById(`week-ck`).innerText = stats.week.ck.toLocaleString() + 'đ';
+        document.getElementById(`week-card`).innerText = stats.week.card.toLocaleString() + 'đ';
+
+        document.getElementById(`total-revenue-month`).innerText = stats.month.t.toLocaleString() + 'đ';
+        document.getElementById(`month-tm`).innerText = stats.month.tm.toLocaleString() + 'đ';
+        document.getElementById(`month-ck`).innerText = stats.month.ck.toLocaleString() + 'đ';
+        document.getElementById(`month-card`).innerText = stats.month.card.toLocaleString() + 'đ';
     }
 
     window.setPreset = function(type, btn) {
@@ -864,17 +880,13 @@
         const chartData = {};
         const productCounts = {};
 
-        // 1. Biến lưu tổng kết cho bộ lọc (Tất cả)
         let filterTotal = 0;
         let filterTM = 0; let filterCK = 0; let filterCard = 0;
-
-        // 2. Biến lưu cho Quầy bar
         let barTM = 0; let barCK = 0; let barCard = 0;
-
-        // 3. Biến lưu cho Quản trị viên
         let adminTM = 0; let adminCK = 0; let adminCard = 0;
 
-        const sortedOrders = Object.entries(rawData).sort((a, b) => b[1].timestamp - a[1].timestamp);
+        // Sắp xếp đơn hàng theo thứ tự sớm nhất ở trên cùng (timestamp tăng dần)
+        const sortedOrders = Object.entries(rawData).sort((a, b) => a[1].timestamp - b[1].timestamp);
 
         sortedOrders.forEach(([key, order]) => {
             const orderDate = new Date(order.timestamp);
@@ -889,13 +901,11 @@
                 const method = (order.payment?.method || 'TM').toUpperCase();
                 const location = order.location || "Quản trị viên";
                 
-                // Cộng dồn tổng hệ thống
                 filterTotal += amount;
                 if (method.includes('CK') || method.includes('CHUYỂN KHOẢN')) filterCK += amount;
                 else if (method.includes('CÀ THẺ') || method.includes('CARD')) filterCard += amount;
                 else filterTM += amount;
 
-                // Cộng dồn theo location
                 if (location === "Quầy bar") {
                     if (method.includes('CK') || method.includes('CHUYỂN KHOẢN')) barCK += amount;
                     else if (method.includes('CÀ THẺ') || method.includes('CARD')) barCard += amount;
@@ -930,7 +940,6 @@
             }
         });
 
-        // Cập nhật UI thẻ tổng kết
         document.getElementById('filter-total').innerText = filterTotal.toLocaleString() + 'đ';
         document.getElementById('filter-tm').innerText = filterTM.toLocaleString() + 'đ';
         document.getElementById('filter-ck').innerText = filterCK.toLocaleString() + 'đ';
