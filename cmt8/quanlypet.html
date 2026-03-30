@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CherryPet Pro - iOS Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap');
+
+        :root {
+            --ios-blue: #007AFF;
+            --ios-system-bg: #f2f2f7;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+        }
+
+        body {
+            background-color: var(--ios-system-bg);
+            margin: 0;
+            padding: 0;
+            color: #1c1c1e;
+            overflow-x: hidden;
+            padding-bottom: 40px;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .ios-card {
+            border-radius: 24px;
+            background: white;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-active:active {
+            transform: scale(0.97);
+            opacity: 0.8;
+        }
+
+        .large-title {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            padding: 40px 20px 10px 20px;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        .screen-transition {
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden { display: none; }
+
+        input, select, textarea {
+            background: #efeff4 !important;
+            border: none !important;
+            border-radius: 14px !important;
+            padding: 14px 16px !important;
+            font-size: 17px !important;
+            outline: none;
+        }
+
+        .pet-item-row {
+            border-bottom: 0.5px solid rgba(0,0,0,0.05);
+            padding: 18px 20px;
+        }
+        
+        .pet-item-row:last-child { border-bottom: none; }
+
+        /* Icon styling */
+        i.ph {
+            font-size: 22px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+<div class="max-w-md mx-auto relative min-h-screen">
+    
+    <div id="screen-home" class="screen-transition">
+        <div class="large-title">CherryPet</div>
+        <div class="px-5">
+            <p class="text-gray-400 text-[15px] mb-6 px-1 font-medium">Hệ thống quản lý tiêm chủng</p>
+            <div class="ios-card overflow-hidden">
+                <div class="pet-item-row btn-active flex justify-between items-center bg-white cursor-pointer" onclick="loadSpecies('Nguyễn Tri Phương')">
+                    <div class="flex items-center">
+                        <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center mr-4 text-indigo-600">
+                            <i class="ph ph-map-pin-line"></i>
+                        </div>
+                        <span class="font-semibold text-[17px]">Nguyễn Tri Phương</span>
+                    </div>
+                    <i class="ph ph-caret-right text-gray-300 text-lg"></i>
+                </div>
+                <div class="pet-item-row btn-active flex justify-between items-center bg-white cursor-pointer" onclick="loadSpecies('CMT8')">
+                    <div class="flex items-center">
+                        <div class="w-11 h-11 rounded-2xl bg-blue-50 flex items-center justify-center mr-4 text-blue-600">
+                            <i class="ph ph-storefront"></i>
+                        </div>
+                        <span class="font-semibold text-[17px]">Cách Mạng Tháng 8</span>
+                    </div>
+                    <i class="ph ph-caret-right text-gray-300 text-lg"></i>
+                </div>
+                <div class="pet-item-row btn-active flex justify-between items-center bg-white cursor-pointer" onclick="loadSpecies('Khách')">
+                    <div class="flex items-center">
+                        <div class="w-11 h-11 rounded-2xl bg-purple-50 flex items-center justify-center mr-4 text-purple-600">
+                            <i class="ph ph-house-line"></i>
+                        </div>
+                        <span class="font-semibold text-[17px]">Khách</span>
+                    </div>
+                    <i class="ph ph-caret-right text-gray-300 text-lg"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-species" class="hidden screen-transition">
+        <div class="flex items-center px-4 pt-6">
+            <button onclick="showScreen('home')" class="text-blue-500 flex items-center font-semibold btn-active">
+                <i class="ph ph-caret-left mr-1"></i> Cơ sở
+            </button>
+        </div>
+        <div class="large-title" id="title-branch">Cơ sở</div>
+        
+        <div class="px-5 mb-8">
+            <div class="ios-card p-5 glass mb-8">
+                <label class="text-[11px] font-bold text-gray-400 uppercase ml-1 mb-3 block tracking-wider">Danh mục loài mới</label>
+                <div class="flex gap-3">
+                    <input type="text" id="new-species-input" class="flex-1" placeholder="Chó, Mèo, Chuột túi...">
+                    <button class="bg-blue-600 text-white rounded-2xl px-5 font-bold btn-active shadow-lg shadow-blue-100" onclick="addNewSpecies()">
+                        <i class="ph ph-plus"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <label class="text-[13px] font-bold text-gray-400 uppercase ml-1 mb-3 block tracking-wider">Danh sách hiện có</label>
+            <div id="list-species" class="ios-card overflow-hidden"></div>
+        </div>
+    </div>
+
+    <div id="screen-pets" class="hidden screen-transition">
+        <div class="flex items-center justify-between px-4 pt-6">
+            <button onclick="showScreen('species')" class="text-blue-500 flex items-center font-semibold btn-active">
+                <i class="ph ph-caret-left mr-1"></i> Quay lại
+            </button>
+            <button onclick="resetForm()" class="bg-blue-600 text-white text-[13px] px-5 py-2.5 rounded-full font-bold shadow-lg shadow-blue-100 btn-active flex items-center gap-2">
+                <i class="ph ph-plus-circle"></i> THÊM BÉ
+            </button>
+        </div>
+        <div class="large-title" id="title-species">Danh sách</div>
+        
+        <div class="px-5 space-y-4" id="list-pets"></div>
+    </div>
+
+    <div id="screen-detail" class="hidden screen-transition">
+        <div class="flex items-center px-4 pt-6">
+            <button onclick="showScreen('pets')" class="text-blue-500 flex items-center font-semibold btn-active">
+                <i class="ph ph-x mr-1"></i> Huỷ bỏ
+            </button>
+        </div>
+        <div class="large-title" id="detail-header">Thông tin bé</div>
+
+        <div class="px-5">
+            <div class="ios-card p-6 mb-6">
+                <div class="mb-5">
+                    <label class="text-[11px] font-bold text-gray-400 uppercase ml-1 mb-2 block tracking-wider">Tên định danh</label>
+                    <input type="text" id="p-name" class="w-full" placeholder="Ví dụ: Lucki">
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-gray-400 uppercase ml-1 mb-2 block tracking-wider">Cân nặng hiện tại (kg)</label>
+                    <input type="number" id="p-weight" step="0.1" class="w-full" placeholder="0.0">
+                </div>
+            </div>
+
+            <div class="ios-card p-6 mb-6">
+                <div class="flex items-center gap-2 mb-5">
+                    <i class="ph ph-calendar-check text-blue-600 text-xl"></i>
+                    <h3 class="font-bold text-lg text-gray-800">Lịch trình y tế</h3>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="reminder-group">
+                        <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Vaccine định kỳ</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="date" id="p-vac-date">
+                            <select id="p-vac-cycle">
+                                <option value="12">12 tháng</option>
+                                <option value="6">6 tháng</option>
+                            </select>
+                        </div>
+                        <div id="status-vac" class="mt-2"></div>
+                    </div>
+
+                    <div class="reminder-group">
+                        <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Tiêm ngừa dại</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="date" id="p-dai-date">
+                            <select id="p-dai-cycle">
+                                <option value="12">1 năm</option>
+                                <option value="24">2 năm</option>
+                            </select>
+                        </div>
+                        <div id="status-dai" class="mt-2"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Tẩy giun</label>
+                            <input type="date" id="p-giun-date" class="w-full">
+                            <select id="p-giun-cycle" class="mt-2 w-full text-xs"><option value="3">Mỗi 3 thg</option></select>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Ngừa ve rận</label>
+                            <input type="date" id="p-ve-date" class="w-full">
+                            <select id="p-ve-cycle" class="mt-2 w-full text-xs"><option value="1">Mỗi 1 thg</option></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ios-card p-6 mb-8">
+                <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Ghi chú đặc biệt</label>
+                <textarea id="p-note" rows="3" class="w-full" placeholder="Ví dụ: Bé kén ăn, hay sợ người lạ..."></textarea>
+            </div>
+
+            <button class="w-full py-4 rounded-2xl bg-blue-600 text-white font-bold text-lg shadow-xl shadow-blue-100 btn-active mb-4 flex items-center justify-center gap-2" id="btn-save-action" onclick="processSave()">
+                <i class="ph ph-floppy-disk"></i> Lưu thông tin
+            </button>
+            <button class="w-full py-4 text-red-500 font-semibold btn-active mb-10 flex items-center justify-center gap-2" id="btn-del-action" onclick="deletePet()">
+                <i class="ph ph-trash"></i> Xoá khỏi hệ thống
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, get, child, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAV7r-rjXo6U62LX1AA7c7DAHb8GhOOOsg",
+        authDomain: "saigon-dalat.firebaseapp.app",
+        databaseURL: "https://saigon-dalat-default-rtdb.firebaseio.com",
+        projectId: "saigon-dalat",
+        appId: "1:339735183485:web:bc23cd740104d272577114"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let curBranch = "", curSpecies = "", isEdit = false, curPetName = "";
+
+    window.showScreen = (name) => {
+        document.querySelectorAll('.screen-transition').forEach(d => d.classList.add('hidden'));
+        const target = document.getElementById('screen-' + name);
+        if(target) target.classList.remove('hidden');
+        window.scrollTo(0,0);
+    };
+
+    function getRemainingDays(lastDateStr, months) {
+        if(!lastDateStr) return null;
+        const lastDate = new Date(lastDateStr);
+        const nextDate = new Date(lastDate);
+        nextDate.setMonth(nextDate.getMonth() + parseInt(months));
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        return Math.ceil((nextDate - today) / (1000 * 60 * 60 * 24));
+    }
+
+    function getStatusColor(days) {
+        if (days === null) return "#D1D1D6"; 
+        if (days <= 0) return "#FF3B30"; 
+        if (days < 20) return "#FF9500"; 
+        return "#34C759"; 
+    }
+
+    function formatDaysText(days) {
+        if (days === null) return "--";
+        if (days <= 0) return `Trễ ${Math.abs(days)}n`;
+        return `${days}n`;
+    }
+
+    window.loadSpecies = async (branch) => {
+        curBranch = branch;
+        document.getElementById('title-branch').innerText = branch;
+        showScreen('species');
+        const snap = await get(child(ref(db), `PetManagement/${branch}`));
+        const list = document.getElementById('list-species');
+        list.innerHTML = "";
+        if(snap.exists()) {
+            Object.keys(snap.val()).forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'pet-item-row btn-active flex justify-between items-center cursor-pointer';
+                item.innerHTML = `<span class="font-semibold text-[17px]">${s}</span><i class="ph ph-caret-right text-gray-300"></i>`;
+                item.onclick = () => loadPets(s);
+                list.appendChild(item);
+            });
+        }
+    };
+
+    window.addNewSpecies = async () => {
+        const val = document.getElementById('new-species-input').value.trim();
+        if(!val) return;
+        await set(ref(db, `PetManagement/${curBranch}/${val}/_config`), { init: true });
+        document.getElementById('new-species-input').value = "";
+        loadSpecies(curBranch);
+    };
+
+    window.loadPets = async (species) => {
+        curSpecies = species;
+        document.getElementById('title-species').innerText = species;
+        showScreen('pets');
+        const snap = await get(child(ref(db), `PetManagement/${curBranch}/${species}`));
+        const list = document.getElementById('list-pets');
+        list.innerHTML = "";
+        if(snap.exists()) {
+            const data = snap.val();
+            Object.keys(data).forEach(pName => {
+                if(pName === '_config') return;
+                const p = data[pName];
+                const dVac = getRemainingDays(p.vac_date, p.vac_cycle || 12);
+                const dDai = getRemainingDays(p.dai_date, p.dai_cycle || 12);
+                const dGiun = getRemainingDays(p.giun_date, p.giun_cycle || 3);
+                const dVe = getRemainingDays(p.ve_date, p.ve_cycle || 1);
+
+                const card = document.createElement('div');
+                card.className = 'ios-card p-5 btn-active flex flex-col cursor-pointer';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                <i class="ph ph-dog"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-[18px]">${pName}</h3>
+                                <p class="text-[12px] text-gray-400 font-semibold tracking-wide">${p.so_ki ? p.so_ki + ' kg' : 'Chưa cân'}</p>
+                            </div>
+                        </div>
+                        <i class="ph ph-caret-right text-gray-300 text-lg"></i>
+                    </div>
+                    <div class="grid grid-cols-4 gap-3">
+                        <div class="bg-gray-50 p-2.5 rounded-2xl text-center">
+                            <div class="status-dot mx-auto mb-1.5" style="background:${getStatusColor(dVac)}"></div>
+                            <p class="text-[9px] text-gray-400 uppercase font-bold">Vaccine</p>
+                            <p class="text-[12px] font-bold" style="color:${getStatusColor(dVac)}">${formatDaysText(dVac)}</p>
+                        </div>
+                        <div class="bg-gray-50 p-2.5 rounded-2xl text-center">
+                            <div class="status-dot mx-auto mb-1.5" style="background:${getStatusColor(dDai)}"></div>
+                            <p class="text-[9px] text-gray-400 uppercase font-bold">Dại</p>
+                            <p class="text-[12px] font-bold" style="color:${getStatusColor(dDai)}">${formatDaysText(dDai)}</p>
+                        </div>
+                        <div class="bg-gray-50 p-2.5 rounded-2xl text-center">
+                            <div class="status-dot mx-auto mb-1.5" style="background:${getStatusColor(dGiun)}"></div>
+                            <p class="text-[9px] text-gray-400 uppercase font-bold">Giun</p>
+                            <p class="text-[12px] font-bold" style="color:${getStatusColor(dGiun)}">${formatDaysText(dGiun)}</p>
+                        </div>
+                        <div class="bg-gray-50 p-2.5 rounded-2xl text-center">
+                            <div class="status-dot mx-auto mb-1.5" style="background:${getStatusColor(dVe)}"></div>
+                            <p class="text-[9px] text-gray-400 uppercase font-bold">Ve rận</p>
+                            <p class="text-[12px] font-bold" style="color:${getStatusColor(dVe)}">${formatDaysText(dVe)}</p>
+                        </div>
+                    </div>
+                `;
+                card.onclick = () => openEdit(pName, p);
+                list.appendChild(card);
+            });
+        }
+    };
+
+    window.openEdit = (name, data) => {
+        isEdit = true;
+        curPetName = name;
+        document.getElementById('detail-header').innerText = name;
+        document.getElementById('p-name').value = name;
+        document.getElementById('p-name').disabled = true;
+        document.getElementById('p-weight').value = data.so_ki || "";
+        document.getElementById('p-note').value = data.ghi_chu || "";
+        
+        document.getElementById('p-vac-date').value = data.vac_date || "";
+        document.getElementById('p-vac-cycle').value = data.vac_cycle || "12";
+        document.getElementById('p-dai-date').value = data.dai_date || "";
+        document.getElementById('p-dai-cycle').value = data.dai_cycle || "12";
+        document.getElementById('p-giun-date').value = data.giun_date || "";
+        document.getElementById('p-giun-cycle').value = data.giun_cycle || "3";
+        document.getElementById('p-ve-date').value = data.ve_date || "";
+        document.getElementById('p-ve-cycle').value = data.ve_cycle || "1";
+
+        renderStatus('status-vac', getRemainingDays(data.vac_date, data.vac_cycle || 12));
+        renderStatus('status-dai', getRemainingDays(data.dai_date, data.dai_cycle || 12));
+
+        document.getElementById('btn-save-action').innerHTML = `<i class="ph ph-check-circle"></i> Cập nhật ngay`;
+        document.getElementById('btn-del-action').classList.remove('hidden');
+        showScreen('detail');
+    };
+
+    function renderStatus(id, days) {
+        const el = document.getElementById(id);
+        if(days === null || !el) return;
+        let cls = days <= 0 ? 'bg-red-50 text-red-600' : (days < 20 ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600');
+        el.innerHTML = `<span class="text-[11px] px-3 py-1.5 rounded-lg font-bold ${cls}">${days <= 0 ? 'QUÁ HẠN ' + Math.abs(days) + 'N' : 'CÒN ' + days + ' NGÀY'}</span>`;
+    }
+
+    window.resetForm = () => {
+        isEdit = false;
+        document.getElementById('detail-header').innerText = "Thêm bé mới";
+        document.getElementById('p-name').value = "";
+        document.getElementById('p-name').disabled = false;
+        ['p-weight','p-note','p-vac-date','p-dai-date','p-giun-date','p-ve-date'].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('btn-save-action').innerHTML = `<i class="ph ph-plus-circle"></i> Thêm vào hệ thống`;
+        document.getElementById('btn-del-action').classList.add('hidden');
+        showScreen('detail');
+    };
+
+    window.processSave = async () => {
+        const name = document.getElementById('p-name').value.trim();
+        if(!name) return alert("Vui lòng nhập tên bé!");
+        const data = {
+            so_ki: document.getElementById('p-weight').value,
+            ghi_chu: document.getElementById('p-note').value,
+            vac_date: document.getElementById('p-vac-date').value,
+            vac_cycle: document.getElementById('p-vac-cycle').value,
+            dai_date: document.getElementById('p-dai-date').value,
+            dai_cycle: document.getElementById('p-dai-cycle').value,
+            giun_date: document.getElementById('p-giun-date').value,
+            giun_cycle: document.getElementById('p-giun-cycle').value,
+            ve_date: document.getElementById('p-ve-date').value,
+            ve_cycle: document.getElementById('p-ve-cycle').value,
+            updatedAt: serverTimestamp()
+        };
+        await set(ref(db, `PetManagement/${curBranch}/${curSpecies}/${name}`), data);
+        loadPets(curSpecies);
+    };
+
+    window.deletePet = async () => {
+        if(confirm("Bạn có chắc chắn muốn xoá thông tin bé này?")) {
+            await remove(ref(db, `PetManagement/${curBranch}/${curSpecies}/${curPetName}`));
+            loadPets(curSpecies);
+        }
+    };
+</script>
+</body>
+</html>
