@@ -156,6 +156,7 @@
             font-weight: 600;
             transition: var(--transition);
             min-width: 80px;
+            text-align: center;
         }
 
         .btn-preset.active {
@@ -176,7 +177,7 @@
             margin-left: 4px;
         }
 
-        .form-control {
+        .form-control, .form-select {
             border-radius: 12px;
             border: 1px solid #E5E5EA;
             padding: 12px 16px;
@@ -373,65 +374,18 @@
             padding-top: 8px;
         }
 
-@media print {
-    @page {
-        size: 80mm auto;
-        margin: 0;
-    }
-
-    html, body {
-        width: 80mm;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: white;
-        overflow: hidden; 
-    }
-
-    .no-print, .modal-header, .modal-footer, .btn-close, .navbar, 
-    .app-container, .modal-backdrop, .btn-print-bill {
-        display: none !important;
-    }
-    
-    .modal.show {
-        position: relative !important;
-        display: block !important;
-        width: 80mm !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: visible !important;
-    }
-    
-    .modal-dialog {
-        margin: 0 !important;
-        max-width: 80mm !important;
-        width: 80mm !important;
-    }
-
-    .modal-content {
-        border: none !important;
-        width: 80mm !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        box-shadow: none !important;
-    }
-
-    .modal-body {
-        padding: 0 2mm 5mm 2mm !important; 
-        width: 80mm !important;
-        margin: 0 !important;
-    }
-
-    table {
-        width: 100% !important;
-        table-layout: fixed;
-    }
-
-    th, td {
-        word-wrap: break-word;
-    }
-
-    .text-center { text-align: center !important; }
-}
+        @media print {
+            @page { size: 80mm auto; margin: 0; }
+            html, body { width: 80mm; margin: 0 !important; padding: 0 !important; background: white; overflow: hidden; }
+            .no-print, .modal-header, .modal-footer, .btn-close, .navbar, .app-container, .modal-backdrop, .btn-print-bill { display: none !important; }
+            .modal.show { position: relative !important; display: block !important; width: 80mm !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; }
+            .modal-dialog { margin: 0 !important; max-width: 80mm !important; width: 80mm !important; }
+            .modal-content { border: none !important; width: 80mm !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; }
+            .modal-body { padding: 0 2mm 5mm 2mm !important; width: 80mm !important; margin: 0 !important; }
+            table { width: 100% !important; table-layout: fixed; }
+            th, td { word-wrap: break-word; }
+            .text-center { text-align: center !important; }
+        }
     </style>
 </head>
 <body>
@@ -442,7 +396,7 @@
             <img src="logocherry.png" alt="Logo" class="main-logo">
             <h1 class="navbar-brand">CHERRYPET COFFEE 2</h1>
             <div style="margin-top: 15px;">
-                <a href="order.html" class="btn-order">
+                <a href="order.html" class="btn-order btn btn-primary rounded-pill px-4">
                     <i class="fas fa-shopping-cart"></i> Đặt món (Order)
                 </a>
             </div>
@@ -495,7 +449,25 @@
                 <button class="btn-preset active" onclick="setPreset('all', this)">Tất cả</button>
                 <button class="btn-preset" onclick="setPreset('today', this)">Hôm nay</button>
                 <button class="btn-preset" onclick="setPreset('week', this)">Tuần này</button>
-                <button class="btn-preset" onclick="setPreset('month', this)">Tháng này</button>
+                <div class="dropdown flex-grow-1" style="min-width: 80px;">
+                    <button class="btn-preset w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Theo tháng
+                    </button>
+                    <ul class="dropdown-menu shadow-sm border-0 rounded-4">
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-1', this)">Tháng 1</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-2', this)">Tháng 2</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-3', this)">Tháng 3</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-4', this)">Tháng 4</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-5', this)">Tháng 5</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-6', this)">Tháng 6</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-7', this)">Tháng 7</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-8', this)">Tháng 8</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-9', this)">Tháng 9</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-10', this)">Tháng 10</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-11', this)">Tháng 11</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setPreset('month-12', this)">Tháng 12</a></li>
+                    </ul>
+                </div>
                 <button class="btn-preset btn-report" onclick="showDailyReport()"><i class="fas fa-file-invoice-dollar me-1"></i>Báo cáo cuối ngày</button>
             </div>
             <div class="row g-2">
@@ -537,7 +509,6 @@
                 <div class="col-12 col-lg-7">
                     <div class="table-container mx-0">
                         <div class="section-title"><i class="fas fa-receipt"></i>Lịch sử hóa đơn</div>
-                        
                         <div class="filter-summary-card">
                             <div class="title">Tổng kết theo bộ lọc</div>
                             <div class="main-value" id="filter-total">0đ</div>
@@ -554,7 +525,6 @@
                                     <span class="label">Cà thẻ</span>
                                     <span class="value" id="filter-card">0đ</span>
                                 </div>
-
                                 <div class="sub-group-title">CHI TIẾT: QUẦY BAR</div>
                                 <div class="filter-summary-item">
                                     <span class="label">Tiền mặt</span>
@@ -568,7 +538,6 @@
                                     <span class="label">Cà thẻ</span>
                                     <span class="value" id="bar-card">0đ</span>
                                 </div>
-
                                 <div class="sub-group-title">CHI TIẾT: QUẢN TRỊ VIÊN</div>
                                 <div class="filter-summary-item">
                                     <span class="label">Tiền mặt</span>
@@ -584,7 +553,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div id="order-table-body"></div>
                     </div>
                 </div>
@@ -595,72 +563,54 @@
 
 <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 20px;">
+        <div class="modal-content">
             <div class="modal-header no-print">
                 <h5 class="modal-title fw-bold">Chi tiết hóa đơn</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-2 text-black" style="width: 80mm; font-family: 'Inter', sans-serif;">
+            <div class="modal-body p-2 text-black" style="width: 80mm;">
                 <div class="text-center mb-4">
-                    <h2 class="text-xl font-black italic" style="font-weight: 900; font-size: 20px;">CHERRYPET COFFEE 2</h2>
-                    <p class="text-xs" style="font-size: 11px; margin-bottom: 2px;">285/94B Cách Mạng Tháng 8, P12, Q10</p>
-                    <p class="text-xs" style="font-size: 11px; margin-bottom: 2px;">SĐT: 033.444.6439</p>
+                    <h2 style="font-weight: 900; font-size: 20px;">CHERRYPET COFFEE 2</h2>
+                    <p style="font-size: 11px; margin-bottom: 2px;">285/94B Cách Mạng Tháng 8, P12, Q10</p>
+                    <p style="font-size: 11px; margin-bottom: 2px;">SĐT: 033.444.6439</p>
                     <div style="border-bottom: 1px dashed black; margin: 8px 0;"></div>
-                    <h3 class="text-sm font-bold" style="font-size: 14px;">PHIẾU THANH TOÁN</h3>
+                    <h3 style="font-size: 14px; font-weight: bold;">PHIẾU THANH TOÁN</h3>
                     <p style="font-size: 10px;" id="m-id">#000000</p>
                 </div>
-
                 <div style="font-size: 11px;" class="mb-2">
                     <div class="d-flex justify-content-between">
                         <span>Ngày: <span id="m-date"></span></span>
                         <span id="m-time"></span>
                     </div>
-                    <p class="mb-0">Thu ngân: <span id="m-cashier">Quản trị viên</span></p>
+                    <p class="mb-0">Thu ngân: <span id="m-cashier"></span></p>
                 </div>
-
                 <div style="border-bottom: 1px solid black; margin: 8px 0;"></div>
-
-                <table class="w-100 text-[11px] mb-2" style="font-size: 11px; width: 100%;">
+                <table style="font-size: 11px; width: 100%;">
                     <thead>
                         <tr style="border-bottom: 1px solid black;">
-                            <th class="text-left py-1">Món</th>
+                            <th class="text-start py-1">Món</th>
                             <th class="text-center py-1">SL</th>
-                            <th class="text-right py-1">T.Tiền</th>
+                            <th class="text-end py-1">T.Tiền</th>
                         </tr>
                     </thead>
-                    <tbody id="m-items-list">
-                    </tbody>
+                    <tbody id="m-items-list"></tbody>
                 </table>
-
                 <div style="border-top: 1px dashed black; padding-top: 8px; font-size: 11px;">
-                    <div class="d-flex justify-content-between">
-                        <span>Tổng cộng:</span>
-                        <span id="m-subtotal">0đ</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span>Giảm giá:</span>
-                        <span id="m-discount">0đ</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span>VAT:</span>
-                        <span id="m-vat">0đ</span>
-                    </div>
-                    <div class="d-flex justify-content-between font-bold text-sm mt-1 border-t border-black pt-1" style="border-top: 1px solid black; font-weight: bold; font-size: 14px;">
-                        <span>THÀNH TIỀN:</span>
-                        <span id="m-total-final">0đ</span>
+                    <div class="d-flex justify-content-between"><span>Tổng cộng:</span><span id="m-subtotal">0đ</span></div>
+                    <div class="d-flex justify-content-between"><span>Giảm giá:</span><span id="m-discount">0đ</span></div>
+                    <div class="d-flex justify-content-between"><span>VAT:</span><span id="m-vat">0đ</span></div>
+                    <div class="d-flex justify-content-between mt-1 pt-1" style="border-top: 1px solid black; font-weight: bold; font-size: 14px;">
+                        <span>THÀNH TIỀN:</span><span id="m-total-final">0đ</span>
                     </div>
                 </div>
-
                 <div class="text-center mt-4" style="font-size: 10px;">
-                    <p class="font-bold italic mb-1" style="font-weight: bold; font-style: italic;">Cảm ơn Quý khách! Hẹn gặp lại.</p>
-                    <p class="mb-0">Wifi: Cherrypet Coffee - MK: 88888888</p>
+                    <p style="font-weight: bold; font-style: italic;">Cảm ơn Quý khách! Hẹn gặp lại.</p>
+                    <p>Wifi: Cherrypet Coffee - MK: 88888888</p>
                 </div>
             </div>
             <div class="modal-footer no-print">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" onclick="window.print()">
-                    <i class="fas fa-print me-2"></i>In Bill
-                </button>
+                <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fas fa-print me-2"></i>In Bill</button>
             </div>
         </div>
     </div>
@@ -673,67 +623,34 @@
                 <h5 class="modal-title fw-bold">Báo cáo doanh thu</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-           <div class="modal-body">
-    <div class="text-center">
-        <h4 class="fw-bold">CHERRYPET COFFEE 2</h4>
-        <p class="report-title fw-bold">BÁO CÁO CUỐI NGÀY</p>
-        <div style="border-bottom: 1.5px solid #000; margin-bottom: 3px;"></div>
-        <p id="report-time-range" class="fw-bold" style="font-size: 11px; margin: 0;"></p>
-    </div>
-
-    <div class="extra-info-section py-2">
-        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
-            <span>Tổng số đơn:</span>
-            <span id="report-total-orders">0</span>
-        </div>
-        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
-            <span>Tổng chiết khấu:</span>
-            <span id="report-total-discount">0đ</span>
-        </div>
-        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
-            <span>Tổng VAT:</span>
-            <span id="report-total-vat">0đ</span>
-        </div>
-    </div>
-
-    <table class="table table-borderless">
-        <thead>
-            <tr style="border-bottom: 1.5px solid #000;">
-                <th style="font-size: 12px; text-align: left;">Tên món</th>
-                <th class="text-center" style="font-size: 12px;">SL</th>
-                <th class="text-end" style="font-size: 12px;">T.Tiền</th>
-            </tr>
-        </thead>
-        <tbody id="report-table-body"></tbody>
-    </table>
-
-    <div class="payment-report-section" style="border-bottom: 0.5px dashed #000; padding-bottom: 8px;">
-        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
-            <span>Tiền mặt:</span>
-            <span id="report-cash-amount">0đ</span>
-        </div>
-        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
-            <span>Chuyển khoản:</span>
-            <span id="report-transfer-amount">0đ</span>
-        </div>
-        <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;">
-            <span>Cà thẻ:</span>
-            <span id="report-card-amount">0đ</span>
-        </div>
-    </div>
-
-    <div class="total-row" style="border-top: none; margin-top: 10px;">
-        <div class="d-flex justify-content-between fw-bold">
-            <span>TỔNG CỘNG:</span>
-            <span id="report-total-amount" style="font-size: 18px;">0đ</span>
-        </div>
-    </div>
-</div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <h4 class="fw-bold">CHERRYPET COFFEE 2</h4>
+                    <p class="report-title fw-bold">BÁO CÁO CUỐI NGÀY</p>
+                    <div style="border-bottom: 1.5px solid #000; margin-bottom: 3px;"></div>
+                    <p id="report-time-range" class="fw-bold" style="font-size: 11px; margin: 0;"></p>
+                </div>
+                <div class="extra-info-section py-2">
+                    <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;"><span>Tổng số đơn:</span><span id="report-total-orders">0</span></div>
+                    <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;"><span>Tổng chiết khấu:</span><span id="report-total-discount">0đ</span></div>
+                    <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;"><span>Tổng VAT:</span><span id="report-total-vat">0đ</span></div>
+                </div>
+                <table class="table table-borderless">
+                    <thead><tr style="border-bottom: 1.5px solid #000;"><th style="font-size: 12px; text-align: left;">Tên món</th><th class="text-center" style="font-size: 12px;">SL</th><th class="text-end" style="font-size: 12px;">T.Tiền</th></tr></thead>
+                    <tbody id="report-table-body"></tbody>
+                </table>
+                <div class="payment-report-section" style="border-bottom: 0.5px dashed #000; padding-bottom: 8px;">
+                    <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;"><span>Tiền mặt:</span><span id="report-cash-amount">0đ</span></div>
+                    <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;"><span>Chuyển khoản:</span><span id="report-transfer-amount">0đ</span></div>
+                    <div class="d-flex justify-content-between fw-bold" style="font-size: 12px;"><span>Cà thẻ:</span><span id="report-card-amount">0đ</span></div>
+                </div>
+                <div class="total-row mt-2">
+                    <div class="d-flex justify-content-between fw-bold"><span>TỔNG CỘNG:</span><span id="report-total-amount" style="font-size: 18px;">0đ</span></div>
+                </div>
+            </div>
             <div class="modal-footer no-print">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" onclick="window.print()">
-                    <i class="fas fa-print me-2"></i>In Báo Cáo (K80)
-                </button>
+                <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fas fa-print me-2"></i>In Báo Cáo (K80)</button>
             </div>
         </div>
     </div>
@@ -772,9 +689,7 @@
     });
 
     function normalizeDate(dateObj) {
-        return dateObj.getFullYear() + '-' + 
-               String(dateObj.getMonth() + 1).padStart(2, '0') + '-' + 
-               String(dateObj.getDate()).padStart(2, '0');
+        return dateObj.getFullYear() + '-' + String(dateObj.getMonth() + 1).padStart(2, '0') + '-' + String(dateObj.getDate()).padStart(2, '0');
     }
 
     function calculateFixedStats() {
@@ -839,21 +754,30 @@
         let start = "", end = "";
 
         document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        
+        // Nếu là nút dropdown, gán active cho nút toggle chính
+        if (type.startsWith('month-')) {
+             const toggleBtn = document.querySelector('.dropdown-toggle');
+             toggleBtn.classList.add('active');
+        } else {
+             btn.classList.add('active');
+        }
 
-        if (type === 'today') {
-            start = normalizeDate(now);
-            end = start;
+        if (type === 'all') {
+            start = ""; end = "";
+        } else if (type === 'today') {
+            start = normalizeDate(now); end = start;
         } else if (type === 'week') {
             const day = now.getDay(); 
             const diff = now.getDate() - (day === 0 ? 6 : day - 1);
             const mon = new Date(new Date(now).setDate(diff));
             const sun = new Date(new Date(mon).setDate(mon.getDate() + 6));
-            start = normalizeDate(mon);
-            end = normalizeDate(sun);
-        } else if (type === 'month') {
-            const monStart = new Date(now.getFullYear(), now.getMonth(), 1);
-            const monEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            start = normalizeDate(mon); end = normalizeDate(sun);
+        } else if (type.startsWith('month-')) {
+            const monthIndex = parseInt(type.split('-')[1]) - 1;
+            const year = now.getFullYear();
+            const monStart = new Date(year, monthIndex, 1);
+            const monEnd = new Date(year, monthIndex + 1, 0);
             start = normalizeDate(monStart);
             end = normalizeDate(monEnd);
         }
@@ -870,19 +794,15 @@
         let tableHtml = '';
         const chartData = {};
         const productCounts = {};
+        let filterTotal = 0, filterTM = 0, filterCK = 0, filterCard = 0;
+        let barTM = 0, barCK = 0, barCard = 0;
+        let adminTM = 0, adminCK = 0, adminCard = 0;
 
-        let filterTotal = 0;
-        let filterTM = 0; let filterCK = 0; let filterCard = 0;
-        let barTM = 0; let barCK = 0; let barCard = 0;
-        let adminTM = 0; let adminCK = 0; let adminCard = 0;
-
-        // CẬP NHẬT TẠI ĐÂY: Sắp xếp theo timestamp giảm dần (Mới nhất lên đầu)
         const sortedOrders = Object.entries(rawData).sort((a, b) => b[1].timestamp - a[1].timestamp);
 
         sortedOrders.forEach(([key, order]) => {
             const orderDate = new Date(order.timestamp);
             const orderDateStr = normalizeDate(orderDate);
-            
             let isMatch = true;
             if (start && orderDateStr < start) isMatch = false;
             if (end && orderDateStr > end) isMatch = false;
@@ -935,11 +855,9 @@
         document.getElementById('filter-tm').innerText = filterTM.toLocaleString() + 'đ';
         document.getElementById('filter-ck').innerText = filterCK.toLocaleString() + 'đ';
         document.getElementById('filter-card').innerText = filterCard.toLocaleString() + 'đ';
-
         document.getElementById('bar-tm').innerText = barTM.toLocaleString() + 'đ';
         document.getElementById('bar-ck').innerText = barCK.toLocaleString() + 'đ';
         document.getElementById('bar-card').innerText = barCard.toLocaleString() + 'đ';
-
         document.getElementById('admin-tm').innerText = adminTM.toLocaleString() + 'đ';
         document.getElementById('admin-ck').innerText = adminCK.toLocaleString() + 'đ';
         document.getElementById('admin-card').innerText = adminCard.toLocaleString() + 'đ';
@@ -956,46 +874,26 @@
         });
 
         document.getElementById('product-summary-body').innerHTML = productHtml || '<tr><td colspan="3" class="text-center py-4 text-muted">Trống</td></tr>';
-        document.getElementById('order-table-body').innerHTML = tableHtml || '<div class="text-center py-5 text-muted">Không có dữ liệu hóa đơn trong khoảng này</div>';
-        
+        document.getElementById('order-table-body').innerHTML = tableHtml || '<div class="text-center py-5 text-muted">Không có dữ liệu hóa đơn</div>';
         updateChart(chartData);
     };
 
     window.viewDetail = function(key) {
         const order = rawData[key];
-        const timestamp = order.timestamp;
-        const fullDate = new Date(timestamp);
+        const fullDate = new Date(order.timestamp);
         const timeStr = fullDate.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
-
         document.getElementById('m-id').innerText = '#' + (order.orderId || '000000');
         document.getElementById('m-date').innerText = order.dateString;
         document.getElementById('m-time').innerText = timeStr;
-
-        const cashierName = order.location === "Quầy bar" ? "Quầy bar" : "Quản trị viên";
-        document.getElementById('m-cashier').innerText = cashierName;
-
-        const subtotal = order.financials?.totalBeforeDiscount || 0;
-        const discount = order.financials?.discountAmount || 0;
-        const vat = order.financials?.vatAmount || 0;
-        const final = order.financials?.totalFinal || 0;
-
-        document.getElementById('m-subtotal').innerText = subtotal.toLocaleString() + 'đ';
-        document.getElementById('m-discount').innerText = discount.toLocaleString() + 'đ';
-        document.getElementById('m-vat').innerText = vat.toLocaleString() + 'đ';
-        document.getElementById('m-total-final').innerText = final.toLocaleString() + 'đ';
-
+        document.getElementById('m-cashier').innerText = order.location || "Quản trị viên";
+        document.getElementById('m-subtotal').innerText = (order.financials?.totalBeforeDiscount || 0).toLocaleString() + 'đ';
+        document.getElementById('m-discount').innerText = (order.financials?.discountAmount || 0).toLocaleString() + 'đ';
+        document.getElementById('m-vat').innerText = (order.financials?.vatAmount || 0).toLocaleString() + 'đ';
+        document.getElementById('m-total-final').innerText = (order.financials?.totalFinal || 0).toLocaleString() + 'đ';
         let itemsHtml = '';
         const items = Array.isArray(order.items) ? order.items : Object.values(order.items);
-        items.forEach((it, i) => {
-            const name = it.name || 'Món không tên';
-            const price = it.price || 0;
-            const qty = it.quantity || 1;
-            itemsHtml += `
-                <tr>
-                    <td class="text-left py-1">${name}</td>
-                    <td class="text-center py-1">${qty}</td>
-                    <td class="text-right py-1">${(price * qty).toLocaleString()}</td>
-                </tr>`;
+        items.forEach(it => {
+            itemsHtml += `<tr><td class="text-start py-1">${it.name}</td><td class="text-center py-1">${it.quantity}</td><td class="text-end py-1">${(it.price * it.quantity).toLocaleString()}</td></tr>`;
         });
         document.getElementById('m-items-list').innerHTML = itemsHtml;
         orderModal.show();
@@ -1005,54 +903,32 @@
         const now = new Date();
         const todayStr = normalizeDate(now);
         const reportData = {};
-        let dayTotal = 0;
-        let dayCash = 0;
-        let dayTransfer = 0;
-        let dayCard = 0;
-        let dayOrderCount = 0;
-        let dayTotalDiscount = 0;
-        let dayTotalVAT = 0;
+        let dayTotal = 0, dayCash = 0, dayTransfer = 0, dayCard = 0, dayOrderCount = 0, dayTotalDiscount = 0, dayTotalVAT = 0;
 
         Object.values(rawData).forEach(order => {
-            const orderDate = new Date(order.timestamp);
-            if (normalizeDate(orderDate) === todayStr) {
+            if (normalizeDate(new Date(order.timestamp)) === todayStr) {
                 dayOrderCount++;
-                const amount = (order.financials?.totalFinal || 0);
-                const discount = (order.financials?.discountAmount || 0);
-                const vat = (order.financials?.vatAmount || 0);
+                const amount = order.financials?.totalFinal || 0;
                 const method = (order.payment?.method || 'TM').toUpperCase();
-                
                 dayTotal += amount;
-                dayTotalDiscount += discount;
-                dayTotalVAT += vat;
-                
-                if (method.includes('CK') || method.includes('CHUYỂN KHOẢN')) dayTransfer += amount;
-                else if (method.includes('CÀ THẺ') || method.includes('CARD')) dayCard += amount;
+                dayTotalDiscount += (order.financials?.discountAmount || 0);
+                dayTotalVAT += (order.financials?.vatAmount || 0);
+                if (method.includes('CK')) dayTransfer += amount;
+                else if (method.includes('CARD')) dayCard += amount;
                 else dayCash += amount;
-
                 const items = Array.isArray(order.items) ? order.items : Object.values(order.items);
                 items.forEach(it => {
-                    const name = typeof it === 'object' ? it.name : it;
-                    const qty = (typeof it === 'object' && it.quantity) ? parseInt(it.quantity) : 1;
-                    const price = (typeof it === 'object' && it.price) ? parseInt(it.price) : 0;
-                    
-                    if (!reportData[name]) {
-                        reportData[name] = { qty: 0, total: 0 };
-                    }
-                    reportData[name].qty += qty;
-                    reportData[name].total += (price * qty);
+                    const name = it.name;
+                    if (!reportData[name]) reportData[name] = { qty: 0, total: 0 };
+                    reportData[name].qty += it.quantity;
+                    reportData[name].total += (it.price * it.quantity);
                 });
             }
         });
 
         let reportHtml = '';
         Object.entries(reportData).forEach(([name, info]) => {
-            reportHtml += `
-                <tr>
-                    <td class="fw-bold" style="font-size: 12px;">${name}</td>
-                    <td class="text-center fw-bold" style="font-size: 12px;">${info.qty}</td>
-                    <td class="text-end fw-bold" style="font-size: 12px;">${info.total.toLocaleString()}</td>
-                </tr>`;
+            reportHtml += `<tr><td class="fw-bold" style="font-size: 12px;">${name}</td><td class="text-center fw-bold" style="font-size: 12px;">${info.qty}</td><td class="text-end fw-bold" style="font-size: 12px;">${info.total.toLocaleString()}</td></tr>`;
         });
 
         document.getElementById('report-total-orders').innerText = dayOrderCount;
@@ -1064,7 +940,6 @@
         document.getElementById('report-transfer-amount').innerText = dayTransfer.toLocaleString() + 'đ';
         document.getElementById('report-card-amount').innerText = dayCard.toLocaleString() + 'đ';
         document.getElementById('report-time-range').innerText = "Ngày: " + now.toLocaleDateString('vi-VN') + " - " + now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
-        
         dailyReportModal.show();
     }
 
@@ -1072,30 +947,18 @@
         const labels = Object.keys(data).sort();
         const values = labels.map(l => data[l]);
         if (myChart) myChart.destroy();
-        
         const ctx = document.getElementById('revenueChart').getContext('2d');
         myChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
-                datasets: [{ 
-                    label: 'Doanh thu', 
-                    data: values, 
-                    backgroundColor: '#007AFF',
-                    borderRadius: 8,
-                    maxBarThickness: 30
-                }]
+                datasets: [{ label: 'Doanh thu', data: values, backgroundColor: '#007AFF', borderRadius: 8, maxBarThickness: 30 }]
             },
             options: { 
-                responsive: true, 
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { 
-                        beginAtZero: true,
-                        ticks: { callback: function(v) { return (v/1000) + 'k'; }, font: { size: 10 } },
-                        grid: { color: '#E5E5EA' }
-                    },
+                    y: { beginAtZero: true, ticks: { callback: v => (v/1000) + 'k', font: { size: 10 } }, grid: { color: '#E5E5EA' } },
                     x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#8E8E93' } }
                 }
             }
