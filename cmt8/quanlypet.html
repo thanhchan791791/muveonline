@@ -28,7 +28,7 @@
             padding: 0;
             color: #1c1c1e;
             overflow-x: hidden;
-            padding-bottom: 40px;
+            padding-bottom: 100px; /* Tăng padding để không bị nút đè lên nội dung cuối */
         }
 
         .glass {
@@ -46,7 +46,7 @@
         }
 
         .btn-active:active {
-            transform: scale(0.97);
+            transform: scale(0.92); /* Thu nhỏ mạnh hơn một chút để tạo cảm giác nhấn thật */
             opacity: 0.8;
         }
 
@@ -94,6 +94,28 @@
         i.ph {
             font-size: 22px;
             vertical-align: middle;
+        }
+
+        /* Floating Action Button Style */
+        .fab-button {
+            position: fixed;
+            bottom: 30px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            background-color: var(--ios-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0, 122, 255, 0.3);
+            z-index: 100;
+            cursor: pointer;
+        }
+        
+        .fab-button i {
+            font-size: 28px;
         }
     </style>
 </head>
@@ -166,13 +188,14 @@
             <button onclick="showScreen('species')" class="text-blue-500 flex items-center font-semibold btn-active">
                 <i class="ph ph-caret-left mr-1"></i> Quay lại
             </button>
-            <button onclick="resetForm()" class="bg-blue-600 text-white text-[13px] px-5 py-2.5 rounded-full font-bold shadow-lg shadow-blue-100 btn-active flex items-center gap-2">
-                <i class="ph ph-plus-circle"></i> THÊM BÉ
-            </button>
-        </div>
+            </div>
         <div class="large-title" id="title-species">Danh sách</div>
         
         <div class="px-5 space-y-4" id="list-pets"></div>
+
+        <div class="fab-button btn-active" onclick="resetForm()">
+            <i class="ph ph-plus-bold"></i>
+        </div>
     </div>
 
     <div id="screen-detail" class="hidden screen-transition">
@@ -268,7 +291,6 @@
 
     let curBranch = "", curSpecies = "", isEdit = false, curPetName = "";
 
-    // Tự động tạo các tùy chọn từ 1-12 tháng và 1-24 tháng
     function populateSelects() {
         const selects = document.querySelectorAll('.cycle-select');
         const longSelects = document.querySelectorAll('.cycle-select-long');
@@ -452,7 +474,6 @@
         document.getElementById('p-name').disabled = false;
         ['p-weight','p-note','p-vac-date','p-dai-date','p-giun-date','p-ve-date'].forEach(id => document.getElementById(id).value = "");
         
-        // Reset cycles to default
         document.getElementById('p-vac-cycle').value = "12";
         document.getElementById('p-dai-cycle').value = "12";
         document.getElementById('p-giun-cycle').value = "3";
