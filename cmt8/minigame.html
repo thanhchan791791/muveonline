@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Quản Lý Khách Hàng - Cherry Premium</title>
+    <style>
+        :root {
+            --cherry-pink: #FFB7C5;
+            --ios-blue: #007AFF;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #1C1C1E;
+            --text-secondary: #8E8E93;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            background: linear-gradient(135deg, #FFF5F7 0%, #F0F4FF 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: env(safe-area-inset-top) 15px env(safe-area-inset-bottom) 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .logo-container {
+            margin: 30px 0 20px 0;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .logo-container img {
+            height: 70px;
+            filter: drop-shadow(0 4px 10px rgba(255, 183, 197, 0.5));
+        }
+
+        .container, .list-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 450px;
+            padding: 25px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .list-container {
+            max-width: 900px;
+            display: none; /* Mặc định ẩn danh sách */
+        }
+
+        h2, h3 {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+            margin-top: 0;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-left: 12px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            box-sizing: border-box;
+            font-size: 17px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: var(--cherry-pink);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(255, 183, 197, 0.4);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
+            margin-bottom: 10px;
+        }
+
+        button:active { transform: scale(0.95); background: #f7a1b2; }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--text-main);
+            box-shadow: none;
+            border: 1px solid var(--glass-border);
+        }
+
+        .info-box {
+            background: rgba(0, 122, 255, 0.1);
+            padding: 14px;
+            border-radius: 14px;
+            color: var(--ios-blue);
+            font-size: 14px;
+            margin-bottom: 18px;
+            display: none;
+            border: 1px solid rgba(0, 122, 255, 0.1);
+        }
+
+        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; }
+        th { color: var(--text-secondary); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 12px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); text-align: left; }
+        td { padding: 16px 10px; border-bottom: 1px solid rgba(0,0,0,0.03); font-size: 14px; }
+
+        .lucky-badge { background: white; color: #D4A017; padding: 4px 8px; border-radius: 8px; font-weight: 800; font-size: 11px; margin: 2px; display: inline-block; border: 1px solid rgba(212, 160, 23, 0.2); }
+        .ticket-count { background-color: var(--text-main); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .history-add { color: #34C759; font-size: 12px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="logo-container">
+    <img src="logocherry.png" alt="Cherry Logo">
+</div>
+
+<div class="container">
+    <h2>Nhập Thông Tin Khách</h2>
+    
+    <label for="cusPhone">Số điện thoại</label>
+    <input type="text" id="cusPhone" placeholder="090..." required>
+
+    <div id="existInfo" class="info-box"></div>
+    
+    <label for="cusName">Tên khách hàng</label>
+    <input type="text" id="cusName" placeholder="Tên khách hàng..." required>
+    
+    <label for="ticketQty">Số lượng vé mua thêm</label>
+    <input type="number" id="ticketQty" value="1" min="1" required>
+    
+    <button id="btnSave">Lưu & Cập nhật</button>
+    <button id="btnToggleList" class="btn-secondary">Xem Lịch Sử Giao Dịch</button>
+    <p id="status"></p>
+</div>
+
+<div class="list-container" id="listContainer">
+    <h3 style="margin-bottom: 15px;">Lịch Sử Chi Tiết</h3>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Thời gian</th>
+                    <th>Khách Hàng</th>
+                    <th>Số Vé (Mới/Tổng)</th>
+                    <th>Chi Tiết Số May Mắn</th>
+                </tr>
+            </thead>
+            <tbody id="customerTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
+        authDomain: "dogs-be72b.firebaseapp.com",
+        databaseURL: "https://dogs-be72b-default-rtdb.firebaseio.com",
+        projectId: "dogs-be72b",
+        storageBucket: "dogs-be72b.firebasestorage.app",
+        messagingSenderId: "1003873040746",
+        appId: "1:1003873040746:web:607f4ff587afc430d3cd13",
+        measurementId: "G-Y72BF1RQ2C"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const ticketRef = ref(db, 'tickets');
+
+    const nameInput = document.getElementById('cusName');
+    const phoneInput = document.getElementById('cusPhone');
+    const qtyInput = document.getElementById('ticketQty');
+    const saveBtn = document.getElementById('btnSave');
+    const toggleBtn = document.getElementById('btnToggleList');
+    const listContainer = document.getElementById('listContainer');
+    const statusTxt = document.getElementById('status');
+    const existInfo = document.getElementById('existInfo');
+    const tableBody = document.getElementById('customerTableBody');
+
+    let allTickets = {};
+    let existingCusKey = null;
+
+    onValue(ticketRef, (snapshot) => {
+        allTickets = snapshot.val() || {};
+        renderTable();
+    });
+
+    toggleBtn.addEventListener('click', () => {
+        const isHidden = listContainer.style.display === 'none' || listContainer.style.display === '';
+        listContainer.style.display = isHidden ? 'block' : 'none';
+        toggleBtn.innerText = isHidden ? 'Ẩn Lịch Sử Giao Dịch' : 'Xem Lịch Sử Giao Dịch';
+    });
+
+    phoneInput.addEventListener('input', () => {
+        const phone = phoneInput.value.trim();
+        existingCusKey = null;
+        existInfo.style.display = 'none';
+        nameInput.value = "";
+        if (phone.length >= 10) {
+            for (let key in allTickets) {
+                if (allTickets[key].phoneNumber === phone) {
+                    existingCusKey = key;
+                    nameInput.value = allTickets[key].customerName;
+                    existInfo.innerHTML = `📌 Khách cũ: Đã có <b>${allTickets[key].ticketQty}</b> vé.`;
+                    existInfo.style.display = 'block';
+                    break;
+                }
+            }
+        }
+    });
+
+    function renderTable() {
+        tableBody.innerHTML = "";
+        const sortedEntries = Object.entries(allTickets).sort((a, b) => new Date(b[1].timestamp) - new Date(a[1].timestamp));
+
+        sortedEntries.forEach(([key, val]) => {
+            const dateObj = new Date(val.timestamp);
+            const timeStr = dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = dateObj.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+            
+            let luckyDisplay = (val.luckyNumbers && Array.isArray(val.luckyNumbers)) 
+                ? val.luckyNumbers.map(n => `<span class="lucky-badge">${n}</span>`).join('')
+                : `<span style="color:#aaa; font-style:italic; font-size:11px;">Chờ cập nhật số...</span>`;
+
+            tableBody.innerHTML += `
+                <tr>
+                    <td><div style="font-weight:600;">${timeStr}</div><div style="font-size:10px; color:#8e8e93;">${dateStr}</div></td>
+                    <td><div style="font-weight:700;">${val.customerName}</div><div style="font-size:11px; color:#666;">${val.phoneNumber}</div></td>
+                    <td>
+                        <div class="history-add">+${val.lastAdded || val.ticketQty} vé mới</div>
+                        <div style="margin-top:4px;"><span class="ticket-count">Tổng: ${val.ticketQty}</span></div>
+                    </td>
+                    <td><div style="max-width:200px;">${luckyDisplay}</div></td>
+                </tr>
+            `;
+        });
+    }
+
+    saveBtn.addEventListener('click', () => {
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const newQty = parseInt(qtyInput.value);
+
+        if (!name || !phone || isNaN(newQty) || newQty < 1) {
+            showStatus("Vui lòng nhập đủ thông tin!", "#FF3B30");
+            return;
+        }
+
+        if (existingCusKey) {
+            const oldQty = allTickets[existingCusKey].ticketQty || 0;
+            update(ref(db, `tickets/${existingCusKey}`), {
+                customerName: name,
+                ticketQty: oldQty + newQty,
+                lastAdded: newQty, // Lưu lại lịch sử lần thêm này
+                timestamp: new Date().toISOString()
+            }).then(() => showStatus("Cộng dồn thành công!", "#34C759"));
+        } else {
+            const newRef = push(ticketRef);
+            set(newRef, {
+                customerName: name,
+                phoneNumber: phone,
+                ticketQty: newQty,
+                lastAdded: newQty,
+                timestamp: new Date().toISOString()
+            }).then(() => showStatus("Đã thêm khách mới!", "#34C759"));
+        }
+
+        phoneInput.value = ""; nameInput.value = ""; qtyInput.value = "1";
+        existInfo.style.display = 'none';
+    });
+
+    function showStatus(msg, color) {
+        statusTxt.innerText = msg;
+        statusTxt.style.color = color;
+    }
+</script>
+
+</body>
+</html>
