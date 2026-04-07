@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -53,8 +54,8 @@
         }
 
         .list-container {
-            max-width: 900px;
-            display: none; /* Mặc định ẩn danh sách */
+            max-width: 950px;
+            display: none; 
         }
 
         h2, h3 {
@@ -111,6 +112,15 @@
             border: 1px solid var(--glass-border);
         }
 
+        .btn-view {
+            padding: 6px 12px;
+            font-size: 11px;
+            width: auto;
+            border-radius: 10px;
+            margin: 0;
+            background: var(--ios-blue);
+        }
+
         .info-box {
             background: rgba(0, 122, 255, 0.1);
             padding: 14px;
@@ -130,6 +140,10 @@
         .lucky-badge { background: white; color: #D4A017; padding: 4px 8px; border-radius: 8px; font-weight: 800; font-size: 11px; margin: 2px; display: inline-block; border: 1px solid rgba(212, 160, 23, 0.2); }
         .ticket-count { background-color: var(--text-main); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .history-add { color: #34C759; font-size: 12px; font-weight: 600; }
+        
+        /* Ẩn nội dung */
+        .hidden-content { display: none; }
+        .mask-content { color: var(--text-secondary); letter-spacing: 2px; }
     </style>
 </head>
 <body>
@@ -165,8 +179,9 @@
                 <tr>
                     <th>Thời gian</th>
                     <th>Khách Hàng</th>
-                    <th>Số Vé (Mới/Tổng)</th>
-                    <th>Chi Tiết Số May Mắn</th>
+                    <th>Số Vé</th>
+                    <th>Số May Mắn</th>
+                    <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody id="customerTableBody"></tbody>
@@ -235,6 +250,12 @@
         }
     });
 
+    // Hàm ẩn 4 số cuối điện thoại
+    function maskPhone(phone) {
+        if(!phone) return "";
+        return phone.slice(0, -4) + "****";
+    }
+
     function renderTable() {
         tableBody.innerHTML = "";
         const sortedEntries = Object.entries(allTickets).sort((a, b) => new Date(b[1].timestamp) - new Date(a[1].timestamp));
@@ -248,18 +269,58 @@
                 ? val.luckyNumbers.map(n => `<span class="lucky-badge">${n}</span>`).join('')
                 : `<span style="color:#aaa; font-style:italic; font-size:11px;">Chờ cập nhật số...</span>`;
 
+            const rowId = `row-${key}`;
+
             tableBody.innerHTML += `
-                <tr>
-                    <td><div style="font-weight:600;">${timeStr}</div><div style="font-size:10px; color:#8e8e93;">${dateStr}</div></td>
-                    <td><div style="font-weight:700;">${val.customerName}</div><div style="font-size:11px; color:#666;">${val.phoneNumber}</div></td>
+                <tr id="${rowId}">
                     <td>
-                        <div class="history-add">+${val.lastAdded || val.ticketQty} vé mới</div>
-                        <div style="margin-top:4px;"><span class="ticket-count">Tổng: ${val.ticketQty}</span></div>
+                        <span class="mask-content">**:**</span>
+                        <div class="hidden-content">
+                            <div style="font-weight:600;">${timeStr}</div>
+                            <div style="font-size:10px; color:#8e8e93;">${dateStr}</div>
+                        </div>
                     </td>
-                    <td><div style="max-width:200px;">${luckyDisplay}</div></td>
+                    <td>
+                        <div style="font-weight:700;">${val.customerName}</div>
+                        <div style="font-size:11px; color:#666;" class="phone-display">${maskPhone(val.phoneNumber)}</div>
+                    </td>
+                    <td>
+                        <div class="history-add">+${val.lastAdded || val.ticketQty}</div>
+                        <div style="margin-top:4px;"><span class="ticket-count">${val.ticketQty}</span></div>
+                    </td>
+                    <td>
+                        <span class="mask-content">***</span>
+                        <div class="hidden-content" style="max-width:200px;">${luckyDisplay}</div>
+                    </td>
+                    <td>
+                        <button class="btn-view" onclick="toggleRowView('${rowId}', '${val.phoneNumber}')">Hiện</button>
+                    </td>
                 </tr>
             `;
         });
+    }
+
+    // Hàm global để xử lý nút bấm hiện/ẩn
+    window.toggleRowView = function(rowId, fullPhone) {
+        const row = document.getElementById(rowId);
+        const btn = row.querySelector('.btn-view');
+        const masks = row.querySelectorAll('.mask-content');
+        const hiddens = row.querySelectorAll('.hidden-content');
+        const phoneDiv = row.querySelector('.phone-display');
+
+        if (btn.innerText === "Hiện") {
+            masks.forEach(m => m.style.display = 'none');
+            hiddens.forEach(h => h.style.display = 'block');
+            phoneDiv.innerText = fullPhone;
+            btn.innerText = "Ẩn";
+            btn.style.background = "#8E8E93";
+        } else {
+            masks.forEach(m => m.style.display = 'inline-block');
+            hiddens.forEach(h => h.style.display = 'none');
+            phoneDiv.innerText = maskPhone(fullPhone);
+            btn.innerText = "Hiện";
+            btn.style.background = "#007AFF";
+        }
     }
 
     saveBtn.addEventListener('click', () => {
@@ -277,7 +338,7 @@
             update(ref(db, `tickets/${existingCusKey}`), {
                 customerName: name,
                 ticketQty: oldQty + newQty,
-                lastAdded: newQty, // Lưu lại lịch sử lần thêm này
+                lastAdded: newQty,
                 timestamp: new Date().toISOString()
             }).then(() => showStatus("Cộng dồn thành công!", "#34C759"));
         } else {
