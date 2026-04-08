@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tra Cứu Thành Viên - Cherrypet</title>
+    <link rel="icon" type="image/png" href="logocherry.png">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -33,6 +34,19 @@
         }
 
         .header { width: 90%; max-width: 450px; text-align: center; margin-bottom: 25px; }
+        
+        /* CSS cho Logo chính */
+        .brand-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            background: white;
+            padding: 5px;
+        }
+
         .header h1 { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
 
         .search-container {
@@ -73,7 +87,6 @@
 
         .points-display { font-size: 44px; font-weight: 900; margin: 5px 0; line-height: 1; }
         
-        /* CSS Mới cho thông tin thăng hạng */
         .next-rank-info {
             font-size: 13px;
             font-weight: 600;
@@ -111,6 +124,7 @@
 <body>
 
 <div class="header">
+    <img src="logocherry.png" alt="Cherrypet Logo" class="brand-logo">
     <h1>Cherrypet Member</h1>
     <p>Tích điểm ngay - Nhận quà liền tay</p>
 </div>
@@ -217,7 +231,6 @@
         document.getElementById('userName').innerText = data.name;
         document.getElementById('userPoints').innerText = points;
         
-        // Reset trạng thái roadmap
         document.querySelectorAll('.tier-item').forEach(el => {
             el.classList.remove('active');
             const label = el.querySelector('.current-label');
@@ -228,7 +241,6 @@
         let pointsToNext = 0;
         let nextRankName = "";
 
-        // Tính toán hạng và điểm cần thêm
         if (points >= 90) { 
             rank = "Kim Cương"; badgeClass = "rank-kimcuong"; activeId = "tier-kimcuong";
             nextRankName = "Tối đa";
@@ -248,7 +260,6 @@
             nextRankName = "Bạc";
         }
 
-        // Hiển thị tin nhắn thăng hạng
         const nextRankMessage = document.getElementById('nextRankMessage');
         if (nextRankName === "Tối đa") {
             nextRankMessage.innerHTML = `Bạn đã đạt cấp độ cao nhất! ✨`;
@@ -256,7 +267,6 @@
             nextRankMessage.innerHTML = `Còn <b>${pointsToNext} điểm</b> và <b>${daysLeft} ngày</b> để lên hạng <b>${nextRankName}</b>`;
         }
 
-        // Hiển thị vị trí hiện tại trên lộ trình
         if (activeId) {
             const activeTier = document.getElementById(activeId);
             activeTier.classList.add('active');
