@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Cứu Thành Viên - Cherrypet</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: rgba(255, 255, 255, 0.85);
+            --ios-accent: #007AFF;
+            --ios-danger: #FF3B30;
+            --ios-success: #34C759;
+            --ios-text: #1C1C1E;
+            --ios-subtext: #8E8E93;
+            --ios-glass-border: rgba(255, 255, 255, 0.5);
+            --pastel-pink: #FFD1DC;
+            --pastel-blue: #B2E2F2;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(160deg, var(--pastel-pink) 0%, var(--pastel-blue) 100%);
+            background-attachment: fixed;
+            margin: 0;
+            padding: 30px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--ios-text);
+            min-height: 100vh;
+        }
+
+        .header { width: 90%; max-width: 450px; text-align: center; margin-bottom: 25px; }
+        .header h1 { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+
+        .search-container {
+            width: 92%; max-width: 450px;
+            background: var(--ios-card);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--ios-glass-border);
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%; padding: 18px; border-radius: 18px; border: 1px solid rgba(0,0,0,0.05);
+            background: rgba(255,255,255,0.8); box-sizing: border-box;
+            font-size: 18px; font-weight: 600; outline: none; text-align: center; margin-bottom: 12px;
+        }
+
+        .btn-lookup {
+            width: 100%; padding: 16px; border-radius: 18px; border: none;
+            background: var(--ios-accent); color: white; font-size: 17px; font-weight: 700;
+            cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+
+        .result-card { width: 92%; max-width: 450px; display: none; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .main-info { background: white; border-radius: 28px; padding: 25px; text-align: center; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); }
+        
+        .rank-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 12px; font-weight: 800; font-size: 13px; margin-bottom: 15px; }
+        .rank-dong { background: #EBD9C6; color: #8A5A31; }
+        .rank-bac { background: #E5E5EA; color: #3A3A3C; }
+        .rank-vang { background: #FFF4CC; color: #B28B00; }
+        .rank-kimcuong { background: #D1F2FF; color: #007AFF; }
+
+        .points-display { font-size: 44px; font-weight: 900; margin: 5px 0; }
+        
+        /* Bảng quyền lợi lộ trình */
+        .roadmap-card { background: var(--ios-card); backdrop-filter: blur(20px); border-radius: 28px; padding: 20px; border: 1px solid var(--ios-glass-border); }
+        .roadmap-title { font-weight: 800; font-size: 17px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        
+        .tier-item {
+            background: rgba(255,255,255,0.5); border-radius: 20px; padding: 15px; margin-bottom: 12px;
+            border: 2px solid transparent; transition: all 0.3s; position: relative;
+        }
+        .tier-item.active { border-color: var(--ios-success); background: #fff; transform: scale(1.02); }
+        .tier-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .tier-name { font-weight: 800; font-size: 15px; }
+        .tier-points { font-size: 12px; color: var(--ios-subtext); font-weight: 600; }
+        
+        .tier-benefits { font-size: 13px; color: #444; padding-left: 20px; line-height: 1.6; }
+        .tier-benefits li { margin-bottom: 4px; }
+        
+        .current-label { 
+            position: absolute; top: -10px; right: 15px; background: var(--ios-success); 
+            color: white; font-size: 10px; padding: 2px 10px; border-radius: 10px; font-weight: 800;
+        }
+
+        .expiry-box { font-size: 13px; font-weight: 600; padding: 12px; border-radius: 15px; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Cherrypet Member</h1>
+    <p>Tích điểm ngay - Nhận quà liền tay</p>
+</div>
+
+<div class="search-container">
+    <input type="tel" id="phone" placeholder="Nhập số điện thoại..." maxlength="10">
+    <button class="btn-lookup" id="btnSearch"><i data-lucide="search" size="20"></i> Tra cứu ưu đãi</button>
+</div>
+
+<div id="result" class="result-card">
+    <div class="main-info">
+        <div id="badge" class="rank-badge"></div>
+        <div id="userName" style="font-size: 18px; font-weight: 700;"></div>
+        <div class="points-display" id="userPoints">0</div>
+        <div style="color: var(--ios-subtext); font-size: 13px; font-weight: 600; margin-bottom: 15px;">ĐIỂM HIỆN CÓ</div>
+        
+        <div id="expiryBox" class="expiry-box"></div>
+    </div>
+
+    <div class="roadmap-card">
+        <div class="roadmap-title"><i data-lucide="map" size="20"></i> Lộ trình ưu đãi của bạn</div>
+        
+        <div class="tier-item" id="tier-bac">
+            <div class="tier-header">
+                <span class="tier-name" style="color:#3A3A3C">🥈 Hạng Bạc</span>
+                <span class="tier-points">5 - 49 điểm</span>
+            </div>
+            <ul class="tier-benefits">
+                <li>Giảm ngay <b>10.000đ</b> trực tiếp trên mỗi vé vào cổng.</li>
+            </ul>
+        </div>
+
+        <div class="tier-item" id="tier-vang">
+            <div class="tier-header">
+                <span class="tier-name" style="color:#B28B00">🥇 Hạng Vàng</span>
+                <span class="tier-points">50 - 89 điểm</span>
+            </div>
+            <ul class="tier-benefits">
+                <li>Ưu đãi giảm <b>10.000đ/vé</b> vào cổng.</li>
+                <li>Giảm thêm <b>10% tổng hóa đơn</b> (áp dụng cho giá đã giảm vé).</li>
+            </ul>
+        </div>
+
+        <div class="tier-item" id="tier-kimcuong">
+            <div class="tier-header">
+                <span class="tier-name" style="color:#007AFF">💎 Hạng Kim Cương</span>
+                <span class="tier-points">Từ 90 điểm</span>
+            </div>
+            <ul class="tier-benefits">
+                <li>Ưu đãi giảm <b>10.000đ/vé</b> vào cổng.</li>
+                <li>Giảm tối đa <b>20% tổng hóa đơn</b> (áp dụng cho giá đã giảm vé).</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    lucide.createIcons();
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDKNfJWJ4AM7vetqSMm5qyOV-79EAjl6mc",
+        authDomain: "muveonline-919a8.firebaseapp.com",
+        databaseURL: "https://muveonline-919a8-default-rtdb.firebaseio.com",
+        projectId: "muveonline-919a8",
+        storageBucket: "muveonline-919a8.firebasestorage.app",
+        messagingSenderId: "399933853156",
+        appId: "1:399933853156:web:982c1da02117606a994bf1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const btnSearch = document.getElementById('btnSearch');
+    const phoneInput = document.getElementById('phone');
+    const resultDiv = document.getElementById('result');
+
+    function getDaysRemaining(lastUpdateStr) {
+        if (!lastUpdateStr) return 0;
+        const diffDays = Math.floor((new Date() - new Date(lastUpdateStr)) / (1000 * 60 * 60 * 24));
+        return Math.max(0, 180 - diffDays);
+    }
+
+    btnSearch.addEventListener('click', async () => {
+        const phone = phoneInput.value.trim();
+        if (phone.length < 10) return alert("Vui lòng nhập SĐT!");
+
+        const snapshot = await get(ref(db, 'members/' + phone));
+        if (snapshot.exists()) {
+            renderUI(snapshot.val());
+        } else {
+            alert("SĐT chưa có trên hệ thống!");
+        }
+    });
+
+    function renderUI(data) {
+        const daysLeft = getDaysRemaining(data.lastUpdate);
+        const points = daysLeft <= 0 ? 0 : data.points;
+        
+        document.getElementById('userName').innerText = data.name;
+        document.getElementById('userPoints').innerText = points;
+        
+        // Reset trạng thái roadmap
+        document.querySelectorAll('.tier-item').forEach(el => {
+            el.classList.remove('active');
+            const label = el.querySelector('.current-label');
+            if (label) label.remove();
+        });
+
+        let rank = "Đồng"; let badgeClass = "rank-dong"; let activeId = "";
+
+        if (points >= 90) { rank = "Kim Cương"; badgeClass = "rank-kimcuong"; activeId = "tier-kimcuong"; }
+        else if (points >= 50) { rank = "Vàng"; badgeClass = "rank-vang"; activeId = "tier-vang"; }
+        else if (points >= 5) { rank = "Bạc"; badgeClass = "rank-bac"; activeId = "tier-bac"; }
+
+        // Hiển thị vị trí hiện tại trên lộ trình
+        if (activeId) {
+            const activeTier = document.getElementById(activeId);
+            activeTier.classList.add('active');
+            activeTier.insertAdjacentHTML('afterbegin', '<span class="current-label">HẠNG CỦA BẠN</span>');
+        }
+
+        const badge = document.getElementById('badge');
+        badge.innerHTML = `<i data-lucide="award" size="14"></i> Hạng ${rank}`;
+        badge.className = "rank-badge " + badgeClass;
+
+        const expiryBox = document.getElementById('expiryBox');
+        expiryBox.innerHTML = `<i data-lucide="clock" size="16"></i> Còn ${daysLeft} ngày để tích điểm`;
+        expiryBox.style.background = daysLeft < 30 ? "rgba(255, 59, 48, 0.1)" : "rgba(52, 199, 89, 0.1)";
+        expiryBox.style.color = daysLeft < 30 ? "var(--ios-danger)" : "var(--ios-success)";
+
+        resultDiv.style.display = 'block';
+        lucide.createIcons();
+        window.scrollTo({ top: resultDiv.offsetTop - 20, behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>
