@@ -71,9 +71,20 @@
         .rank-vang { background: #FFF4CC; color: #B28B00; }
         .rank-kimcuong { background: #D1F2FF; color: #007AFF; }
 
-        .points-display { font-size: 44px; font-weight: 900; margin: 5px 0; }
+        .points-display { font-size: 44px; font-weight: 900; margin: 5px 0; line-height: 1; }
         
-        /* Bảng quyền lợi lộ trình */
+        /* CSS Mới cho thông tin thăng hạng */
+        .next-rank-info {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ios-accent);
+            background: rgba(0, 122, 255, 0.08);
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin: 10px 0 15px 0;
+            display: inline-block;
+        }
+
         .roadmap-card { background: var(--ios-card); backdrop-filter: blur(20px); border-radius: 28px; padding: 20px; border: 1px solid var(--ios-glass-border); }
         .roadmap-title { font-weight: 800; font-size: 17px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
         
@@ -114,7 +125,9 @@
         <div id="badge" class="rank-badge"></div>
         <div id="userName" style="font-size: 18px; font-weight: 700;"></div>
         <div class="points-display" id="userPoints">0</div>
-        <div style="color: var(--ios-subtext); font-size: 13px; font-weight: 600; margin-bottom: 15px;">ĐIỂM HIỆN CÓ</div>
+        <div style="color: var(--ios-subtext); font-size: 13px; font-weight: 600;">ĐIỂM HIỆN CÓ</div>
+        
+        <div id="nextRankMessage" class="next-rank-info"></div>
         
         <div id="expiryBox" class="expiry-box"></div>
     </div>
@@ -212,10 +225,36 @@
         });
 
         let rank = "Đồng"; let badgeClass = "rank-dong"; let activeId = "";
+        let pointsToNext = 0;
+        let nextRankName = "";
 
-        if (points >= 90) { rank = "Kim Cương"; badgeClass = "rank-kimcuong"; activeId = "tier-kimcuong"; }
-        else if (points >= 50) { rank = "Vàng"; badgeClass = "rank-vang"; activeId = "tier-vang"; }
-        else if (points >= 5) { rank = "Bạc"; badgeClass = "rank-bac"; activeId = "tier-bac"; }
+        // Tính toán hạng và điểm cần thêm
+        if (points >= 90) { 
+            rank = "Kim Cương"; badgeClass = "rank-kimcuong"; activeId = "tier-kimcuong";
+            nextRankName = "Tối đa";
+        } 
+        else if (points >= 50) { 
+            rank = "Vàng"; badgeClass = "rank-vang"; activeId = "tier-vang";
+            pointsToNext = 90 - points;
+            nextRankName = "Kim Cương";
+        } 
+        else if (points >= 5) { 
+            rank = "Bạc"; badgeClass = "rank-bac"; activeId = "tier-bac";
+            pointsToNext = 50 - points;
+            nextRankName = "Vàng";
+        } 
+        else {
+            pointsToNext = 5 - points;
+            nextRankName = "Bạc";
+        }
+
+        // Hiển thị tin nhắn thăng hạng
+        const nextRankMessage = document.getElementById('nextRankMessage');
+        if (nextRankName === "Tối đa") {
+            nextRankMessage.innerHTML = `Bạn đã đạt cấp độ cao nhất! ✨`;
+        } else {
+            nextRankMessage.innerHTML = `Còn <b>${pointsToNext} điểm</b> và <b>${daysLeft} ngày</b> để lên hạng <b>${nextRankName}</b>`;
+        }
 
         // Hiển thị vị trí hiện tại trên lộ trình
         if (activeId) {
@@ -229,7 +268,7 @@
         badge.className = "rank-badge " + badgeClass;
 
         const expiryBox = document.getElementById('expiryBox');
-        expiryBox.innerHTML = `<i data-lucide="clock" size="16"></i> Còn ${daysLeft} ngày để tích điểm`;
+        expiryBox.innerHTML = `<i data-lucide="clock" size="16"></i> Hạn dùng điểm: ${daysLeft} ngày`;
         expiryBox.style.background = daysLeft < 30 ? "rgba(255, 59, 48, 0.1)" : "rgba(52, 199, 89, 0.1)";
         expiryBox.style.color = daysLeft < 30 ? "var(--ios-danger)" : "var(--ios-success)";
 
