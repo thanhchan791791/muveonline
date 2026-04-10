@@ -28,7 +28,7 @@
             background-color: var(--ios-bg); 
             color: #1C1C1E;
             margin: 0;
-            padding: 20px 15px 100px 15px; /* Thêm padding bottom để không bị che bởi nút */
+            padding: 20px 15px 100px 15px;
             line-height: 1.5;
         }
 
@@ -42,18 +42,15 @@
             background: rgba(0,0,0,0.4);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            display: none; /* Ẩn mặc định */
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             padding: 20px;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
-        /* --- Layout Container (Form) --- */
         .container { 
             width: 100%;
             max-width: 500px; 
@@ -111,7 +108,6 @@
         .fab-penalty { background-color: var(--ios-red); }
         .fab:active { transform: scale(0.9); }
 
-        /* --- Typography --- */
         h2, h3 { 
             font-weight: 700;
             letter-spacing: -0.5px;
@@ -122,7 +118,6 @@
         h2 { font-size: 22px; text-align: center; }
         h3 { font-size: 20px; text-align: left; }
 
-        /* --- Form Elements --- */
         .form-group { margin-bottom: 20px; }
         label { 
             display: block; 
@@ -151,7 +146,6 @@
             box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
         }
 
-        /* --- Buttons Style --- */
         .btn-group { display: flex; gap: 12px; margin-top: 25px; }
         
         .btn-submit { 
@@ -169,7 +163,6 @@
         .btn-bonus { background-color: var(--ios-green); }
         .btn-penalty { background-color: var(--ios-red); }
         
-        /* --- Message/Toast --- */
         #message { 
             margin-top: 15px; 
             padding: 12px; 
@@ -181,7 +174,6 @@
         .success { background: #E2F9E9; color: var(--ios-green); }
         .error { background: #FFE5E5; color: var(--ios-red); }
 
-        /* --- Data Table iOS Style --- */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { 
             text-transform: uppercase;
@@ -213,8 +205,6 @@
         .btn-delete { background: #FFE5E5; color: var(--ios-red); }
 
         @media (max-width: 480px) {
-            .container { padding: 20px; border-radius: 24px; }
-            .fab-container { right: 20px; bottom: 20px; }
             .btn-group { flex-direction: column; }
         }
     </style>
@@ -229,31 +219,25 @@
 <div class="modal-overlay" id="modal-overlay" onclick="closeModalOnOuterClick(event)">
     <div class="container" id="form-container">
         <h2 id="form-title">Thêm Thưởng / Phạt</h2>
-        
         <div class="form-group">
             <label>CHỌN NHÂN VIÊN</label>
             <select id="employee-select">
                 <option value="">-- Đang tải danh sách... --</option>
             </select>
         </div>
-
         <div class="form-group">
             <label>SỐ TIỀN (VNĐ)</label>
             <input type="number" id="amount" placeholder="Ví dụ: 500000">
         </div>
-
         <div class="form-group">
             <label>GHI CHÚ / LÝ DO</label>
             <textarea id="note" rows="3" placeholder="Nhập lý do chi tiết..."></textarea>
         </div>
-
         <div id="message"></div>
-
         <div class="btn-group" id="normal-btns">
             <button class="btn-submit" id="btn-save-main" onclick="">LƯU DỮ LIỆU</button>
             <button style="background-color: #8E8E93; flex: 0.5;" class="btn-submit" onclick="closeModal()">HỦY</button>
         </div>
-        
         <div class="btn-group" id="edit-btns" style="display: none;">
             <button class="btn-submit btn-bonus" id="confirm-edit-btn">CẬP NHẬT</button>
             <button style="background-color: #8E8E93;" class="btn-submit" onclick="cancelEdit()">HỦY</button>
@@ -270,7 +254,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, get, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAV7r-rjXo6U62LX1AA7c7DAHb8GhOOOsg",
@@ -288,16 +272,15 @@
 
     const BONUS_PATH = `bonus_records/Bonus_1766803246316/records`;
     const PENALTY_PATH = `penalty_records/Penalty_1766806609663/records`;
+    const EMPLOYEE_PATH = 'employee_list/List_1772476013048';
 
-    // UI Logic: Open/Close Modal
+    // UI Logic
     window.openModal = function(type) {
         const overlay = document.getElementById('modal-overlay');
         const title = document.getElementById('form-title');
         const saveBtn = document.getElementById('btn-save-main');
-        
         resetForm();
         overlay.classList.add('active');
-        
         if(type === 'BONUS') {
             title.innerText = "Thêm Thưởng Mới";
             saveBtn.innerText = "LƯU THƯỞNG";
@@ -319,12 +302,29 @@
         if(e.target.id === 'modal-overlay') closeModal();
     }
 
-    // Data Loading
-    async function loadEmployees() {
-        const select = document.getElementById('employee-select');
-        const path = 'employee_list/List_1766810871909'; 
-        try {
-            const snapshot = await get(ref(db, path));
+    // --- Tự động thêm Kim Anh vào Firebase khi tải trang nếu chưa có ---
+    async function checkAndAddKimAnh() {
+        const snap = await get(ref(db, EMPLOYEE_PATH));
+        if (snap.exists()) {
+            let data = snap.val();
+            let records = data.records || [];
+            const exists = records.some(emp => emp && emp.id === "56");
+            
+            if (!exists) {
+                records.push({ id: "56", name: "Kim Anh" });
+                await update(ref(db, EMPLOYEE_PATH), {
+                    records: records,
+                    addedCount: (data.addedCount || 0) + 1
+                });
+                console.log("Đã tự động thêm Kim Anh ID 56");
+            }
+        }
+    }
+
+    // --- Cập nhật danh sách nhân viên thời gian thực ---
+    function listenToEmployees() {
+        onValue(ref(db, EMPLOYEE_PATH), (snapshot) => {
+            const select = document.getElementById('employee-select');
             if (snapshot.exists()) {
                 const records = snapshot.val().records || [];
                 let options = '<option value="">-- Chọn nhân viên --</option>';
@@ -332,8 +332,10 @@
                     if(emp) options += `<option value="${emp.id}" data-name="${emp.name}">${emp.id} - ${emp.name}</option>`;
                 });
                 select.innerHTML = options;
+            } else {
+                select.innerHTML = '<option value="">Không có dữ liệu nhân viên</option>';
             }
-        } catch (e) { console.error("Lỗi tải nhân viên:", e); }
+        });
     }
 
     function listenToData() {
@@ -421,7 +423,6 @@
         document.getElementById('form-title').innerText = "Sửa " + (type === 'BONUS' ? "Thưởng" : "Phạt");
         document.getElementById('normal-btns').style.display = 'none';
         document.getElementById('edit-btns').style.display = 'flex';
-
         document.getElementById('modal-overlay').classList.add('active');
 
         document.getElementById('confirm-edit-btn').onclick = async () => {
@@ -429,7 +430,6 @@
             const newNote = document.getElementById('note').value;
             const snapUpdate = await get(ref(db, path));
             let records = snapUpdate.val();
-            
             if (type === 'BONUS') {
                 records[index].bonusAmount = newAmount;
                 records[index].bonusNote = newNote;
@@ -437,7 +437,6 @@
                 records[index].totalPenalty = newAmount;
                 records[index].details = [newNote];
             }
-            
             await set(ref(db, path), records);
             showMessage("Đã cập nhật!", "success");
             setTimeout(cancelEdit, 1000);
@@ -464,9 +463,9 @@
         msgDiv.innerText = text; msgDiv.className = type; msgDiv.style.display = 'block';
     }
 
-    loadEmployees();
+    checkAndAddKimAnh();
+    listenToEmployees();
     listenToData();
 </script>
-
 </body>
 </html>
