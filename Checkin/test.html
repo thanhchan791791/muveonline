@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Check-in Tích Điểm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --success-color: #34C759;
+            --danger-color: #FF3B30;
+            --bg-color: #F2F2F7;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #1C1C1E;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        h2 { margin-bottom: 10px; font-weight: 600; }
+        p { font-size: 14px; color: #8E8E93; margin-bottom: 25px; }
+
+        #btn-checkin {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        #btn-checkin:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .success { background-color: #d1f7d6; color: var(--success-color); display: block !important; }
+        .error { background-color: #ffdada; color: var(--danger-color); display: block !important; }
+        
+        .loading { opacity: 0.6; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Check-in</h2>
+    <p>Vui lòng nhấn nút bên dưới để xác nhận bạn đang ở quán.</p>
+    
+    <button id="btn-checkin" onclick="handleCheckIn()">Check-in Ngay</button>
+    
+    <div id="status"></div>
+</div>
+
+<script>
+    // TỌA ĐỘ CỦA QUÁN
+    const SHOP_LAT = 10.777109;
+    const SHOP_LON = 106.677511;
+    const MAX_DISTANCE = 50; // Bán kính cho phép (mét)
+
+    const statusDiv = document.getElementById('status');
+    const btn = document.getElementById('btn-checkin');
+
+    function handleCheckIn() {
+        if (!navigator.geolocation) {
+            showStatus("Trình duyệt của bạn không hỗ trợ định vị.", "error");
+            return;
+        }
+
+        btn.innerText = "Đang kiểm tra...";
+        btn.classList.add('loading');
+        statusDiv.style.display = 'none';
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+
+                const distance = calculateDistance(userLat, userLon, SHOP_LAT, SHOP_LON);
+
+                console.log(`Khoảng cách: ${distance.toFixed(2)}m (Sai số GPS: ${accuracy.toFixed(1)}m)`);
+
+                if (distance <= MAX_DISTANCE) {
+                    showStatus(`Thành công! Bạn đang ở trong quán (${distance.toFixed(1)}m).`, "success");
+                } else {
+                    showStatus(`Thất bại! Bạn đang ở ngoài khu vực quán (${distance.toFixed(1)}m).`, "error");
+                }
+                
+                btn.innerText = "Check-in Ngay";
+                btn.classList.remove('loading');
+            },
+            (error) => {
+                let msg = "Không thể lấy vị trí.";
+                if(error.code == 1) msg = "Vui lòng cho phép truy cập vị trí để check-in.";
+                showStatus(msg, "error");
+                btn.innerText = "Check-in Ngay";
+                btn.classList.remove('loading');
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    }
+
+    // Hàm tính khoảng cách Haversine (trả về mét)
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // Bán kính Trái đất tính bằng mét
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    function showStatus(message, type) {
+        statusDiv.innerText = message;
+        statusDiv.className = type;
+    }
+</script>
+
+</body>
+</html>
