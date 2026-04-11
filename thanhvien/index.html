@@ -35,31 +35,20 @@
 
         .header { width: 90%; max-width: 450px; text-align: center; margin-bottom: 25px; }
         
-        /* CSS cho Logo chính */
         .brand-logo {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            border-radius: 20px;
-            margin-bottom: 12px;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-            background: white;
-            padding: 5px;
+            width: 80px; height: 80px; object-fit: contain; border-radius: 20px;
+            margin-bottom: 12px; box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            background: white; padding: 5px;
         }
 
         .header h1 { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
 
         .search-container {
-            width: 92%; max-width: 450px;
-            background: var(--ios-card);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--ios-glass-border);
-            border-radius: 28px;
-            padding: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            box-sizing: border-box;
-            margin-bottom: 20px;
+            width: 92%; max-width: 450px; background: var(--ios-card);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--ios-glass-border); border-radius: 28px;
+            padding: 20px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box; margin-bottom: 20px;
         }
 
         input {
@@ -72,6 +61,27 @@
             width: 100%; padding: 16px; border-radius: 18px; border: none;
             background: var(--ios-accent); color: white; font-size: 17px; font-weight: 700;
             cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+
+        #notFoundArea {
+            display: none; text-align: center; padding: 15px;
+            background: rgba(255, 59, 48, 0.05); border-radius: 20px; margin-top: 15px;
+            border: 1px dashed var(--ios-danger);
+        }
+
+        .btn-open-reg {
+            background: var(--ios-success); color: white; border: none; padding: 10px 20px;
+            border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px;
+        }
+
+        #registrationForm {
+            display: none; margin-top: 15px; padding: 20px;
+            background: white; border-radius: 22px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .btn-submit-reg {
+            width: 100%; padding: 15px; border-radius: 15px; border: none;
+            background: var(--ios-success); color: white; font-weight: 700; cursor: pointer;
         }
 
         .result-card { width: 92%; max-width: 450px; display: none; animation: slideUp 0.4s ease-out; }
@@ -88,14 +98,9 @@
         .points-display { font-size: 44px; font-weight: 900; margin: 5px 0; line-height: 1; }
         
         .next-rank-info {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--ios-accent);
-            background: rgba(0, 122, 255, 0.08);
-            padding: 8px 12px;
-            border-radius: 12px;
-            margin: 10px 0 15px 0;
-            display: inline-block;
+            font-size: 13px; font-weight: 600; color: var(--ios-accent);
+            background: rgba(0, 122, 255, 0.08); padding: 8px 12px;
+            border-radius: 12px; margin: 10px 0 15px 0; display: inline-block;
         }
 
         .roadmap-card { background: var(--ios-card); backdrop-filter: blur(20px); border-radius: 28px; padding: 20px; border: 1px solid var(--ios-glass-border); }
@@ -109,9 +114,7 @@
         .tier-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .tier-name { font-weight: 800; font-size: 15px; }
         .tier-points { font-size: 12px; color: var(--ios-subtext); font-weight: 600; }
-        
         .tier-benefits { font-size: 13px; color: #444; padding-left: 20px; line-height: 1.6; }
-        .tier-benefits li { margin-bottom: 4px; }
         
         .current-label { 
             position: absolute; top: -10px; right: 15px; background: var(--ios-success); 
@@ -132,6 +135,23 @@
 <div class="search-container">
     <input type="tel" id="phone" placeholder="Nhập số điện thoại..." maxlength="10">
     <button class="btn-lookup" id="btnSearch"><i data-lucide="search" size="20"></i> Tra cứu ưu đãi</button>
+
+    <div id="notFoundArea">
+        <p style="color: var(--ios-danger); font-weight: 700; margin: 0;">Số điện thoại chưa đăng ký!</p>
+        <button class="btn-open-reg" id="btnOpenReg">Đăng ký thành viên mới</button>
+    </div>
+
+    <div id="registrationForm">
+        <p style="font-weight: 800; margin-bottom: 10px; font-size: 14px;">ĐĂNG KÝ MỚI (+1 ĐIỂM)</p>
+        <label style="font-size: 12px; color: var(--ios-subtext); display: block; margin-bottom: 5px;">Số điện thoại:</label>
+        <input type="tel" id="regPhone" disabled style="background: #f0f0f0; font-size: 16px; padding: 12px;">
+        
+        <label style="font-size: 12px; color: var(--ios-subtext); display: block; margin-bottom: 5px;">Họ và tên khách hàng:</label>
+        <input type="text" id="regName" placeholder="Ví dụ: Nguyễn Văn A" style="font-size: 16px; padding: 12px; border: 1px solid var(--ios-accent);">
+        
+        <button class="btn-submit-reg" id="btnSubmitReg">Xác nhận đăng ký</button>
+        <p id="locationStatus" style="font-size: 11px; color: var(--ios-subtext); margin-top: 8px; text-align: center;"></p>
+    </div>
 </div>
 
 <div id="result" class="result-card">
@@ -140,52 +160,30 @@
         <div id="userName" style="font-size: 18px; font-weight: 700;"></div>
         <div class="points-display" id="userPoints">0</div>
         <div style="color: var(--ios-subtext); font-size: 13px; font-weight: 600;">ĐIỂM HIỆN CÓ</div>
-        
         <div id="nextRankMessage" class="next-rank-info"></div>
-        
         <div id="expiryBox" class="expiry-box"></div>
     </div>
 
     <div class="roadmap-card">
         <div class="roadmap-title"><i data-lucide="map" size="20"></i> Lộ trình ưu đãi của bạn</div>
-        
         <div class="tier-item" id="tier-bac">
-            <div class="tier-header">
-                <span class="tier-name" style="color:#3A3A3C">🥈 Hạng Bạc</span>
-                <span class="tier-points">5 - 49 điểm</span>
-            </div>
-            <ul class="tier-benefits">
-                <li>Giảm ngay <b>10.000đ</b> trực tiếp trên mỗi vé vào cổng.</li>
-            </ul>
+            <div class="tier-header"><span class="tier-name" style="color:#3A3A3C">🥈 Hạng Bạc</span><span class="tier-points">5 - 49 điểm</span></div>
+            <ul class="tier-benefits"><li>Giảm ngay <b>10.000đ</b> trực tiếp trên mỗi vé.</li></ul>
         </div>
-
         <div class="tier-item" id="tier-vang">
-            <div class="tier-header">
-                <span class="tier-name" style="color:#B28B00">🥇 Hạng Vàng</span>
-                <span class="tier-points">50 - 89 điểm</span>
-            </div>
-            <ul class="tier-benefits">
-                <li>Ưu đãi giảm <b>10.000đ/vé</b> vào cổng.</li>
-                <li>Giảm thêm <b>10% tổng hóa đơn</b> (áp dụng cho giá đã giảm vé).</li>
-            </ul>
+            <div class="tier-header"><span class="tier-name" style="color:#B28B00">🥇 Hạng Vàng</span><span class="tier-points">50 - 89 điểm</span></div>
+            <ul class="tier-benefits"><li>Ưu đãi giảm <b>10.000đ/vé</b> và <b>10% tổng hóa đơn</b>.</li></ul>
         </div>
-
         <div class="tier-item" id="tier-kimcuong">
-            <div class="tier-header">
-                <span class="tier-name" style="color:#007AFF">💎 Hạng Kim Cương</span>
-                <span class="tier-points">Từ 90 điểm</span>
-            </div>
-            <ul class="tier-benefits">
-                <li>Ưu đãi giảm <b>10.000đ/vé</b> vào cổng.</li>
-                <li>Giảm tối đa <b>20% tổng hóa đơn</b> (áp dụng cho giá đã giảm vé).</li>
-            </ul>
+            <div class="tier-header"><span class="tier-name" style="color:#007AFF">💎 Hạng Kim Cương</span><span class="tier-points">Từ 90 điểm</span></div>
+            <ul class="tier-benefits"><li>Ưu đãi giảm <b>10.000đ/vé</b> và <b>20% tổng hóa đơn</b>.</li></ul>
         </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     lucide.createIcons();
 
@@ -202,9 +200,97 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    // Tọa độ chi nhánh
+    const LOCATIONS = [
+        { lat: 10.761032, lng: 106.668847, name: "Chi nhánh 1" },
+        { lat: 10.777109, lng: 106.677511, name: "Chi nhánh 2" }
+    ];
+    const MAX_DISTANCE = 0.1; // Bán kính cho phép đăng ký (0.1km = 100 mét)
+
     const btnSearch = document.getElementById('btnSearch');
     const phoneInput = document.getElementById('phone');
     const resultDiv = document.getElementById('result');
+    const notFoundArea = document.getElementById('notFoundArea');
+    const registrationForm = document.getElementById('registrationForm');
+    const regPhoneInput = document.getElementById('regPhone');
+    const regNameInput = document.getElementById('regName');
+    const locationStatus = document.getElementById('locationStatus');
+
+    // Hàm tính khoảng cách (km)
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; 
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    btnSearch.addEventListener('click', async () => {
+        const phone = phoneInput.value.trim();
+        if (phone.length < 10) return alert("Vui lòng nhập đủ 10 số!");
+        resultDiv.style.display = 'none';
+        notFoundArea.style.display = 'none';
+        registrationForm.style.display = 'none';
+
+        const snapshot = await get(ref(db, 'members/' + phone));
+        if (snapshot.exists()) {
+            renderUI(snapshot.val());
+        } else {
+            notFoundArea.style.display = 'block';
+        }
+    });
+
+    document.getElementById('btnOpenReg').addEventListener('click', () => {
+        notFoundArea.style.display = 'none';
+        regPhoneInput.value = phoneInput.value;
+        registrationForm.style.display = 'block';
+        locationStatus.innerText = "Hệ thống sẽ xác thực vị trí của bạn khi nhấn Đăng ký.";
+    });
+
+    document.getElementById('btnSubmitReg').addEventListener('click', async () => {
+        const name = regNameInput.value.trim();
+        if (!name) return alert("Vui lòng nhập họ tên!");
+
+        locationStatus.innerText = "Đang xác thực vị trí...";
+
+        if (!navigator.geolocation) {
+            return alert("Trình duyệt của bạn không hỗ trợ định vị.");
+        }
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+
+            // Kiểm tra xem có gần chi nhánh nào không
+            const isNear = LOCATIONS.some(loc => {
+                const dist = calculateDistance(userLat, userLng, loc.lat, loc.lng);
+                return dist <= MAX_DISTANCE;
+            });
+
+            if (isNear) {
+                const phone = regPhoneInput.value;
+                const today = new Date().toISOString();
+                const newUser = {
+                    name: name,
+                    points: 1,
+                    lastUpdate: today
+                };
+
+                await set(ref(db, 'members/' + phone), newUser);
+                alert("Đăng ký thành công! Chào mừng " + name + ".");
+                registrationForm.style.display = 'none';
+                renderUI(newUser);
+            } else {
+                locationStatus.innerText = "Xác thực thất bại.";
+                alert("Vui lòng tới quán để đăng ký thành viên!");
+            }
+        }, (error) => {
+            locationStatus.innerText = "Không thể lấy vị trí.";
+            alert("Bạn cần cho phép quyền truy cập vị trí để đăng ký!");
+        }, { enableHighAccuracy: true });
+    });
 
     function getDaysRemaining(lastUpdateStr) {
         if (!lastUpdateStr) return 0;
@@ -212,60 +298,22 @@
         return Math.max(0, 180 - diffDays);
     }
 
-    btnSearch.addEventListener('click', async () => {
-        const phone = phoneInput.value.trim();
-        if (phone.length < 10) return alert("Vui lòng nhập SĐT!");
-
-        const snapshot = await get(ref(db, 'members/' + phone));
-        if (snapshot.exists()) {
-            renderUI(snapshot.val());
-        } else {
-            alert("SĐT chưa có trên hệ thống!");
-        }
-    });
-
     function renderUI(data) {
         const daysLeft = getDaysRemaining(data.lastUpdate);
-        const points = daysLeft <= 0 ? 0 : data.points;
-        
+        const points = (data.lastUpdate && daysLeft <= 0) ? 0 : data.points;
         document.getElementById('userName').innerText = data.name;
         document.getElementById('userPoints').innerText = points;
-        
-        document.querySelectorAll('.tier-item').forEach(el => {
-            el.classList.remove('active');
-            const label = el.querySelector('.current-label');
-            if (label) label.remove();
-        });
+        document.querySelectorAll('.tier-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.current-label').forEach(el => el.remove());
 
-        let rank = "Đồng"; let badgeClass = "rank-dong"; let activeId = "";
-        let pointsToNext = 0;
-        let nextRankName = "";
-
-        if (points >= 90) { 
-            rank = "Kim Cương"; badgeClass = "rank-kimcuong"; activeId = "tier-kimcuong";
-            nextRankName = "Tối đa";
-        } 
-        else if (points >= 50) { 
-            rank = "Vàng"; badgeClass = "rank-vang"; activeId = "tier-vang";
-            pointsToNext = 90 - points;
-            nextRankName = "Kim Cương";
-        } 
-        else if (points >= 5) { 
-            rank = "Bạc"; badgeClass = "rank-bac"; activeId = "tier-bac";
-            pointsToNext = 50 - points;
-            nextRankName = "Vàng";
-        } 
-        else {
-            pointsToNext = 5 - points;
-            nextRankName = "Bạc";
-        }
+        let rank = "Đồng", badgeClass = "rank-dong", activeId = "", pointsToNext = 0, nextRankName = "";
+        if (points >= 90) { rank = "Kim Cương"; badgeClass = "rank-kimcuong"; activeId = "tier-kimcuong"; nextRankName = "Tối đa"; } 
+        else if (points >= 50) { rank = "Vàng"; badgeClass = "rank-vang"; activeId = "tier-vang"; pointsToNext = 90 - points; nextRankName = "Kim Cương"; } 
+        else if (points >= 5) { rank = "Bạc"; badgeClass = "rank-bac"; activeId = "tier-bac"; pointsToNext = 50 - points; nextRankName = "Vàng"; } 
+        else { pointsToNext = 5 - points; nextRankName = "Bạc"; }
 
         const nextRankMessage = document.getElementById('nextRankMessage');
-        if (nextRankName === "Tối đa") {
-            nextRankMessage.innerHTML = `Bạn đã đạt cấp độ cao nhất! ✨`;
-        } else {
-            nextRankMessage.innerHTML = `Còn <b>${pointsToNext} điểm</b> và <b>${daysLeft} ngày</b> để lên hạng <b>${nextRankName}</b>`;
-        }
+        nextRankMessage.innerHTML = (nextRankName === "Tối đa") ? "Bạn đã đạt cấp độ cao nhất! ✨" : `Còn <b>${pointsToNext} điểm</b> để lên hạng <b>${nextRankName}</b>`;
 
         if (activeId) {
             const activeTier = document.getElementById(activeId);
@@ -278,9 +326,10 @@
         badge.className = "rank-badge " + badgeClass;
 
         const expiryBox = document.getElementById('expiryBox');
-        expiryBox.innerHTML = `<i data-lucide="clock" size="16"></i> Hạn dùng điểm: ${daysLeft} ngày`;
-        expiryBox.style.background = daysLeft < 30 ? "rgba(255, 59, 48, 0.1)" : "rgba(52, 199, 89, 0.1)";
-        expiryBox.style.color = daysLeft < 30 ? "var(--ios-danger)" : "var(--ios-success)";
+        const displayDays = daysLeft || 180;
+        expiryBox.innerHTML = `<i data-lucide="clock" size="16"></i> Hạn dùng điểm: ${displayDays} ngày`;
+        expiryBox.style.background = (displayDays < 30) ? "rgba(255, 59, 48, 0.1)" : "rgba(52, 199, 89, 0.1)";
+        expiryBox.style.color = (displayDays < 30) ? "var(--ios-danger)" : "var(--ios-success)";
 
         resultDiv.style.display = 'block';
         lucide.createIcons();
