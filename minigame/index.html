@@ -146,6 +146,7 @@
 
         .btn-primary { background: var(--primary-cherry); color: white; box-shadow: 0 6px 20px rgba(255, 183, 197, 0.4); }
         .btn-understand { background: var(--ios-blue); color: white; margin-top: 15px; }
+        .btn-register { background: var(--success); color: white; margin-top: 10px; display: none; }
 
         #luckySection { display: none; animation: fadeInUp 0.6s ease-out; }
         
@@ -200,6 +201,8 @@
             transition: all 0.3s;
         }
         .shake-anim { animation: shake 0.4s ease-in-out; }
+
+        #nameGroup { display: none; animation: fadeInUp 0.4s ease-out; }
     </style>
 </head>
 <body>
@@ -214,8 +217,8 @@
             <div class="rules-title"><i data-lucide="info"></i> THỂ LỆ CHƯƠNG TRÌNH</div>
             <ul class="rules-list">
                 <li>Thời gian: <b>06/04</b> đến hết <b>19/04</b>.</li>
-                <li>Mỗi vé mua tương ứng <b>1 lượt chọn số</b>.</li>
-                <li>Quay thưởng Random dựa trên các con số khách đã lựa chọn.</li>
+                <li>Vui lòng <b>bật vị trí</b> tại cửa hàng để tham gia.</li>
+                <li>Khách mới đăng ký được tặng <b>1 lượt</b>.</li>
             </ul>
         </div>
         <button class="btn-understand" id="btnUnderstand">Tôi đã hiểu <i data-lucide="check-circle-2"></i></button>
@@ -226,7 +229,14 @@
             <i data-lucide="phone" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #8E8E93; width: 20px;"></i>
             <input type="tel" id="phoneInput" placeholder="Nhập SĐT để tiếp tục">
         </div>
+
+        <div class="input-group" id="nameGroup">
+            <i data-lucide="user" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #8E8E93; width: 20px;"></i>
+            <input type="text" id="nameInput" placeholder="Nhập Họ và Tên của bạn">
+        </div>
+
         <button id="btnLogin" class="btn-primary">Xác nhận <i data-lucide="arrow-right"></i></button>
+        <button id="btnRegister" class="btn-register">Đăng ký ngay <i data-lucide="user-plus"></i></button>
     </div>
 
     <div id="luckySection">
@@ -250,22 +260,9 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, get, update, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     lucide.createIcons();
-
-    document.getElementById('btnUnderstand').addEventListener('click', () => {
-        const wrapper = document.getElementById('rulesWrapper');
-        wrapper.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-        wrapper.style.opacity = '0';
-        wrapper.style.transform = 'scale(0.9)';
-        
-        setTimeout(() => {
-            wrapper.style.display = 'none';
-            const loginSec = document.getElementById('loginSection');
-            loginSec.classList.add('show');
-        }, 500);
-    });
 
     const firebaseConfig = {
         apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
@@ -281,10 +278,42 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    // Tọa độ cửa hàng
+    const STORES = [
+        { lat: 10.761032, lng: 106.668847, name: "Chi nhánh 1" },
+        { lat: 10.777109, lng: 106.677511, name: "Chi nhánh 2" }
+    ];
+    const MAX_DISTANCE = 0.5; // Bán kính 500m (0.5km)
+
     let currentCustomerKey = null;
     let customerData = null;
     let allTakenNumbers = [];
     let myNumbers = [];
+
+    // Hàm tính khoảng cách giữa 2 tọa độ (Km)
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    document.getElementById('btnUnderstand').addEventListener('click', () => {
+        const wrapper = document.getElementById('rulesWrapper');
+        wrapper.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        wrapper.style.opacity = '0';
+        wrapper.style.transform = 'scale(0.9)';
+        
+        setTimeout(() => {
+            wrapper.style.display = 'none';
+            const loginSec = document.getElementById('loginSection');
+            loginSec.classList.add('show');
+        }, 500);
+    });
 
     document.getElementById('btnLogin').addEventListener('click', async () => {
         const btn = document.getElementById('btnLogin');
@@ -300,23 +329,83 @@
         lucide.createIcons();
 
         const snapshot = await get(ref(db, 'tickets'));
+        let found = false;
+
         if (snapshot.exists()) {
             snapshot.forEach((child) => {
                 if (child.val().phoneNumber === phone) {
                     currentCustomerKey = child.key;
                     customerData = child.val();
+                    found = true;
                 }
             });
+        }
 
-            if (currentCustomerKey) {
+        if (found) {
+            startSession();
+        } else {
+            btn.style.display = 'none';
+            document.getElementById('nameGroup').style.display = 'block';
+            document.getElementById('btnRegister').style.display = 'flex';
+            showStatus("SĐT mới! Vui lòng nhập tên tại shop để đăng ký.", "#FF9500", "map-pin");
+        }
+    });
+
+    // Xử lý Đăng ký + Kiểm tra vị trí
+    document.getElementById('btnRegister').addEventListener('click', () => {
+        const name = document.getElementById('nameInput').value.trim();
+        const phone = document.getElementById('phoneInput').value.trim();
+        const btnReg = document.getElementById('btnRegister');
+
+        if (!name) {
+            showStatus("Vui lòng nhập Tên", "#FF3B30", "user");
+            triggerShake();
+            return;
+        }
+
+        btnReg.innerHTML = `<i data-lucide="loader-2" class="spin"></i> Đang xác vị trí...`;
+        lucide.createIcons();
+
+        if (!navigator.geolocation) {
+            showStatus("Trình duyệt không hỗ trợ định vị", "#FF3B30", "alert-circle");
+            btnReg.innerHTML = `Đăng ký ngay <i data-lucide="user-plus"></i>`;
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+
+            // Kiểm tra xem khách có ở gần chi nhánh nào không
+            let isNearStore = false;
+            STORES.forEach(store => {
+                const dist = getDistance(userLat, userLng, store.lat, store.lng);
+                if (dist <= MAX_DISTANCE) isNearStore = true;
+            });
+
+            if (isNearStore) {
+                const newTicketRef = push(ref(db, 'tickets'));
+                const newCustomer = {
+                    customerName: name,
+                    phoneNumber: phone,
+                    ticketQty: 1,
+                    luckyNumbers: []
+                };
+
+                await set(newTicketRef, newCustomer);
+                currentCustomerKey = newTicketRef.key;
+                customerData = newCustomer;
                 startSession();
             } else {
-                btn.innerHTML = `Xác nhận <i data-lucide="arrow-right"></i>`;
-                lucide.createIcons();
-                showStatus("SĐT chưa có trên hệ thống!", "#FF3B30", "alert-circle");
+                showStatus("Bạn cần ở tại cửa hàng để đăng ký!", "#FF3B30", "map-pin-off");
+                btnReg.innerHTML = `Đăng ký ngay <i data-lucide="user-plus"></i>`;
                 triggerShake();
             }
-        }
+        }, (error) => {
+            showStatus("Vui lòng cho phép truy cập vị trí", "#FF3B30", "map-pin");
+            btnReg.innerHTML = `Đăng ký ngay <i data-lucide="user-plus"></i>`;
+            lucide.createIcons();
+        }, { enableHighAccuracy: true });
     });
 
     function triggerShake() {
@@ -342,7 +431,7 @@
                 snapshot.forEach((child) => {
                     const data = child.val();
                     if (data.luckyNumbers) {
-                        globalCount += data.luckyNumbers.length; // Cộng dồn tổng số đã chọn
+                        globalCount += data.luckyNumbers.length;
                         if (child.key !== currentCustomerKey) {
                             allTakenNumbers = allTakenNumbers.concat(data.luckyNumbers);
                         } else {
@@ -360,8 +449,6 @@
     function updateTotalBadge(count) {
         const badge = document.getElementById('totalCountBadge');
         badge.innerHTML = `<i data-lucide="users"></i> Hiện có ${count} số đã được chọn`;
-        badge.style.transform = 'scale(1.1)';
-        setTimeout(() => badge.style.transform = 'scale(1)', 200);
         lucide.createIcons();
     }
 
@@ -385,7 +472,6 @@
             const cell = document.createElement('div');
             cell.className = 'num-cell';
             cell.innerText = numStr;
-            cell.style.animationDelay = `${(i % 50) * 0.01}s`;
 
             if (myNumbers.includes(numStr)) {
                 cell.classList.add('selected');
@@ -424,7 +510,6 @@
             s.style.opacity = '1';
             lucide.createIcons();
         }, 100);
-        if(color === "#34C759") setTimeout(() => s.style.opacity = "0", 3000);
     }
 </script>
 
