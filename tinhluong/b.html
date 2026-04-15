@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quản lý Thưởng/Phạt - Saigon Dalat</title>
+    <title>Quản lý Hình Phạt - Saigon Dalat</title>
     <style>
         /* --- iOS System Variable & Reset --- */
         :root {
@@ -104,7 +104,6 @@
             transition: var(--transition);
         }
 
-        .fab-bonus { background-color: var(--ios-green); }
         .fab-penalty { background-color: var(--ios-red); }
         .fab:active { transform: scale(0.9); }
 
@@ -212,13 +211,12 @@
 <body>
 
 <div class="fab-container">
-    <button class="fab fab-bonus" onclick="openModal('BONUS')" title="Thêm Thưởng">+</button>
     <button class="fab fab-penalty" onclick="openModal('PENALTY')" title="Thêm Phạt">−</button>
 </div>
 
 <div class="modal-overlay" id="modal-overlay" onclick="closeModalOnOuterClick(event)">
     <div class="container" id="form-container">
-        <h2 id="form-title">Thêm Thưởng / Phạt</h2>
+        <h2 id="form-title">Thêm Hình Phạt</h2>
         <div class="form-group">
             <label>CHỌN NHÂN VIÊN</label>
             <select id="employee-select">
@@ -226,11 +224,11 @@
             </select>
         </div>
         <div class="form-group">
-            <label>SỐ TIỀN (VNĐ)</label>
-            <input type="number" id="amount" placeholder="Ví dụ: 500000">
+            <label>SỐ TIỀN PHẠT (VNĐ)</label>
+            <input type="number" id="amount" placeholder="Ví dụ: 50000">
         </div>
         <div class="form-group">
-            <label>GHI CHÚ / LÝ DO</label>
+            <label>LÝ DO PHẠT</label>
             <textarea id="note" rows="3" placeholder="Nhập lý do chi tiết..."></textarea>
         </div>
         <div id="message"></div>
@@ -281,17 +279,12 @@
         const saveBtn = document.getElementById('btn-save-main');
         resetForm();
         overlay.classList.add('active');
-        if(type === 'BONUS') {
-            title.innerText = "Thêm Thưởng Mới";
-            saveBtn.innerText = "LƯU THƯỞNG";
-            saveBtn.className = "btn-submit btn-bonus";
-            saveBtn.onclick = () => submitData('BONUS');
-        } else {
-            title.innerText = "Thêm Hình Phạt";
-            saveBtn.innerText = "LƯU PHẠT";
-            saveBtn.className = "btn-submit btn-penalty";
-            saveBtn.onclick = () => submitData('PENALTY');
-        }
+        
+        // Luôn mặc định là PENALTY vì đã bỏ nút BONUS ở ngoài giao diện
+        title.innerText = "Thêm Hình Phạt";
+        saveBtn.innerText = "LƯU PHẠT";
+        saveBtn.className = "btn-submit btn-penalty";
+        saveBtn.onclick = () => submitData('PENALTY');
     }
 
     window.closeModal = function() {
@@ -302,7 +295,6 @@
         if(e.target.id === 'modal-overlay') closeModal();
     }
 
-    // --- Tự động thêm Kim Anh vào Firebase khi tải trang nếu chưa có ---
     async function checkAndAddKimAnh() {
         const snap = await get(ref(db, EMPLOYEE_PATH));
         if (snap.exists()) {
@@ -316,12 +308,10 @@
                     records: records,
                     addedCount: (data.addedCount || 0) + 1
                 });
-                console.log("Đã tự động thêm Kim Anh ID 56");
             }
         }
     }
 
-    // --- Cập nhật danh sách nhân viên thời gian thực ---
     function listenToEmployees() {
         onValue(ref(db, EMPLOYEE_PATH), (snapshot) => {
             const select = document.getElementById('employee-select');
