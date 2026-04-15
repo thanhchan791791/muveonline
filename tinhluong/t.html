@@ -28,6 +28,7 @@
         window.cloudBonusData = [];
         window.cloudSalaryData = [];
         window.cloudPenaltySummary = {}; 
+        window.cloudAdvanceData = []; // Lưu trữ dữ liệu ứng lương
 
         onValue(query(ref(db, 'bonus_records'), limitToLast(1)), (snapshot) => {
             const data = snapshot.val();
@@ -43,6 +44,15 @@
             if (data) {
                 const lastKey = Object.keys(data)[0];
                 window.cloudSalaryData = data[lastKey].records || [];
+                syncDataAfterUpload();
+            }
+        });
+
+        onValue(query(ref(db, 'advance_records'), limitToLast(1)), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const lastKey = Object.keys(data)[0];
+                window.cloudAdvanceData = data[lastKey].records || [];
                 syncDataAfterUpload();
             }
         });
@@ -135,6 +145,15 @@
             .then(() => alert("✅ Đã lưu!"));
         };
 
+        window.saveAdvanceToFirebase = function() {
+            if (allEmployees.length === 0) return alert("Không có dữ liệu!");
+            const data = allEmployees
+                .filter(emp => (emp.advanceAmount > 0))
+                .map(emp => ({ id: emp.id, name: emp.name, advanceAmount: emp.advanceAmount }));
+            set(ref(db, 'advance_records/Advance_' + Date.now()), { records: data, createdAt: new Date().toLocaleString() })
+            .then(() => alert("✅ Đã lưu ứng lương!"));
+        };
+
         window.openPenaltyModal = function() {
             const tbody = document.getElementById('penalty-body');
             tbody.innerHTML = '';
@@ -149,23 +168,44 @@
             document.getElementById('penalty-overlay').style.display = 'flex';
         };
 
+        window.openAdvanceModal = function() {
+            const tbody = document.getElementById('advance-body');
+            tbody.innerHTML = '';
+            allEmployees.filter(e => e.attendanceRecords.length > 0).forEach(emp => {
+                const idx = allEmployees.indexOf(emp);
+                tbody.innerHTML += `
+                    <tr style="border-bottom: 1px solid var(--ios-border);">
+                        <td style="font-weight:600; padding:15px 8px;">${emp.name}</td>
+                        <td style="padding:15px 8px;">
+                            <input type="text" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; text-align:right;" 
+                            value="${emp.advanceAmount ? emp.advanceAmount.toLocaleString('vi-VN') : ''}" 
+                            placeholder="Số tiền ứng" 
+                            oninput="formatCurrencyInput(this, (val) => { allEmployees[${idx}].advanceAmount=val; calculateMonthlyTotals(); })">
+                        </td>
+                    </tr>`;
+            });
+            document.getElementById('advance-overlay').style.display = 'flex';
+        };
+
         window.openQuickStatsModal = function() {
             const container = document.getElementById('quick-stats-grid');
             container.innerHTML = '';
             allEmployees.filter(e => e.attendanceRecords.length > 0).forEach(emp => {
                 const totalFine = emp.stats.totalPenalty + (emp.stats.cloudPenalty || 0);
-                if (emp.bonusAmount > 0 || totalFine > 0) {
+                const advance = emp.advanceAmount || 0;
+                if (emp.bonusAmount > 0 || totalFine > 0 || advance > 0) {
                     container.innerHTML += `
                         <div style="background:#f9f9f9; padding:8px; border-radius:10px; border:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
                             <span style="font-weight:700; font-size:13px; width:40%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${emp.name}</span>
                             <div style="width:60%; text-align:right;">
                                 ${emp.bonusAmount > 0 ? `<span style="color:#34C759; font-size:11px; font-weight:600;">+${(emp.bonusAmount/1000).toLocaleString()}k</span>` : ''}
                                 ${totalFine > 0 ? `<span style="color:#FF3B30; font-size:11px; font-weight:600; margin-left:8px;">-${(totalFine/1000).toLocaleString()}k</span>` : ''}
+                                ${advance > 0 ? `<span style="color:#5856D6; font-size:11px; font-weight:600; margin-left:8px;">Ứng:${(advance/1000).toLocaleString()}k</span>` : ''}
                             </div>
                         </div>`;
                 }
             });
-            if(container.innerHTML === '') container.innerHTML = '<div style="text-align:center; color:#888; grid-column: 1/-1;">Chưa có thưởng/phạt</div>';
+            if(container.innerHTML === '') container.innerHTML = '<div style="text-align:center; color:#888; grid-column: 1/-1;">Chưa có thưởng/phạt/ứng</div>';
             document.getElementById('quick-stats-overlay').style.display = 'flex';
         };
     </script>
@@ -176,6 +216,7 @@
             --ios-green: #34C759;
             --ios-red: #FF3B30;
             --ios-orange: #FF9500;
+            --ios-indigo: #5856D6;
             --ios-bg: #F2F2F7;
             --ios-card: rgba(255, 255, 255, 0.9);
             --ios-text: #1C1C1E;
@@ -274,6 +315,7 @@
         .btn-salary { background: #1c1c1e; }
         .btn-bonus { background: var(--ios-blue); }
         .btn-penalty { background: var(--ios-red); }
+        .btn-advance { background: var(--ios-indigo); }
         .btn-quick { background: var(--ios-orange); }
         .btn-save-cloud { background: #34C759; margin-top: 10px; padding: 14px; }
 
@@ -339,7 +381,6 @@
             font-weight: 700;
         }
 
-        /* Bảng tổng kết lương nhanh CSS */
         .quick-salary-card {
             display: none;
             background: #fff;
@@ -452,7 +493,6 @@
             font-size: 22px; 
         }
 
-        /* Custom switch for fixed salary */
         .switch-container {
             display: flex;
             align-items: center;
@@ -502,7 +542,7 @@
                 <span id="total-month-bonus" style="color:var(--ios-green)">0đ</span>
             </div>
             <div class="summary-box">
-                <label>Tổng Phạt</label>
+                <label>Tổng Phạt & Ứng</label>
                 <span id="total-month-penalty" style="color:var(--ios-red)">0đ</span>
             </div>
             <div class="summary-box" style="background: #eef7ff; border: 1px solid #cce5ff;">
@@ -552,6 +592,9 @@
         <button class="btn-action btn-penalty" onclick="window.openPenaltyModal()">
             <i data-lucide="octagon-alert"></i> Danh Sách Phạt Trễ
         </button>
+        <button class="btn-action btn-advance" onclick="window.openAdvanceModal()">
+            <i data-lucide="hand-coins"></i> Danh Sách Ứng Lương
+        </button>
     </div>
     
     <table id="summary-table">
@@ -567,7 +610,7 @@
                 <tr>
                     <th>Tên nhân viên</th>
                     <th class="text-right">Lương</th>
-                    <th class="text-right">Thưởng/Phạt</th>
+                    <th class="text-right">Thưởng/Trừ</th>
                     <th class="text-right">Thực nhận</th>
                 </tr>
             </thead>
@@ -656,6 +699,24 @@
     </div>
 </div>
 
+<div id="advance-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); backdrop-filter:blur(10px); z-index:1000; align-items:flex-end; justify-content:center;">
+    <div class="modal-content" style="width:100%; max-width:600px;">
+        <span class="close-btn" onclick="closeAllModals()" style="position:absolute; top:20px; right:20px; font-size:30px; cursor:pointer;">&times;</span>
+        <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px; display:flex; align-items:center; gap:8px;">
+            <i data-lucide="hand-coins" style="color:var(--ios-indigo)"></i> Ứng Lương Nhân Viên
+        </h3>
+        <div style="max-height:50vh; overflow-y:auto;">
+            <table style="width:100%; border-collapse: collapse;">
+                <thead><tr style="text-align:left; color:#8e8e93; font-size:12px;"><th>NHÂN VIÊN</th><th style="text-align:right">SỐ TIỀN ỨNG</th></tr></thead>
+                <tbody id="advance-body"></tbody>
+            </table>
+        </div>
+        <button class="btn-action btn-save-cloud" style="width:100%; margin-top:20px; background:var(--ios-indigo);" onclick="window.saveAdvanceToFirebase()">
+            <i data-lucide="save"></i> Lưu Dữ Liệu Ứng Lương
+        </button>
+    </div>
+</div>
+
 <script>
     let allEmployees = [];
     let currentDateHeaders = [];
@@ -665,7 +726,6 @@
     }
     initIcons();
 
-    // Hàm format số khi nhập liệu
     function formatCurrencyInput(input, callback) {
         let value = input.value.replace(/\D/g, "");
         if (value !== "") {
@@ -709,6 +769,7 @@
                     onceDays: [], tripleDays: [],
                     stats: { totalMinutes: 0, totalPenalty: 0, cloudPenalty: 0, countOnce: 0, countTriple: 0 }, 
                     hourlyRate: 0, bonusAmount: 0, bonusNote: "",
+                    advanceAmount: 0, // Thêm trường ứng lương
                     isFixedSalary: false 
                 };
                 allEmployees.push(emp);
@@ -810,6 +871,10 @@
             }
             const b = window.cloudBonusData.find(c => c.name === emp.name);
             if (b) { emp.bonusAmount = b.bonusAmount; emp.bonusNote = b.bonusNote; }
+            
+            const a = window.cloudAdvanceData.find(c => c.name === emp.name);
+            if (a) { emp.advanceAmount = a.advanceAmount; }
+
             if (window.cloudPenaltySummary[emp.name]) {
                 emp.stats.cloudPenalty = window.cloudPenaltySummary[emp.name].total;
             }
@@ -820,7 +885,7 @@
     function calculateMonthlyTotals() {
         let totalSalary = 0;
         let totalBonus = 0;
-        let totalPenalty = 0;
+        let totalPenaltyAndAdvance = 0;
         const quickBody = document.getElementById('quick-salary-body');
         quickBody.innerHTML = '';
 
@@ -834,21 +899,22 @@
                 }
                 
                 const curPenalty = (emp.stats.totalPenalty + (emp.stats.cloudPenalty || 0));
+                const curAdvance = (emp.advanceAmount || 0);
                 const curBonus = (emp.bonusAmount || 0);
-                const curFinal = baseSalary + curBonus - curPenalty;
+                const totalDeduction = curPenalty + curAdvance;
+                const curFinal = baseSalary + curBonus - totalDeduction;
 
                 totalSalary += baseSalary;
                 totalBonus += curBonus;
-                totalPenalty += curPenalty;
+                totalPenaltyAndAdvance += totalDeduction;
 
-                // Cập nhật bảng tổng kết nhanh
                 quickBody.innerHTML += `
                     <tr>
                         <td style="font-weight:600">${emp.name}</td>
                         <td class="text-right">${baseSalary.toLocaleString()}</td>
                         <td class="text-right">
                             <span style="color:var(--ios-green)">+${curBonus.toLocaleString()}</span> / 
-                            <span style="color:var(--ios-red)">-${curPenalty.toLocaleString()}</span>
+                            <span style="color:var(--ios-red)">-${totalDeduction.toLocaleString()}</span>
                         </td>
                         <td class="text-right" style="font-weight:700; color:var(--ios-blue)">${curFinal.toLocaleString()}</td>
                     </tr>
@@ -858,8 +924,8 @@
 
         document.getElementById('total-month-salary').innerText = totalSalary.toLocaleString() + "đ";
         document.getElementById('total-month-bonus').innerText = "+" + totalBonus.toLocaleString() + "đ";
-        document.getElementById('total-month-penalty').innerText = "-" + totalPenalty.toLocaleString() + "đ";
-        document.getElementById('total-month-final').innerText = (totalSalary + totalBonus - totalPenalty).toLocaleString() + "đ";
+        document.getElementById('total-month-penalty').innerText = "-" + totalPenaltyAndAdvance.toLocaleString() + "đ";
+        document.getElementById('total-month-final').innerText = (totalSalary + totalBonus - totalPenaltyAndAdvance).toLocaleString() + "đ";
         
         document.getElementById('monthly-summary-card').style.display = 'block';
         document.getElementById('quick-salary-card').style.display = 'block';
@@ -932,9 +998,10 @@
         const cloudPenalty = window.cloudPenaltySummary[emp.name] ? window.cloudPenaltySummary[emp.name].total : 0;
         const cloudDetails = window.cloudPenaltySummary[emp.name] ? window.cloudPenaltySummary[emp.name].details : [];
         const totalFine = emp.stats.totalPenalty + cloudPenalty;
+        const advance = emp.advanceAmount || 0;
         
         const allPenaltyDetails = [...new Set([...cloudDetails, ...emp.lateDetails])];
-        const final = base + (emp.bonusAmount || 0) - totalFine;
+        const final = base + (emp.bonusAmount || 0) - totalFine - advance;
         
         document.getElementById('detail-summary-box').innerHTML = `
             <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:14px;">
@@ -955,6 +1022,11 @@
                 </div>
                 ${allPenaltyDetails.length > 0 ? `<div style="font-size:11px; color:#666; margin-top:2px; max-height:80px; overflow-y:auto;">${allPenaltyDetails.map(d => '• ' + d).join('<br>')}</div>` : ''}
             </div>
+
+            ${advance > 0 ? `
+            <div style="margin-top:8px; display:flex; justify-content:space-between; color:var(--ios-indigo); font-weight:700;">
+                <span>Ứng lương:</span> <span>-${advance.toLocaleString()} đ</span>
+            </div>` : ''}
 
             <div style="margin-top:12px; background:#F2F2F7; padding:10px; border-radius:12px;">
                 <div style="font-size:13px; font-weight:700; color:#8E8E93; margin-bottom:4px;">Tổng số ngày nghỉ (${absentDays.length} ngày):</div>
@@ -1011,6 +1083,7 @@
         document.getElementById('bonus-overlay').style.display = 'none';
         document.getElementById('penalty-overlay').style.display = 'none';
         document.getElementById('quick-stats-overlay').style.display = 'none';
+        document.getElementById('advance-overlay').style.display = 'none';
     }
 </script>
 </body>
