@@ -112,10 +112,6 @@
             z-index: 100;
             cursor: pointer;
         }
-        
-        .fab-button i {
-            font-size: 28px;
-        }
     </style>
 </head>
 <body>
@@ -165,21 +161,7 @@
             </button>
         </div>
         <div class="large-title" id="title-branch">Cơ sở</div>
-        
-        <div class="px-5 mb-8">
-            <div class="ios-card p-5 glass mb-8">
-                <label class="text-[11px] font-bold text-gray-400 uppercase ml-1 mb-3 block tracking-wider">Danh mục loài mới</label>
-                <div class="flex gap-3">
-                    <input type="text" id="new-species-input" class="flex-1" placeholder="Chó, Mèo, Chuột túi...">
-                    <button class="bg-blue-600 text-white rounded-2xl px-5 font-bold btn-active shadow-lg shadow-blue-100" onclick="addNewSpecies()">
-                        <i class="ph ph-plus"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <label class="text-[13px] font-bold text-gray-400 uppercase ml-1 mb-3 block tracking-wider">Danh sách hiện có</label>
-            <div id="list-species" class="ios-card overflow-hidden"></div>
-        </div>
+        <div id="list-species" class="px-5 ios-card overflow-hidden mx-5"></div>
     </div>
 
     <div id="screen-pets" class="hidden screen-transition">
@@ -187,11 +169,9 @@
             <button onclick="showScreen('species')" class="text-blue-500 flex items-center font-semibold btn-active">
                 <i class="ph ph-caret-left mr-1"></i> Quay lại
             </button>
-            </div>
+        </div>
         <div class="large-title" id="title-species">Danh sách</div>
-        
         <div class="px-5 space-y-4" id="list-pets"></div>
-
         <div class="fab-button btn-active" onclick="resetForm()">
             <i class="ph ph-plus-bold"></i>
         </div>
@@ -227,8 +207,8 @@
                     <div class="reminder-group">
                         <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Vaccine định kỳ (Ngày tiêm gần nhất)</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="date" id="p-vac-date">
-                            <select id="p-vac-cycle" class="cycle-select"></select>
+                            <input type="date" id="p-vac-date" onchange="updateDetailStatus()">
+                            <select id="p-vac-cycle" class="cycle-select" onchange="updateDetailStatus()"></select>
                         </div>
                         <div id="status-vac" class="mt-2"></div>
                     </div>
@@ -236,8 +216,8 @@
                     <div class="reminder-group">
                         <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Tiêm ngừa dại (Ngày tiêm gần nhất)</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="date" id="p-dai-date">
-                            <select id="p-dai-cycle" class="cycle-select-long"></select>
+                            <input type="date" id="p-dai-date" onchange="updateDetailStatus()">
+                            <select id="p-dai-cycle" class="cycle-select-long" onchange="updateDetailStatus()"></select>
                         </div>
                         <div id="status-dai" class="mt-2"></div>
                     </div>
@@ -245,13 +225,15 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Tẩy giun (Gần nhất)</label>
-                            <input type="date" id="p-giun-date" class="w-full">
-                            <select id="p-giun-cycle" class="mt-2 w-full text-xs cycle-select"></select>
+                            <input type="date" id="p-giun-date" class="w-full" onchange="updateDetailStatus()">
+                            <select id="p-giun-cycle" class="mt-2 w-full text-xs cycle-select" onchange="updateDetailStatus()"></select>
+                            <div id="status-giun" class="mt-2"></div>
                         </div>
                         <div>
                             <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Ngừa ve rận (Gần nhất)</label>
-                            <input type="date" id="p-ve-date" class="w-full">
-                            <select id="p-ve-cycle" class="mt-2 w-full text-xs cycle-select"></select>
+                            <input type="date" id="p-ve-date" class="w-full" onchange="updateDetailStatus()">
+                            <select id="p-ve-cycle" class="mt-2 w-full text-xs cycle-select" onchange="updateDetailStatus()"></select>
+                            <div id="status-ve" class="mt-2"></div>
                         </div>
                     </div>
                 </div>
@@ -259,10 +241,10 @@
 
             <div class="ios-card p-6 mb-8">
                 <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Ghi chú đặc biệt</label>
-                <textarea id="p-note" rows="3" class="w-full" placeholder="Ví dụ: Bé kén ăn, hay sợ người lạ..."></textarea>
+                <textarea id="p-note" rows="3" class="w-full" placeholder="Ví dụ: Bé kén ăn..."></textarea>
             </div>
 
-            <button class="w-full py-4 rounded-2xl bg-blue-600 text-white font-bold text-lg shadow-xl shadow-blue-100 btn-active mb-4 flex items-center justify-center gap-2" id="btn-save-action" onclick="processSave()">
+            <button class="w-full py-4 rounded-2xl bg-blue-600 text-white font-bold text-lg shadow-xl btn-active mb-4 flex items-center justify-center gap-2" id="btn-save-action" onclick="processSave()">
                 <i class="ph ph-floppy-disk"></i> Lưu thông tin
             </button>
             <button class="w-full py-4 text-red-500 font-semibold btn-active mb-10 flex items-center justify-center gap-2" id="btn-del-action" onclick="deletePet()">
@@ -307,7 +289,7 @@
             for(let i=1; i<=24; i++) {
                 let opt = document.createElement('option');
                 opt.value = i;
-                opt.text = i <= 12 ? `Mỗi ${i} tháng` : `Mỗi ${i} tháng (${(i/12).toFixed(1)} năm)`;
+                opt.text = `Mỗi ${i} tháng`;
                 sel.appendChild(opt);
             }
         });
@@ -321,28 +303,21 @@
         window.scrollTo(0,0);
     };
 
-    // LOGIC MỚI: Tự động cộng chu kỳ vào ngày tiêm gần nhất để tính ngày hẹn
+    // Logic tính ngày: Ngày tiêm + chu kỳ tháng - Ngày hôm nay
     function getRemainingDays(lastDateStr, months) {
         if(!lastDateStr) return null;
-        
         const lastDate = new Date(lastDateStr);
         const nextDate = new Date(lastDate);
-        
-        // Cộng thêm số tháng chu kỳ
         nextDate.setMonth(nextDate.getMonth() + parseInt(months));
-        
         const today = new Date();
         today.setHours(0,0,0,0);
-        
-        // Tính khoảng cách ngày
-        const diffTime = nextDate - today;
-        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return Math.ceil((nextDate - today) / (1000 * 60 * 60 * 24));
     }
 
     function getStatusColor(days) {
         if (days === null) return "#D1D1D6"; 
         if (days <= 0) return "#FF3B30"; 
-        if (days < 20) return "#FF9500"; 
+        if (days < 15) return "#FF9500"; 
         return "#34C759"; 
     }
 
@@ -371,14 +346,6 @@
         }
     };
 
-    window.addNewSpecies = async () => {
-        const val = document.getElementById('new-species-input').value.trim();
-        if(!val) return;
-        await set(ref(db, `PetManagement/${curBranch}/${val}/_config`), { init: true });
-        document.getElementById('new-species-input').value = "";
-        loadSpecies(curBranch);
-    };
-
     window.loadPets = async (species) => {
         curSpecies = species;
         document.getElementById('title-species').innerText = species;
@@ -401,37 +368,19 @@
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                                <i class="ph ph-dog"></i>
-                            </div>
+                            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600"><i class="ph ph-dog"></i></div>
                             <div>
                                 <h3 class="font-bold text-[18px]">${pName}</h3>
-                                <p class="text-[12px] text-gray-400 font-semibold tracking-wide">${p.so_ki ? p.so_ki + ' kg' : 'Chưa cân'}</p>
+                                <p class="text-[12px] text-gray-400 font-semibold">${p.so_ki ? p.so_ki + ' kg' : 'Chưa cân'}</p>
                             </div>
                         </div>
-                        <i class="ph ph-caret-right text-gray-300 text-lg"></i>
+                        <i class="ph ph-caret-right text-gray-300"></i>
                     </div>
                     <div class="grid grid-cols-4 gap-3">
-                        <div class="bg-gray-50 p-2.5 rounded-2xl text-center">
-                            <div class="status-dot mx-auto mb-1.5" style="background:${getStatusColor(dVac)}"></div>
-                            <p class="text-[9px] text-gray-400 uppercase font-bold">Vaccine</p>
-                            <p class="text-[12px] font-bold" style="color:${getStatusColor(dVac)}">${formatDaysText(dVac)}</p>
-                        </div>
-                        <div class="bg-gray-50 p-2.5 rounded-2xl text-center">
-                            <div class="status-dot mx-auto mb-1.5" style="background:${getStatusColor(dDai)}"></div>
-                            <p class="text-[9px] text-gray-400 uppercase font-bold">Dại</p>
-                            <p class="text-[12px] font-bold" style="color:${getStatusColor(dDai)}">${formatDaysText(dDai)}</p>
-                        </div>
-                        <div class="bg-gray-50 p-2.5 rounded-2xl text-center">
-                            <div class="status-dot mx-auto mb-1.5" style="background:${getStatusColor(dGiun)}"></div>
-                            <p class="text-[9px] text-gray-400 uppercase font-bold">Giun</p>
-                            <p class="text-[12px] font-bold" style="color:${getStatusColor(dGiun)}">${formatDaysText(dGiun)}</p>
-                        </div>
-                        <div class="bg-gray-50 p-2.5 rounded-2xl text-center">
-                            <div class="status-dot mx-auto mb-1.5" style="background:${getStatusColor(dVe)}"></div>
-                            <p class="text-[9px] text-gray-400 uppercase font-bold">Ve rận</p>
-                            <p class="text-[12px] font-bold" style="color:${getStatusColor(dVe)}">${formatDaysText(dVe)}</p>
-                        </div>
+                        ${renderMiniStatus('Vac', dVac)}
+                        ${renderMiniStatus('Dại', dDai)}
+                        ${renderMiniStatus('Giun', dGiun)}
+                        ${renderMiniStatus('Ve', dVe)}
                     </div>
                 `;
                 card.onclick = () => openEdit(pName, p);
@@ -440,15 +389,23 @@
         }
     };
 
+    function renderMiniStatus(label, days) {
+        return `
+            <div class="bg-gray-50 p-2 rounded-2xl text-center">
+                <div class="status-dot mx-auto mb-1" style="background:${getStatusColor(days)}"></div>
+                <p class="text-[8px] text-gray-400 uppercase font-bold">${label}</p>
+                <p class="text-[11px] font-bold" style="color:${getStatusColor(days)}">${formatDaysText(days)}</p>
+            </div>
+        `;
+    }
+
     window.openEdit = (name, data) => {
-        isEdit = true;
-        curPetName = name;
+        isEdit = true; curPetName = name;
         document.getElementById('detail-header').innerText = name;
         document.getElementById('p-name').value = name;
         document.getElementById('p-name').disabled = true;
         document.getElementById('p-weight').value = data.so_ki || "";
         document.getElementById('p-note').value = data.ghi_chu || "";
-        
         document.getElementById('p-vac-date').value = data.vac_date || "";
         document.getElementById('p-vac-cycle').value = data.vac_cycle || "12";
         document.getElementById('p-dai-date').value = data.dai_date || "";
@@ -457,38 +414,35 @@
         document.getElementById('p-giun-cycle').value = data.giun_cycle || "3";
         document.getElementById('p-ve-date').value = data.ve_date || "";
         document.getElementById('p-ve-cycle').value = data.ve_cycle || "1";
-
-        renderStatus('status-vac', getRemainingDays(data.vac_date, data.vac_cycle || 12));
-        renderStatus('status-dai', getRemainingDays(data.dai_date, data.dai_cycle || 12));
-
+        updateDetailStatus();
         document.getElementById('btn-save-action').innerHTML = `<i class="ph ph-check-circle"></i> Cập nhật ngay`;
         document.getElementById('btn-del-action').classList.remove('hidden');
         showScreen('detail');
     };
 
-    function renderStatus(id, days) {
+    window.updateDetailStatus = () => {
+        renderLabelStatus('status-vac', getRemainingDays(document.getElementById('p-vac-date').value, document.getElementById('p-vac-cycle').value));
+        renderLabelStatus('status-dai', getRemainingDays(document.getElementById('p-dai-date').value, document.getElementById('p-dai-cycle').value));
+        renderLabelStatus('status-giun', getRemainingDays(document.getElementById('p-giun-date').value, document.getElementById('p-giun-cycle').value));
+        renderLabelStatus('status-ve', getRemainingDays(document.getElementById('p-ve-date').value, document.getElementById('p-ve-cycle').value));
+    };
+
+    function renderLabelStatus(id, days) {
         const el = document.getElementById(id);
         if(!el) return;
         if(days === null) { el.innerHTML = ""; return; }
-        let cls = days <= 0 ? 'bg-red-50 text-red-600' : (days < 20 ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600');
-        el.innerHTML = `<span class="text-[11px] px-3 py-1.5 rounded-lg font-bold ${cls}">${days <= 0 ? 'QUÁ HẠN ' + Math.abs(days) + 'N' : 'CÒN ' + days + ' NGÀY'}</span>`;
+        let cls = days <= 0 ? 'bg-red-50 text-red-600' : (days < 15 ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600');
+        el.innerHTML = `<span class="text-[10px] px-2 py-1 rounded-lg font-bold ${cls}">${days <= 0 ? 'QUÁ HẠN ' + Math.abs(days) + 'N' : 'CÒN ' + days + ' NGÀY'}</span>`;
     }
 
     window.resetForm = () => {
         isEdit = false;
         document.getElementById('detail-header').innerText = "Thêm bé mới";
-        document.getElementById('p-name').value = "";
-        document.getElementById('p-name').disabled = false;
+        document.getElementById('p-name').value = ""; document.getElementById('p-name').disabled = false;
         ['p-weight','p-note','p-vac-date','p-dai-date','p-giun-date','p-ve-date'].forEach(id => document.getElementById(id).value = "");
-        
-        document.getElementById('p-vac-cycle').value = "12";
-        document.getElementById('p-dai-cycle').value = "12";
-        document.getElementById('p-giun-cycle').value = "3";
-        document.getElementById('p-ve-cycle').value = "1";
-        
-        document.getElementById('status-vac').innerHTML = "";
-        document.getElementById('status-dai').innerHTML = "";
-        
+        document.getElementById('p-vac-cycle').value = "12"; document.getElementById('p-dai-cycle').value = "12";
+        document.getElementById('p-giun-cycle').value = "3"; document.getElementById('p-ve-cycle').value = "1";
+        updateDetailStatus();
         document.getElementById('btn-save-action').innerHTML = `<i class="ph ph-plus-circle"></i> Thêm vào hệ thống`;
         document.getElementById('btn-del-action').classList.add('hidden');
         showScreen('detail');
@@ -515,7 +469,7 @@
     };
 
     window.deletePet = async () => {
-        if(confirm("Bạn có chắc chắn muốn xoá thông tin bé này?")) {
+        if(confirm("Xoá thông tin bé này?")) {
             await remove(ref(db, `PetManagement/${curBranch}/${curSpecies}/${curPetName}`));
             loadPets(curSpecies);
         }
