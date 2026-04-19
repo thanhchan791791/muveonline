@@ -28,7 +28,7 @@
             padding: 0;
             color: #1c1c1e;
             overflow-x: hidden;
-            padding-bottom: 100px; /* Tăng padding để không bị nút đè lên nội dung cuối */
+            padding-bottom: 100px;
         }
 
         .glass {
@@ -46,7 +46,7 @@
         }
 
         .btn-active:active {
-            transform: scale(0.92); /* Thu nhỏ mạnh hơn một chút để tạo cảm giác nhấn thật */
+            transform: scale(0.92);
             opacity: 0.8;
         }
 
@@ -96,7 +96,6 @@
             vertical-align: middle;
         }
 
-        /* Floating Action Button Style */
         .fab-button {
             position: fixed;
             bottom: 30px;
@@ -226,7 +225,7 @@
                 
                 <div class="space-y-6">
                     <div class="reminder-group">
-                        <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Vaccine định kỳ</label>
+                        <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Vaccine định kỳ (Ngày tiêm gần nhất)</label>
                         <div class="grid grid-cols-2 gap-3">
                             <input type="date" id="p-vac-date">
                             <select id="p-vac-cycle" class="cycle-select"></select>
@@ -235,7 +234,7 @@
                     </div>
 
                     <div class="reminder-group">
-                        <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Tiêm ngừa dại</label>
+                        <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Tiêm ngừa dại (Ngày tiêm gần nhất)</label>
                         <div class="grid grid-cols-2 gap-3">
                             <input type="date" id="p-dai-date">
                             <select id="p-dai-cycle" class="cycle-select-long"></select>
@@ -245,12 +244,12 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Tẩy giun</label>
+                            <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Tẩy giun (Gần nhất)</label>
                             <input type="date" id="p-giun-date" class="w-full">
                             <select id="p-giun-cycle" class="mt-2 w-full text-xs cycle-select"></select>
                         </div>
                         <div>
-                            <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Ngừa ve rận</label>
+                            <label class="text-[11px] font-bold text-gray-400 uppercase block mb-2 tracking-wider">Ngừa ve rận (Gần nhất)</label>
                             <input type="date" id="p-ve-date" class="w-full">
                             <select id="p-ve-cycle" class="mt-2 w-full text-xs cycle-select"></select>
                         </div>
@@ -322,14 +321,22 @@
         window.scrollTo(0,0);
     };
 
+    // LOGIC MỚI: Tự động cộng chu kỳ vào ngày tiêm gần nhất để tính ngày hẹn
     function getRemainingDays(lastDateStr, months) {
         if(!lastDateStr) return null;
+        
         const lastDate = new Date(lastDateStr);
         const nextDate = new Date(lastDate);
+        
+        // Cộng thêm số tháng chu kỳ
         nextDate.setMonth(nextDate.getMonth() + parseInt(months));
+        
         const today = new Date();
         today.setHours(0,0,0,0);
-        return Math.ceil((nextDate - today) / (1000 * 60 * 60 * 24));
+        
+        // Tính khoảng cách ngày
+        const diffTime = nextDate - today;
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
 
     function getStatusColor(days) {
