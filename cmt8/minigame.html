@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -39,7 +38,7 @@
             filter: drop-shadow(0 4px 10px rgba(255, 183, 197, 0.5));
         }
 
-        .container, .list-container {
+        .container, .list-container, .search-container {
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -132,6 +131,15 @@
             border: 1px solid rgba(0, 122, 255, 0.1);
         }
 
+        .search-result-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 16px;
+            background: #f8f9fa;
+            border-left: 5px solid var(--ios-blue);
+            display: none;
+        }
+
         .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; }
         th { color: var(--text-secondary); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 12px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); text-align: left; }
@@ -141,7 +149,6 @@
         .ticket-count { background-color: var(--text-main); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .history-add { color: #34C759; font-size: 12px; font-weight: 600; }
         
-        /* Ẩn nội dung */
         .hidden-content { display: none; }
         .mask-content { color: var(--text-secondary); letter-spacing: 2px; }
     </style>
@@ -169,6 +176,15 @@
     <button id="btnSave">Lưu & Cập nhật</button>
     <button id="btnToggleList" class="btn-secondary">Xem Lịch Sử Giao Dịch</button>
     <p id="status"></p>
+</div>
+
+<div class="search-container">
+    <h3>Tra Cứu Con Số</h3>
+    <label>Nhập số may mắn</label>
+    <input type="number" id="searchNumber" placeholder="Ví dụ: 123">
+    <button id="btnSearch" style="background: var(--ios-blue); box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);">Tìm Kiếm</button>
+    
+    <div id="searchResult" class="search-result-box"></div>
 </div>
 
 <div class="list-container" id="listContainer">
@@ -218,12 +234,76 @@
     const existInfo = document.getElementById('existInfo');
     const tableBody = document.getElementById('customerTableBody');
 
+    const searchInput = document.getElementById('searchNumber');
+    const searchBtn = document.getElementById('btnSearch');
+    const searchResult = document.getElementById('searchResult');
+
     let allTickets = {};
     let existingCusKey = null;
 
     onValue(ticketRef, (snapshot) => {
         allTickets = snapshot.val() || {};
         renderTable();
+    });
+
+    // Hàm ẩn SĐT
+    function maskPhone(phone) {
+        if(!phone) return "";
+        return phone.slice(0, -4) + "****";
+    }
+
+    // LOGIC TÌM KIẾM CÓ NÚT HIỆN SĐT
+    searchBtn.addEventListener('click', () => {
+        const targetNum = searchInput.value.trim();
+        if (!targetNum) {
+            alert("Vui lòng nhập số!");
+            return;
+        }
+
+        searchResult.style.display = 'block';
+        let found = false;
+
+        for (let key in allTickets) {
+            const customer = allTickets[key];
+            if (customer.luckyNumbers && Array.isArray(customer.luckyNumbers)) {
+                if (customer.luckyNumbers.some(n => n.toString() === targetNum)) {
+                    searchResult.innerHTML = `
+                        <div style="font-size:14px;">
+                            <p style="margin:0 0 5px 0;">✅ Tìm thấy số <b>${targetNum}</b>:</p>
+                            <div style="font-weight:700; font-size:17px;">${customer.customerName}</div>
+                            <div style="color:var(--ios-blue); font-weight:600; margin-bottom:8px;">
+                                SĐT: <span id="searchPhoneText">${maskPhone(customer.phoneNumber)}</span>
+                            </div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <span class="ticket-count">Tổng: ${customer.ticketQty} vé</span>
+                                <button class="btn-view" id="btnShowSearchPhone">Hiện SĐT</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Nút hiện SĐT trong kết quả tìm kiếm
+                    document.getElementById('btnShowSearchPhone').addEventListener('click', function() {
+                        const txt = document.getElementById('searchPhoneText');
+                        if (this.innerText === "Hiện SĐT") {
+                            txt.innerText = customer.phoneNumber;
+                            this.innerText = "Ẩn";
+                            this.style.background = "#8E8E93";
+                        } else {
+                            txt.innerText = maskPhone(customer.phoneNumber);
+                            this.innerText = "Hiện SĐT";
+                            this.style.background = "#007AFF";
+                        }
+                    });
+
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found) {
+            searchResult.innerHTML = `<p style="color:#FF3B30; font-size:14px; margin:0;">❌ Số <b>${targetNum}</b> chưa có ai chọn.</p>`;
+        }
     });
 
     toggleBtn.addEventListener('click', () => {
@@ -249,12 +329,6 @@
             }
         }
     });
-
-    // Hàm ẩn 4 số cuối điện thoại
-    function maskPhone(phone) {
-        if(!phone) return "";
-        return phone.slice(0, -4) + "****";
-    }
 
     function renderTable() {
         tableBody.innerHTML = "";
@@ -300,7 +374,6 @@
         });
     }
 
-    // Hàm global để xử lý nút bấm hiện/ẩn
     window.toggleRowView = function(rowId, fullPhone) {
         const row = document.getElementById(rowId);
         const btn = row.querySelector('.btn-view');
