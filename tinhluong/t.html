@@ -762,7 +762,7 @@
             }
             if (row.some(c => String(c).includes("ID:"))) {
                 let empName = row[9];
-                let isThua = String(empName).toLowerCase().trim() === "thua";
+                let isNoPenalty = String(empName).toLowerCase().trim() === "thua" || String(empName).toLowerCase().trim() === "bich van" || String(empName).toLowerCase().trim() === "bích vân";
 
                 let emp = { 
                     id: row[2], name: empName, attendanceRecords: [], lateDetails: [],
@@ -786,7 +786,7 @@
                                 const totalMins = h1 * 60 + m1;
                                 
                                 let isLate = false;
-                                if (!isThua) {
+                                if (!isNoPenalty) {
                                     const morningMark = 425; 
                                     const afternoonMark = 900; 
                                     const targetMark = Math.abs(totalMins - morningMark) < Math.abs(totalMins - afternoonMark) ? morningMark : afternoonMark;
@@ -808,7 +808,7 @@
                                 const [h4, m4] = times[3].split(':').map(Number);
 
                                 let isLate = false;
-                                if (!isThua) {
+                                if (!isNoPenalty) {
                                     const firstInMins = h1 * 60 + m1;
                                     const morningMark = 425; 
                                     const diff = firstInMins - morningMark;
