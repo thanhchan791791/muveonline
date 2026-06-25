@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Đánh Giá Dịch Vụ Khách Hàng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ios-bg: #FDF6F6; /* Nền xám hồng siêu nhẹ cực sang */
+            --ios-card-bg: rgba(255, 255, 255, 0.85); /* Trắng sứ trong suốt nhẹ */
+            --ios-primary: #FF6B8B; /* Hồng pastel ngọt ngào làm chủ đạo */
+            --ios-primary-light: #FFF0F2; /* Nền hồng nhẹ cho các hàng list */
+            --ios-text-main: #2C2C2E; /* Màu chữ xám đen chuẩn Apple */
+            --ios-text-sub: #A4A4AA; /* Màu ghi phụ */
+            --ios-border: rgba(0, 0, 0, 0.05);
+            --ios-rating-star: #FFB300; /* Vàng kim cao cấp cho sao */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--ios-bg);
+            color: var(--ios-text-main);
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            overflow-x: hidden;
+            letter-spacing: -0.2px;
+        }
+
+        /* Container chính mô phỏng màn hình app chuyên nghiệp */
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: var(--ios-bg);
+        }
+
+        /* Header Glassmorphism chứa thêm LOGO quán */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(253, 246, 246, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 16px 20px 14px 20px;
+            text-align: center;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Style cho logo quán */
+        .app-logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            border-radius: 18px;
+            box-shadow: 0 4px 12px rgba(255, 107, 139, 0.15);
+            margin-bottom: 4px;
+        }
+
+        header h1 {
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #1C1C1E;
+        }
+        
+        header p {
+            font-size: 12.5px;
+            color: var(--ios-text-sub);
+            font-weight: 500;
+        }
+
+        /* Toàn bộ form cuộn mượt */
+        .content-scroll {
+            padding: 20px 16px;
+        }
+
+        /* Block tiêu đề phụ dạng chữ in nhỏ thanh lịch */
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--ios-text-sub);
+            margin-left: 12px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Thẻ (Card) bo góc lớn, đổ bóng mịn mượt (Soft Shadow) */
+        .ios-card {
+            background: #FFFFFF;
+            border-radius: 22px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(255, 107, 139, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        /* --- 1. KHU VỰC THÚ CƯNG: HÀNG DỌC VUỐT XUỐNG, 1 HÀNG LÀ 1 ẢNH LỚN --- */
+        .area-vertical-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .area-item {
+            width: 100%;
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            aspect-ratio: 2.1 / 1; /* Tỷ lệ ảnh thuôn dài theo chiều dọc màn hình di động cực đẹp */
+            cursor: pointer;
+            border: 2.5px solid transparent;
+            background: #FFF;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .area-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        /* Căn giữa chữ và nội dung hoàn hảo */
+        .area-item .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.35); /* Phủ mờ để nổi bật tên khu vực */
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Căn giữa hoàn toàn theo cả 2 trục */
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.2px;
+            padding: 16px;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease;
+        }
+
+        /* Trạng thái Khi Chạm vào Card */
+        .area-item:active {
+            transform: scale(0.97);
+        }
+
+        /* Trạng thái Đã Chọn chuẩn iOS Accent Pink */
+        .area-item.selected {
+            border-color: var(--ios-primary);
+            box-shadow: 0 8px 24px rgba(255, 107, 139, 0.2);
+        }
+        
+        .area-item.selected .overlay {
+            background: rgba(255, 107, 139, 0.55); /* Đổi màu overlay sang hồng trong suốt */
+        }
+        
+        .area-item.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: white;
+            color: var(--ios-primary);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- BANNER LẮNG NGHE GÓP Ý KHÁCH HÀNG --- */
+        .ios-commitment-card {
+            background: linear-gradient(135deg, #FFF5F6 0%, #FFEBEF 100%);
+            border: 1px dashed rgba(255, 107, 139, 0.4);
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(255, 107, 139, 0.02);
+        }
+
+        .ios-commitment-icon {
+            font-size: 24px;
+            animation: heartBeat 2s infinite ease-in-out;
+        }
+
+        .ios-commitment-text {
+            font-size: 13.5px;
+            line-height: 1.45;
+            color: #48484A;
+            font-weight: 500;
+        }
+
+        .ios-commitment-text strong {
+            color: #FF4A70;
+            font-weight: 600;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        /* --- PHẦN TỰ ĐỘNG ĐẨY NỘI DUNG MƯỢT MÀ --- */
+        .interactive-step {
+            opacity: 0;
+            transform: translateY(30px);
+            pointer-events: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                        transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                        max-height 0.6s ease;
+        }
+
+        .interactive-step.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            max-height: 1200px;
+            margin-top: 12px;
+        }
+
+        /* --- 2. ĐÁNH GIÁ SAO (Premium Haptic Animation) --- */
+        .rating-container {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            padding: 10px 0;
+        }
+
+        .star {
+            font-size: 38px;
+            color: #E5E5EA;
+            cursor: pointer;
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
+        }
+
+        .star.active {
+            color: var(--ios-rating-star);
+            filter: drop-shadow(0 2px 4px rgba(255, 179, 0, 0.2));
+        }
+
+        .star:active {
+            transform: scale(1.4);
+        }
+
+        /* --- 3. INPUT FORM KIỂU NHÓM HÀNG NATIVE APP --- */
+        .ios-list {
+            background: #FFFFFF;
+            border-radius: 22px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(255, 107, 139, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .ios-list-row {
+            display: flex;
+            flex-direction: column;
+            padding: 14px 20px;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.04);
+            background: #FFFFFF;
+            transition: background-color 0.2s;
+        }
+
+        .ios-list-row:focus-within {
+            background-color: var(--ios-primary-light);
+        }
+
+        .ios-list-row label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #48484A;
+        }
+
+        .ios-input, .ios-textarea {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            background: transparent;
+            color: var(--ios-text-main);
+            padding: 4px 0;
+        }
+
+        .ios-input::placeholder, .ios-textarea::placeholder {
+            color: #C7C7CC;
+        }
+
+        .ios-textarea {
+            height: 95px;
+            resize: none;
+            line-height: 1.4;
+        }
+
+        /* --- 4. NÚT GỬI ĐÁNH GIÁ PREMIUM --- */
+        .btn-submit {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #FF6B8B 0%, #FF4A70 100%);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            padding: 18px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 74, 112, 0.3);
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 10px rgba(255, 74, 112, 0.2);
+            filter: brightness(0.95);
+        }
+
+        /* Trạng thái loading chặn bấm liên tục */
+        .btn-submit:disabled {
+            background: #C7C7CC;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* --- 5. POPUP THÔNG BÁO THÀNH CÔNG --- */
+        .success-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 24px;
+        }
+
+        .success-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 32px 24px;
+            text-align: center;
+            width: 100%;
+            max-width: 320px;
+            transform: scale(0.85);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .success-overlay.active .success-card {
+            transform: scale(1);
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #34C759 0%, #28CD41 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 6px 16px rgba(52, 199, 89, 0.3);
+        }
+
+        .success-card h2 {
+            font-size: 21px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1C1C1E;
+        }
+
+        .success-card p {
+            color: #636366;
+            font-size: 15px;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .btn-close {
+            background: #E5E5EA;
+            color: var(--ios-text-main);
+            border: none;
+            border-radius: 14px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-close:active {
+            background: #D1D1D6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <img src="logo.png" alt="Logo Quán" class="app-logo" onerror="this.style.display='none';">
+        <h1>ĐÁNH GIÁ CHẤT LƯỢNG</h1>
+        <p>Ý kiến của bạn giúp chúng tôi phục vụ tốt hơn 5★</p>
+    </header>
+
+    <form id="feedbackForm" onsubmit="submitFeedback(event)">
+        <div class="content-scroll">
+            
+            <div class="section-title">Vui lòng chọn khu vực bạn vừa trải nghiệm</div>
+            
+            <div class="area-vertical-list id-area-selection">
+                <div class="area-item" onclick="selectArea(this, 'Chó')">
+                    <img src="dog.jpg" alt="Khu vực Chó" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500'">
+                    <div class="overlay">Khu vực Chó</div>
+                </div>
+                <div class="area-item" onclick="selectArea(this, 'Mèo')">
+                    <img src="cat.jpg" alt="Khu vực Mèo" onerror="this.src='https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=500'">
+                    <div class="overlay">Khu vực Mèo</div>
+                </div>
+                <div class="area-item" onclick="selectArea(this, 'Gấu Mèo')">
+                    <img src="raccoon.jpg" alt="Khu vực Gấu Mèo" onerror="this.src='https://images.unsplash.com/photo-1497250681960-ef046c08a56e?w=500'">
+                    <div class="overlay">Khu vực Gấu Mèo</div>
+                </div>
+                <div class="area-item" onclick="selectArea(this, 'Capybara')">
+                    <img src="capybara.jpg" alt="Khu vực Capybara" onerror="this.src='https://images.unsplash.com/photo-1561948955-570b270e7c36?w=500'">
+                    <div class="overlay">Khu Capybara</div>
+                </div>
+            </div>
+
+            <div class="ios-commitment-card">
+                <div class="ios-commitment-icon">💝</div>
+                <div class="ios-commitment-text">
+                    Mọi góp ý của quý khách đều được <strong>ghi nhận nghiêm túc</strong> và cửa hàng sẽ nỗ lực cải thiện tốt nhất có thể nhằm nâng cao chất lượng dịch vụ!
+                </div>
+            </div>
+
+            <div class="ios-list" style="margin-bottom: 24px;">
+                <div class="ios-list-row">
+                    <label for="generalComment">Góp ý chung về cửa hàng (Không bắt buộc)</label>
+                    <input type="text" id="generalComment" class="ios-input" placeholder="Không gian, vệ sinh, wifi, giữ xe...">
+                </div>
+            </div>
+
+            <div id="remainingSteps" class="interactive-step">
+                
+                <div class="section-title">Đánh giá chất lượng dịch vụ</div>
+                <div class="ios-card">
+                    <div class="rating-container" id="starContainer">
+                        <span class="star" onclick="setRating(1)">★</span>
+                        <span class="star" onclick="setRating(2)">★</span>
+                        <span class="star" onclick="setRating(3)">★</span>
+                        <span class="star" onclick="setRating(4)">★</span>
+                        <span class="star" onclick="setRating(5)">★</span>
+                    </div>
+                    <div id="ratingText" style="text-align: center; font-size: 14px; font-weight: 600; color: var(--ios-rating-star); margin-top: 8px;">Vui lòng chọn số sao</div>
+                </div>
+
+                <div class="section-title">Phản ánh & Đóng góp ý kiến</div>
+                <div class="ios-list">
+                    <div class="ios-list-row">
+                        <label for="staffName">Tên nhân viên phục vụ (nếu nhớ)</label>
+                        <input type="text" id="staffName" class="ios-input" placeholder="Ví dụ: Nguyễn Văn A...">
+                    </div>
+                    <div class="ios-list-row">
+                        <label for="feedbackContent">Nội dung phản ánh / góp ý</label>
+                        <textarea id="feedbackContent" class="ios-textarea" placeholder="Chia sẻ trải nghiệm thực tế của bạn tại đây để cửa hàng cải thiện..." required></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-submit">Gửi Đánh Giá</button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<div class="success-overlay" id="successPopup">
+    <div class="success-card">
+        <div class="success-icon">✓</div>
+        <h2>Cảm Ơn Bạn!</h2>
+        <p>Đánh giá quý báu của bạn đã được ghi nhận. Cửa hàng sẽ liên tục cải thiện dịch vụ 5 sao.</p>
+        <button class="btn-close" onclick="closePopup()">Đóng</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Cấu hình Firebase tài khoản của bạn
+    const firebaseConfig = {
+        apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
+        authDomain: "dogs-be72b.firebaseapp.com",
+        databaseURL: "https://dogs-be72b-default-rtdb.firebaseio.com",
+        projectId: "dogs-be72b",
+        storageBucket: "dogs-be72b.firebasestorage.app",
+        messagingSenderId: "1003873040746",
+        appId: "1:1003873040746:web:607f4ff587afc430d3cd13",
+        measurementId: "G-Y72BF1RQ2C"
+    };
+
+    // Khởi tạo và kết nối DB
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Xử lý gửi dữ liệu khi click nút Submit trên Form
+    window.submitFeedback = function(event) {
+        event.preventDefault();
+
+        if (!selectedArea) {
+            alert("Vui lòng chọn khu vực bạn đã trải nghiệm nhé!");
+            return;
+        }
+
+        if (selectedRating === 0) {
+            alert("Vui lòng dành tặng chúng tôi số sao đánh giá!");
+            return;
+        }
+
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Đang gửi...";
+
+        // Lấy thời gian thực tại Việt Nam để lưu lịch sử thuận tiện
+        const now = new Date();
+        const timeString = now.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+
+        const generalCommentVal = document.getElementById('generalComment').value.trim();
+        const staffNameVal = document.getElementById('staffName').value.trim();
+        const feedbackContentVal = document.getElementById('feedbackContent').value.trim();
+
+        const feedbackData = {
+            khu_vuc: selectedArea,
+            gop_y_chung: generalCommentVal,
+            so_sao: selectedRating,
+            nhan_vien: staffNameVal,
+            gop_y: feedbackContentVal,
+            thoi_gian: timeString,
+            timestamp: Date.now()
+        };
+
+        // 1. Đẩy thẳng vào nhánh 'danh_gia_khach_hang' trên Database
+        const feedbackListRef = ref(db, 'danh_gia_khach_hang');
+        const newFeedbackRef = push(feedbackListRef);
+
+        set(newFeedbackRef, feedbackData)
+            .then(() => {
+                // 2. Đồng thời gửi thông báo về nhóm Telegram của bạn ngay lập tức
+                sendTelegramAlert(feedbackData);
+                // Kích hoạt hiển thị popup thông báo thành công
+                document.getElementById('successPopup').classList.add('active');
+            })
+            .catch((error) => {
+                console.error("Lỗi gửi dữ liệu Firebase:", error);
+                alert("Có lỗi xảy ra khi truyền dữ liệu. Vui lòng kiểm tra kết nối mạng!");
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Gửi Đánh Giá";
+            });
+    }
+
+    // Hàm thực hiện gọi API Telegram Bot gửi về nhóm của bạn
+    function sendTelegramAlert(data) {
+        const botToken = "8581857488:AAGFtZdA3NecouzR8YaJsH0eVKEFlGZ2fB0";
+        const chatId = "-5503428893";
+        
+        // Tạo chuỗi hiển thị số sao bằng icon cho trực quan dễ nhìn
+        const starIcons = "⭐".repeat(data.so_sao);
+
+        // Nội dung tin nhắn gửi về nhóm Telegram dạng text rõ ràng
+        const message = `🔔 <b>CÓ ĐÁNH GIÁ MỚI TỪ KHÁCH HÀNG</b>\n\n` +
+                        `📍 <b>Khu vực:</b> ${data.khu_vuc}\n` +
+                        `⭐ <b>Đánh giá:</b> ${data.so_sao} Sao (${starIcons})\n` +
+                        `👤 <b>Nhân viên phục vụ:</b> ${data.nhan_vien ? data.nhan_vien : "Không nhập"}\n` +
+                        `📝 <b>Nội dung góp ý:</b> ${data.gop_y}\n` +
+                        `💬 <b>Góp ý chung:</b> ${data.gop_y_chung ? data.gop_y_chung : "Không nhập"}\n\n` +
+                        `⏰ <b>Thời gian:</b> ${data.thoi_gian}`;
+
+        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message,
+                parse_mode: "HTML"
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error("Lỗi gửi Telegram API:", response.statusText);
+            }
+        })
+        .catch(error => {
+            console.error("Lỗi kết nối mạng khi gửi Telegram:", error);
+        });
+    }
+</script>
+
+<script>
+    let selectedArea = "";
+    let selectedRating = 0;
+
+    function selectArea(element, areaName) {
+        document.querySelectorAll('.area-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        element.classList.add('selected');
+        selectedArea = areaName;
+        
+        if (navigator.vibrate) navigator.vibrate(10);
+
+        const remainingSteps = document.getElementById('remainingSteps');
+        if (!remainingSteps.classList.contains('visible')) {
+            remainingSteps.classList.add('visible');
+            setTimeout(() => {
+                remainingSteps.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 250);
+        }
+    }
+
+    function setRating(rating) {
+        selectedRating = rating;
+        const stars = document.querySelectorAll('#starContainer .star');
+        const textDisplay = document.getElementById('ratingText');
+        
+        const labels = {
+            1: "Rất không hài lòng 😞",
+            2: "Chưa hài lòng 🙁",
+            3: "Bình thường 😐",
+            4: "Hài lòng 🙂",
+            5: "Rất tuyệt vời! 😍"
+        };
+
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+
+        textDisplay.innerText = labels[rating];
+        if (navigator.vibrate) navigator.vibrate(15);
+    }
+
+    function closePopup() {
+        document.getElementById('successPopup').classList.remove('active');
+        document.getElementById('feedbackForm').reset();
+        
+        document.querySelectorAll('.area-item').forEach(item => item.classList.remove('selected'));
+        document.querySelectorAll('#starContainer .star').forEach(star => star.classList.remove('active'));
+        document.getElementById('ratingText').innerText = "Vui lòng chọn số sao";
+        
+        document.getElementById('remainingSteps').classList.remove('visible');
+        
+        selectedArea = "";
+        selectedRating = 0;
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>
