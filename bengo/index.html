@@ -127,7 +127,7 @@
             text-align: center;
         }
 
-        /* KHU VỰC ALBUM ẢNH STACK 3D */
+        /* KHU VỰC ALBUM ẢNH STACK 3D HỖ TRỢ ĐẾN 7 ẢNH */
         .album-container {
             position: relative;
             width: 260px;
@@ -277,28 +277,38 @@
         </header>
 
         <div class="album-container">
-            <div class="photo-card" id="card5" style="transform: translateZ(-40px) rotate(-5deg); opacity: 0.6; z-index: 1;">
-                <img src="IMG_9352.jpeg" alt="Ảnh 5">
+            <div class="photo-card" id="card7" style="transform: translateZ(-60px) rotate(-5deg); opacity: 0.5; z-index: 1;">
+                <img src="IMG_9527.jpeg" alt="Ảnh 7">
                 <div class="caption">Thương Bé Ngơ nhất trên đời 👩‍❤️‍👨</div>
             </div>
 
-            <div class="photo-card" id="card4" style="transform: translateZ(-30px) rotate(3deg); opacity: 0.7; z-index: 2;">
-                <img src="IMG_9436.jpeg" alt="Ảnh 4">
+            <div class="photo-card" id="card6" style="transform: translateZ(-50px) rotate(4deg); opacity: 0.6; z-index: 2;">
+                <img src="IMG_9487.jpeg" alt="Ảnh 6">
+                <div class="caption">Luôn tươi cười rạng rỡ em nhé 🥰</div>
+            </div>
+
+            <div class="photo-card" id="card5" style="transform: translateZ(-40px) rotate(-3deg); opacity: 0.7; z-index: 3;">
+                <img src="IMG_9451.png" alt="Ảnh 5">
                 <div class="caption">Anh hứa bảo vệ em suốt đời 🥺</div>
             </div>
 
-            <div class="photo-card" id="card3" style="transform: translateZ(-20px) rotate(-3deg); opacity: 0.8; z-index: 3;">
-                <img src="IMG_9442.jpeg" alt="Ảnh 3">
-                <div class="caption">Tự hào vì có một em người yêu siêu xịn 💖</div>
+            <div class="photo-card" id="card4" style="transform: translateZ(-30px) rotate(3deg); opacity: 0.75; z-index: 4;">
+                <img src="IMG_9442.jpeg" alt="Ảnh 4">
+                <div class="caption">Tự hào vì có em bên cạnh 💖</div>
             </div>
 
-            <div class="photo-card" id="card2" style="transform: translateZ(-10px) rotate(4deg); opacity: 0.9; z-index: 4;">
-                <img src="IMG_9451.png" alt="Ảnh 2">
-                <div class="caption">Nụ cười làm anh say đắm 🥰</div>
+            <div class="photo-card" id="card3" style="transform: translateZ(-20px) rotate(-4deg); opacity: 0.8; z-index: 5;">
+                <img src="IMG_9439.jpeg" alt="Ảnh 3">
+                <div class="caption">Nụ cười làm anh say đắm 🌟</div>
             </div>
 
-            <div class="photo-card active-top" id="card1" style="transform: translateZ(0) rotate(1deg); z-index: 5;">
-                <img src="IMG_9487.jpeg" alt="Ảnh 1">
+            <div class="photo-card" id="card2" style="transform: translateZ(-10px) rotate(3deg); opacity: 0.9; z-index: 6;">
+                <img src="IMG_9436.jpeg" alt="Ảnh 2">
+                <div class="caption">Chăm sóc em từng chút một 💊</div>
+            </div>
+
+            <div class="photo-card active-top" id="card1" style="transform: translateZ(0) rotate(1deg); z-index: 7;">
+                <img src="IMG_9352.jpeg" alt="Ảnh 1">
                 <div class="caption">Mảnh ghép đầu tiên của tụi mình 💞</div>
             </div>
         </div>
@@ -311,6 +321,7 @@
     </div>
 
     <script>
+        // Kịch bản 5 bước tương ứng lật qua từng ảnh
         const storySteps = [
             {
                 title: "Nhớ ăn uống đầy đủ nha 🍚",
@@ -345,7 +356,7 @@
                 text: "Điều quan trọng nhất là lúc nào Bé Ngơ cũng phải cười thật nhiều. Có chuyện gì mệt mỏi cứ nói anh nghe, anh luôn ở sau lưng em!",
                 btnText: "Nhận ngàn nụ hôn từ anh 💋",
                 swipeCardId: "card5",
-                nextActiveCardId: null
+                nextActiveCardId: "card6"
             }
         ];
         
@@ -425,6 +436,15 @@
                 }, 1000);
 
             } else {
+                // Lật nốt các ảnh còn lại sang giao diện kết thúc rực rỡ
+                document.getElementById('card6').classList.add('swiped');
+                const finalCard = document.getElementById('card7');
+                if (finalCard) {
+                    finalCard.style.transform = 'translateZ(0) rotate(1deg)';
+                    finalCard.style.opacity = '1';
+                    finalCard.classList.add('active-top');
+                }
+
                 document.getElementById('letterTitle').innerText = "Yêu em nhất trên đời! 💕";
                 document.getElementById('changing-text').innerText = "Chúc mừng kỷ niệm 12 ngày của tụi mình! Ngoan ngoãn, giữ gìn sức khỏe rồi anh dắt đi chơi nha Bé Ngơ ơi! Chụt chụt! 💋";
                 btnElement.style.display = 'none';
