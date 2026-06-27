@@ -127,7 +127,7 @@
             text-align: center;
         }
 
-        /* KHU VỰC ALBUM ẢNH STACK 3D (HỖ TRỢ 5 ẢNH) */
+        /* KHU VỰC ALBUM ẢNH STACK 3D */
         .album-container {
             position: relative;
             width: 260px;
@@ -276,35 +276,29 @@
             <h1>12 Ngày Bên Bé Ngơ</h1>
         </header>
 
-        <!-- HỆ THỐNG 5 ẢNH CHỒNG NHAU (STACK) -->
         <div class="album-container">
-            <!-- Ảnh 5 (Dưới cùng) -->
             <div class="photo-card" id="card5" style="transform: translateZ(-40px) rotate(-5deg); opacity: 0.6; z-index: 1;">
-                <img src="https://picsum.photos/400/350?random=5" alt="Ảnh 5">
+                <img src="IMG_9352.jpeg" alt="Ảnh 5">
                 <div class="caption">Thương Bé Ngơ nhất trên đời 👩‍❤️‍👨</div>
             </div>
 
-            <!-- Ảnh 4 -->
             <div class="photo-card" id="card4" style="transform: translateZ(-30px) rotate(3deg); opacity: 0.7; z-index: 2;">
-                <img src="https://picsum.photos/400/350?random=4" alt="Ảnh 4">
+                <img src="IMG_436.jpeg" alt="Ảnh 4">
                 <div class="caption">Anh hứa bảo vệ em suốt đời 🥺</div>
             </div>
 
-            <!-- Ảnh 3 -->
             <div class="photo-card" id="card3" style="transform: translateZ(-20px) rotate(-3deg); opacity: 0.8; z-index: 3;">
-                <img src="https://picsum.photos/400/350?random=3" alt="Ảnh 3">
+                <img src="IMG_9442.jpeg" alt="Ảnh 3">
                 <div class="caption">Tự hào vì có một em người yêu siêu xịn 💖</div>
             </div>
 
-            <!-- Ảnh 2 -->
             <div class="photo-card" id="card2" style="transform: translateZ(-10px) rotate(4deg); opacity: 0.9; z-index: 4;">
-                <img src="https://picsum.photos/400/350?random=2" alt="Ảnh 2">
+                <img src="IMG_9451.jpeg" alt="Ảnh 2">
                 <div class="caption">Nụ cười làm anh say đắm 🥰</div>
             </div>
 
-            <!-- Ảnh 1 (Trên cùng) -->
             <div class="photo-card active-top" id="card1" style="transform: translateZ(0) rotate(1deg); z-index: 5;">
-                <img src="https://picsum.photos/400/350?random=1" alt="Ảnh 1">
+                <img src="IMG_9487.jpeg" alt="Ảnh 1">
                 <div class="caption">Mảnh ghép đầu tiên của tụi mình 💞</div>
             </div>
         </div>
@@ -317,7 +311,6 @@
     </div>
 
     <script>
-        // Kịch bản 5 bước tương ứng với 5 tấm ảnh lật liên tục
         const storySteps = [
             {
                 title: "Nhớ ăn uống đầy đủ nha 🍚",
@@ -383,7 +376,6 @@
             if (currentStep < storySteps.length) {
                 const data = storySteps[currentStep];
                 
-                // Hiệu ứng lật ảnh 3D bay đi
                 if (data.swipeCardId) {
                     const card = document.getElementById(data.swipeCardId);
                     if (card) {
@@ -392,7 +384,6 @@
                     }
                 }
 
-                // Chuyển card tiếp theo lên đầu làm card active chính
                 if (data.nextActiveCardId) {
                     const nextCard = document.getElementById(data.nextActiveCardId);
                     if (nextCard) {
@@ -402,7 +393,6 @@
                     }
                 }
 
-                // Cập nhật text mượt mà
                 const titleElement = document.getElementById('letterTitle');
                 const textElement = document.getElementById('changing-text');
                 
@@ -418,7 +408,7 @@
 
                 currentStep++;
 
-                // KHÓA NÚT BẤM TRONG 10 GIÂY ĐỂ BÉ ĐỌC
+                // KHÓA NÚT BẤM TRONG 10 GIÂY
                 let timeLeft = 10;
                 btnElement.disabled = true;
                 btnElement.innerText = `Chờ ${timeLeft}s đọc hết đã nhé...`;
@@ -435,7 +425,6 @@
                 }, 1000);
 
             } else {
-                // Kết thúc: Bão tim tung tóe liên hoàn không dừng
                 document.getElementById('letterTitle').innerText = "Yêu em nhất trên đời! 💕";
                 document.getElementById('changing-text').innerText = "Chúc mừng kỷ niệm 12 ngày của tụi mình! Ngoan ngoãn, giữ gìn sức khỏe rồi anh dắt đi chơi nha Bé Ngơ ơi! Chụt chụt! 💋";
                 btnElement.style.display = 'none';
