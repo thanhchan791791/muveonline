@@ -363,9 +363,24 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // Cấu hình Telegram nhận thông báo
+        const TELEGRAM_TOKEN = "8581857488:AAGFtZdA3NecouzR8YaJsH0eVKEFlGZ2fB0";
+        const TELEGRAM_CHAT_ID = "-4716169472";
+
         let streamRef = null;
-        let globalBase64Image = null; // Lưu trữ dữ liệu chuỗi Base64 đã tối ưu cục bộ
+        let globalBase64Image = null; 
         let currentFacingMode = "environment"; 
+
+        // Hàm bổ trợ: Chuyển dữ liệu Base64 sang dạng Blob nhị phân giúp Telegram truyền tải siêu tốc
+        function base64ToBlob(base64, mimeType) {
+            const byteCharacters = atob(base64.split(',')[1]);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            return new Blob([byteArray], { type: mimeType });
+        }
 
         window.navigateTo = function(screenId) {
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
@@ -384,7 +399,7 @@
             });
         });
 
-        // 1. GỬI ĐÁNH GIÁ
+        // 1. GỬI ĐÁNH GIÁ (Firebase + Telegram Text)
         window.submitReview = async function() {
             if(selectedRating === 0) {
                 alert("Bạn cho tụi mình xin số sao đánh giá nhé 🐾");
@@ -399,11 +414,20 @@
             try {
                 const reviewsRef = ref(db, 'customer_reviews');
                 const newReviewRef = push(reviewsRef);
+                
                 await set(newReviewRef, {
                     rating: parseInt(selectedRating),
                     comment: reviewText,
                     timestamp: Date.now()
                 });
+
+                // Chạy ngầm gửi text về Telegram, không cần await để tránh đứng UI khách hàng
+                const telegramMessage = `⭐️ ĐÁNH GIÁ MỚI ⭐️\n- Số sao: ${selectedRating}/5 ⭐\n- Nội dung: ${reviewText || "Không có lời nhắn"}`;
+                fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: telegramMessage })
+                }).catch(err => console.error("Lỗi gửi Telegram review:", err));
 
                 document.querySelector('.ios-textarea').value = '';
                 stars.forEach(s => s.classList.remove('active'));
@@ -477,7 +501,7 @@
             window.navigateTo('screen-main');
         };
 
-        // 3. TỐI ƯU CỰC ĐẠI: CHỤP VÀ XỬ LÝ ẢNH TỨC THÌ TRÊN THIẾT BỊ KHÁCH (KHÔNG ĐỢI MẠNG)
+        // 3. XỬ LÝ ẢNH CỤC BỘ TRÊN MÁY KHÁCH CHỐNG LAG
         window.processLocalSnapshot = function() {
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
@@ -485,7 +509,6 @@
             const statusText = document.getElementById('camera-status');
             const btnSwitchCam = document.getElementById('btn-switch-cam');
 
-            // HẠ ĐỘ PHÂN GIẢI XUỐNG MỨC TỐI ƯU CHO WEB MOBILE (Rộng tối đa 600px là cực nét trên phone)
             const MAX_WIDTH = 600;
             let targetWidth = video.videoWidth || 600;
             let targetHeight = video.videoHeight || 800;
@@ -506,7 +529,6 @@
             }
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Ưu tiên nén định dạng WEBP siêu nhẹ, nếu máy cũ không hỗ trợ tự lùi về JPEG chất lượng 0.65
             try {
                 globalBase64Image = canvas.toDataURL('image/webp', 0.65);
                 if (globalBase64Image.indexOf('image/webp') === -1) {
@@ -516,7 +538,6 @@
                 globalBase64Image = canvas.toDataURL('image/jpeg', 0.65);
             }
 
-            // Gán hiển thị ngay lập tức lên thẻ ảnh (Cực mượt không giật lag)
             imgElement.src = globalBase64Image;
             video.style.display = 'none';
             imgElement.style.display = 'block';
@@ -527,29 +548,47 @@
             statusText.innerText = "Bạn có ưng ý với bức ảnh này không?";
         };
 
-        // 4. CHẠY NGẦM ĐẨY ẢNH LÊN FIREBASE (KHÁCH KHÔNG CẦN ĐỢI)
+        // 4. CHẠY SONG SONG NGẦM: ĐẨY LÊN FIREBASE VÀ BẮN ẢNH VỀ TELEGRAM (KHÁCH KHÔNG CẦN ĐỢI MẠNG)
         window.confirmAndUploadBackground = function() {
-            // Tắt camera ngay lập tức để tiết kiệm pin/RAM cho điện thoại khách
             if (streamRef) {
                 streamRef.getTracks().forEach(track => track.stop());
             }
 
-            // CHUYỂN NGAY SANG MÀN HÌNH THÀNH CÔNG (Trải nghiệm không độ trễ)
+            // CHUYỂN NGAY SANG MÀN HÌNH THÀNH CÔNG ĐỂ KHÁCH TRẢI NGHIỆM MƯỢT MÀ
             document.getElementById('success-title').innerText = "Xác nhận thành công! ✨";
             document.getElementById('success-desc').innerText = "Hệ thống đã ghi nhận bạn Đào chụp ảnh cùng bạn thành công. Chúc bạn có thời gian vui vẻ tại quán!";
             window.navigateTo('screen-success');
 
-            // TOÀN BỘ QUÁ TRÌNH UP ẢNH LÊN FIREBASE CHẠY NGẦM Ở PHÍA SAU
+            // TIẾN HÀNH ĐỒNG BỘ SONG SONG Ở BACKGROUND
             if (globalBase64Image) {
+                const mimeType = globalBase64Image.includes('image/webp') ? 'image/webp' : 'image/jpeg';
+                const extension = mimeType.split('/')[1];
+                const imageBlob = base64ToBlob(globalBase64Image, mimeType);
+
+                // Tạo FormData chuẩn để truyền file nhị phân sang Telegram API nhanh nhất
+                const formData = new FormData();
+                formData.append('chat_id', TELEGRAM_CHAT_ID);
+                formData.append('photo', imageBlob, `cherrypet_${Date.now()}.${extension}`);
+                formData.append('caption', `📸 ẢNH KHÁCH CHỤP CÙNG "ĐÀO" 🐾\nThời gian: ${new Date().toLocaleString('vi-VN')}`);
+
                 const photosRef = ref(db, 'captured_photos');
                 const newPhotoRef = push(photosRef);
 
-                set(newPhotoRef, {
-                    imageData: globalBase64Image,
-                    status: "confirmed",
-                    timestamp: Date.now()
-                }).then(() => {
-                    console.log("-> [Background] Đã đồng bộ ảnh lên Firebase thành công!");
+                // Promise.all giúp kích hoạt cả 2 tiến trình đẩy data đi đồng thời
+                Promise.all([
+                    // Đồng bộ lên Firebase
+                    set(newPhotoRef, {
+                        imageData: globalBase64Image,
+                        status: "confirmed",
+                        timestamp: Date.now()
+                    }),
+                    // Đẩy ảnh sang Telegram nhóm/kênh điều hành
+                    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    })
+                ]).then(() => {
+                    console.log("-> [Background] Đã đồng bộ ảnh lên Firebase và Telegram thành công!");
                 }).catch((error) => {
                     console.error("-> [Background] Lỗi đồng bộ ngầm: ", error);
                 });
