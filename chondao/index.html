@@ -193,6 +193,32 @@
             object-fit: cover;
         }
 
+        /* Nút đổi camera kính mờ phong cách iOS */
+        .switch-cam-btn {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #ffffff;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        
+        .switch-cam-btn:active {
+            transform: scale(0.9) rotate(30deg);
+        }
+
         #captured-image { display: none; }
 
         .success-checkmark {
@@ -214,7 +240,6 @@
             100% { transform: scale(1); }
         }
 
-        /* Hiệu ứng loading dạng spinner iOS */
         .spinner {
             display: inline-block;
             width: 20px;
@@ -278,6 +303,11 @@
             <div class="ios-card" style="padding: 16px;">
                 <div class="camera-box">
                     <video id="video" autoplay playsinline muted></video>
+                    
+                    <button id="btn-switch-cam" class="switch-cam-btn" onclick="switchCamera()">
+                        <i class="fa-solid fa-camera-rotate"></i>
+                    </button>
+                    
                     <img id="captured-image" alt="Captured photo">
                     <canvas id="canvas" style="display:none;"></canvas>
                 </div>
@@ -320,7 +350,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, push, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Firebase Config của bạn
         const firebaseConfig = {
             apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
             authDomain: "dogs-be72b.firebaseapp.com",
@@ -332,21 +361,20 @@
             measurementId: "G-Y72BF1RQ2C"
         };
 
-        // Khởi tạo Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Biến toàn cục quản lý camera và ID của ảnh vừa chụp
         let streamRef = null;
         let currentPhotoId = null;
+        
+        // Mặc định ban đầu cấu hình mở camera sau ('environment')
+        let currentFacingMode = "environment"; 
 
-        // Định nghĩa các hàm điều hướng và tương tác toàn cục
         window.navigateTo = function(screenId) {
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         };
 
-        // Logic đánh giá sao
         const stars = document.querySelectorAll('.star');
         let selectedRating = 0;
 
@@ -380,7 +408,6 @@
                     timestamp: Date.now()
                 });
 
-                // Reset UI sau thành công
                 document.querySelector('.ios-textarea').value = '';
                 stars.forEach(s => s.classList.remove('active'));
                 selectedRating = 0;
@@ -398,25 +425,62 @@
             }
         };
 
-        // 2. MỞ CAMERA
-        window.startCamera = async function() {
-            window.navigateTo('screen-camera');
-            window.retakePhoto();
+        // 2. HÀM KHỞI ĐỘNG CAMERA (CÓ THAM SỐ TRUYỀN HƯỚNG CAM)
+        async function openCamera(facingMode) {
+            // Tắt stream cũ đang hoạt động trước khi mở luồng mới
+            if (streamRef) {
+                streamRef.getTracks().forEach(track => track.stop());
+            }
 
             try {
                 streamRef = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user' },
+                    video: { 
+                        facingMode: facingMode,
+                        width: { ideal: 1080 },
+                        height: { ideal: 1440 }
+                    },
                     audio: false
                 });
-                document.getElementById('video').srcObject = streamRef;
+                
+                const videoElement = document.getElementById('video');
+                videoElement.srcObject = streamRef;
+
+                // Xử lý hiệu ứng gương phản chiếu: CHỈ lật hình đối với camera trước (user)
+                if (facingMode === 'user') {
+                    videoElement.style.transform = 'scaleX(-1)';
+                } else {
+                    videoElement.style.transform = 'scaleX(1)';
+                }
+
             } catch (err) {
-                console.error("Lỗi truy cập Camera: ", err);
-                alert("Không thể mở camera. Bạn hãy cấp quyền truy cập camera cho trình duyệt nhé!");
-                window.navigateTo('screen-main');
+                console.error("Lỗi khởi tạo thiết bị camera: ", err);
+                
+                // Cơ chế dự phòng: Nếu không mở được cam sau (máy tính không có), tự động lùi về cam bất kỳ có sẵn
+                if (facingMode === "environment") {
+                    console.log("Thử mở lại bằng chế độ camera mặc định bất kỳ...");
+                    openCamera("user");
+                } else {
+                    alert("Không thể truy cập camera. Vui lòng kiểm tra quyền cài đặt của trình duyệt!");
+                    window.navigateTo('screen-main');
+                }
             }
+        }
+
+        // Bấm mở camera từ menu chính
+        window.startCamera = function() {
+            window.navigateTo('screen-camera');
+            window.retakePhoto();
+            currentFacingMode = "environment"; // Mặc định luôn ưu tiên camera sau
+            openCamera(currentFacingMode);
         };
 
-        // 3. TẮT CAMERA
+        // 3. HÀM CHUYỂN ĐỔI QUA LẠI GIỮA CAM TRƯỚC VÀ CAM SAU
+        window.switchCamera = function() {
+            currentFacingMode = (currentFacingMode === "user") ? "environment" : "user";
+            openCamera(currentFacingMode);
+        };
+
+        // TẮT CAMERA
         window.stopCameraView = function() {
             if (streamRef) {
                 streamRef.getTracks().forEach(track => track.stop());
@@ -431,52 +495,48 @@
             const imgElement = document.getElementById('captured-image');
             const btnSnapshot = document.getElementById('btn-snapshot');
             const statusText = document.getElementById('camera-status');
+            const btnSwitchCam = document.getElementById('btn-switch-cam');
 
-            // Vẽ ảnh lên canvas
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const context = canvas.getContext('2d');
             
-            // Hiệu ứng gương khi chụp cam trước
-            context.translate(canvas.width, 0);
-            context.scale(-1, 1);
+            // Xử lý lưu hướng ảnh dựa theo loại camera lúc chụp
+            if (currentFacingMode === 'user') {
+                context.translate(canvas.width, 0);
+                context.scale(-1, 1);
+            }
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Chuyển ảnh thành chuỗi Base64
-            const base64Image = canvas.toDataURL('image/jpeg', 0.7); // nén chất lượng xuống 70% để tải nhanh hơn
+            const base64Image = canvas.toDataURL('image/jpeg', 0.7);
 
-            // Đổi trạng thái hiển thị đang xử lý dữ liệu
             btnSnapshot.disabled = true;
             btnSnapshot.innerHTML = `<span class="spinner"></span> Đang đồng bộ Firebase...`;
             statusText.innerText = "Đang tải ảnh lên hệ thống...";
+            btnSwitchCam.style.display = 'none'; // Ẩn nút xoay cam khi đang xem ảnh chụp
 
             try {
-                // Bước A: Đẩy chuỗi Base64 lên node 'captured_photos' trên Firebase Realtime
                 const photosRef = ref(db, 'captured_photos');
                 const newPhotoRef = push(photosRef);
-                currentPhotoId = newPhotoRef.key; // Lưu lại key vừa tạo
+                currentPhotoId = newPhotoRef.key;
 
                 await set(newPhotoRef, {
                     imageData: base64Image,
-                    status: "pending", // tạm thời lưu ở trạng thái chờ khách duyệt
+                    status: "pending",
                     timestamp: Date.now()
                 });
 
-                // Bước B: Lấy dữ liệu ảnh vừa lưu chính xác từ node đó về để hiển thị
                 statusText.innerText = "Đang tải ảnh từ Firebase về để xác nhận...";
                 const savedPhotoSnap = await get(ref(db, `captured_photos/${currentPhotoId}`));
 
                 if (savedPhotoSnap.exists()) {
                     const fetchedData = savedPhotoSnap.val();
                     
-                    // Gán nguồn ảnh lấy từ Firebase vào thẻ <img> để khách xem
                     imgElement.src = fetchedData.imageData;
 
-                    // Ẩn luồng video trực tiếp, hiện thẻ ảnh tĩnh lên
                     video.style.display = 'none';
                     imgElement.style.display = 'block';
 
-                    // Chuyển cụm điều hướng nút sang chế độ Xác nhận
                     document.getElementById('camera-actions').style.display = 'none';
                     document.getElementById('confirm-actions').style.display = 'block';
                     statusText.innerText = "Đây là ảnh tải thực tế từ Realtime DB:";
@@ -500,6 +560,7 @@
             document.getElementById('captured-image').style.display = 'none';
             document.getElementById('camera-actions').style.display = 'block';
             document.getElementById('confirm-actions').style.display = 'none';
+            document.getElementById('btn-switch-cam').style.display = 'flex'; // Hiện lại nút xoay cam
             document.getElementById('camera-status').innerText = "Hãy chọn góc thật đẹp cùng bạn cún nhé!";
             currentPhotoId = null;
         };
@@ -508,7 +569,6 @@
         window.confirmPhoto = async function() {
             if (currentPhotoId) {
                 try {
-                    // Cập nhật trạng thái ảnh thành 'confirmed'
                     await set(ref(db, `captured_photos/${currentPhotoId}/status`), "confirmed");
                 } catch (e) {
                     console.error("Không thể cập nhật trạng thái ảnh: ", e);
