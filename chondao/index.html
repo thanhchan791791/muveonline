@@ -17,8 +17,10 @@
             --card-bg: rgba(255, 255, 255, 0.75);
             --card-blur: blur(20px);
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 8px 32px rgba(255, 183, 178, 0.3);
-            --text-main: #4A4A4A;
+            --shadow-md: 0 12px 40px rgba(255, 183, 178, 0.25);
+            --shadow-btn: 0 8px 20px rgba(255, 162, 154, 0.2);
+            --text-main: #3A3A3C;
+            --text-secondary: #8E8E93;
         }
 
         * {
@@ -53,80 +55,190 @@
         .screen {
             display: none;
             width: 100%;
-            animation: slideIn 0.5s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+            opacity: 0;
             flex-direction: column;
             align-items: center;
         }
 
         .screen.active {
             display: flex;
+            animation: iosSlideIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes iosSlideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(40px) scale(0.96);
+                filter: blur(5px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
         }
 
         .ios-card {
             background: var(--card-bg);
             backdrop-filter: var(--card-blur);
             -webkit-backdrop-filter: var(--card-blur);
-            border-radius: 28px;
-            padding: 30px 24px;
+            border-radius: 32px;
+            padding: 32px 24px;
             width: 100%;
             box-shadow: var(--shadow-md);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             text-align: center;
             margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hiệu ứng ánh sáng lung linh chạy qua card */
+        .ios-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+            animation: shineEffect 6s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes shineEffect {
+            0% { transform: translate(-30%, -30%) rotate(45deg); }
+            100% { transform: translate(30%, 30%) rotate(45deg); }
         }
 
         .logo-area {
-            margin-top: 40px;
+            margin-top: 25px;
             text-align: center;
-            animation: bounce 2s infinite ease-in-out;
         }
 
-        .logo-area i {
-            font-size: 4rem;
-            color: var(--primary-pink);
-            text-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        /* Khung chứa ảnh logo mới của quán */
+        .logo-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 110px;
+            height: 110px;
+            border-radius: 30px;
+            background: #ffffff;
+            padding: 8px;
+            box-shadow: 0 12px 24px rgba(255, 183, 178, 0.4);
+            animation: gentleFloat 4s infinite ease-in-out;
+        }
+
+        .logo-wrapper img.main-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 22px;
+        }
+
+        .logo-wrapper .sub-icon {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            font-size: 1.6rem;
+            color: #FFB7B2;
+            background: #ffffff;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: heartBeat 1.5s infinite ease-in-out;
+        }
+
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
         }
 
         .main-title {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: #5D5D5D;
-            margin-top: 15px;
-            letter-spacing: -0.5px;
+            color: #3A3A3C;
+            margin-top: 20px;
+            letter-spacing: -0.8px;
         }
 
         .subtitle {
-            font-size: 0.95rem;
-            color: #8E8E93;
-            margin-top: 5px;
-            margin-bottom: 30px;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            margin-bottom: 24px;
+            line-height: 1.4;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        .info-badge {
+            background: rgba(255, 183, 178, 0.15);
+            color: #D87A74;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 15px;
         }
 
         .ios-btn {
             width: 100%;
-            padding: 16px 20px;
-            border-radius: 20px;
+            padding: 18px 24px;
+            border-radius: 22px;
             border: none;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             gap: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ios-btn .btn-text-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .ios-btn .btn-subtext {
+            font-size: 0.8rem;
+            font-weight: 400;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .ios-btn i.btn-main-icon {
+            font-size: 1.4rem;
+        }
+
+        .ios-btn i.fa-chevron-right {
+            font-size: 0.9rem;
+            opacity: 0.5;
+            transition: transform 0.3s;
+        }
+
+        .ios-btn:hover i.fa-chevron-right {
+            transform: translateX(4px);
         }
 
         .ios-btn:disabled {
@@ -135,121 +247,174 @@
         }
 
         .ios-btn:active:not(:disabled) {
-            transform: scale(0.96);
-            opacity: 0.9;
+            transform: scale(0.95);
+            filter: brightness(0.95);
         }
 
-        .btn-pink { background: linear-gradient(135deg, #FFB7B2 0%, #FFA29A 100%); color: white; }
-        .btn-peach { background: linear-gradient(135deg, #FFDAC1 0%, #FFC8A2 100%); color: #7A5741; }
-        .btn-mint { background: linear-gradient(135deg, #B5EAD7 0%, #A1E3CC 100%); color: #2E5A4B; }
-        .btn-secondary { background: rgba(0, 0, 0, 0.05); color: #4A4A4A; backdrop-filter: blur(5px); }
+        .btn-pink { 
+            background: linear-gradient(135deg, #FFB7B2 0%, #FFA29A 100%); 
+            color: white;
+            box-shadow: 0 8px 24px rgba(255, 162, 154, 0.35);
+        }
+        .btn-peach { 
+            background: linear-gradient(135deg, #FFDAC1 0%, #FFC8A2 100%); 
+            color: #6D432A;
+            box-shadow: 0 8px 24px rgba(255, 200, 162, 0.35);
+        }
+        .btn-mint { 
+            background: linear-gradient(135deg, #B5EAD7 0%, #90DCC2 100%); 
+            color: #1A4335;
+            box-shadow: 0 8px 24px rgba(144, 220, 194, 0.35);
+            justify-content: center;
+        }
+        .btn-secondary { 
+            background: rgba(0, 0, 0, 0.04); 
+            color: #4A4A4A; 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,0,0,0.02);
+            justify-content: center;
+        }
 
         .rating-container {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin: 20px 0;
+            gap: 14px;
+            margin: 25px 0;
         }
 
         .star {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             color: #E5E5EA;
             cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s;
         }
 
-        .star.active { color: #FFD60A; transform: scale(1.15); }
+        .star.active { 
+            color: #FFD60A; 
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 8px rgba(255, 214, 10, 0.5));
+        }
 
         .ios-textarea {
             width: 100%;
-            height: 120px;
-            padding: 16px;
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: rgba(255, 255, 255, 0.6);
+            height: 140px;
+            padding: 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.5);
             font-size: 1rem;
             resize: none;
             outline: none;
-            transition: border-color 0.3s;
-            margin-bottom: 20px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-bottom: 24px;
+            color: var(--text-main);
         }
 
-        .ios-textarea:focus { border-color: var(--primary-pink); background: #ffffff; }
+        .ios-textarea:focus { 
+            border-color: #FFB7B2; 
+            background: #ffffff; 
+            box-shadow: 0 0 0 4px rgba(255, 183, 178, 0.25);
+        }
 
         .camera-box {
             width: 100%;
-            border-radius: 24px;
+            border-radius: 28px;
             overflow: hidden;
-            background: #000;
+            background: #1C1C1E;
             position: relative;
             aspect-ratio: 3/4;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+            margin-bottom: 24px;
+            border: 4px solid rgba(255,255,255,0.5);
         }
 
         #video, #captured-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: all 0.3s ease;
         }
 
         .switch-cam-btn {
             position: absolute;
-            bottom: 16px;
-            right: 16px;
-            width: 48px;
-            height: 48px;
+            bottom: 20px;
+            right: 20px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.4);
             color: #ffffff;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 10;
-            transition: transform 0.2s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
         .switch-cam-btn:active {
-            transform: scale(0.9) rotate(30deg);
+            transform: scale(0.85) rotate(45deg);
         }
 
         #captured-image { display: none; }
 
         .success-checkmark {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            background: #E2F0CB;
+            width: 90px;
+            height: 90px;
+            margin: 10px auto 25px;
+            background: linear-gradient(135deg, #E2F0CB 0%, #CDE6A5 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            box-shadow: 0 8px 20px rgba(226, 240, 203, 0.5);
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        .success-checkmark i { font-size: 2.5rem; color: #578059; }
+        .success-checkmark i { font-size: 2.8rem; color: #436645; }
 
         @keyframes popIn {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
 
         .spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border: 3px solid rgba(255,255,255,.3);
             border-radius: 50%;
             border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
+            animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .suggest-tag {
+            background: rgba(0,0,0,0.04);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .suggest-tag:active {
+            background: var(--primary-pink);
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -258,24 +423,40 @@
 
         <div id="screen-main" class="screen active">
             <div class="logo-area">
-                <i class="fa-solid fa-paw"></i>
+                <div class="logo-wrapper">
+                    <img src="logo.PNG" alt="Cherrypet Logo" class="main-logo-img">
+                    <div class="sub-icon">🐾</div>
+                </div>
                 <h1 class="main-title">Xin chào bạn!</h1>
-                <p class="subtitle">Hôm nay bạn trải nghiệm thế nào nè?</p>
+                <p class="subtitle">Chào mừng bạn đến với không gian của những chiếc ôm 🐾<br>Hôm nay bạn trải nghiệm tại quán thế nào nè?</p>
             </div>
             
             <div class="ios-card">
+                <div class="info-badge">
+                    <i class="fa-solid fa-star"></i> Đóng góp ý kiến giúp nâng cấp dịch vụ
+                </div>
+                
                 <button class="ios-btn btn-pink" onclick="navigateTo('screen-review')">
-                    <i class="fa-solid fa-heart-captioned"></i> Đánh giá dịch vụ
+                    <div class="btn-text-group">
+                        <span>Đánh giá dịch vụ</span>
+                        <span class="btn-subtext">Chia sẻ cảm xúc & chấm điểm 5 sao</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
                 </button>
+                
                 <button class="ios-btn btn-peach" onclick="startCamera()">
-                    <i class="fa-solid fa-camera"></i> Chọn "đào" chụp ảnh
+                    <div class="btn-text-group">
+                        <span>Chọn "đào" chụp ảnh</span>
+                        <span class="btn-subtext">Lưu giữ khoảnh khắc cùng các bé pet</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
         </div>
 
         <div id="screen-review" class="screen">
             <div class="main-title" style="margin-top: 20px;">Đánh giá dịch vụ</div>
-            <p class="subtitle">Ý kiến của bạn giúp tụi mình tốt hơn mỗi ngày</p>
+            <p class="subtitle">Mỗi ý kiến của bạn là động lực giúp tụi mình<br>hoàn thiện và tốt hơn mỗi ngày</p>
 
             <div class="ios-card">
                 <div class="rating-container">
@@ -286,18 +467,25 @@
                     <i class="fa-solid fa-star star" data-value="5"></i>
                 </div>
 
-                <textarea class="ios-textarea" placeholder="Chia sẻ thêm cảm nhận của bạn tại đây nha..."></textarea>
+                <div class="tag-container">
+                    <span class="suggest-tag" onclick="document.querySelector('.ios-textarea').value += 'Các bé pet siêu dễ thương và mến khách! '">Pet dễ thương 🐶</span>
+                    <span class="suggest-tag" onclick="document.querySelector('.ios-textarea').value += 'Không gian sạch sẽ, không bị mùi, rất thoải mái. '">Không gian sạch 🌿</span>
+                    <span class="suggest-tag" onclick="document.querySelector('.ios-textarea').value += 'Nhân viên phục vụ nhiệt tình, thân thiện vô cùng. '">Phục vụ tốt ✨</span>
+                </div>
+
+                <textarea class="ios-textarea" placeholder="Chia sẻ thêm cảm nhận chi tiết của bạn tại đây để tụi mình biết nha..."></textarea>
                 
                 <button class="ios-btn btn-mint" id="btn-submit-review" onclick="submitReview()">
-                    <i class="fa-solid fa-paper-plane"></i> Gửi đánh giá
+                    <span>Gửi đánh giá ngay</span>
+                    <i class="fa-solid fa-paper-plane btn-main-icon"></i>
                 </button>
-                <button class="ios-btn btn-secondary" onclick="navigateTo('screen-main')">Quay lại</button>
+                <button class="ios-btn btn-secondary" onclick="navigateTo('screen-main')">Quay lại Trang chủ</button>
             </div>
         </div>
 
         <div id="screen-camera" class="screen">
             <div class="main-title" style="margin-top: 20px;">Chụp ảnh cùng "Đào"</div>
-            <p class="subtitle" id="camera-status">Hãy chọn góc thật đẹp cùng bạn cún nhé!</p>
+            <p class="subtitle" id="camera-status">Hãy căn chỉnh một góc thật xinh đẹp và thần thái cùng bạn cún đáng yêu nhé!</p>
 
             <div class="ios-card" style="padding: 16px;">
                 <div class="camera-box">
@@ -312,34 +500,34 @@
                 </div>
 
                 <div id="camera-actions">
-                    <button class="ios-btn btn-pink" id="btn-snapshot" onclick="processLocalSnapshot()">
-                        <i class="fa-solid fa-camera"></i> Chụp ảnh ngay
+                    <button class="ios-btn btn-pink" id="btn-snapshot" onclick="processLocalSnapshot()" style="justify-content: center;">
+                        <i class="fa-solid fa-camera btn-main-icon" style="margin-right: 8px;"></i> Bấm chụp ảnh ngay
                     </button>
                 </div>
                 
                 <div id="confirm-actions" style="display: none;">
                     <button class="ios-btn btn-mint" onclick="confirmAndUploadBackground()">
-                        <i class="fa-solid fa-circle-check"></i> Xác nhận chọn bạn này
+                        <i class="fa-solid fa-circle-check btn-main-icon" style="margin-right: 8px;"></i> Xác nhận chọn bức ảnh này
                     </button>
                     <button class="ios-btn btn-secondary" onclick="retakePhoto()">
-                        <i class="fa-solid fa-arrow-rotate-left"></i> Chụp lại
+                        <i class="fa-solid fa-arrow-rotate-left" style="margin-right: 8px;"></i> Chụp lại hình khác
                     </button>
                 </div>
 
-                <button class="ios-btn btn-secondary" id="btn-camera-back" onclick="stopCameraView()">Hủy bỏ</button>
+                <button class="ios-btn btn-secondary" id="btn-camera-back" onclick="stopCameraView()">Hủy bỏ và quay lại</button>
             </div>
         </div>
 
         <div id="screen-success" class="screen">
-            <div class="ios-card" style="margin-top: 80px;">
+            <div class="ios-card" style="margin-top: 60px;">
                 <div class="success-checkmark">
                     <i class="fa-solid fa-check"></i>
                 </div>
-                <h2 id="success-title" style="margin-bottom: 10px;">Cảm ơn bạn!</h2>
-                <p id="success-desc" style="color: #666; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.4;">
+                <h2 id="success-title" style="margin-bottom: 12px; font-weight: 700; letter-spacing: -0.5px;">Cảm ơn bạn!</h2>
+                <p id="success-desc" style="color: #666; margin-bottom: 30px; font-size: 0.98rem; line-height: 1.5; padding: 0 10px;">
                     Ghi nhận lịch sự thành công.
                 </p>
-                <button class="ios-btn btn-pink" onclick="navigateTo('screen-main')">Quay về Trang chủ</button>
+                <button class="ios-btn btn-pink" onclick="navigateTo('screen-main')" style="justify-content: center;">Quay về Trang chủ</button>
             </div>
         </div>
 
@@ -371,7 +559,6 @@
         let globalBase64Image = null; 
         let currentFacingMode = "environment"; 
 
-        // Hàm bổ trợ: Chuyển dữ liệu Base64 sang dạng Blob nhị phân giúp Telegram truyền tải siêu tốc
         function base64ToBlob(base64, mimeType) {
             const byteCharacters = atob(base64.split(',')[1]);
             const byteNumbers = new Array(byteCharacters.length);
@@ -421,7 +608,6 @@
                     timestamp: Date.now()
                 });
 
-                // Chạy ngầm gửi text về Telegram, không cần await để tránh đứng UI khách hàng
                 const telegramMessage = `⭐️ ĐÁNH GIÁ MỚI ⭐️\n- Số sao: ${selectedRating}/5 ⭐\n- Nội dung: ${reviewText || "Không có lời nhắn"}`;
                 fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
                     method: 'POST',
@@ -442,7 +628,7 @@
                 alert("Gửi đánh giá không thành công!");
             } finally {
                 btnSubmit.disabled = false;
-                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Gửi đánh giá`;
+                btnSubmit.innerHTML = `<span>Gửi đánh giá ngay</span><i class="fa-solid fa-paper-plane btn-main-icon"></i>`;
             }
         };
 
@@ -545,44 +731,38 @@
 
             document.getElementById('camera-actions').style.display = 'none';
             document.getElementById('confirm-actions').style.display = 'block';
-            statusText.innerText = "Bạn có ưng ý với bức ảnh này không?";
+            statusText.innerText = "Bạn có thực sự ưng ý với bức ảnh tuyệt vời này không?";
         };
 
-        // 4. CHẠY SONG SONG NGẦM: ĐẨY LÊN FIREBASE VÀ BẮN ẢNH VỀ TELEGRAM (KHÁCH KHÔNG CẦN ĐỢI MẠNG)
+        // 4. CHẠY SONG SONG NGẦM
         window.confirmAndUploadBackground = function() {
             if (streamRef) {
                 streamRef.getTracks().forEach(track => track.stop());
             }
 
-            // CHUYỂN NGAY SANG MÀN HÌNH THÀNH CÔNG ĐỂ KHÁCH TRẢI NGHIỆM MƯỢT MÀ
             document.getElementById('success-title').innerText = "Xác nhận thành công! ✨";
             document.getElementById('success-desc').innerText = "Hệ thống đã ghi nhận bạn Đào chụp ảnh cùng bạn thành công. Chúc bạn có thời gian vui vẻ tại quán!";
             window.navigateTo('screen-success');
 
-            // TIẾN HÀNH ĐỒNG BỘ SONG SONG Ở BACKGROUND
             if (globalBase64Image) {
                 const mimeType = globalBase64Image.includes('image/webp') ? 'image/webp' : 'image/jpeg';
                 const extension = mimeType.split('/')[1];
                 const imageBlob = base64ToBlob(globalBase64Image, mimeType);
 
-                // Tạo FormData chuẩn để truyền file nhị phân sang Telegram API nhanh nhất
                 const formData = new FormData();
                 formData.append('chat_id', TELEGRAM_CHAT_ID);
                 formData.append('photo', imageBlob, `cherrypet_${Date.now()}.${extension}`);
                 formData.append('caption', `📸 ẢNH KHÁCH CHỤP CÙNG "ĐÀO" 🐾\nThời gian: ${new Date().toLocaleString('vi-VN')}`);
 
-                const photosRef = ref(db, 'captured_photos');
+                const photosRef = ref(db, 'captured_photos');a
                 const newPhotoRef = push(photosRef);
 
-                // Promise.all giúp kích hoạt cả 2 tiến trình đẩy data đi đồng thời
                 Promise.all([
-                    // Đồng bộ lên Firebase
                     set(newPhotoRef, {
                         imageData: globalBase64Image,
                         status: "confirmed",
                         timestamp: Date.now()
                     }),
-                    // Đẩy ảnh sang Telegram nhóm/kênh điều hành
                     fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
                         method: 'POST',
                         body: formData
