@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Cherrypet Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-pink: #FFB7B2;
+            --primary-peach: #FFDAC1;
+            --mint-green: #E2F0CB;
+            --ios-blue: #007AFF;
+            --bg-gradient: linear-gradient(135deg, #FFF5F5 0%, #FFF0F5 100%);
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --card-blur: blur(20px);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 32px rgba(255, 183, 178, 0.3);
+            --text-main: #4A4A4A;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+            padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom) 16px;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 414px;
+            min-height: calc(100vh - 40px);
+            margin: 20px auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            animation: slideIn 0.5s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .ios-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--card-blur);
+            -webkit-backdrop-filter: var(--card-blur);
+            border-radius: 28px;
+            padding: 30px 24px;
+            width: 100%;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .logo-area {
+            margin-top: 40px;
+            text-align: center;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        .logo-area i {
+            font-size: 4rem;
+            color: var(--primary-pink);
+            text-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .main-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #5D5D5D;
+            margin-top: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #8E8E93;
+            margin-top: 5px;
+            margin-bottom: 30px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .ios-btn {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 20px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .ios-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .ios-btn:active:not(:disabled) {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+
+        .btn-pink { background: linear-gradient(135deg, #FFB7B2 0%, #FFA29A 100%); color: white; }
+        .btn-peach { background: linear-gradient(135deg, #FFDAC1 0%, #FFC8A2 100%); color: #7A5741; }
+        .btn-mint { background: linear-gradient(135deg, #B5EAD7 0%, #A1E3CC 100%); color: #2E5A4B; }
+        .btn-secondary { background: rgba(0, 0, 0, 0.05); color: #4A4A4A; backdrop-filter: blur(5px); }
+
+        .rating-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .star {
+            font-size: 2.2rem;
+            color: #E5E5EA;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s;
+        }
+
+        .star.active { color: #FFD60A; transform: scale(1.15); }
+
+        .ios-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            transition: border-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .ios-textarea:focus { border-color: var(--primary-pink); background: #ffffff; }
+
+        .camera-box {
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+            aspect-ratio: 3/4;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+        }
+
+        #video, #captured-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #captured-image { display: none; }
+
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: #E2F0CB;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .success-checkmark i { font-size: 2.5rem; color: #578059; }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* Hiệu ứng loading dạng spinner iOS */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+
+        <div id="screen-main" class="screen active">
+            <div class="logo-area">
+                <i class="fa-solid fa-paw"></i>
+                <h1 class="main-title">Xin chào bạn!</h1>
+                <p class="subtitle">Hôm nay bạn trải nghiệm thế nào nè?</p>
+            </div>
+            
+            <div class="ios-card">
+                <button class="ios-btn btn-pink" onclick="navigateTo('screen-review')">
+                    <i class="fa-solid fa-heart-captioned"></i> Đánh giá dịch vụ
+                </button>
+                <button class="ios-btn btn-peach" onclick="startCamera()">
+                    <i class="fa-solid fa-camera"></i> Chọn "đào" chụp ảnh
+                </button>
+            </div>
+        </div>
+
+        <div id="screen-review" class="screen">
+            <div class="main-title" style="margin-top: 20px;">Đánh giá dịch vụ</div>
+            <p class="subtitle">Ý kiến của bạn giúp tụi mình tốt hơn mỗi ngày</p>
+
+            <div class="ios-card">
+                <div class="rating-container">
+                    <i class="fa-solid fa-star star" data-value="1"></i>
+                    <i class="fa-solid fa-star star" data-value="2"></i>
+                    <i class="fa-solid fa-star star" data-value="3"></i>
+                    <i class="fa-solid fa-star star" data-value="4"></i>
+                    <i class="fa-solid fa-star star" data-value="5"></i>
+                </div>
+
+                <textarea class="ios-textarea" placeholder="Chia sẻ thêm cảm nhận của bạn tại đây nha..."></textarea>
+                
+                <button class="ios-btn btn-mint" id="btn-submit-review" onclick="submitReview()">
+                    <i class="fa-solid fa-paper-plane"></i> Gửi đánh giá
+                </button>
+                <button class="ios-btn btn-secondary" onclick="navigateTo('screen-main')">Quay lại</button>
+            </div>
+        </div>
+
+        <div id="screen-camera" class="screen">
+            <div class="main-title" style="margin-top: 20px;">Chụp ảnh cùng "Đào"</div>
+            <p class="subtitle" id="camera-status">Hãy chọn góc thật đẹp cùng bạn cún nhé!</p>
+
+            <div class="ios-card" style="padding: 16px;">
+                <div class="camera-box">
+                    <video id="video" autoplay playsinline muted></video>
+                    <img id="captured-image" alt="Captured photo">
+                    <canvas id="canvas" style="display:none;"></canvas>
+                </div>
+
+                <div id="camera-actions">
+                    <button class="ios-btn btn-pink" id="btn-snapshot" onclick="takeSnapshotAndUpload()">
+                        <i class="fa-solid fa-circle-dot"></i> Chụp ảnh ngay
+                    </button>
+                </div>
+                
+                <div id="confirm-actions" style="display: none;">
+                    <button class="ios-btn btn-mint" onclick="confirmPhoto()">
+                        <i class="fa-solid fa-circle-check"></i> Xác nhận chọn bạn này
+                    </button>
+                    <button class="ios-btn btn-secondary" onclick="retakePhoto()">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> Chụp lại
+                    </button>
+                </div>
+
+                <button class="ios-btn btn-secondary" id="btn-camera-back" onclick="stopCameraView()">Hủy bỏ</button>
+            </div>
+        </div>
+
+        <div id="screen-success" class="screen">
+            <div class="ios-card" style="margin-top: 80px;">
+                <div class="success-checkmark">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h2 id="success-title" style="margin-bottom: 10px;">Cảm ơn bạn!</h2>
+                <p id="success-desc" style="color: #666; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.4;">
+                    Ghi nhận lịch sự thành công.
+                </p>
+                <button class="ios-btn btn-pink" onclick="navigateTo('screen-main')">Quay về Trang chủ</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, push, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Firebase Config của bạn
+        const firebaseConfig = {
+            apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
+            authDomain: "dogs-be72b.firebaseapp.com",
+            databaseURL: "https://dogs-be72b-default-rtdb.firebaseio.com",
+            projectId: "dogs-be72b",
+            storageBucket: "dogs-be72b.firebasestorage.app",
+            messagingSenderId: "1003873040746",
+            appId: "1:1003873040746:web:607f4ff587afc430d3cd13",
+            measurementId: "G-Y72BF1RQ2C"
+        };
+
+        // Khởi tạo Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Biến toàn cục quản lý camera và ID của ảnh vừa chụp
+        let streamRef = null;
+        let currentPhotoId = null;
+
+        // Định nghĩa các hàm điều hướng và tương tác toàn cục
+        window.navigateTo = function(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        };
+
+        // Logic đánh giá sao
+        const stars = document.querySelectorAll('.star');
+        let selectedRating = 0;
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = star.getAttribute('data-value');
+                stars.forEach(s => {
+                    s.classList.toggle('active', s.getAttribute('data-value') <= selectedRating);
+                });
+            });
+        });
+
+        // 1. XỬ LÝ GỬI ĐÁNH GIÁ LÊN FIREBASE REALTIME
+        window.submitReview = async function() {
+            if(selectedRating === 0) {
+                alert("Bạn cho tụi mình xin số sao đánh giá nhé 🐾");
+                return;
+            }
+
+            const reviewText = document.querySelector('.ios-textarea').value;
+            const btnSubmit = document.getElementById('btn-submit-review');
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span class="spinner"></span> Đang gửi...`;
+
+            try {
+                const reviewsRef = ref(db, 'customer_reviews');
+                const newReviewRef = push(reviewsRef);
+                await set(newReviewRef, {
+                    rating: parseInt(selectedRating),
+                    comment: reviewText,
+                    timestamp: Date.now()
+                });
+
+                // Reset UI sau thành công
+                document.querySelector('.ios-textarea').value = '';
+                stars.forEach(s => s.classList.remove('active'));
+                selectedRating = 0;
+
+                document.getElementById('success-title').innerText = "Cảm ơn bạn yêu! 💕";
+                document.getElementById('success-desc').innerText = "Tụi mình đã ghi nhận những đóng góp quý giá từ bạn để nâng cao trải nghiệm dịch vụ.";
+                window.navigateTo('screen-success');
+
+            } catch (error) {
+                console.error("Lỗi gửi đánh giá: ", error);
+                alert("Gửi đánh giá không thành công, vui lòng thử lại!");
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Gửi đánh giá`;
+            }
+        };
+
+        // 2. MỞ CAMERA
+        window.startCamera = async function() {
+            window.navigateTo('screen-camera');
+            window.retakePhoto();
+
+            try {
+                streamRef = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' },
+                    audio: false
+                });
+                document.getElementById('video').srcObject = streamRef;
+            } catch (err) {
+                console.error("Lỗi truy cập Camera: ", err);
+                alert("Không thể mở camera. Bạn hãy cấp quyền truy cập camera cho trình duyệt nhé!");
+                window.navigateTo('screen-main');
+            }
+        };
+
+        // 3. TẮT CAMERA
+        window.stopCameraView = function() {
+            if (streamRef) {
+                streamRef.getTracks().forEach(track => track.stop());
+            }
+            window.navigateTo('screen-main');
+        };
+
+        // 4. CHỤP ẢNH -> LƯU VÀO FIREBASE -> LẤY TỪ FIREBASE HIỂN THỊ LẠI
+        window.takeSnapshotAndUpload = async function() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const imgElement = document.getElementById('captured-image');
+            const btnSnapshot = document.getElementById('btn-snapshot');
+            const statusText = document.getElementById('camera-status');
+
+            // Vẽ ảnh lên canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            
+            // Hiệu ứng gương khi chụp cam trước
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Chuyển ảnh thành chuỗi Base64
+            const base64Image = canvas.toDataURL('image/jpeg', 0.7); // nén chất lượng xuống 70% để tải nhanh hơn
+
+            // Đổi trạng thái hiển thị đang xử lý dữ liệu
+            btnSnapshot.disabled = true;
+            btnSnapshot.innerHTML = `<span class="spinner"></span> Đang đồng bộ Firebase...`;
+            statusText.innerText = "Đang tải ảnh lên hệ thống...";
+
+            try {
+                // Bước A: Đẩy chuỗi Base64 lên node 'captured_photos' trên Firebase Realtime
+                const photosRef = ref(db, 'captured_photos');
+                const newPhotoRef = push(photosRef);
+                currentPhotoId = newPhotoRef.key; // Lưu lại key vừa tạo
+
+                await set(newPhotoRef, {
+                    imageData: base64Image,
+                    status: "pending", // tạm thời lưu ở trạng thái chờ khách duyệt
+                    timestamp: Date.now()
+                });
+
+                // Bước B: Lấy dữ liệu ảnh vừa lưu chính xác từ node đó về để hiển thị
+                statusText.innerText = "Đang tải ảnh từ Firebase về để xác nhận...";
+                const savedPhotoSnap = await get(ref(db, `captured_photos/${currentPhotoId}`));
+
+                if (savedPhotoSnap.exists()) {
+                    const fetchedData = savedPhotoSnap.val();
+                    
+                    // Gán nguồn ảnh lấy từ Firebase vào thẻ <img> để khách xem
+                    imgElement.src = fetchedData.imageData;
+
+                    // Ẩn luồng video trực tiếp, hiện thẻ ảnh tĩnh lên
+                    video.style.display = 'none';
+                    imgElement.style.display = 'block';
+
+                    // Chuyển cụm điều hướng nút sang chế độ Xác nhận
+                    document.getElementById('camera-actions').style.display = 'none';
+                    document.getElementById('confirm-actions').style.display = 'block';
+                    statusText.innerText = "Đây là ảnh tải thực tế từ Realtime DB:";
+                } else {
+                    throw new Error("Không tìm thấy dữ liệu ảnh trên Firebase.");
+                }
+
+            } catch (error) {
+                console.error("Lỗi đồng bộ Firebase: ", error);
+                alert("Đã xảy ra lỗi khi đồng bộ ảnh với hệ thống!");
+                window.retakePhoto();
+            } finally {
+                btnSnapshot.disabled = false;
+                btnSnapshot.innerHTML = `<i class="fa-solid fa-circle-dot"></i> Chụp ảnh ngay`;
+            }
+        };
+
+        // 5. CHỤP LẠI (RESET CAM)
+        window.retakePhoto = function() {
+            document.getElementById('video').style.display = 'block';
+            document.getElementById('captured-image').style.display = 'none';
+            document.getElementById('camera-actions').style.display = 'block';
+            document.getElementById('confirm-actions').style.display = 'none';
+            document.getElementById('camera-status').innerText = "Hãy chọn góc thật đẹp cùng bạn cún nhé!";
+            currentPhotoId = null;
+        };
+
+        // 6. XÁC NHẬN CHỌN ĐÀO THÀNH CÔNG
+        window.confirmPhoto = async function() {
+            if (currentPhotoId) {
+                try {
+                    // Cập nhật trạng thái ảnh thành 'confirmed'
+                    await set(ref(db, `captured_photos/${currentPhotoId}/status`), "confirmed");
+                } catch (e) {
+                    console.error("Không thể cập nhật trạng thái ảnh: ", e);
+                }
+            }
+
+            if (streamRef) {
+                streamRef.getTracks().forEach(track => track.stop());
+            }
+            
+            document.getElementById('success-title').innerText = "Xác nhận thành công! ✨";
+            document.getElementById('success-desc').innerText = "Hệ thống đã ghi nhận bạn Đào chụp ảnh cùng bạn thành công. Chúc bạn có thời gian vui vẻ tại quán!";
+            window.navigateTo('screen-success');
+        };
+    </script>
+</body>
+</html>
