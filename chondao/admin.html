@@ -462,7 +462,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // Khởi tạo cấu hình Firebase đồng bộ[cite: 1]
         const firebaseConfig = {
@@ -479,24 +479,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Khởi tạo danh sách nhân sự mặc định ban đầu[cite: 1]
-        let staffRegistry = [
-            { id: "nv1", name: "Mỹ Nghi", zone: "cho", ratingSum: 0, ratingCount: 0 },
-            { id: "nv2", name: "Kim Anh", zone: "cho", ratingSum: 0, ratingCount: 0 },
-            { id: "nv3", name: "Duy Vỹ", zone: "cho", ratingSum: 0, ratingCount: 0 },
-            
-            { id: "nv4", name: "Thu Hằng", zone: "gau_meo", ratingSum: 0, ratingCount: 0 },
-            { id: "nv5", name: "Minh Triết", zone: "gau_meo", ratingSum: 0, ratingCount: 0 },
-            { id: "nv6", name: "Hoàng Long", zone: "gau_meo", ratingSum: 0, ratingCount: 0 },
-            
-            { id: "nv7", name: "Khánh Linh", zone: "meo", ratingSum: 0, ratingCount: 0 },
-            { id: "nv8", name: "Bảo Ngọc", zone: "meo", ratingSum: 0, ratingCount: 0 },
-            { id: "nv9", name: "Thành Đạt", zone: "meo", ratingSum: 0, ratingCount: 0 },
-            
-            { id: "nv10", name: "Tấn Phát", zone: "capybara", ratingSum: 0, ratingCount: 0 },
-            { id: "nv11", name: "Nhã Phương", zone: "capybara", ratingSum: 0, ratingCount: 0 },
-            { id: "nv12", name: "Quốc Anh", zone: "capybara", ratingSum: 0, ratingCount: 0 }
-        ];
+        // Biến lưu trữ danh sách nhân sự cục bộ tự động đồng bộ theo Firebase
+        let staffRegistry = [];
 
         const zoneNames = {
             cho: "Khu vực Chó",
@@ -508,7 +492,7 @@
         // Biến lưu trữ tạm thời dữ liệu đánh giá lấy từ Firebase để tính toán sao mỗi khi render nhân viên mới
         let rawReviewsCache = [];
 
-        // HÀM THÊM NHÂN VIÊN MỚI
+        // HÀM THÊM NHÂN VIÊN MỚI - ĐẨY LÊN FIREBASE REALTIME
         window.addNewStaff = function() {
             const nameInput = document.getElementById('new-staff-name');
             const zoneSelect = document.getElementById('new-staff-zone');
@@ -521,47 +505,47 @@
                 return;
             }
 
-            // Kiểm tra trùng tên nhân viên
+            // Kiểm tra trùng tên nhân viên cục bộ trước khi đẩy data
             const isDuplicate = staffRegistry.some(s => s.name.toLowerCase() === name.toLowerCase());
             if(isDuplicate) {
                 alert(`Nhân viên "${name}" đã có sẵn trong hệ thống rồi ạ! ✨`);
                 return;
             }
 
-            // Tạo Object nhân viên mới
-            const newStaff = {
-                id: "nv_" + Date.now(), // Tạo ID duy nhất theo timestamp
+            const newStaffId = "nv_" + Date.now(); // Tạo ID duy nhất theo timestamp
+
+            // Đẩy trực tiếp Object nhân viên mới lên node 'staff_registry' trên Firebase
+            set(ref(db, 'staff_registry/' + newStaffId), {
+                id: newStaffId,
                 name: name,
                 zone: zone,
                 ratingSum: 0,
                 ratingCount: 0
-            };
-
-            // Đẩy vào mảng dữ liệu và render lại
-            staffRegistry.push(newStaff);
-            nameInput.value = ""; // Clear input sau khi thêm thành công
-            
-            // Tính toán lại điểm số sao từ cache dữ liệu cũ luôn cho nhân viên mới nếu trùng tên trong quá khứ
-            recalculateRatings(); 
-            renderStaffBoards();
+            }).then(() => {
+                nameInput.value = ""; // Clear input sau khi thêm thành công
+            }).catch((error) => {
+                console.error("Lỗi thêm nhân viên lên Firebase: ", error);
+            });
         };
 
-        // HÀM XÓA NHÂN VIÊN KHỎI DANH SÁCH
+        // HÀM XÓA NHÂN VIÊN - GỠ KHỎI FIREBASE REALTIME
         window.deleteStaff = function(staffId, staffName) {
             const confirmDelete = confirm(`Anh Thành có chắc chắn muốn xóa nhân viên "${staffName}" khỏi sơ đồ không?`);
             if(!confirmDelete) return;
 
-            // Lọc loại bỏ nhân viên khỏi mảng cục bộ
-            staffRegistry = staffRegistry.filter(s => s.id !== staffId);
-            renderStaffBoards();
+            // Xóa trực tiếp node nhân viên này trên Firebase
+            remove(ref(db, 'staff_registry/' + staffId))
+            .catch((error) => {
+                console.error("Lỗi xóa nhân viên trên Firebase: ", error);
+            });
         };
 
         // TÁCH BIỆT HÀM TÍNH TOÁN ĐIỂM SAO TỪ DATA CACHE
         function recalculateRatings() {
-            // Reset điểm tích luỹ
+            // Reset điểm tích luỹ cục bộ
             staffRegistry.forEach(s => { s.ratingSum = 0; s.ratingCount = 0; });
 
-            // Chạy vòng lặp tính toán lại
+            // Chạy vòng lặp tính toán lại dựa vào lịch sử reviews đánh giá
             rawReviewsCache.forEach(review => {
                 if (review.staff && review.staff !== "Không chọn") {
                     const assignedStaffs = review.staff.split(", ");
@@ -641,12 +625,30 @@
                 const staffId = draggingCard.getAttribute('data-id');
                 const targetZone = column.getAttribute('data-zone');
 
-                const staffIndex = staffRegistry.findIndex(s => s.id === staffId);
-                if (staffIndex !== -1) {
-                    staffRegistry[staffIndex].zone = targetZone;
-                    renderStaffBoards(); 
-                }
+                // Khi kéo thả vị trí, cập nhật cập nhật trực tiếp `zone` mới của nhân viên lên thẳng Firebase
+                update(ref(db, 'staff_registry/' + staffId), {
+                    zone: targetZone
+                }).catch((error) => {
+                    console.error("Lỗi cập nhật khu vực kéo thả trên Firebase: ", error);
+                });
             });
+        });
+
+        // LẮNG NGHE DANH SÁCH NHÂN VIÊN REALTIME TỪ FIREBASE
+        const staffRef = ref(db, 'staff_registry');
+        onValue(staffRef, (snapshot) => {
+            const data = snapshot.val();
+            staffRegistry = [];
+            
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    staffRegistry.push(data[key]);
+                });
+            }
+            
+            // Tính toán lại sao và cập nhật lại sơ đồ ngay lập tức khi danh sách Firebase thay đổi
+            recalculateRatings();
+            renderStaffBoards();
         });
 
         // LẮNG NGHE DỮ LIỆU ĐÁNH GIÁ REALTIME TỪ FIREBASE[cite: 1]
@@ -706,9 +708,6 @@
             // Re-render sơ đồ bảng nhân viên
             renderStaffBoards();
         });
-
-        // Khởi động render danh sách ban đầu[cite: 1]
-        renderStaffBoards();
     </script>
 </body>
 </html>
