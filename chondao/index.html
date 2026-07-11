@@ -523,19 +523,19 @@
                     <div class="zone-grid">
                         <div class="zone-item" data-zone="cho" onclick="selectZone('cho')">
                             <i class="fa-solid fa-dog"></i>
-                            <span>Khu vực Chó</span>
+                            <span id="zone-text-cho">Khu vực Chó</span>
                         </div>
                         <div class="zone-item" data-zone="gau_meo" onclick="selectZone('gau_meo')">
                             <i class="fa-solid fa-paw"></i>
-                            <span>Gấu Mèo</span>
+                            <span id="zone-text-gau_meo">Gấu Mèo</span>
                         </div>
                         <div class="zone-item" data-zone="meo" onclick="selectZone('meo')">
                             <i class="fa-solid fa-cat"></i>
-                            <span>Khu vực Mèo</span>
+                            <span id="zone-text-meo">Khu vực Mèo</span>
                         </div>
                         <div class="zone-item" data-zone="capybara" onclick="selectZone('capybara')">
                             <i class="fa-solid fa-hippo"></i>
-                            <span>Capybara</span>
+                            <span id="zone-text-capybara">Capybara</span>
                         </div>
                     </div>
                 </div>
@@ -625,7 +625,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
@@ -654,19 +654,50 @@
         let selectedStaffArray = []; // Chuyển thành Mảng để lưu nhiều nhân viên cùng lúc
         let isNoStaffSelected = false; // Trạng thái chọn "Không chọn nhân viên"
 
-        const staffData = {
+        // Khởi tạo biến cục bộ chứa dữ liệu mặc định ban đầu
+        let staffData = {
             cho: ["Mỹ Nghi", "Kim Anh", "Duy Vỹ"],
             gau_meo: ["Thu Hằng", "Minh Triết", "Hoàng Long"],
             meo: ["Khánh Linh", "Bảo Ngọc", "Thành Đạt"],
             capybara: ["Tấn Phát", "Nhã Phương", "Quốc Anh"]
         };
 
-        const zoneNames = {
+        let zoneNames = {
             cho: "Khu vực Chó",
             gau_meo: "Gấu Mèo",
             meo: "Khu vực Mèo",
             capybara: "Capybara"
         };
+
+        // LẮNG NGHE SỰ THAY ĐỔI CỦA NHÂN VIÊN VÀ KHU VỰC TỪ FIREBASE REALTIME DATABASE (STAFF_REGISTRY)
+        const configRef = ref(db, 'staff_registry');
+        onValue(configRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // Reset lại danh sách nhân viên tạm thời trước khi phân loại từ Firebase
+                const newStaffData = {
+                    cho: [],
+                    gau_meo: [],
+                    meo: [],
+                    capybara: []
+                };
+
+                // Duyệt qua tất cả các key nhân viên (ví dụ: nv_1783738365498)
+                Object.keys(data).forEach(key => {
+                    const staffMember = data[key];
+                    if (staffMember && staffMember.name && staffMember.zone) {
+                        const zone = staffMember.zone;
+                        // Nếu zone hợp lệ trong cấu trúc, đẩy tên nhân viên vào mảng của zone đó
+                        if (newStaffData[zone] !== undefined) {
+                            newStaffData[zone].push(staffMember.name);
+                        }
+                    }
+                });
+
+                staffData = newStaffData;
+                console.log("Đã cập nhật danh sách nhân viên mới từ node staff_registry trên Firebase!", staffData);
+            }
+        });
 
         function base64ToBlob(base64, mimeType) {
             const byteCharacters = atob(base64.split(',')[1]);
