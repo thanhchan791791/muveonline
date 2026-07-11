@@ -81,7 +81,7 @@
             margin-top: 24px;
         }
 
-        /* NÂNG CẤP LOGO ĐỘNG HÌNH ẢNH CAO CẤP */
+        /* LOGO ĐỘNG HÌNH ẢNH CAO CẤP */
         .logo-area {
             margin-top: 35px;
             text-align: center;
@@ -182,15 +182,197 @@
         .btn-mint { background: linear-gradient(135deg, #B5EAD7 0%, #94DCBE 100%); color: #1E4638; }
         .btn-secondary { background: rgba(0, 0, 0, 0.04); color: #3A3A3C; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 
+        /* THANH ĐIỀU HƯỚNG TỪNG BƯỚC STEP-BY-STEP */
+        .step-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 24px;
+            position: relative;
+            padding: 0 10px;
+        }
+
+        .step-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #E5E5EA;
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .step-line-progress {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 3px;
+            background: #FFB7B2;
+            z-index: 2;
+            transform: translateY(-50%);
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 0%;
+        }
+
+        .step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #E5E5EA;
+            color: #8E8E93;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 3;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .step-dot.active {
+            background: #FFB7B2;
+            color: white;
+            transform: scale(1.15);
+            box-shadow: 0 0 10px rgba(255, 183, 178, 0.6);
+        }
+
+        .step-dot.completed {
+            background: #B5EAD7;
+            color: #1E4638;
+        }
+
+        /* KHU VỰC NỘI DUNG TỪNG BƯỚC */
+        .review-step-content {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .review-step-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-label {
+            text-align: left;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* GRID CHỌN KHU VỰC */
+        .zone-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+
+        .zone-item {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1.5px solid rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            padding: 20px 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-main);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .zone-item i {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            transition: transform 0.3s ease;
+        }
+
+        .zone-item.selected {
+            background: linear-gradient(135deg, #FFB7B2 0%, #FFA29A 100%);
+            border-color: #FFA29A;
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(255, 183, 178, 0.4);
+        }
+
+        .zone-item.selected i {
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        /* GRID CHỌN NHÂN VIÊN */
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .staff-item {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1.5px solid rgba(0, 0, 0, 0.05);
+            border-radius: 18px;
+            padding: 16px 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .staff-item.selected {
+            background: linear-gradient(135deg, #B5EAD7 0%, #94DCBE 100%);
+            border-color: #94DCBE;
+            color: #1E4638;
+            font-weight: 600;
+            box-shadow: 0 6px 14px rgba(181, 234, 215, 0.4);
+        }
+
+        /* Ô không chọn nhân viên đặc biệt */
+        .staff-item.none-item {
+            grid-column: span 2;
+            background: rgba(0, 0, 0, 0.03);
+            border: 1.5px dashed rgba(0, 0, 0, 0.15);
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .staff-item.none-item.selected {
+            background: linear-gradient(135deg, #FFDAC1 0%, #FFC8A2 100%);
+            border-color: #FFC8A2;
+            color: #6D4C31;
+            font-weight: 600;
+            border-style: solid;
+        }
+
+        /* ĐÁNH GIÁ SAO */
         .rating-container {
             display: flex;
             justify-content: center;
-            gap: 16px;
-            margin: 24px 0;
+            gap: 18px;
+            margin: 20px 0 28px 0;
         }
 
         .star {
-            font-size: 2.4rem;
+            font-size: 2.6rem;
             color: #E5E5EA;
             cursor: pointer;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s;
@@ -200,7 +382,7 @@
 
         .ios-textarea {
             width: 100%;
-            height: 130px;
+            height: 120px;
             padding: 18px;
             border-radius: 20px;
             border: 1px solid rgba(0, 0, 0, 0.08);
@@ -210,12 +392,21 @@
             resize: none;
             outline: none;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             line-height: 1.4;
         }
 
         .ios-textarea:focus { border-color: #FFB7B2; background: #ffffff; box-shadow: 0 0 0 4px rgba(255, 183, 178, 0.2); }
 
+        /* THANH ĐIỀU HƯỚNG NÚT BẤM */
+        .navigation-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        /* CAMERA */
         .camera-box {
             width: 100%;
             border-radius: 26px;
@@ -255,10 +446,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
-        .switch-cam-btn:active {
-            transform: scale(0.88) rotate(45deg);
-        }
-
+        .switch-cam-btn:active { transform: scale(0.88) rotate(45deg); }
         #captured-image { display: none; }
 
         .success-checkmark {
@@ -274,11 +462,7 @@
         }
 
         .success-checkmark i { font-size: 2.8rem; color: #4A6E4C; }
-
-        @keyframes popIn {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
-        }
+        @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
         .spinner {
             display: inline-block;
@@ -309,35 +493,81 @@
             </div>
             
             <div class="ios-card">
-                <button class="ios-btn btn-pink" onclick="navigateTo('screen-review')">
+                <button class="ios-btn btn-pink" onclick="navigateTo('screen-review'); initReviewSteps();">
                     <i class="fa-solid fa-star-comment"></i> Đóng góp ý kiến dịch vụ
                 </button>
-                <button class="ios-btn btn-peach" onclick="startCamera()">
-                    <i class="fa-solid fa-camera"></i> Chọn đào để ôm hoặc chụp ảnh ^^
-                </button>
+                <!-- <button class="ios-btn btn-peach" onclick="startCamera()">
+                    <i class="fa-solid fa-camera"></i> Chọn đào để ôm hoặc chụp ảnh ^^
+                </button> -->
             </div>
         </div>
 
-        <!-- MÀN HÌNH ĐÁNH GIÁ -->
+        <!-- MÀN HÌNH ĐÁNH GIÁ (TIẾN TRÌNH TỪNG BƯỚC) -->
         <div id="screen-review" class="screen">
             <div class="main-title" style="margin-top: 24px;">Đóng góp ý kiến</div>
-            <p class="subtitle">Trải nghiệm của bạn là động lực giúp tụi mình hoàn thiện hơn mỗi ngày</p>
+            <p class="subtitle">Tụi mình chia sẻ thành từng bước ngắn để không làm mất thời gian của bạn nha</p>
 
             <div class="ios-card">
-                <div class="rating-container">
-                    <i class="fa-solid fa-star star" data-value="1"></i>
-                    <i class="fa-solid fa-star star" data-value="2"></i>
-                    <i class="fa-solid fa-star star" data-value="3"></i>
-                    <i class="fa-solid fa-star star" data-value="4"></i>
-                    <i class="fa-solid fa-star star" data-value="5"></i>
+                <!-- Thanh tiến trình chỉ báo Step -->
+                <div class="step-container">
+                    <div class="step-line"></div>
+                    <div class="step-line-progress" id="step-progress"></div>
+                    <div class="step-dot active" id="dot-1">1</div>
+                    <div class="step-dot" id="dot-2">2</div>
+                    <div class="step-dot" id="dot-3">3</div>
                 </div>
 
-                <textarea class="ios-textarea" placeholder="Nhập những điều bạn hài lòng hoặc điều cần cải thiện tại đây để tụi mình lắng nghe nha..."></textarea>
-                
-                <button class="ios-btn btn-mint" id="btn-submit-review" onclick="submitReview()">
-                    <i class="fa-solid fa-paper-plane"></i> Gửi đánh giá ngay
-                </button>
-                <button class="ios-btn btn-secondary" onclick="navigateTo('screen-main')">Quay lại trang chủ</button>
+                <!-- BƯỚC 1: CHỌN KHU VỰC -->
+                <div id="review-step-1" class="review-step-content active">
+                    <div class="section-label"><i class="fa-solid fa-map-location-dot"></i> Bước 1: Khu vực trải nghiệm?</div>
+                    <div class="zone-grid">
+                        <div class="zone-item" data-zone="cho" onclick="selectZone('cho')">
+                            <i class="fa-solid fa-dog"></i>
+                            <span>Khu vực Chó</span>
+                        </div>
+                        <div class="zone-item" data-zone="gau_meo" onclick="selectZone('gau_meo')">
+                            <i class="fa-solid fa-paw"></i>
+                            <span>Gấu Mèo</span>
+                        </div>
+                        <div class="zone-item" data-zone="meo" onclick="selectZone('meo')">
+                            <i class="fa-solid fa-cat"></i>
+                            <span>Khu vực Mèo</span>
+                        </div>
+                        <div class="zone-item" data-zone="capybara" onclick="selectZone('capybara')">
+                            <i class="fa-solid fa-hippo"></i>
+                            <span>Capybara</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BƯỚC 2: CHỌN NHÂN VIÊN (CHỌN NHIỀU ĐƯỢC) -->
+                <div id="review-step-2" class="review-step-content">
+                    <div class="section-label"><i class="fa-solid fa-user-check"></i> Bước 2: Nhân viên hỗ trợ bạn?</div>
+                    <div id="staff-list-container" class="staff-grid">
+                        <!-- Danh sách nhân viên đổ vào đây qua JS -->
+                    </div>
+                </div>
+
+                <!-- BƯỚC 3: ĐÁNH GIÁ SAO VÀ GÓP Ý -->
+                <div id="review-step-3" class="review-step-content">
+                    <div class="section-label"><i class="fa-solid fa-ranking-star"></i> Bước 3: Đánh giá & cảm nhận</div>
+                    <div class="rating-container">
+                        <i class="fa-solid fa-star star" data-value="1"></i>
+                        <i class="fa-solid fa-star star" data-value="2"></i>
+                        <i class="fa-solid fa-star star" data-value="3"></i>
+                        <i class="fa-solid fa-star star" data-value="4"></i>
+                        <i class="fa-solid fa-star star" data-value="5"></i>
+                    </div>
+
+                    <textarea class="ios-textarea" placeholder="Nhập những điều bạn hài lòng hoặc điều cần cải thiện tại đây để tụi mình lắng nghe nha..."></textarea>
+                </div>
+
+                <!-- CÁC NÚT ĐIỀU HƯỚNG TIẾN TRÌNH -->
+                <div class="navigation-actions">
+                    <button class="ios-btn btn-secondary" id="btn-step-prev" onclick="prevStep()" style="margin-bottom:0; flex: 1;">Quay lại</button>
+                    <button class="ios-btn btn-pink" id="btn-step-next" onclick="nextStep()" style="margin-bottom:0; flex: 1.5;">Tiếp theo</button>
+                    <button class="ios-btn btn-mint" id="btn-step-submit" onclick="submitReview()" style="margin-bottom:0; flex: 1.5; display: none;">Gửi đánh giá</button>
+                </div>
             </div>
         </div>
 
@@ -411,7 +641,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Cấu hình Telegram nhận thông báo
         const TELEGRAM_TOKEN = "8581857488:AAGFtZdA3NecouzR8YaJsH0eVKEFlGZ2fB0";
         const TELEGRAM_CHAT_ID = "-5503428893";
 
@@ -419,7 +648,26 @@
         let globalBase64Image = null; 
         let currentFacingMode = "environment"; 
 
-        // Hàm bổ trợ: Chuyển dữ liệu Base64 sang dạng Blob nhị phân giúp Telegram truyền tải siêu tốc
+        // QUẢN LÝ TIẾN TRÌNH TỪNG BƯỚC (STEPS)
+        let currentStep = 1;
+        let selectedZone = "";
+        let selectedStaffArray = []; // Chuyển thành Mảng để lưu nhiều nhân viên cùng lúc
+        let isNoStaffSelected = false; // Trạng thái chọn "Không chọn nhân viên"
+
+        const staffData = {
+            cho: ["Mỹ Nghi", "Kim Anh", "Duy Vỹ"],
+            gau_meo: ["Thu Hằng", "Minh Triết", "Hoàng Long"],
+            meo: ["Khánh Linh", "Bảo Ngọc", "Thành Đạt"],
+            capybara: ["Tấn Phát", "Nhã Phương", "Quốc Anh"]
+        };
+
+        const zoneNames = {
+            cho: "Khu vực Chó",
+            gau_meo: "Gấu Mèo",
+            meo: "Khu vực Mèo",
+            capybara: "Capybara"
+        };
+
         function base64ToBlob(base64, mimeType) {
             const byteCharacters = atob(base64.split(',')[1]);
             const byteNumbers = new Array(byteCharacters.length);
@@ -435,6 +683,166 @@
             document.getElementById(screenId).classList.add('active');
         };
 
+        // KHỞI TẠO HOẶC RESET STEPS
+        window.initReviewSteps = function() {
+            currentStep = 1;
+            selectedZone = "";
+            selectedStaffArray = [];
+            isNoStaffSelected = false;
+            selectedRating = 0;
+            
+            document.querySelectorAll('.zone-item').forEach(item => item.classList.remove('selected'));
+            document.querySelector('.ios-textarea').value = '';
+            stars.forEach(s => s.classList.remove('active'));
+            
+            renderStepUI();
+        };
+
+        // CẬP NHẬT GIAO DIỆN HIỂN THỊ CỦA CÁC BƯỚC BẰNG JS & CSS
+        function renderStepUI() {
+            // Hiển thị Khối nội dung tương ứng với Step hiện tại
+            document.querySelectorAll('.review-step-content').forEach((content, index) => {
+                content.classList.toggle('active', (index + 1) === currentStep);
+            });
+
+            // Cập nhật các chấm tròn báo hiệu vị trí của khách hàng
+            document.getElementById('dot-1').className = `step-dot ${currentStep >= 1 ? 'active' : ''} ${currentStep > 1 ? 'completed' : ''}`;
+            document.getElementById('dot-2').className = `step-dot ${currentStep >= 2 ? 'active' : ''} ${currentStep > 2 ? 'completed' : ''}`;
+            document.getElementById('dot-3').className = `step-dot ${currentStep === 3 ? 'active' : ''}`;
+
+            // Cập nhật thanh line chạy ngang kết nối các Step
+            const progressLine = document.getElementById('step-progress');
+            if (currentStep === 1) progressLine.style.width = '0%';
+            if (currentStep === 2) progressLine.style.width = '50%';
+            if (currentStep === 3) progressLine.style.width = '100%';
+
+            // Cấu hình linh hoạt trạng thái ẩn/hiện của các nút bấm điều hướng bên dưới
+            const btnPrev = document.getElementById('btn-step-prev');
+            const btnNext = document.getElementById('btn-step-next');
+            const btnSubmit = document.getElementById('btn-step-submit');
+
+            if (currentStep === 1) {
+                btnPrev.innerText = "Trang chủ";
+                btnNext.style.display = "flex";
+                btnSubmit.style.display = "none";
+            } else if (currentStep === 2) {
+                btnPrev.innerText = "Quay lại";
+                btnNext.style.display = "flex";
+                btnSubmit.style.display = "none";
+            } else if (currentStep === 3) {
+                btnPrev.innerText = "Quay lại";
+                btnNext.style.display = "none";
+                btnSubmit.style.display = "flex";
+            }
+        }
+
+        // ĐIỀU HƯỚNG BƯỚC TIẾP THEO (NEXT)
+        window.nextStep = function() {
+            if (currentStep === 1) {
+                if (!selectedZone) {
+                    alert("Bạn vui lòng bấm chọn khu vực trải nghiệm trước nha 🐾");
+                    return;
+                }
+                // Nếu hợp lệ, tự động sinh Grid danh sách nhân viên của khu đó trước khi chuyển bước 2
+                generateStaffGrid();
+                currentStep = 2;
+            } else if (currentStep === 2) {
+                if (selectedStaffArray.length === 0 && !isNoStaffSelected) {
+                    alert("Bạn hãy chọn nhân viên hoặc bấm vào ô 'Không chọn nhân viên' để tiếp tục nhé! ✨");
+                    return;
+                }
+                currentStep = 3;
+            }
+            renderStepUI();
+        };
+
+        // ĐIỀU HƯỚNG BƯỚC TRƯỚC ĐÓ (BACK)
+        window.prevStep = function() {
+            if (currentStep === 1) {
+                window.navigateTo('screen-main');
+            } else {
+                currentStep--;
+                renderStepUI();
+            }
+        };
+
+        // HÀM CHỌN KHU VỰC TẠI STEP 1
+        window.selectZone = function(zoneKey) {
+            selectedZone = zoneKey;
+            document.querySelectorAll('.zone-item').forEach(item => {
+                item.classList.toggle('selected', item.getAttribute('data-zone') === zoneKey);
+            });
+            // Tự động chuyển qua bước tiếp theo luôn khi khách vừa click chọn để tăng tính tiện dụng mượt mà
+            setTimeout(() => { window.nextStep(); }, 250);
+        };
+
+        // HÀM GENERATE ĐỘNG NÚT NHÂN VIÊN VÀ Ô ĐẶC BIỆT TẠI STEP 2
+        function generateStaffGrid() {
+            const container = document.getElementById('staff-list-container');
+            container.innerHTML = "";
+            selectedStaffArray = [];
+            isNoStaffSelected = false;
+
+            const listStaff = staffData[selectedZone] || [];
+            
+            // 1. Render các ô nhân viên thực tế
+            listStaff.forEach(staffName => {
+                const item = document.createElement('div');
+                item.className = "staff-item";
+                item.innerHTML = `<i class="fa-regular fa-circle"></i> <span>${staffName}</span>`;
+                
+                item.onclick = function() {
+                    // Nếu trước đó đang bật trạng thái "Không chọn", click vào người sẽ tự tắt "Không chọn" đi
+                    if(isNoStaffSelected) {
+                        isNoStaffSelected = false;
+                        const noneBtn = container.querySelector('.none-item');
+                        if(noneBtn) {
+                            noneBtn.classList.remove('selected');
+                            noneBtn.querySelector('i').className = "fa-regular fa-circle";
+                        }
+                    }
+
+                    if(selectedStaffArray.includes(staffName)) {
+                        // Bỏ chọn nhân viên nếu click lại
+                        selectedStaffArray = selectedStaffArray.filter(name => name !== staffName);
+                        item.classList.remove('selected');
+                        item.querySelector('i').className = "fa-regular fa-circle";
+                    } else {
+                        // Thêm nhân viên vào danh sách lựa chọn
+                        selectedStaffArray.push(staffName);
+                        item.classList.add('selected');
+                        item.querySelector('i').className = "fa-solid fa-circle-check";
+                    }
+                };
+                container.appendChild(item);
+            });
+
+            // 2. Render thêm một ô "Không chọn nhân viên" riêng biệt ở dưới cùng
+            const noneItem = document.createElement('div');
+            noneItem.className = "staff-item none-item";
+            noneItem.innerHTML = `<i class="fa-regular fa-circle"></i> <span>Không chọn nhân viên</span>`;
+            
+            noneItem.onclick = function() {
+                isNoStaffSelected = !isNoStaffSelected;
+                
+                if(isNoStaffSelected) {
+                    noneItem.classList.add('selected');
+                    noneItem.querySelector('i').className = "fa-solid fa-circle-check";
+                    
+                    // Xoá toàn bộ các nhân viên đã tick chọn trước đó để đảo ngược trạng thái đồng nhất
+                    selectedStaffArray = [];
+                    container.querySelectorAll('.staff-item:not(.none-item)').forEach(btn => {
+                        btn.classList.remove('selected');
+                        btn.querySelector('i').className = "fa-regular fa-circle";
+                    });
+                } else {
+                    noneItem.classList.remove('selected');
+                    noneItem.querySelector('i').className = "fa-regular fa-circle";
+                }
+            };
+            container.appendChild(noneItem);
+        }
+
         const stars = document.querySelectorAll('.star');
         let selectedRating = 0;
 
@@ -447,7 +855,7 @@
             });
         });
 
-        // 1. GỬI ĐÁNH GIÁ (Firebase + Telegram Text)
+        // GỬI ĐÁNH GIÁ CUỐI CÙNG LÊN HỆ THỐNG (FIREBASE + TELEGRAM)
         window.submitReview = async function() {
             if(selectedRating === 0) {
                 alert("Bạn cho tụi mình xin số sao đánh giá nhé 🐾");
@@ -455,31 +863,39 @@
             }
 
             const reviewText = document.querySelector('.ios-textarea').value;
-            const btnSubmit = document.getElementById('btn-submit-review');
+            const btnSubmit = document.getElementById('btn-step-submit');
             btnSubmit.disabled = true;
             btnSubmit.innerHTML = `<span class="spinner"></span> Đang gửi...`;
+
+            // Chuẩn hoá chuỗi văn bản danh sách nhân viên để đẩy data
+            let finalStaffString = "Không chọn";
+            if (selectedStaffArray.length > 0) {
+                finalStaffString = selectedStaffArray.join(", ");
+            }
 
             try {
                 const reviewsRef = ref(db, 'customer_reviews');
                 const newReviewRef = push(reviewsRef);
                 
                 await set(newReviewRef, {
+                    zone: selectedZone,
+                    staff: finalStaffString,
                     rating: parseInt(selectedRating),
                     comment: reviewText,
                     timestamp: Date.now()
                 });
 
-                // Chạy ngầm gửi text về Telegram, không cần await để tránh đứng UI khách hàng
-                const telegramMessage = `⭐️ ĐÁNH GIÁ MỚI ⭐️\n- Số sao: ${selectedRating}/5 ⭐\n- Nội dung: ${reviewText || "Không có lời nhắn"}`;
+                // Đồng bộ ngầm đẩy dữ liệu chi tiết cấu trúc đa lựa chọn về Telegram
+                const zoneDisplay = zoneNames[selectedZone] || selectedZone;
+                const telegramMessage = `⭐️ ĐÁNH GIÁ TRẢI NGHIỆM MỚI ⭐️\n📌 Khu vực: ${zoneDisplay}\n👤 Nhân viên: ${finalStaffString}\n- Số sao: ${selectedRating}/5 ⭐\n- Nội dung: ${reviewText || "Không có lời nhắn"}`;
+                
                 fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: telegramMessage })
-                }).catch(err => console.error("Lỗi gửi Telegram review:", err));
+                }).catch(err => console.error("Lỗi gửi Telegram:", err));
 
-                document.querySelector('.ios-textarea').value = '';
-                stars.forEach(s => s.classList.remove('active'));
-                selectedRating = 0;
+                window.initReviewSteps(); // Reset form
 
                 document.getElementById('success-title').innerText = "Cảm ơn bạn yêu! 💕";
                 document.getElementById('success-desc').innerText = "Tụi mình đã ghi nhận những đóng góp quý giá từ bạn để nâng cao trải nghiệm dịch vụ.";
@@ -490,11 +906,11 @@
                 alert("Gửi đánh giá không thành công!");
             } finally {
                 btnSubmit.disabled = false;
-                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Gửi đánh giá ngay`;
+                btnSubmit.innerHTML = `Gửi đánh giá`;
             }
         };
 
-        // 2. KHỞI ĐỘNG CAMERA
+        // KHỞI ĐỘNG CAMERA CHỤP ẢNH
         async function openCamera(facingMode) {
             if (streamRef) {
                 streamRef.getTracks().forEach(track => track.stop());
@@ -549,7 +965,6 @@
             window.navigateTo('screen-main');
         };
 
-        // 3. XỬ LÝ ẢNH CỤC BỘ TRÊN MÁY KHÁCH CHỐNG LAG
         window.processLocalSnapshot = function() {
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
@@ -596,24 +1011,20 @@
             statusText.innerText = "Bạn có ưng ý với bức ảnh này không?";
         };
 
-        // 4. CHẠY SONG SONG NGẦM: ĐẨY LÊN FIREBASE VÀ BẮN ẢNH VỀ TELEGRAM (KHÁCH KHÔNG CẦN ĐỢI MẠNG)
         window.confirmAndUploadBackground = function() {
             if (streamRef) {
                 streamRef.getTracks().forEach(track => track.stop());
             }
 
-            // CHUYỂN NGAY SANG MÀN HÌNH THÀNH CÔNG ĐỂ KHÁCH TRẢI NGHIỆM MƯỢT MÀ
             document.getElementById('success-title').innerText = "Xác nhận thành công! ✨";
             document.getElementById('success-desc').innerText = "Hệ thống đã ghi nhận bạn Đào chụp ảnh cùng bạn thành công. Chúc bạn có thời gian vui vẻ tại quán!";
             window.navigateTo('screen-success');
 
-            // TIẾN HÀNH ĐỒNG BỘ SONG SONG Ở BACKGROUND
             if (globalBase64Image) {
                 const mimeType = globalBase64Image.includes('image/webp') ? 'image/webp' : 'image/jpeg';
                 const extension = mimeType.split('/')[1];
                 const imageBlob = base64ToBlob(globalBase64Image, mimeType);
 
-                // Tạo FormData chuẩn để truyền file nhị phân sang Telegram API nhanh nhất
                 const formData = new FormData();
                 formData.append('chat_id', TELEGRAM_CHAT_ID);
                 formData.append('photo', imageBlob, `cherrypet_${Date.now()}.${extension}`);
@@ -622,15 +1033,12 @@
                 const photosRef = ref(db, 'captured_photos');
                 const newPhotoRef = push(photosRef);
 
-                // Promise.all giúp kích hoạt cả 2 tiến trình đẩy data đi đồng thời
                 Promise.all([
-                    // Đồng bộ lên Firebase
                     set(newPhotoRef, {
                         imageData: globalBase64Image,
                         status: "confirmed",
                         timestamp: Date.now()
                     }),
-                    // Đẩy ảnh sang Telegram nhóm/kênh điều hành
                     fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
                         method: 'POST',
                         body: formData
