@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cherrypet Admin - Quản Lý Nhân Viên & Đánh Giá</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --ios-bg: #F2F2F7;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-blur: blur(20px);
+            --text-main: #1C1C1E;
+            --text-secondary: #8E8E93;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --primary-pink: #FFB7B2;
+            --mint-green: #B5EAD7;
+            --peach: #FFDAC1;
+            --capy-purple: #E8D7FF;
+            --ios-blue: #007AFF;
+            --ios-red: #FF3B30;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--ios-bg);
+            color: var(--text-main);
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 0 8px;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+        }
+
+        .title-area h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .title-area p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        /* THANH ĐIỀU KHIỂN - THÊM NHÂN VIÊN */
+        .controls-area {
+            background: var(--card-bg);
+            backdrop-filter: var(--card-blur);
+            -webkit-backdrop-filter: var(--card-blur);
+            border-radius: 20px;
+            padding: 16px 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+        }
+
+        .ios-input, .ios-select {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .ios-input:focus, .ios-select:focus {
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+        }
+
+        .ios-input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .ios-btn-primary {
+            background: var(--ios-blue);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .ios-btn-primary:active {
+            transform: scale(0.97);
+            filter: brightness(0.9);
+        }
+
+        /* LAYOUT CHÍNH */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2.5fr 1.5fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ios-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--card-blur);
+            -webkit-backdrop-filter: var(--card-blur);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* KHU VỰC KÉO THẢ */
+        .zone-boards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 650px) {
+            .zone-boards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .zone-column {
+            background: rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 16px;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s ease;
+        }
+
+        .zone-column.drag-over {
+            background: rgba(0, 122, 255, 0.05);
+            border-color: #007AFF;
+        }
+
+        .zone-header {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .zone-header .badge {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Màu sắc đồng bộ các khu vực */
+        .zone-cho { border-top: 5px solid var(--primary-pink); }
+        .zone-cho .badge { background: var(--primary-pink); color: #fff; }
+        
+        .zone-gau_meo { border-top: 5px solid var(--peach); }
+        .zone-gau_meo .badge { background: var(--peach); color: #6D4C31; }
+        
+        .zone-meo { border-top: 5px solid var(--mint-green); }
+        .zone-meo .badge { background: var(--mint-green); color: #1E4638; }
+        
+        .zone-capybara { border-top: 5px solid var(--capy-purple); }
+        .zone-capybara .badge { background: var(--capy-purple); color: #4A1E86; }
+
+        .staff-list-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* CARD NHÂN VIÊN CÓ THỂ KÉO THẢ */
+        .staff-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: grab;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .staff-card:active {
+            cursor: grabbing;
+        }
+
+        .staff-card.dragging {
+            opacity: 0.4;
+            transform: scale(0.98);
+        }
+
+        .staff-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .staff-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .staff-rating-avg {
+            font-size: 0.8rem;
+            color: #FFD60A;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 214, 10, 0.12);
+            padding: 2px 8px;
+            border-radius: 8px;
+            width: fit-content;
+            font-weight: 600;
+        }
+
+        .staff-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-delete-staff {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-delete-staff:hover {
+            color: var(--ios-red);
+            background: rgba(255, 59, 48, 0.1);
+        }
+
+        .drag-handle {
+            color: var(--text-secondary);
+            opacity: 0.4;
+            padding: 6px;
+        }
+
+        /* LỊCH SỬ ĐÁNH GIÁ CỦA KHÁCH */
+        .reviews-panel {
+            max-height: 680px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .review-item {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .review-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .review-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 8px;
+        }
+
+        .tag-zone { background: rgba(0, 0, 0, 0.05); color: var(--text-main); }
+        .tag-staff { background: #E2F0CB; color: #4A6E4C; }
+
+        .review-stars {
+            color: #FFD60A;
+            font-size: 0.85rem;
+        }
+
+        .review-comment {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .review-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        /* ANIMATION */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <header>
+            <div class="title-area">
+                <h1>Cherrypet Admin Dashboard</h1>
+                <p>Quản lý danh sách, điều phối vị trí làm việc và giám sát phản hồi Realtime</p>
+            </div>
+        </header>
+
+        <!-- THANH CHỨC NĂNG THÊM NHÂN VIÊN MỚI -->
+        <div class="controls-area">
+            <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); margin-right: 4px;">
+                <i class="fa-solid fa-user-plus" style="color: var(--ios-blue);"></i> Thêm nhân viên:
+            </span>
+            <input type="text" id="new-staff-name" class="ios-input" placeholder="Nhập họ tên nhân viên mới...">
+            <select id="new-staff-zone" class="ios-select">
+                <option value="cho">Khu vực Chó</option>
+                <option value="gau_meo">Gấu Mèo</option>
+                <option value="meo">Khu vực Mèo</option>
+                <option value="capybara">Capybara</option>
+            </select>
+            <button class="ios-btn-primary" onclick="addNewStaff()">
+                <i class="fa-solid fa-plus"></i> Thêm vào danh sách
+            </button>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <!-- CỘT TRÁI: DANH SÁCH NHÂN VIÊN THEO KHU VỰC CÓ KÉO THẢ VÀ XOÁ -->
+            <div class="ios-card">
+                <div class="card-title"><i class="fa-solid fa-people-arrows"></i> Sơ đồ vị trí nhân sự từng khu vực</div>
+                
+                <div class="zone-boards">
+                    <!-- KHU VỰC CHÓ -->
+                    <div class="zone-column zone-cho" data-zone="cho">
+                        <div class="zone-header">
+                            <span><i class="fa-solid fa-dog"></i> Khu vực Chó</span>
+                            <span class="badge" id="badge-cho">0</span>
+                        </div>
+                        <div class="staff-list-container" id="container-cho"></div>
+                    </div>
+
+                    <!-- GẤU MÈO -->
+                    <div class="zone-column zone-gau_meo" data-zone="gau_meo">
+                        <div class="zone-header">
+                            <span><i class="fa-solid fa-paw"></i> Gấu Mèo</span>
+                            <span class="badge" id="badge-gau_meo">0</span>
+                        </div>
+                        <div class="staff-list-container" id="container-gau_meo"></div>
+                    </div>
+
+                    <!-- KHU VỰC MÈO -->
+                    <div class="zone-column zone-meo" data-zone="meo">
+                        <div class="zone-header">
+                            <span><i class="fa-solid fa-cat"></i> Khu vực Mèo</span>
+                            <span class="badge" id="badge-meo">0</span>
+                        </div>
+                        <div class="staff-list-container" id="container-meo"></div>
+                    </div>
+
+                    <!-- CAPYBARA -->
+                    <div class="zone-column zone-capybara" data-zone="capybara">
+                        <div class="zone-header">
+                            <span><i class="fa-solid fa-hippo"></i> Capybara</span>
+                            <span class="badge" id="badge-capybara">0</span>
+                        </div>
+                        <div class="staff-list-container" id="container-capybara"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CỘT PHẢI: CHI TIẾT ĐÁNH GIÁ REALTIME -->
+            <div class="ios-card">
+                <div class="card-title"><i class="fa-solid fa-comment-medical"></i> Nhật ký Đánh giá Khách hàng</div>
+                <div class="reviews-panel" id="reviews-log">
+                    <!-- Nội dung đánh giá Realtime đổ về đây -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Khởi tạo cấu hình Firebase đồng bộ[cite: 1]
+        const firebaseConfig = {
+            apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
+            authDomain: "dogs-be72b.firebaseapp.com",
+            databaseURL: "https://dogs-be72b-default-rtdb.firebaseio.com",
+            projectId: "dogs-be72b",
+            storageBucket: "dogs-be72b.firebasestorage.app",
+            messagingSenderId: "1003873040746",
+            appId: "1:1003873040746:web:607f4ff587afc430d3cd13",
+            measurementId: "G-Y72BF1RQ2C"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Khởi tạo danh sách nhân sự mặc định ban đầu[cite: 1]
+        let staffRegistry = [
+            { id: "nv1", name: "Mỹ Nghi", zone: "cho", ratingSum: 0, ratingCount: 0 },
+            { id: "nv2", name: "Kim Anh", zone: "cho", ratingSum: 0, ratingCount: 0 },
+            { id: "nv3", name: "Duy Vỹ", zone: "cho", ratingSum: 0, ratingCount: 0 },
+            
+            { id: "nv4", name: "Thu Hằng", zone: "gau_meo", ratingSum: 0, ratingCount: 0 },
+            { id: "nv5", name: "Minh Triết", zone: "gau_meo", ratingSum: 0, ratingCount: 0 },
+            { id: "nv6", name: "Hoàng Long", zone: "gau_meo", ratingSum: 0, ratingCount: 0 },
+            
+            { id: "nv7", name: "Khánh Linh", zone: "meo", ratingSum: 0, ratingCount: 0 },
+            { id: "nv8", name: "Bảo Ngọc", zone: "meo", ratingSum: 0, ratingCount: 0 },
+            { id: "nv9", name: "Thành Đạt", zone: "meo", ratingSum: 0, ratingCount: 0 },
+            
+            { id: "nv10", name: "Tấn Phát", zone: "capybara", ratingSum: 0, ratingCount: 0 },
+            { id: "nv11", name: "Nhã Phương", zone: "capybara", ratingSum: 0, ratingCount: 0 },
+            { id: "nv12", name: "Quốc Anh", zone: "capybara", ratingSum: 0, ratingCount: 0 }
+        ];
+
+        const zoneNames = {
+            cho: "Khu vực Chó",
+            gau_meo: "Gấu Mèo",
+            meo: "Khu vực Mèo",
+            capybara: "Capybara"
+        };
+
+        // Biến lưu trữ tạm thời dữ liệu đánh giá lấy từ Firebase để tính toán sao mỗi khi render nhân viên mới
+        let rawReviewsCache = [];
+
+        // HÀM THÊM NHÂN VIÊN MỚI
+        window.addNewStaff = function() {
+            const nameInput = document.getElementById('new-staff-name');
+            const zoneSelect = document.getElementById('new-staff-zone');
+            
+            const name = nameInput.value.trim();
+            const zone = zoneSelect.value;
+
+            if(!name) {
+                alert("Anh Thành vui lòng nhập tên nhân viên trước nha! 🐾");
+                return;
+            }
+
+            // Kiểm tra trùng tên nhân viên
+            const isDuplicate = staffRegistry.some(s => s.name.toLowerCase() === name.toLowerCase());
+            if(isDuplicate) {
+                alert(`Nhân viên "${name}" đã có sẵn trong hệ thống rồi ạ! ✨`);
+                return;
+            }
+
+            // Tạo Object nhân viên mới
+            const newStaff = {
+                id: "nv_" + Date.now(), // Tạo ID duy nhất theo timestamp
+                name: name,
+                zone: zone,
+                ratingSum: 0,
+                ratingCount: 0
+            };
+
+            // Đẩy vào mảng dữ liệu và render lại
+            staffRegistry.push(newStaff);
+            nameInput.value = ""; // Clear input sau khi thêm thành công
+            
+            // Tính toán lại điểm số sao từ cache dữ liệu cũ luôn cho nhân viên mới nếu trùng tên trong quá khứ
+            recalculateRatings(); 
+            renderStaffBoards();
+        };
+
+        // HÀM XÓA NHÂN VIÊN KHỎI DANH SÁCH
+        window.deleteStaff = function(staffId, staffName) {
+            const confirmDelete = confirm(`Anh Thành có chắc chắn muốn xóa nhân viên "${staffName}" khỏi sơ đồ không?`);
+            if(!confirmDelete) return;
+
+            // Lọc loại bỏ nhân viên khỏi mảng cục bộ
+            staffRegistry = staffRegistry.filter(s => s.id !== staffId);
+            renderStaffBoards();
+        };
+
+        // TÁCH BIỆT HÀM TÍNH TOÁN ĐIỂM SAO TỪ DATA CACHE
+        function recalculateRatings() {
+            // Reset điểm tích luỹ
+            staffRegistry.forEach(s => { s.ratingSum = 0; s.ratingCount = 0; });
+
+            // Chạy vòng lặp tính toán lại
+            rawReviewsCache.forEach(review => {
+                if (review.staff && review.staff !== "Không chọn") {
+                    const assignedStaffs = review.staff.split(", ");
+                    assignedStaffs.forEach(sName => {
+                        const targetStaff = staffRegistry.find(s => s.name.trim() === sName.trim());
+                        if (targetStaff) {
+                            targetStaff.ratingSum += review.rating;
+                            targetStaff.ratingCount += 1;
+                        }
+                    });
+                }
+            });
+        }
+
+        // RENDER GIAO DIỆN CÁC KHU VỰC VÀ NHÂN VIÊN
+        function renderStaffBoards() {
+            const zones = ["cho", "gau_meo", "meo", "capybara"];
+            zones.forEach(z => {
+                document.getElementById(`container-${z}`).innerHTML = "";
+                document.getElementById(`badge-${z}`).innerText = "0";
+            });
+
+            staffRegistry.forEach(staff => {
+                const container = document.getElementById(`container-${staff.zone}`);
+                if (!container) return;
+
+                const card = document.createElement('div');
+                card.className = "staff-card";
+                card.setAttribute('draggable', 'true');
+                card.setAttribute('data-id', staff.id);
+
+                const avgRating = staff.ratingCount > 0 ? (staff.ratingSum / staff.ratingCount).toFixed(1) : "5.0";
+
+                card.innerHTML = `
+                    <div class="staff-info">
+                        <span class="staff-name">${staff.name}</span>
+                        <span class="staff-rating-avg"><i class="fa-solid fa-star"></i> ${avgRating} (${staff.ratingCount} đánh giá)</span>
+                    </div>
+                    <div class="staff-actions">
+                        <button class="btn-delete-staff" onclick="deleteStaff('${staff.id}', '${staff.name}')" title="Xóa nhân viên">
+                            <i class="fa-solid fa-user-minus"></i>
+                        </button>
+                        <div class="drag-handle"><i class="fa-solid fa-grip-lines"></i></div>
+                    </div>
+                `;
+
+                card.addEventListener('dragstart', () => card.classList.add('dragging'));
+                card.addEventListener('dragend', () => card.classList.remove('dragging'));
+
+                container.appendChild(card);
+            });
+
+            zones.forEach(z => {
+                const count = staffRegistry.filter(s => s.zone === z).length;
+                document.getElementById(`badge-${z}`).innerText = count;
+            });
+        }
+
+        // CÀI ĐẶT SỰ KIỆN CHO CÁC VÙNG CHỨA DROP COLUMN[cite: 1]
+        document.querySelectorAll('.zone-column').forEach(column => {
+            column.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                column.classList.add('drag-over');
+            });
+
+            column.addEventListener('dragleave', () => {
+                column.classList.remove('drag-over');
+            });
+
+            column.addEventListener('drop', (e) => {
+                e.preventDefault();
+                column.classList.remove('drag-over');
+                
+                const draggingCard = document.querySelector('.staff-card.dragging');
+                if (!draggingCard) return;
+
+                const staffId = draggingCard.getAttribute('data-id');
+                const targetZone = column.getAttribute('data-zone');
+
+                const staffIndex = staffRegistry.findIndex(s => s.id === staffId);
+                if (staffIndex !== -1) {
+                    staffRegistry[staffIndex].zone = targetZone;
+                    renderStaffBoards(); 
+                }
+            });
+        });
+
+        // LẮNG NGHE DỮ LIỆU ĐÁNH GIÁ REALTIME TỪ FIREBASE[cite: 1]
+        const reviewsRef = ref(db, 'customer_reviews');
+        onValue(reviewsRef, (snapshot) => {
+            const data = snapshot.val();
+            const logContainer = document.getElementById('reviews-log');
+            logContainer.innerHTML = "";
+
+            if (!data) {
+                logContainer.innerHTML = `<p style="color: var(--text-secondary); padding: 20px; text-align: center;">Chưa có dữ liệu đánh giá nào.</p>`;
+                rawReviewsCache = [];
+                recalculateRatings();
+                renderStaffBoards();
+                return;
+            }
+
+            // Chuyển Object thành mảng và cache lại để phục vụ thêm/xoá nhân viên động[cite: 1]
+            rawReviewsCache = [];
+            Object.keys(data).forEach(key => {
+                rawReviewsCache.push(data[key]);
+            });
+            
+            // Sắp xếp thời gian đánh giá mới nhất lên đầu[cite: 1]
+            rawReviewsCache.sort((a, b) => b.timestamp - a.timestamp);
+
+            // Tính toán lại số sao cho nhân viên
+            recalculateRatings();
+
+            // Kết xuất HTML Nhật ký đánh giá ra màn hình[cite: 1]
+            rawReviewsCache.forEach(review => {
+                const rItem = document.createElement('div');
+                rItem.className = "review-item";
+
+                let starsHtml = "";
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += `<i class="${i <= review.rating ? 'fa-solid' : 'fa-regular'} fa-star"></i>`;
+                }
+
+                const zoneLabel = zoneNames[review.zone] || review.zone;
+                const formattedTime = new Date(review.timestamp).toLocaleString('vi-VN');
+
+                rItem.innerHTML = `
+                    <div class="review-top">
+                        <div class="review-tags">
+                            <span class="tag tag-zone"><i class="fa-solid fa-location-dot"></i> ${zoneLabel}</span>
+                            <span class="tag tag-staff"><i class="fa-solid fa-user"></i> NV: ${review.staff}</span>
+                        </div>
+                        <div class="review-stars">${starsHtml}</div>
+                    </div>
+                    <div class="review-comment">${review.comment || "<i>Khách không để lại bình luận văn bản.</i>"}</div>
+                    <div class="review-time">${formattedTime}</div>
+                `;
+                logContainer.appendChild(rItem);
+            });
+
+            // Re-render sơ đồ bảng nhân viên
+            renderStaffBoards();
+        });
+
+        // Khởi động render danh sách ban đầu[cite: 1]
+        renderStaffBoards();
+    </script>
+</body>
+</html>
