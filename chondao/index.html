@@ -537,6 +537,10 @@
                             <i class="fa-solid fa-hippo"></i>
                             <span id="zone-text-capybara">Capybara</span>
                         </div>
+                        <div class="zone-item" data-zone="thu_ngan" onclick="selectZone('thu_ngan')">
+                            <i class="fa-solid fa-cash-register"></i>
+                            <span id="zone-text-thu_ngan">Thu Ngân</span>
+                        </div>
                     </div>
                 </div>
 
@@ -659,14 +663,16 @@
             cho: ["Mỹ Nghi", "Kim Anh", "Duy Vỹ"],
             gau_meo: ["Thu Hằng", "Minh Triết", "Hoàng Long"],
             meo: ["Khánh Linh", "Bảo Ngọc", "Thành Đạt"],
-            capybara: ["Tấn Phát", "Nhã Phương", "Quốc Anh"]
+            capybara: ["Tấn Phát", "Nhã Phương", "Quốc Anh"],
+            thu_ngan: []
         };
 
         let zoneNames = {
             cho: "Khu vực Chó",
             gau_meo: "Gấu Mèo",
             meo: "Khu vực Mèo",
-            capybara: "Capybara"
+            capybara: "Capybara",
+            thu_ngan: "Thu Ngân"
         };
 
         // LẮNG NGHE SỰ THAY ĐỔI CỦA NHÂN VIÊN VÀ KHU VỰC TỪ FIREBASE REALTIME DATABASE (STAFF_REGISTRY)
@@ -679,7 +685,8 @@
                     cho: [],
                     gau_meo: [],
                     meo: [],
-                    capybara: []
+                    capybara: [],
+                    thu_ngan: []
                 };
 
                 // Duyệt qua tất cả các key nhân viên (ví dụ: nv_1783738365498)
@@ -1080,6 +1087,12 @@
                     console.error("-> [Background] Lỗi đồng bộ ngầm: ", error);
                 });
             }
+        };
+
+        window.openReviewWithZone = function(zoneKey) {
+            window.navigateTo('screen-review');
+            window.initReviewSteps();
+            window.selectZone(zoneKey);
         };
 
         window.retakePhoto = function() {
