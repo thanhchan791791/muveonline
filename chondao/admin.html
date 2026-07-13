@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cherrypet Admin - Quản Lý Nhân Viên & Đánh Giá</title>
+    <title>Cherrypet Admin - Phân Công Vị Trí Realtime</title>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -50,14 +50,6 @@
             padding: 0 8px;
         }
 
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 16px;
-            }
-        }
-
         .title-area h1 {
             font-size: 2rem;
             font-weight: 700;
@@ -86,7 +78,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.01);
         }
 
-        .ios-input, .ios-select {
+        .ios-input {
             padding: 12px 16px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
@@ -95,16 +87,13 @@
             outline: none;
             transition: all 0.2s;
             color: var(--text-main);
-        }
-
-        .ios-input:focus, .ios-select:focus {
-            border-color: var(--ios-blue);
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
-        }
-
-        .ios-input {
             flex: 1;
             min-width: 200px;
+        }
+
+        .ios-input:focus {
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
         }
 
         .ios-btn-primary {
@@ -124,7 +113,6 @@
 
         .ios-btn-primary:active {
             transform: scale(0.97);
-            filter: brightness(0.9);
         }
 
         /* LAYOUT CHÍNH */
@@ -160,11 +148,12 @@
             gap: 8px;
         }
 
-        /* KHU VỰC KÉO THẢ */
+        /* KHU VỰC KÉO THẢ VỊ TRÍ KHU VỰC */
         .zone-boards {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 16px;
+            margin-bottom: 24px;
         }
 
         @media (max-width: 650px) {
@@ -178,7 +167,7 @@
             border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 16px;
-            min-height: 280px;
+            min-height: 220px;
             display: flex;
             flex-direction: column;
             transition: all 0.2s ease;
@@ -197,7 +186,6 @@
             justify-content: space-between;
             align-items: center;
             padding: 4px;
-            border-radius: 8px;
         }
 
         .zone-header .badge {
@@ -207,7 +195,6 @@
             font-weight: 600;
         }
 
-        /* Màu sắc đồng bộ các khu vực */
         .zone-cho { border-top: 5px solid var(--primary-pink); }
         .zone-cho .badge { background: var(--primary-pink); color: #fff; }
         
@@ -227,7 +214,7 @@
             gap: 10px;
         }
 
-        /* CARD NHÂN VIÊN CÓ THỂ KÉO THẢ */
+        /* CARD NHÂN VIÊN TRÊN SƠ ĐỒ KHU VỰC */
         .staff-card {
             background: #ffffff;
             border: 1px solid var(--border-color);
@@ -240,18 +227,10 @@
             transition: all 0.2s ease;
             box-shadow: 0 2px 6px rgba(0,0,0,0.02);
             user-select: none;
-            position: relative;
-            overflow: hidden;
         }
 
-        .staff-card:active {
-            cursor: grabbing;
-        }
-
-        .staff-card.dragging {
-            opacity: 0.4;
-            transform: scale(0.98);
-        }
+        .staff-card:active { cursor: grabbing; }
+        .staff-card.dragging { opacity: 0.4; }
 
         .staff-info {
             display: flex;
@@ -260,11 +239,8 @@
             flex: 1;
         }
 
-        .staff-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
+        .staff-name { font-weight: 600; font-size: 0.95rem; }
+        
         .staff-rating-avg {
             font-size: 0.8rem;
             color: #FFD60A;
@@ -278,43 +254,69 @@
             font-weight: 600;
         }
 
-        .staff-actions {
+        .drag-handle { color: var(--text-secondary); opacity: 0.4; padding: 6px; }
+
+        /* BẢNG DANH SÁCH NHÂN VIÊN CHƯA PHÂN CÔNG (POOL) */
+        .pool-zone-box {
+            background: rgba(0, 0, 0, 0.01);
+            border: 1px dashed var(--border-color);
+            border-radius: 18px;
+            padding: 20px;
+            min-height: 140px;
+            transition: all 0.2s ease;
+        }
+
+        .pool-zone-box.drag-over {
+            background: rgba(0, 122, 255, 0.03);
+            border-color: var(--ios-blue);
+        }
+
+        .pool-staff-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* THẺ TÊN NHÂN VIÊN TRONG BẢNG CHỜ */
+        .staff-pool-tag {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 12px;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
         }
+
+        .staff-pool-tag:active { cursor: grabbing; }
+        .staff-pool-tag.dragging { opacity: 0.4; transform: scale(0.95); }
+
+        .tag-main { display: flex; align-items: center; gap: 8px; }
+        .tag-handle { opacity: 0.3; font-size: 0.8rem; }
 
         .btn-delete-staff {
             background: transparent;
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            padding: 6px;
-            border-radius: 8px;
+            padding: 4px;
+            border-radius: 6px;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        .btn-delete-staff:hover {
-            color: var(--ios-red);
-            background: rgba(255, 59, 48, 0.1);
-        }
+        .btn-delete-staff:hover { color: var(--ios-red); background: rgba(255, 59, 48, 0.1); }
 
-        .drag-handle {
-            color: var(--text-secondary);
-            opacity: 0.4;
-            padding: 6px;
-        }
-
-        /* LỊCH SỬ ĐÁNH GIÁ CỦA KHÁCH */
-        .reviews-panel {
-            max-height: 680px;
-            overflow-y: auto;
-            padding-right: 6px;
-        }
-
+        /* NHẬT KÝ ĐÁNH GIÁ CỦA KHÁCH */
+        .reviews-panel { max-height: 600px; overflow-y: auto; padding-right: 6px; }
+        
         .review-item {
             background: #ffffff;
             border: 1px solid var(--border-color);
@@ -324,56 +326,21 @@
             animation: fadeIn 0.4s ease;
         }
 
-        .review-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
-
-        .review-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .tag {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 8px;
-        }
-
+        .review-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .review-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag { font-size: 0.75rem; font-weight: 600; padding: 3px 8px; border-radius: 8px; }
         .tag-zone { background: rgba(0, 0, 0, 0.05); color: var(--text-main); }
         .tag-staff { background: #E2F0CB; color: #4A6E4C; }
+        .review-stars { color: #FFD60A; font-size: 0.85rem; }
+        .review-comment { font-size: 0.9rem; line-height: 1.4; color: var(--text-main); margin-bottom: 8px; text-align: left; }
+        .review-time { font-size: 0.75rem; color: var(--text-secondary); text-align: right; }
 
-        .review-stars {
-            color: #FFD60A;
-            font-size: 0.85rem;
-        }
-
-        .review-comment {
-            font-size: 0.9rem;
-            line-height: 1.4;
-            color: var(--text-main);
-            margin-bottom: 8px;
-            text-align: left;
-        }
-
-        .review-time {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            text-align: right;
-        }
-
-        /* ANIMATION */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
     </style>
 </head>
@@ -383,22 +350,16 @@
         <header>
             <div class="title-area">
                 <h1>Cherrypet Admin Dashboard</h1>
-                <p>Quản lý danh sách, điều phối vị trí làm việc và giám sát phản hồi Realtime</p>
+                <p>Điều phối vị trí nhân sự trực và giám sát đánh giá phản hồi Realtime</p>
             </div>
         </header>
 
-        <!-- THANH CHỨC NĂNG THÊM NHÂN VIÊN MỚI -->
+        <!-- THANH THÊM NHÂN VIÊN MỚI -->
         <div class="controls-area">
             <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); margin-right: 4px;">
                 <i class="fa-solid fa-user-plus" style="color: var(--ios-blue);"></i> Thêm nhân viên:
             </span>
             <input type="text" id="new-staff-name" class="ios-input" placeholder="Nhập họ tên nhân viên mới...">
-            <select id="new-staff-zone" class="ios-select">
-                <option value="cho">Khu vực Chó</option>
-                <option value="gau_meo">Gấu Mèo</option>
-                <option value="meo">Khu vực Mèo</option>
-                <option value="capybara">Capybara</option>
-            </select>
             <button class="ios-btn-primary" onclick="addNewStaff()">
                 <i class="fa-solid fa-plus"></i> Thêm vào danh sách
             </button>
@@ -406,9 +367,9 @@
 
         <div class="dashboard-grid">
             
-            <!-- CỘT TRÁI: DANH SÁCH NHÂN VIÊN THEO KHU VỰC CÓ KÉO THẢ VÀ XOÁ -->
+            <!-- CỘT TRÁI: SƠ ĐỒ PHÂN CÔNG VÀ BẢNG DANH SÁCH NHÂN VIÊN CHUNG -->
             <div class="ios-card">
-                <div class="card-title"><i class="fa-solid fa-people-arrows"></i> Sơ đồ vị trí nhân sự từng khu vực</div>
+                <div class="card-title"><i class="fa-solid fa-map-location-dot" style="color: var(--ios-blue);"></i> Sơ đồ điều phối nhân sự các khu vực</div>
                 
                 <div class="zone-boards">
                     <!-- KHU VỰC CHÓ -->
@@ -447,13 +408,24 @@
                         <div class="staff-list-container" id="container-capybara"></div>
                     </div>
                 </div>
+
+                <!-- BẢNG DANH SÁCH NHÂN VIÊN CHUNG (KÉO LÊN ĐỂ PHÂN CÔNG / THẢ VỀ ĐỂ HỦY) -->
+                <div class="pool-zone-box" data-zone="none">
+                    <p style="font-size: 0.9rem; color: var(--text-main); font-weight: 600;">
+                        <i class="fa-solid fa-users" style="color: var(--ios-blue);"></i> Danh sách nhân viên trong ca trực
+                    </p>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">
+                        (Kéo tên bạn bất kỳ thả vào các ô khu vực phía trên để phân công trực. Bạn nào được phân công sẽ tự động ẩn khỏi đây)
+                    </p>
+                    <div class="pool-staff-container" id="container-pool"></div>
+                </div>
             </div>
 
             <!-- CỘT PHẢI: CHI TIẾT ĐÁNH GIÁ REALTIME -->
             <div class="ios-card">
                 <div class="card-title"><i class="fa-solid fa-comment-medical"></i> Nhật ký Đánh giá Khách hàng</div>
                 <div class="reviews-panel" id="reviews-log">
-                    <!-- Nội dung đánh giá Realtime đổ về đây -->
+                    <!-- Phản hồi realtime tự động đổ vào đây -->
                 </div>
             </div>
 
@@ -464,7 +436,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Khởi tạo cấu hình Firebase đồng bộ[cite: 1]
         const firebaseConfig = {
             apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
             authDomain: "dogs-be72b.firebaseapp.com",
@@ -479,73 +450,64 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Biến lưu trữ danh sách nhân sự cục bộ tự động đồng bộ theo Firebase
         let staffRegistry = [];
+        let rawReviewsCache = [];
 
         const zoneNames = {
             cho: "Khu vực Chó",
             gau_meo: "Gấu Mèo",
             meo: "Khu vực Mèo",
-            capybara: "Capybara"
+            capybara: "Capybara",
+            none: "Chưa phân công"
         };
 
-        // Biến lưu trữ tạm thời dữ liệu đánh giá lấy từ Firebase để tính toán sao mỗi khi render nhân viên mới
-        let rawReviewsCache = [];
-
-        // HÀM THÊM NHÂN VIÊN MỚI - ĐẨY LÊN FIREBASE REALTIME
+        // THÊM NHÂN VIÊN MỚI - MẶC ĐỊNH LÀ CHƯA PHÂN CÔNG ("none")
         window.addNewStaff = function() {
             const nameInput = document.getElementById('new-staff-name');
-            const zoneSelect = document.getElementById('new-staff-zone');
-            
             const name = nameInput.value.trim();
-            const zone = zoneSelect.value;
 
             if(!name) {
                 alert("Anh Thành vui lòng nhập tên nhân viên trước nha! 🐾");
                 return;
             }
 
-            // Kiểm tra trùng tên nhân viên cục bộ trước khi đẩy data
             const isDuplicate = staffRegistry.some(s => s.name.toLowerCase() === name.toLowerCase());
             if(isDuplicate) {
-                alert(`Nhân viên "${name}" đã có sẵn trong hệ thống rồi ạ! ✨`);
+                alert(`Nhân viên "${name}" đã có sẵn trong danh sách rồi ạ! ✨`);
                 return;
             }
 
-            const newStaffId = "nv_" + Date.now(); // Tạo ID duy nhất theo timestamp
+            const newStaffId = "nv_" + Date.now();
 
-            // Đẩy trực tiếp Object nhân viên mới lên node 'staff_registry' trên Firebase
+            // Đẩy lên Firebase với thuộc tính currentZone ban đầu là "none" (nằm dưới danh sách)
             set(ref(db, 'staff_registry/' + newStaffId), {
                 id: newStaffId,
                 name: name,
-                zone: zone,
+                currentZone: "none", 
                 ratingSum: 0,
                 ratingCount: 0
             }).then(() => {
-                nameInput.value = ""; // Clear input sau khi thêm thành công
+                nameInput.value = "";
             }).catch((error) => {
-                console.error("Lỗi thêm nhân viên lên Firebase: ", error);
+                console.error("Lỗi thêm nhân viên: ", error);
             });
         };
 
-        // HÀM XÓA NHÂN VIÊN - GỠ KHỎI FIREBASE REALTIME
+        // XÓA NHÂN VIÊN KHỎI FIREBASE
         window.deleteStaff = function(staffId, staffName) {
-            const confirmDelete = confirm(`Anh Thành có chắc chắn muốn xóa nhân viên "${staffName}" khỏi sơ đồ không?`);
+            const confirmDelete = confirm(`Anh Thành có chắc muốn xóa nhân viên "${staffName}" không?`);
             if(!confirmDelete) return;
 
-            // Xóa trực tiếp node nhân viên này trên Firebase
             remove(ref(db, 'staff_registry/' + staffId))
             .catch((error) => {
-                console.error("Lỗi xóa nhân viên trên Firebase: ", error);
+                console.error("Lỗi xóa nhân viên: ", error);
             });
         };
 
-        // TÁCH BIỆT HÀM TÍNH TOÁN ĐIỂM SAO TỪ DATA CACHE
+        // TÍNH TOÁN LẠI ĐIỂM SAO TỪ DATA REVIEWS CACHE
         function recalculateRatings() {
-            // Reset điểm tích luỹ cục bộ
             staffRegistry.forEach(s => { s.ratingSum = 0; s.ratingCount = 0; });
 
-            // Chạy vòng lặp tính toán lại dựa vào lịch sử reviews đánh giá
             rawReviewsCache.forEach(review => {
                 if (review.staff && review.staff !== "Không chọn") {
                     const assignedStaffs = review.staff.split(", ");
@@ -560,100 +522,123 @@
             });
         }
 
-        // RENDER GIAO DIỆN CÁC KHU VỰC VÀ NHÂN VIÊN
+        // RENDER GIAO DIỆN PHÂN CÔNG (ẨN / HIỆN THEO ĐÚNG LOGIC ĐỐI LẬP)
         function renderStaffBoards() {
             const zones = ["cho", "gau_meo", "meo", "capybara"];
-            zones.forEach(z => {
-                document.getElementById(`container-${z}`).innerHTML = "";
-                document.getElementById(`badge-${z}`).innerText = "0";
-            });
+            
+            // Xóa sạch nội dung cũ các ô chứa trên giao diện trước khi render lại
+            zones.forEach(z => document.getElementById(`container-${z}`).innerHTML = "");
+            document.getElementById('container-pool').innerHTML = "";
 
             staffRegistry.forEach(staff => {
-                const container = document.getElementById(`container-${staff.zone}`);
-                if (!container) return;
+                // Đảm bảo có thuộc tính phân vùng khu vực trực, mặc định là none
+                const currentZone = staff.currentZone || "none";
 
-                const card = document.createElement('div');
-                card.className = "staff-card";
-                card.setAttribute('draggable', 'true');
-                card.setAttribute('data-id', staff.id);
+                if (currentZone !== "none") {
+                    // 1. Nếu ĐÃ PHÂN CÔNG -> Hiện ở sơ đồ khu vực phía trên (Và tự động ẩn ở bảng dưới)
+                    const container = document.getElementById(`container-${currentZone}`);
+                    if (container) {
+                        const card = document.createElement('div');
+                        card.className = "staff-card";
+                        card.setAttribute('draggable', 'true');
+                        card.setAttribute('data-id', staff.id);
 
-                const avgRating = staff.ratingCount > 0 ? (staff.ratingSum / staff.ratingCount).toFixed(1) : "5.0";
+                        const avgRating = staff.ratingCount > 0 ? (staff.ratingSum / staff.ratingCount).toFixed(1) : "5.0";
 
-                card.innerHTML = `
-                    <div class="staff-info">
-                        <span class="staff-name">${staff.name}</span>
-                        <span class="staff-rating-avg"><i class="fa-solid fa-star"></i> ${avgRating} (${staff.ratingCount} đánh giá)</span>
-                    </div>
-                    <div class="staff-actions">
-                        <button class="btn-delete-staff" onclick="deleteStaff('${staff.id}', '${staff.name}')" title="Xóa nhân viên">
-                            <i class="fa-solid fa-user-minus"></i>
-                        </button>
-                        <div class="drag-handle"><i class="fa-solid fa-grip-lines"></i></div>
-                    </div>
-                `;
+                        card.innerHTML = `
+                            <div class="staff-info">
+                                <span class="staff-name">${staff.name}</span>
+                                <span class="staff-rating-avg"><i class="fa-solid fa-star"></i> ${avgRating} (${staff.ratingCount} lượt)</span>
+                            </div>
+                            <div class="drag-handle"><i class="fa-solid fa-grip-lines"></i></div>
+                        `;
 
-                card.addEventListener('dragstart', () => card.classList.add('dragging'));
-                card.addEventListener('dragend', () => card.classList.remove('dragging'));
+                        card.addEventListener('dragstart', () => card.classList.add('dragging'));
+                        card.addEventListener('dragend', () => card.classList.remove('dragging'));
 
-                container.appendChild(card);
+                        container.appendChild(card);
+                    }
+                } else {
+                    // 2. Nếu CHƯA PHÂN CÔNG ("none") -> Hiện ở bảng danh sách nhân viên chung bên dưới
+                    const poolContainer = document.getElementById('container-pool');
+                    if (poolContainer) {
+                        const tag = document.createElement('div');
+                        tag.className = "staff-pool-tag";
+                        tag.setAttribute('draggable', 'true');
+                        tag.setAttribute('data-id', staff.id);
+
+                        tag.innerHTML = `
+                            <div class="tag-main">
+                                <span class="tag-handle"><i class="fa-solid fa-bars"></i></span> 
+                                <span>${staff.name}</span>
+                            </div>
+                            <button class="btn-delete-staff" onclick="event.stopPropagation(); deleteStaff('${staff.id}', '${staff.name}')" title="Xóa">
+                                <i class="fa-solid fa-user-minus"></i>
+                            </button>
+                        `;
+
+                        tag.addEventListener('dragstart', () => tag.classList.add('dragging'));
+                        tag.addEventListener('dragend', () => tag.classList.remove('dragging'));
+
+                        poolContainer.appendChild(tag);
+                    }
+                }
             });
 
+            // Cập nhật lại số lượng Badge trên từng ô hiển thị trực quan
             zones.forEach(z => {
-                const count = staffRegistry.filter(s => s.zone === z).length;
+                const count = document.getElementById(`container-${z}`).children.length;
                 document.getElementById(`badge-${z}`).innerText = count;
             });
         }
 
-        // CÀI ĐẶT SỰ KIỆN CHO CÁC VÙNG CHỨA DROP COLUMN[cite: 1]
-        document.querySelectorAll('.zone-column').forEach(column => {
-            column.addEventListener('dragover', (e) => {
+        // ĐĂNG KÝ SỰ KIỆN KÉO THẢ ĐỒNG BỘ LÊN FIREBASE REALTIME
+        // Áp dụng cho cả 4 ô Khu vực và ô Bảng danh sách nhân viên chung bên dưới
+        document.querySelectorAll('.zone-column, .pool-zone-box').forEach(box => {
+            box.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                column.classList.add('drag-over');
+                box.classList.add('drag-over');
             });
 
-            column.addEventListener('dragleave', () => {
-                column.classList.remove('drag-over');
+            box.addEventListener('dragleave', () => {
+                box.classList.remove('drag-over');
             });
 
-            column.addEventListener('drop', (e) => {
+            box.addEventListener('drop', (e) => {
                 e.preventDefault();
-                column.classList.remove('drag-over');
+                box.classList.remove('drag-over');
                 
-                const draggingCard = document.querySelector('.staff-card.dragging');
-                if (!draggingCard) return;
+                // Nhận diện phần tử đang được kéo (Có thể là từ thẻ Tag hoặc từ Card khu vực)
+                const draggingEl = document.querySelector('.staff-card.dragging, .staff-pool-tag.dragging');
+                if (!draggingEl) return;
 
-                const staffId = draggingCard.getAttribute('data-id');
-                const targetZone = column.getAttribute('data-zone');
+                const staffId = draggingEl.getAttribute('data-id');
+                const targetZone = box.getAttribute('data-zone'); // Lấy "cho", "meo",... hoặc "none" từ thuộc tính html
 
-                // Khi kéo thả vị trí, cập nhật cập nhật trực tiếp `zone` mới của nhân viên lên thẳng Firebase
+                // Đẩy trạng thái phân phối vị trí trực lên thẳng Firebase Realtime
                 update(ref(db, 'staff_registry/' + staffId), {
-                    zone: targetZone
+                    currentZone: targetZone
                 }).catch((error) => {
-                    console.error("Lỗi cập nhật khu vực kéo thả trên Firebase: ", error);
+                    console.error("Lỗi đồng bộ kéo thả lên Firebase: ", error);
                 });
             });
         });
 
         // LẮNG NGHE DANH SÁCH NHÂN VIÊN REALTIME TỪ FIREBASE
-        const staffRef = ref(db, 'staff_registry');
-        onValue(staffRef, (snapshot) => {
+        onValue(ref(db, 'staff_registry'), (snapshot) => {
             const data = snapshot.val();
             staffRegistry = [];
-            
             if (data) {
                 Object.keys(data).forEach(key => {
                     staffRegistry.push(data[key]);
                 });
             }
-            
-            // Tính toán lại sao và cập nhật lại sơ đồ ngay lập tức khi danh sách Firebase thay đổi
             recalculateRatings();
             renderStaffBoards();
         });
 
-        // LẮNG NGHE DỮ LIỆU ĐÁNH GIÁ REALTIME TỪ FIREBASE[cite: 1]
-        const reviewsRef = ref(db, 'customer_reviews');
-        onValue(reviewsRef, (snapshot) => {
+        // LẮNG NGHE DỮ LIỆU ĐÁNH GIÁ REALTIME TỪ FIREBASE ĐỂ HIỂN THỊ CỘT PHẢI
+        onValue(ref(db, 'customer_reviews'), (snapshot) => {
             const data = snapshot.val();
             const logContainer = document.getElementById('reviews-log');
             logContainer.innerHTML = "";
@@ -666,19 +651,12 @@
                 return;
             }
 
-            // Chuyển Object thành mảng và cache lại để phục vụ thêm/xoá nhân viên động[cite: 1]
             rawReviewsCache = [];
-            Object.keys(data).forEach(key => {
-                rawReviewsCache.push(data[key]);
-            });
-            
-            // Sắp xếp thời gian đánh giá mới nhất lên đầu[cite: 1]
+            Object.keys(data).forEach(key => rawReviewsCache.push(data[key]));
             rawReviewsCache.sort((a, b) => b.timestamp - a.timestamp);
 
-            // Tính toán lại số sao cho nhân viên
             recalculateRatings();
 
-            // Kết xuất HTML Nhật ký đánh giá ra màn hình[cite: 1]
             rawReviewsCache.forEach(review => {
                 const rItem = document.createElement('div');
                 rItem.className = "review-item";
@@ -705,7 +683,6 @@
                 logContainer.appendChild(rItem);
             });
 
-            // Re-render sơ đồ bảng nhân viên
             renderStaffBoards();
         });
     </script>
