@@ -689,12 +689,12 @@
                     thu_ngan: []
                 };
 
-                // Duyệt qua tất cả các key nhân viên (ví dụ: nv_1783738365498)
+                // Duyệt qua tất cả các key nhân viên (ví dụ: nv_1783921544227)
                 Object.keys(data).forEach(key => {
                     const staffMember = data[key];
-                    if (staffMember && staffMember.name && staffMember.zone) {
-                        const zone = staffMember.zone;
-                        // Nếu zone hợp lệ trong cấu trúc, đẩy tên nhân viên vào mảng của zone đó
+                    if (staffMember && staffMember.name && staffMember.currentZone) {
+                        const zone = staffMember.currentZone;
+                        // Nếu currentZone hợp lệ trong cấu trúc, đẩy tên nhân viên vào mảng của zone đó
                         if (newStaffData[zone] !== undefined) {
                             newStaffData[zone].push(staffMember.name);
                         }
