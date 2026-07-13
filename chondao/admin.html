@@ -19,6 +19,7 @@
             --mint-green: #B5EAD7;
             --peach: #FFDAC1;
             --capy-purple: #E8D7FF;
+            --cashier-blue: #B3E5FC;
             --ios-blue: #007AFF;
             --ios-red: #FF3B30;
         }
@@ -206,6 +207,9 @@
         
         .zone-capybara { border-top: 5px solid var(--capy-purple); }
         .zone-capybara .badge { background: var(--capy-purple); color: #4A1E86; }
+
+        .zone-thu_ngan { border-top: 5px solid #4FC3F7; }
+        .zone-thu_ngan .badge { background: var(--cashier-blue); color: #0277BD; }
 
         .staff-list-container {
             flex: 1;
@@ -407,6 +411,15 @@
                         </div>
                         <div class="staff-list-container" id="container-capybara"></div>
                     </div>
+
+                    <!-- THU NGÂN -->
+                    <div class="zone-column zone-thu_ngan" data-zone="thu_ngan">
+                        <div class="zone-header">
+                            <span><i class="fa-solid fa-cash-register"></i> Thu ngân</span>
+                            <span class="badge" id="badge-thu_ngan">0</span>
+                        </div>
+                        <div class="staff-list-container" id="container-thu_ngan"></div>
+                    </div>
                 </div>
 
                 <!-- BẢNG DANH SÁCH NHÂN VIÊN CHUNG (KÉO LÊN ĐỂ PHÂN CÔNG / THẢ VỀ ĐỂ HỦY) -->
@@ -458,6 +471,7 @@
             gau_meo: "Gấu Mèo",
             meo: "Khu vực Mèo",
             capybara: "Capybara",
+            thu_ngan: "Thu ngân",
             none: "Chưa phân công"
         };
 
@@ -524,7 +538,7 @@
 
         // RENDER GIAO DIỆN PHÂN CÔNG (ẨN / HIỆN THEO ĐÚNG LOGIC ĐỐI LẬP)
         function renderStaffBoards() {
-            const zones = ["cho", "gau_meo", "meo", "capybara"];
+            const zones = ["cho", "gau_meo", "meo", "capybara", "thu_ngan"];
             
             // Xóa sạch nội dung cũ các ô chứa trên giao diện trước khi render lại
             zones.forEach(z => document.getElementById(`container-${z}`).innerHTML = "");
@@ -587,13 +601,16 @@
 
             // Cập nhật lại số lượng Badge trên từng ô hiển thị trực quan
             zones.forEach(z => {
-                const count = document.getElementById(`container-${z}`).children.length;
-                document.getElementById(`badge-${z}`).innerText = count;
+                const containerEl = document.getElementById(`container-${z}`);
+                if (containerEl) {
+                    const count = containerEl.children.length;
+                    document.getElementById(`badge-${z}`).innerText = count;
+                }
             });
         }
 
         // ĐĂNG KÝ SỰ KIỆN KÉO THẢ ĐỒNG BỘ LÊN FIREBASE REALTIME
-        // Áp dụng cho cả 4 ô Khu vực và ô Bảng danh sách nhân viên chung bên dưới
+        // Áp dụng cho cả 5 ô Khu vực và ô Bảng danh sách nhân viên chung bên dưới
         document.querySelectorAll('.zone-column, .pool-zone-box').forEach(box => {
             box.addEventListener('dragover', (e) => {
                 e.preventDefault();
