@@ -394,37 +394,39 @@
             padding-top: 18px;
         }
 
-        /* --- BỐ CỤC PHÂN CHIA THỨC ĂN & NƯỚC UỐNG --- */
+        /* --- BỐ CỤC PHÂN CHIA THỨC ĂN & NƯỚC UỐNG (LÀM NỔI BẬT & NỔI BẬT TO) --- */
         .menu-tabs {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 15px;
-            background: #fff0f3;
-            padding: 5px;
-            border-radius: 16px;
+            background: #ffe5ec;
+            padding: 6px;
+            border-radius: 18px;
         }
 
         .menu-tab-btn {
             flex: 1;
-            padding: 10px 12px;
+            padding: 14px 12px;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             background: transparent;
-            font-size: 14px;
-            font-weight: 800;
+            font-size: 16px;
+            font-weight: 900;
             color: #6d6875;
             cursor: pointer;
             transition: all 0.25s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
+            letter-spacing: 0.5px;
         }
 
         .menu-tab-btn.active {
-            background: #ffffff;
-            color: #ff758f;
-            box-shadow: 0 4px 12px rgba(255, 117, 143, 0.2);
+            background: linear-gradient(135deg, #ff758f 0%, #ff4d6d 100%);
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(255, 77, 109, 0.35);
+            transform: scale(1.02);
         }
 
         .menu-tab-content {
@@ -533,6 +535,53 @@
             font-weight: 800;
         }
         .price-sticky-bar span { color: #ff4d6d; font-size: 20px; }
+
+        /* ICON GIỎ HÀNG FLOATING CORNER GÓC DƯỚI BÊN PHẢI MÀN HÌNH */
+        .floating-cart-btn {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #ff4d6d 0%, #ff758f 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4);
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid #ffffff;
+        }
+
+        .floating-cart-btn:active {
+            transform: scale(0.9);
+        }
+
+        .floating-cart-btn svg {
+            width: 26px;
+            height: 26px;
+            fill: #ffffff;
+        }
+
+        .floating-cart-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #10b981;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 900;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
 
         .modal-overlay {
             display: none;
@@ -769,14 +818,14 @@
 
         <!-- KHU VỰC CHỌN MÓN ĐƯỢC ĐƯA NƯỚC UỐNG LÊN TRƯỚC VÀ TÁCH TÁCH XA RA -->
         <div class="search-drink-box">
-            <label style="color: #ff758f; margin-bottom: 12px; display: block;" id="lbl-select-drink">Chọn danh mục món bên dưới:</label>
+            <label style="color: #ff758f; margin-bottom: 12px; display: block; font-weight: 800;" id="lbl-select-drink">Chọn danh mục món bên dưới:</label>
             
             <div class="menu-tabs">
                 <button class="menu-tab-btn active" id="tab-btn-drinks" onclick="switchMenuTab('drinks')">
-                    <span id="txt-tab-drinks">NƯỚC UỐNG</span>
+                    <span id="txt-tab-drinks">🍹 NƯỚC UỐNG</span>
                 </button>
                 <button class="menu-tab-btn" id="tab-btn-food" onclick="switchMenuTab('food')">
-                    <span id="txt-tab-food">THỨC ĂN THÚ</span>
+                    <span id="txt-tab-food">🍖 THỨC ĂN THÚ</span>
                 </button>
             </div>
 
@@ -826,6 +875,14 @@
         </div>
         <p class="note-staff" id="txt-note-staff">Hãy xuất trình màn hình hóa đơn này cho nhân viên quầy để đối chiếu và nhận vòng tay nha!</p>
     </div>
+</div>
+
+<!-- ICON GIỎ HÀNG FLOATING GÓC DƯỚI BÊN PHẢI MÀN HÌNH -->
+<div id="floating-cart" class="floating-cart-btn" onclick="scrollToCart()" style="display: none;">
+    <svg viewBox="0 0 24 24">
+        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+    </svg>
+    <div id="floating-cart-count" class="floating-cart-badge">0</div>
 </div>
 
 <!-- THANH CỐ ĐỊNH NÚT XÁC NHẬN ĐƠN HÀNG (STICKY BOTTOM) -->
@@ -1140,8 +1197,8 @@
             ticketRedPrice: "110.000đ / vé",
             ticketRedDesc: "Trải nghiệm: Đầy đủ khu vực Vé Xanh + Được vào khu VIP vui chơi, ôm ấp \"bộ trưởng ngoại giao\" Capybara và cho các bé Gấu Mèo (Raccoon) tinh nghịch ăn!",
             selectDrink: "Chọn danh mục món bên dưới:",
-            tabFood: "THỨC ĂN THÚ",
-            tabDrinks: "NƯỚC UỐNG",
+            tabFood: "🍖 THỨC ĂN THÚ",
+            tabDrinks: "🍹 NƯỚC UỐNG",
             cartTitle: "Món bạn đã chọn:",
             totalLabel: "TỔNG CỘNG:",
             stickyConfirm: "Xác nhận đơn hàng ->",
@@ -1198,8 +1255,8 @@
             ticketRedPrice: "110,000 VND / ticket",
             ticketRedDesc: "Experience: Includes all Green Ticket areas + VIP area access to hug Capybaras and feed playful Raccoons!",
             selectDrink: "Select item category below:",
-            tabFood: "PET FOOD",
-            tabDrinks: "DRINKS",
+            tabFood: "🍖 PET FOOD",
+            tabDrinks: "🍹 DRINKS",
             cartTitle: "Selected Items:",
             totalLabel: "TOTAL:",
             stickyConfirm: "Confirm Order ->",
@@ -1410,6 +1467,22 @@
         const listContainer = document.getElementById('cart-items-list');
         const activeDrinkIds = Object.keys(orderState.drinks);
 
+        let totalItemsCount = orderState.ticketGreen + orderState.ticketRed;
+
+        activeDrinkIds.forEach(id => {
+            totalItemsCount += orderState.drinks[id];
+        });
+
+        const floatingCart = document.getElementById('floating-cart');
+        const floatingBadge = document.getElementById('floating-cart-count');
+
+        if (totalItemsCount > 0) {
+            floatingCart.style.display = 'flex';
+            floatingBadge.innerText = totalItemsCount;
+        } else {
+            floatingCart.style.display = 'none';
+        }
+
         if (activeDrinkIds.length === 0) {
             cartContainer.style.display = 'none';
             return;
@@ -1432,6 +1505,16 @@
         listContainer.innerHTML = html;
     }
 
+    function scrollToCart() {
+        const cartElement = document.getElementById('selected-cart');
+        if (cartElement && cartElement.style.display !== 'none') {
+            cartElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            const searchBox = document.querySelector('.search-drink-box');
+            if (searchBox) searchBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
     function changeTicketQty(type, val) {
         const input = document.getElementById(`qty-${type}`);
         let currentVal = parseInt(input.value) || 0;
@@ -1442,6 +1525,7 @@
         if (type === 'green') orderState.ticketGreen = currentVal;
         if (type === 'red') orderState.ticketRed = currentVal;
 
+        updateSelectedCart();
         updateTotalCost();
     }
 
@@ -1470,6 +1554,7 @@
         const nextStep = document.getElementById(nextId);
         const mainContainer = document.getElementById('main-container');
         const stickyBar = document.getElementById('sticky-confirm-bar');
+        const floatingCart = document.getElementById('floating-cart');
         
         currentStep.style.display = 'none';
         currentStep.classList.remove('active');
@@ -1480,8 +1565,10 @@
         if (nextId === 'step-3') {
             stickyBar.style.display = 'flex';
             mainContainer.classList.add('has-sticky-btn');
+            updateSelectedCart();
         } else {
             stickyBar.style.display = 'none';
+            floatingCart.style.display = 'none';
             mainContainer.classList.remove('has-sticky-btn');
         }
         
