@@ -382,37 +382,50 @@
             display: block;
         }
 
+        /* NỔI BẬT KHU VỰC CHỌN MÓN NƯỚC & THỨC ĂN THÚ */
         .search-drink-box {
-            background: #fff;
-            border: 2px solid #ffe5ec;
-            border-radius: 20px;
-            padding: 15px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff0f3 100%);
+            border: 3px solid #ff758f;
+            border-radius: 24px;
+            padding: 20px 16px;
             margin-top: 28px;
             margin-bottom: 20px;
-            border-top: 2px dashed #ffccd5;
-            padding-top: 18px;
+            box-shadow: 0 10px 25px rgba(255, 117, 143, 0.25);
+            position: relative;
+        }
+
+        .search-drink-box label#lbl-select-drink {
+            font-size: 18px !important;
+            font-weight: 900 !important;
+            color: #d90429 !important;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .menu-tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            background: #fff0f3;
-            padding: 5px;
-            border-radius: 16px;
+            gap: 10px;
+            margin-bottom: 18px;
+            background: #ffe3e8;
+            padding: 6px;
+            border-radius: 20px;
+            border: 2px solid #ffb3c1;
         }
 
         .menu-tab-btn {
             flex: 1;
-            padding: 10px 12px;
+            padding: 14px 10px;
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
             background: transparent;
-            font-size: 14px;
-            font-weight: 800;
+            font-size: 16px;
+            font-weight: 900;
             color: #6d6875;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -420,9 +433,10 @@
         }
 
         .menu-tab-btn.active {
-            background: #ffffff;
-            color: #ff758f;
-            box-shadow: 0 4px 12px rgba(255, 117, 143, 0.2);
+            background: linear-gradient(135deg, #ff758f 0%, #ff4d6d 100%);
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(255, 77, 109, 0.4);
+            transform: scale(1.02);
         }
 
         .menu-tab-content {
@@ -434,18 +448,19 @@
         }
 
         .category-item {
-            margin-bottom: 10px;
-            border: 1.5px solid #ffe5ec;
-            border-radius: 14px;
+            margin-bottom: 12px;
+            border: 2px solid #ffccd5;
+            border-radius: 18px;
             overflow: hidden;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
         }
 
         .category-header {
-            background: #fffafb;
-            padding: 12px 16px;
+            background: #ffffff;
+            padding: 15px 18px;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 16px;
             color: #4a4e69;
             display: flex;
             justify-content: space-between;
@@ -461,19 +476,20 @@
 
         .category-header::after {
             content: '▾';
-            font-size: 16px;
+            font-size: 18px;
             color: #ff758f;
             transition: transform 0.3s;
         }
 
         .category-item.active {
-            border-color: #ff8fa3;
-            box-shadow: 0 4px 12px rgba(255, 143, 163, 0.1);
+            border-color: #ff4d6d;
+            box-shadow: 0 6px 15px rgba(255, 77, 109, 0.2);
         }
 
         .category-item.active .category-header {
             background: #fff0f3;
-            color: #ff758f;
+            color: #ff4d6d;
+            font-size: 17px;
         }
 
         .category-item.active .category-header::after {
@@ -483,9 +499,9 @@
         .category-content {
             display: none;
             background: #fff;
-            padding: 5px 10px;
-            border-top: 1px solid #ffe5ec;
-            max-height: 250px;
+            padding: 8px 12px;
+            border-top: 1.5px solid #ffe5ec;
+            max-height: 280px;
             overflow-y: auto;
         }
 
@@ -493,31 +509,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 8px;
+            padding: 12px 10px;
             border-bottom: 1px solid #fff0f3;
             background: #fff;
         }
         .drink-search-item:last-child {
             border-bottom: none;
         }
-        .drink-search-name { font-size: 14px; font-weight: 700; color: #4a4e69; }
-        .drink-search-price { font-size: 13px; color: #ff758f; font-weight: 700; margin-left: 5px; }
-
-        .selected-drinks-cart {
-            margin-top: 15px;
-            background: #fdf2f4;
-            border-radius: 16px;
-            padding: 12px;
-            display: none;
-        }
-        .cart-title {
-            font-size: 13px;
-            font-weight: 800;
-            color: #ff758f;
-            margin-bottom: 8px;
-            border-bottom: 1px dashed #ffccd5;
-            padding-bottom: 4px;
-        }
+        .drink-search-name { font-size: 15px; font-weight: 800; color: #333333; }
+        .drink-search-price { font-size: 15px; color: #ff4d6d; font-weight: 800; margin-left: 6px; }
 
         .price-sticky-bar {
             background: #fff0f3;
@@ -531,6 +531,120 @@
             font-weight: 800;
         }
         .price-sticky-bar span { color: #ff4d6d; font-size: 20px; }
+
+        /* ICON GIỎ HÀNG CỐ ĐỊNH GÓC PHẢI DƯỚI MÀN HÌNH */
+        .floating-cart-btn {
+            position: fixed;
+            bottom: 85px;
+            right: 20px;
+            width: 62px;
+            height: 62px;
+            background: linear-gradient(135deg, #ff4d6d 0%, #ff758f 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(255, 77, 109, 0.5);
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid #ffffff;
+        }
+        .floating-cart-btn:hover {
+            transform: scale(1.08);
+        }
+        .floating-cart-btn:active {
+            transform: scale(0.95);
+        }
+        .floating-cart-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: #ffffff;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #d90429;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 900;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* MODAL POPUP GIỎ HÀNG CHI TIẾT */
+        .cart-modal-box {
+            background: #ffffff;
+            width: 90%;
+            max-width: 420px;
+            max-height: 85vh;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 3px solid var(--primary-pink);
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed #ffccd5;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+        .cart-modal-header h3 {
+            font-size: 18px;
+            color: #d90429;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cart-modal-close {
+            background: #f1f5f9;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 16px;
+            color: #6d6875;
+            cursor: pointer;
+        }
+        .cart-modal-body {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 4px;
+        }
+        .cart-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #fff0f3;
+        }
+        .cart-item-info {
+            flex: 1;
+            padding-right: 10px;
+        }
+        .cart-item-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #333;
+        }
+        .cart-item-sub {
+            font-size: 12px;
+            color: #ff4d6d;
+            font-weight: 700;
+        }
 
         .modal-overlay {
             display: none;
@@ -765,7 +879,7 @@
             </div>
         </div>
 
-        <!-- KHU VỰC CHỌN MÓN -->
+        <!-- KHU VỰC CHỌN MÓN NỔI BẬT -->
         <div class="search-drink-box">
             <label style="color: #ff758f; margin-bottom: 12px; display: block;" id="lbl-select-drink">Chọn danh mục món bên dưới:</label>
             
@@ -784,11 +898,6 @@
 
             <div id="tab-content-food" class="menu-tab-content">
                 <div id="food-categories-container"></div>
-            </div>
-
-            <div class="selected-drinks-cart" id="selected-cart">
-                <div class="cart-title" id="txt-cart-title">Món bạn đã chọn:</div>
-                <div id="cart-items-list"></div>
             </div>
         </div>
 
@@ -826,12 +935,41 @@
     </div>
 </div>
 
+<!-- ICON GIỎ HÀNG NỔI BÊN PHẢI DƯỚI MÀN HÌNH -->
+<div id="floating-cart-btn" class="floating-cart-btn animate__animated animate__bounceIn" style="display: none;" onclick="openCartModal()">
+    <svg viewBox="0 0 24 24">
+        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+    </svg>
+    <div id="cart-badge-count" class="cart-badge">0</div>
+</div>
+
 <!-- THANH CỐ ĐỊNH NÚT XÁC NHẬN ĐƠN HÀNG (STICKY BOTTOM) -->
 <div id="sticky-confirm-bar" class="sticky-confirm-wrapper" style="display: none;">
     <button class="btn btn-sticky" id="btn-sticky-confirm" onclick="handleOrderConfirmation()">Xác nhận đơn hàng -></button>
 </div>
 
-<!-- MODALS -->
+<!-- MODALS GIỎ HÀNG -->
+<div id="cart-modal" class="modal-overlay" style="background: rgba(0,0,0,0.6);">
+    <div class="cart-modal-box animate__animated animate__zoomIn">
+        <div class="cart-modal-header">
+            <h3 id="txt-cart-modal-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#d90429"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                Giỏ Hàng Của Bạn
+            </h3>
+            <button class="cart-modal-close" onclick="closeCartModal()">✕</button>
+        </div>
+        <div class="cart-modal-body" id="cart-modal-body">
+            <!-- Danh sách món đã chọn sẽ được hiển thị ở đây -->
+        </div>
+        <div style="border-top: 2px dashed #ffccd5; padding-top: 12px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; font-weight: 800;">
+            <span style="font-size: 15px; color: #4a4e69;">Tổng cộng:</span>
+            <span id="cart-modal-total" style="font-size: 18px; color: #d90429;">0đ</span>
+        </div>
+        <button class="btn" style="margin-top: 15px; background: linear-gradient(135deg, #4ef084 0%, #10b981 100%); font-size: 15px; padding: 12px;" onclick="closeCartModal(); handleOrderConfirmation();">Xác nhận đơn hàng</button>
+    </div>
+</div>
+
+<!-- MODALS KHÁC -->
 <div id="menu-modal" class="modal-overlay zoom-mode" onclick="closeMenuModal()">
     <img id="modal-menu-img" src="menu2.1.png" alt="Menu Phóng To" onerror="this.src='menu2.1.jpg'">
 </div>
@@ -1151,7 +1289,9 @@
             ticketRedBillName: "Combo Chi Nhánh 1 + Chi Nhánh 2",
             noTicketBillNote: "Chưa chọn vé & món (Sẽ gọi thêm khi vào trong)",
             pinSuccess: "Mã PIN chính xác! Đơn hàng đã được xác nhận.",
-            pinError: "Mã PIN không đúng, vui lòng thử lại."
+            pinError: "Mã PIN không đúng, vui lòng thử lại.",
+            cartModalTitle: "Giỏ Hàng Của Bạn",
+            cartEmptyNote: "Giỏ hàng hiện đang trống"
         },
         en: {
             rulesImg: "luuy2.png",
@@ -1213,7 +1353,9 @@
             ticketRedBillName: "Combo Branch 1 + Branch 2",
             noTicketBillNote: "No ticket/drink selected (Will order inside)",
             pinSuccess: "Correct PIN! Order verified successfully.",
-            pinError: "Incorrect PIN, please try again."
+            pinError: "Incorrect PIN, please try again.",
+            cartModalTitle: "Your Shopping Cart",
+            cartEmptyNote: "Your cart is currently empty"
         }
     };
 
@@ -1275,7 +1417,6 @@
         document.getElementById('lbl-select-drink').innerText = t.selectDrink;
         document.getElementById('txt-tab-food').innerText = t.tabFood;
         document.getElementById('txt-tab-drinks').innerText = t.tabDrinks;
-        document.getElementById('txt-cart-title').innerText = t.cartTitle;
         document.getElementById('txt-total-label').innerText = t.totalLabel;
         document.getElementById('btn-sticky-confirm').innerText = t.stickyConfirm;
 
@@ -1301,7 +1442,6 @@
         document.getElementById('btn-risk-yes').innerText = t.riskYes;
 
         initDrinkCategories();
-        updateSelectedCart();
 
         switchStep('step-0', 'step-1');
     }
@@ -1396,35 +1536,8 @@
         const qtyInputs = document.querySelectorAll(`#qty-${drinkId}`);
         qtyInputs.forEach(input => input.value = currentVal);
 
-        updateSelectedCart();
         updateTotalCost();
-    }
-
-    function updateSelectedCart() {
-        const cartContainer = document.getElementById('selected-cart');
-        const listContainer = document.getElementById('cart-items-list');
-        const activeDrinkIds = Object.keys(orderState.drinks);
-
-        if (activeDrinkIds.length === 0) {
-            cartContainer.style.display = 'none';
-            return;
-        }
-
-        cartContainer.style.display = 'block';
-        let html = '';
-        allDrinks = getAllDrinksList();
-        activeDrinkIds.forEach(id => {
-            const drink = allDrinks.find(d => d.id === id);
-            if (drink) {
-                html += `
-                    <div style="display:flex; justify-content:space-between; font-size:13.5px; margin-top:5px; color:#5c5552;">
-                        <span><strong>${drink.name}</strong> (x${orderState.drinks[id]})</span>
-                        <span style="font-weight:700; color:#ff758f;">${(drink.price * orderState.drinks[id]).toLocaleString('vi-VN')}đ</span>
-                    </div>
-                `;
-            }
-        });
-        listContainer.innerHTML = html;
+        renderCartModalContent();
     }
 
     function changeTicketQty(type, val) {
@@ -1438,6 +1551,7 @@
         if (type === 'red') orderState.ticketRed = currentVal;
 
         updateTotalCost();
+        renderCartModalContent();
     }
 
     function calculateTotal() {
@@ -1455,9 +1569,103 @@
         return total;
     }
 
+    function calculateTotalItemsCount() {
+        let count = orderState.ticketGreen + orderState.ticketRed;
+        for (const qty of Object.values(orderState.drinks)) {
+            count += qty;
+        }
+        return count;
+    }
+
     function updateTotalCost() {
         const total = calculateTotal();
+        const itemCount = calculateTotalItemsCount();
+
         document.getElementById('realtime-total').innerText = total.toLocaleString('vi-VN') + 'đ';
+        document.getElementById('cart-badge-count').innerText = itemCount;
+
+        const cartBtn = document.getElementById('floating-cart-btn');
+        if (itemCount > 0) {
+            cartBtn.classList.add('animate__pulse');
+        } else {
+            cartBtn.classList.remove('animate__pulse');
+        }
+    }
+
+    /* QUẢN LÝ MODAL GIỎ HÀNG */
+    function openCartModal() {
+        renderCartModalContent();
+        document.getElementById('cart-modal').style.display = 'flex';
+    }
+
+    function closeCartModal() {
+        document.getElementById('cart-modal').style.display = 'none';
+    }
+
+    function renderCartModalContent() {
+        const t = translations[currentLang];
+        const body = document.getElementById('cart-modal-body');
+        const modalTotal = document.getElementById('cart-modal-total');
+        let html = '';
+
+        if (orderState.ticketGreen > 0) {
+            html += `
+                <div class="cart-item-row">
+                    <div class="cart-item-info">
+                        <div class="cart-item-title">${t.ticketGreenBillName}</div>
+                        <div class="cart-item-sub">110.000đ</div>
+                    </div>
+                    <div class="quantity-selector">
+                        <button class="qty-btn" onclick="changeTicketQty('green', -1)">-</button>
+                        <input type="number" class="qty-input" value="${orderState.ticketGreen}" readonly>
+                        <button class="qty-btn" onclick="changeTicketQty('green', 1)">+</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        if (orderState.ticketRed > 0) {
+            html += `
+                <div class="cart-item-row">
+                    <div class="cart-item-info">
+                        <div class="cart-item-title">${t.ticketRedBillName}</div>
+                        <div class="cart-item-sub">180.000đ</div>
+                    </div>
+                    <div class="quantity-selector">
+                        <button class="qty-btn" onclick="changeTicketQty('red', -1)">-</button>
+                        <input type="number" class="qty-input" value="${orderState.ticketRed}" readonly>
+                        <button class="qty-btn" onclick="changeTicketQty('red', 1)">+</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        allDrinks = getAllDrinksList();
+        for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
+            const drink = allDrinks.find(d => d.id === drinkId);
+            if (drink) {
+                html += `
+                    <div class="cart-item-row">
+                        <div class="cart-item-info">
+                            <div class="cart-item-title">${drink.name}</div>
+                            <div class="cart-item-sub">${(drink.price).toLocaleString('vi-VN')}đ</div>
+                        </div>
+                        <div class="quantity-selector">
+                            <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', -1, event)">-</button>
+                            <input type="number" class="qty-input" value="${qty}" readonly>
+                            <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', 1, event)">+</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        if (html === '') {
+            html = `<p style="text-align: center; color: #8d99ae; font-weight: 700; margin: 30px 0;">${t.cartEmptyNote}</p>`;
+        }
+
+        body.innerHTML = html;
+        modalTotal.innerText = calculateTotal().toLocaleString('vi-VN') + 'đ';
     }
 
     function switchStep(currentId, nextId, animationIn = 'animate__fadeInRight') {
@@ -1465,6 +1673,7 @@
         const nextStep = document.getElementById(nextId);
         const mainContainer = document.getElementById('main-container');
         const stickyBar = document.getElementById('sticky-confirm-bar');
+        const floatingCartBtn = document.getElementById('floating-cart-btn');
         
         currentStep.style.display = 'none';
         currentStep.classList.remove('active');
@@ -1474,9 +1683,11 @@
 
         if (nextId === 'step-3') {
             stickyBar.style.display = 'flex';
+            floatingCartBtn.style.display = 'flex';
             mainContainer.classList.add('has-sticky-btn');
         } else {
             stickyBar.style.display = 'none';
+            floatingCartBtn.style.display = 'none';
             mainContainer.classList.remove('has-sticky-btn');
         }
         
