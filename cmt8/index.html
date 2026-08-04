@@ -276,18 +276,18 @@
             border: none;
         }
 
-        /* --- BACK BUTTON (UPDATED) --- */
+        /* --- BACK BUTTON --- */
         .back-btn {
             position: absolute;
             top: 15px;
-            right: 15px; /* Chuyển sang bên phải */
+            right: 15px;
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             color: white;
-            width: 44px; /* Kích thước nút vuông/tròn */
+            width: 44px;
             height: 44px;
-            border-radius: 50%; /* Làm nút tròn cho hiện đại */
+            border-radius: 50%;
             z-index: 100;
             border: none;
             cursor: pointer;
@@ -341,7 +341,8 @@
 
     <div id="main-app">
         <header>
-            <h1>Cherry Pet Coffee</h1> <button class="logout-btn-top" onclick="handleLogout()">
+            <h1>Cherry Pet Coffee</h1>
+            <button class="logout-btn-top" onclick="handleLogout()">
                 <i class="fas fa-sign-out-alt"></i> Thoát
             </button>
         </header>
@@ -382,6 +383,11 @@
             <div class="menu-item" onclick="loadPage('https://thanhchan791791.github.io/hihihi/quytrinh/admin.html')">
                 <div class="icon"><i class="fas fa-tasks"></i></div>
                 <span>Quản lý order</span>
+            </div>
+            <!-- Đã thêm nút Quản lý đánh giá bên dưới -->
+            <div class="menu-item" onclick="loadPage('https://cherrybooking.io.vn/chondao//admin.html')">
+                <div class="icon"><i class="fas fa-star"></i></div>
+                <span>Quản lý đánh giá</span>
             </div>
         </div>
 
