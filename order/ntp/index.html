@@ -744,8 +744,8 @@
             <input type="text" id="fullname" placeholder="Ví dụ: Nguyễn Văn A" autocomplete="off">
         </div>
         <div class="form-group">
-            <label for="phone" id="lbl-phone">Số điện thoại (Nhập đúng 10 số)</label>
-            <input type="tel" id="phone" placeholder="Ví dụ: 0912345678" autocomplete="off" maxlength="10">
+            <label for="phone" id="lbl-phone">Số điện thoại (Nhập đúng từ 10 số trở lên)</label>
+            <input type="tel" id="phone" placeholder="Ví dụ: 0912345678" autocomplete="off">
         </div>
         <button class="btn" id="btn-step1-next" onclick="goToStep2()">Tiếp tục nhận vé -></button>
     </div>
@@ -937,18 +937,14 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    const staffCodes = {
-        "001": {
-            code: "001",
-            createdAt: "14:36:01 22/7/2026",
-            name: "Vân"
-        },
-        "002": {
-            code: "002",
-            createdAt: "14:36:22 22/7/2026",
-            name: "Kim"
-        }
-    };
+    // Biến lưu trữ danh sách staff_codes cập nhật từ Firebase Realtime Database
+    let staffCodes = {};
+
+    // Lắng nghe dữ liệu realtime từ node 'staff_codes' trên Firebase
+    database.ref('staff_codes').on('value', (snapshot) => {
+        staffCodes = snapshot.val() || {};
+        console.log("Cập nhật danh sách mã nhân viên mới nhất từ Firebase:", staffCodes);
+    });
 
     let currentLang = 'vi';
 
@@ -1177,7 +1173,7 @@
             step1Sub: "Điền thông tin đặt lịch hẹn với các bé thú cưng nha!",
             lblFullname: "Họ tên của bạn",
             placeholderName: "Ví dụ: Nguyễn Văn A",
-            lblPhone: "Số điện thoại (Nhập đúng 10 số)",
+            lblPhone: "Số điện thoại (Nhập đúng từ 10 số trở lên)",
             placeholderPhone: "Ví dụ: 0912345678",
             btnStep1Next: "Tiếp tục nhận vé ->",
             step2Title: "Nội Quy Quán Nhỏ",
@@ -1221,7 +1217,7 @@
             riskNo: "Hủy bỏ",
             riskYes: "Tớ đồng ý",
             alertFillInfo: "Bạn vui lòng nhập đầy đủ Họ tên và Số điện thoại nhé!",
-            alertPhoneFormat: "Số điện thoại không đúng cấu trúc rồi ạ (Yêu cầu 10 số, bắt đầu bằng số 0)!",
+            alertPhoneFormat: "Số điện thoại không đúng cấu trúc rồi ạ (Bắt đầu bằng số 0 và từ 10 số trở lên)!",
             ticketGreenBillName: "Vé Xanh (Combo 1)",
             ticketRedBillName: "Vé Đỏ (Combo 2)",
             noTicketBillNote: "Chưa chọn vé & món (Sẽ gọi thêm khi vào trong)",
@@ -1235,7 +1231,7 @@
             step1Sub: "Please fill in your information to book a date with our pets!",
             lblFullname: "Your Full Name",
             placeholderName: "Example: John Doe",
-            lblPhone: "Phone Number (10 digits)",
+            lblPhone: "Phone Number (10+ digits)",
             placeholderPhone: "Example: 0912345678",
             btnStep1Next: "Continue to Tickets ->",
             step2Title: "House Rules",
@@ -1279,7 +1275,7 @@
             riskNo: "Cancel",
             riskYes: "I Agree",
             alertFillInfo: "Please enter your full Name and Phone number!",
-            alertPhoneFormat: "Invalid phone number format (10 digits required, starting with 0)!",
+            alertPhoneFormat: "Invalid phone number format (Must start with 0 and have at least 10 digits)!",
             ticketGreenBillName: "Green Ticket (Combo 1)",
             ticketRedBillName: "Red Ticket (Combo 2)",
             noTicketBillNote: "No ticket/drink selected (Will order inside)",
@@ -1587,7 +1583,9 @@
         const t = translations[currentLang];
         const name = document.getElementById('fullname').value.trim();
         const phone = document.getElementById('phone').value.trim();
-        const phoneRegex = /^(0[3|5|7|8|9])[0-9]{8}$/;
+        
+        // Cấu trúc Regex: bắt đầu từ 0 và tổng chữ số từ 10 trở lên
+        const phoneRegex = /^0[0-9]{9,}$/;
 
         if (!name || !phone) {
             triggerErrorShake();
@@ -1784,14 +1782,27 @@
         const pinMessage = document.getElementById('pin-message');
         const inputCode = pinInput.value.trim();
         
-        if (staffCodes[inputCode]) {
-            const staff = staffCodes[inputCode];
+        // Tìm thông tin nhân viên từ biến staffCodes (được cập nhật realtime từ Firebase)
+        let foundStaff = staffCodes[inputCode];
+        
+        // Hỗ trợ trường hợp nếu lưu object trên Firebase mà thuộc tính code khác tên key
+        if (!foundStaff && typeof staffCodes === 'object') {
+            const matchingKey = Object.keys(staffCodes).find(key => staffCodes[key] && staffCodes[key].code === inputCode);
+            if (matchingKey) {
+                foundStaff = staffCodes[matchingKey];
+            }
+        }
+
+        if (foundStaff) {
+            const staffName = foundStaff.name || "Nhân viên";
+            const staffCode = foundStaff.code || inputCode;
+
             pinMessage.style.display = 'block';
             pinMessage.style.color = '#2e7d32';
-            pinMessage.innerText = `${t.pinSuccess} (NV: ${staff.name})`;
+            pinMessage.innerText = `${t.pinSuccess} (NV: ${staffName})`;
             pinInput.disabled = true;
 
-            saveOrderToFirebase(staff);
+            saveOrderToFirebase({ name: staffName, code: staffCode });
 
         } else if (inputCode.length >= 3) {
             pinMessage.style.display = 'block';
