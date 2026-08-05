@@ -1015,19 +1015,18 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    /* DANH SÁCH MÃ NHÂN VIÊN CẬP NHẬT THEO NODE DỮ LIỆU MỚI */
-    const staffCodes = {
-        "000": { code: "000", name: "phúc" },
-        "110": { code: "110", name: "nhân viên 110" },
-        "176": { code: "176", name: "nhân viên 176" },
-        "198": { code: "198", name: "nhân viên 198" },
-        "201": { code: "201", name: "nhân viên 201" },
-        "212": { code: "212", name: "nhân viên 212" },
-        "242": { code: "242", name: "nhân viên 242" },
-        "295": { code: "295", name: "nhân viên 295" },
-        "512": { code: "512", name: "nhân viên 512" },
-        "564": { code: "564", name: "my" }
-    };
+    /* ĐỌC DỮ LIỆU MÃ NHÂN VIÊN TRỰC TIẾP TỪ FIREBASE REALTIME DATABASE (NODE staff_codes) */
+    let staffCodes = {};
+
+    database.ref('staff_codes').on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            staffCodes = snapshot.val();
+            console.log("Cập nhật danh sách nhân viên thành công từ Firebase:", staffCodes);
+        } else {
+            staffCodes = {};
+            console.warn("Không tìm thấy dữ liệu tại node staff_codes.");
+        }
+    });
 
     let currentLang = 'vi';
 
@@ -1897,8 +1896,8 @@
             createdAt: now.toLocaleString('vi-VN'),
             timestamp: timestamp,
             language: currentLang,
-            confirmedBy: staffInfo ? staffInfo.name : "N/A",
-            confirmedByCode: staffInfo ? staffInfo.code : "N/A"
+            confirmedBy: staffInfo ? (staffInfo.name || "N/A") : "N/A",
+            confirmedByCode: staffInfo ? (staffInfo.code || "N/A") : "N/A"
         };
 
         database.ref('orders_branch2').push(orderData)
@@ -1910,20 +1909,24 @@
             });
     }
 
+    /* KIỂM TRA MÃ PIN NHÂN VIÊN DỰA TRÊN DỮ LIỆU ĐỌC DỘNG TỪ FIREBASE */
     function checkStaffPin() {
         const t = translations[currentLang];
         const pinInput = document.getElementById('staff-pin');
         const pinMessage = document.getElementById('pin-message');
         const inputCode = pinInput.value.trim();
         
-        if (staffCodes[inputCode]) {
+        if (staffCodes && staffCodes[inputCode]) {
             const staff = staffCodes[inputCode];
+            const staffName = typeof staff === 'object' ? (staff.name || inputCode) : staff;
+            const staffCodeVal = typeof staff === 'object' ? (staff.code || inputCode) : inputCode;
+
             pinMessage.style.display = 'block';
             pinMessage.style.color = '#2e7d32';
-            pinMessage.innerText = `${t.pinSuccess} (NV: ${staff.name})`;
+            pinMessage.innerText = `${t.pinSuccess} (NV: ${staffName})`;
             pinInput.disabled = true;
 
-            saveOrderToFirebase(staff);
+            saveOrderToFirebase({ name: staffName, code: staffCodeVal });
 
         } else if (inputCode.length >= 3) {
             pinMessage.style.display = 'block';
