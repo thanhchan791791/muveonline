@@ -807,8 +807,8 @@
             <input type="text" id="fullname" placeholder="Ví dụ: Nguyễn Văn A" autocomplete="off">
         </div>
         <div class="form-group">
-            <label for="phone" id="lbl-phone">Số điện thoại (Nhập đúng 10 số)</label>
-            <input type="tel" id="phone" placeholder="Ví dụ: 0912345678" autocomplete="off" maxlength="10">
+            <label for="phone" id="lbl-phone">Số điện thoại (Nhập từ 10 số trở lên)</label>
+            <input type="tel" id="phone" placeholder="Ví dụ: 0912345678" autocomplete="off">
         </div>
         <button class="btn" id="btn-step1-next" onclick="goToStep2()">Tiếp tục nhận vé -></button>
     </div>
@@ -1015,14 +1015,23 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
+    /* DANH SÁCH MÃ NHÂN VIÊN CẬP NHẬT THEO NODE DỮ LIỆU MỚI */
     const staffCodes = {
-        "001": { code: "001", name: "Vân" },
-        "002": { code: "002", name: "Kim" }
+        "000": { code: "000", name: "phúc" },
+        "110": { code: "110", name: "nhân viên 110" },
+        "176": { code: "176", name: "nhân viên 176" },
+        "198": { code: "198", name: "nhân viên 198" },
+        "201": { code: "201", name: "nhân viên 201" },
+        "212": { code: "212", name: "nhân viên 212" },
+        "242": { code: "242", name: "nhân viên 242" },
+        "295": { code: "295", name: "nhân viên 295" },
+        "512": { code: "512", name: "nhân viên 512" },
+        "564": { code: "564", name: "my" }
     };
 
     let currentLang = 'vi';
 
-    /* DANH SÁCH THỰC ĐƠN CHI NHÁNH 2 (ĐÃ CẬP NHẬT CHÍNH XÁC THEO ẢNH MENU) */
+    /* DANH SÁCH THỰC ĐƠN CHI NHÁNH 2 */
     const menuDataByLang = {
         vi: {
             food: [
@@ -1236,7 +1245,7 @@
             step1Sub: "Điền thông tin đặt lịch hẹn với các bé thú cưng nha!",
             lblFullname: "Họ tên của bạn",
             placeholderName: "Ví dụ: Nguyễn Văn A",
-            lblPhone: "Số điện thoại (Nhập đúng 10 số)",
+            lblPhone: "Số điện thoại (Nhập từ 10 số trở lên)",
             placeholderPhone: "Ví dụ: 0912345678",
             btnStep1Next: "Tiếp tục nhận vé ->",
             step2Title: "Nội Quy Quán Nhỏ",
@@ -1284,7 +1293,7 @@
             riskNo: "Hủy bỏ",
             riskYes: "Tớ đồng ý",
             alertFillInfo: "Bạn vui lòng nhập đầy đủ Họ tên và Số điện thoại nhé!",
-            alertPhoneFormat: "Số điện thoại không đúng cấu trúc rồi ạ (Yêu cầu 10 số, bắt đầu bằng số 0)!",
+            alertPhoneFormat: "Số điện thoại không đúng cấu trúc (Yêu cầu bắt đầu bằng số 0 và từ 10 số trở lên)!",
             ticketGreenBillName: "Vé vào cổng",
             ticketRedBillName: "Combo Chi Nhánh 1 + Chi Nhánh 2",
             noTicketBillNote: "Chưa chọn vé & món (Sẽ gọi thêm khi vào trong)",
@@ -1300,7 +1309,7 @@
             step1Sub: "Please fill in your information to book a date with our pets!",
             lblFullname: "Your Full Name",
             placeholderName: "Example: John Doe",
-            lblPhone: "Phone Number (10 digits)",
+            lblPhone: "Phone Number (10+ digits)",
             placeholderPhone: "Example: 0912345678",
             btnStep1Next: "Continue to Tickets ->",
             step2Title: "House Rules",
@@ -1348,7 +1357,7 @@
             riskNo: "Cancel",
             riskYes: "I Agree",
             alertFillInfo: "Please enter your full Name and Phone number!",
-            alertPhoneFormat: "Invalid phone number format (10 digits required, starting with 0)!",
+            alertPhoneFormat: "Invalid phone number format (Must start with 0 and be at least 10 digits long)!",
             ticketGreenBillName: "Entrance Ticket",
             ticketRedBillName: "Combo Branch 1 + Branch 2",
             noTicketBillNote: "No ticket/drink selected (Will order inside)",
@@ -1706,7 +1715,9 @@
         const t = translations[currentLang];
         const name = document.getElementById('fullname').value.trim();
         const phone = document.getElementById('phone').value.trim();
-        const phoneRegex = /^(0[3|5|7|8|9])[0-9]{8}$/;
+        
+        /* Kiểm tra SĐT bắt đầu bằng số 0 và từ 10 số trở lên */
+        const phoneRegex = /^0[0-9]{9,}$/;
 
         if (!name || !phone) {
             triggerErrorShake();
