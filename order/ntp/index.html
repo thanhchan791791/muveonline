@@ -170,7 +170,7 @@
             border: 2px dashed #ffb3c1;
             padding: 6px;
             background-color: #fff5f6;
-            margin-bottom: 22px;
+            margin-bottom: 15px;
             cursor: zoom-in;
             text-align: center;
         }
@@ -180,6 +180,20 @@
             height: auto;
             border-radius: 12px;
             display: block;
+        }
+
+        /* KHU VỰC LƯU Ý ĐỎ DƯỚI BẢNG NỘI QUY */
+        .rules-extra-notice {
+            background-color: #ffe5e5;
+            border: 1.5px solid #ff4d4d;
+            color: #d90429;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 22px;
+            line-height: 1.4;
         }
 
         .checkbox-container {
@@ -757,6 +771,12 @@
             <img id="rules-img-element" src="luuy.png" class="rules-img" alt="Lưu ý quan trọng" onerror="this.src='luuy.jpg'">
             <p id="txt-rules-zoom-note" style="font-size: 11px; color:#a1a1a1; margin-top:5px; font-weight:bold;">Bấm vào ảnh để xem lưu ý rõ hơn</p>
         </div>
+        
+        <!-- DÒNG LƯU Ý ĐỎ BỔ SUNG DƯỚI ẢNH NỘI QUY -->
+        <div class="rules-extra-notice" id="txt-rules-extra-notice">
+            Lưu ý:Khi vào chơi phòng gấu mèo trường hợp bị cào, cắn quán sẽ không chịu trách nhiệm, mong quý khách cân nhắc kĩ và dưới 18 tuổi phải có phụ huynh vào chung.
+        </div>
+
         <label class="checkbox-container">
             <input type="checkbox" id="agree-checkbox" onchange="toggleRuleBtn()">
             <span id="txt-agree-rules">TÔI ĐÃ ĐỌC VÀ HIỂU NỘI QUY</span>
@@ -914,7 +934,7 @@
 <div id="risk-confirm-modal" class="modal-overlay" style="background: rgba(0,0,0,0.6);">
     <div class="confirm-alert-box animate__animated animate__bounceIn">
         <h3 id="txt-modal-risk-title">Một chút lưu ý nhỏ bạn nha!</h3>
-        <p id="txt-modal-risk-desc">Các bé thú cưng đôi lúc sẽ vô tình cào nhẹ hoặc phản ứng tự vệ nếu chúng ta tương tác sai cách (không đúng nội quy). Để đảm bảo an toàn, bạn vui lòng tự lưu ý và đồng ý chịu trách nhiệm cho các rủi ro va quẹt, trầy xước ngoài ý muốn trong quá trình vui chơi nhé.</p>
+        <p id="txt-modal-risk-desc">Khi vào chơi phòng gấu mèo trường hợp bị cào, cắn quán sẽ không chịu trách nhiệm, mong quý khách cân nhắc kĩ và dưới 18 tuổi phải có phụ huynh vào chung.</p>
         <div class="confirm-buttons">
             <button class="btn-confirm-no" id="btn-risk-no" onclick="closeRiskModal()">Hủy bỏ</button>
             <button class="btn-confirm-yes" id="btn-risk-yes" onclick="confirmRiskAndSubmit()">Tớ đồng ý</button>
@@ -1178,6 +1198,7 @@
             btnStep1Next: "Tiếp tục nhận vé ->",
             step2Title: "Nội Quy Quán Nhỏ",
             rulesZoomNote: "Bấm vào ảnh để xem lưu ý rõ hơn",
+            rulesExtraNotice: "Lưu ý: khi vào chơi phòng gấu mèo trường hợp bị cào, cắn quán sẽ không chịu trách nhiệm, mong quý khách cân nhắc kĩ và dưới 18 tuổi phải có phụ huynh vào chung.",
             agreeRules: "TÔI ĐÃ ĐỌC VÀ HIỂU NỘI QUY",
             btnRuleNext: "Đồng ý & Tiếp tục ->",
             step3Title: "Chọn Vé & Gọi Món",
@@ -1213,7 +1234,7 @@
             tcheckNo: "Quay lại",
             tcheckYes: "Đúng vậy",
             riskTitle: "Một chút lưu ý nhỏ bạn nha!",
-            riskDesc: "Các bé thú cưng đôi lúc sẽ vô tình cào nhẹ hoặc phản ứng tự vệ nếu chúng ta tương tác sai cách (không đúng nội quy). Để đảm bảo an toàn, bạn vui lòng tự lưu ý và đồng ý chịu trách nhiệm cho các rủi ro va quẹt, trầy xước ngoài ý muốn trong quá trình vui chơi nhé.",
+            riskDesc: "Khi vào chơi phòng gấu mèo trường hợp bị cào, cắn quán sẽ không chịu trách nhiệm, mong quý khách cân nhắc kĩ và dưới 18 tuổi phải có phụ huynh vào chung.",
             riskNo: "Hủy bỏ",
             riskYes: "Tớ đồng ý",
             alertFillInfo: "Bạn vui lòng nhập đầy đủ Họ tên và Số điện thoại nhé!",
@@ -1236,6 +1257,7 @@
             btnStep1Next: "Continue to Tickets ->",
             step2Title: "House Rules",
             rulesZoomNote: "Tap on the image to enlarge guidelines",
+            rulesExtraNotice: "Note: Please be aware that the establishment assumes no liability for any scratches or bites that may occur while visiting the raccoon room; we ask that you consider this carefully. Visitors under the age of 18 must be accompanied by a parent or guardian.",
             agreeRules: "I HAVE READ & AGREE TO THE RULES",
             btnRuleNext: "Agree & Continue ->",
             step3Title: "Select Tickets & Drinks",
@@ -1271,7 +1293,7 @@
             tcheckNo: "Go Back",
             tcheckYes: "Yes, I understand",
             riskTitle: "Important Safety Note!",
-            riskDesc: "Our pets may accidentally scratch or react defensively if handled incorrectly. For safety, please be careful and accept personal responsibility for any accidental scratches during playtime.",
+            riskDesc: "Khi vào chơi phòng gấu mèo trường hợp bị cào, cắn quán sẽ không chịu trách nhiệm, mong quý khách cân nhắc kĩ và dưới 18 tuổi phải có phụ huynh vào chung.",
             riskNo: "Cancel",
             riskYes: "I Agree",
             alertFillInfo: "Please enter your full Name and Phone number!",
@@ -1313,6 +1335,7 @@
 
         document.getElementById('txt-step2-title').innerText = t.step2Title;
         document.getElementById('txt-rules-zoom-note').innerText = t.rulesZoomNote;
+        document.getElementById('txt-rules-extra-notice').innerText = t.rulesExtraNotice;
         document.getElementById('txt-agree-rules').innerText = t.agreeRules;
         document.getElementById('btn-rule-next').innerText = t.btnRuleNext;
 
