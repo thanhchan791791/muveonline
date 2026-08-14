@@ -170,7 +170,7 @@
             border: 2px dashed #ffb3c1;
             padding: 6px;
             background-color: #fff5f6;
-            margin-bottom: 15px;
+            margin-bottom: 22px;
             cursor: zoom-in;
             text-align: center;
         }
@@ -180,20 +180,6 @@
             height: auto;
             border-radius: 12px;
             display: block;
-        }
-
-        /* KHU VỰC LƯU Ý ĐỎ DƯỚI BẢNG NỘI QUY */
-        .rules-extra-notice {
-            background-color: #ffe5e5;
-            border: 1.5px solid #ff4d4d;
-            color: #d90429;
-            padding: 10px 14px;
-            border-radius: 14px;
-            font-size: 14px;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 22px;
-            line-height: 1.4;
         }
 
         .checkbox-container {
@@ -308,9 +294,6 @@
         .ticket-option.red { border-color: #ffdad3; background: linear-gradient(180deg, #ffffff 0%, #fff5f3 100%); }
         .ticket-option.red::before { background-color: var(--red-pastel); }
 
-        .ticket-option.purple { border-color: #e2d6ff; background: linear-gradient(180deg, #ffffff 0%, #f8f0ff 100%); }
-        .ticket-option.purple::before { background-color: #9d4edd; }
-
         .badge-hot {
             position: absolute;
             top: 0; right: 0;
@@ -334,7 +317,6 @@
         }
         .ticket-info.green h3 { color: #52796f; }
         .ticket-info.red h3 { color: #d90429; }
-        .ticket-info.purple h3 { color: #7b2cbf; }
         .ticket-price { font-size: 14px; font-weight: 700; color: #6d6875; }
 
         .ticket-description {
@@ -345,7 +327,6 @@
         }
         .ticket-option.green .ticket-description { color: #52796f; }
         .ticket-option.red .ticket-description { color: #b7094c; }
-        .ticket-option.purple .ticket-description { color: #5a189a; }
 
         .included-animals { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
         .animal-tag {
@@ -357,7 +338,6 @@
         }
         .ticket-option.green .animal-tag { background: #e8f5e9; color: #2e7d32; }
         .ticket-option.red .animal-tag { background: #ffebee; color: #c62828; }
-        .ticket-option.purple .animal-tag { background: #f3e5f5; color: #6a1b9a; }
 
         .quantity-selector {
             display: flex;
@@ -777,12 +757,6 @@
             <img id="rules-img-element" src="luuy.png" class="rules-img" alt="Lưu ý quan trọng" onerror="this.src='luuy.jpg'">
             <p id="txt-rules-zoom-note" style="font-size: 11px; color:#a1a1a1; margin-top:5px; font-weight:bold;">Bấm vào ảnh để xem lưu ý rõ hơn</p>
         </div>
-        
-        <!-- DÒNG LƯU Ý ĐỎ BỔ SUNG DƯỚI ẢNH NỘI QUY -->
-        <div class="rules-extra-notice" id="txt-rules-extra-notice">
-            Lưu ý:Khi vào chơi phòng gấu mèo trường hợp bị cào, cắn quán sẽ không chịu trách nhiệm, mong quý khách cân nhắc kĩ và dưới 18 tuổi phải có phụ huynh vào chung.
-        </div>
-
         <label class="checkbox-container">
             <input type="checkbox" id="agree-checkbox" onchange="toggleRuleBtn()">
             <span id="txt-agree-rules">TÔI ĐÃ ĐỌC VÀ HIỂU NỘI QUY</span>
@@ -839,26 +813,6 @@
                 <button class="qty-btn" onclick="changeTicketQty('red', -1)">-</button>
                 <input type="number" id="qty-red" class="qty-input" value="0" min="0" readonly>
                 <button class="qty-btn" onclick="changeTicketQty('red', 1)">+</button>
-            </div>
-        </div>
-
-        <!-- VÉ COMBO 3 -->
-        <div class="ticket-option purple animate__animated animate__fadeInUp">
-            <div class="badge-hot" style="background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);">SUPER COMBO</div>
-            <div class="ticket-info purple">
-                <h3 id="txt-ticket-combo3-title">Vé Combo 3 (Chi Nhánh 1 + Chi Nhánh 2)</h3>
-                <span class="ticket-price" id="txt-ticket-combo3-price">180.000đ / vé</span>
-                <p class="ticket-description" id="txt-ticket-combo3-desc">
-                    Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat, Lạc đà Alpaca)!
-                </p>
-                <div class="included-animals">
-                    <span class="animal-tag">Chó</span><span class="animal-tag">Mèo</span><span class="animal-tag">Gấu Mèo</span><span class="animal-tag">Capybara</span><span class="animal-tag">Vẹt</span><span class="animal-tag">Cầy Meerkat</span><span class="animal-tag">Lạc đà Alpaca</span>
-                </div>
-            </div>
-            <div class="quantity-selector">
-                <button class="qty-btn" onclick="changeTicketQty('combo3', -1)">-</button>
-                <input type="number" id="qty-combo3" class="qty-input" value="0" min="0" readonly>
-                <button class="qty-btn" onclick="changeTicketQty('combo3', 1)">+</button>
             </div>
         </div>
 
@@ -960,7 +914,7 @@
 <div id="risk-confirm-modal" class="modal-overlay" style="background: rgba(0,0,0,0.6);">
     <div class="confirm-alert-box animate__animated animate__bounceIn">
         <h3 id="txt-modal-risk-title">Một chút lưu ý nhỏ bạn nha!</h3>
-        <p id="txt-modal-risk-desc">Khi vào chơi phòng gấu mèo trường hợp bị cào, cắn quán sẽ không chịu trách nhiệm, mong quý khách cân nhắc kĩ và dưới 18 tuổi phải có phụ huynh vào chung.</p>
+        <p id="txt-modal-risk-desc">Các bé thú cưng đôi lúc sẽ vô tình cào nhẹ hoặc phản ứng tự vệ nếu chúng ta tương tác sai cách (không đúng nội quy). Để đảm bảo an toàn, bạn vui lòng tự lưu ý và đồng ý chịu trách nhiệm cho các rủi ro va quẹt, trầy xước ngoài ý muốn trong quá trình vui chơi nhé.</p>
         <div class="confirm-buttons">
             <button class="btn-confirm-no" id="btn-risk-no" onclick="closeRiskModal()">Hủy bỏ</button>
             <button class="btn-confirm-yes" id="btn-risk-yes" onclick="confirmRiskAndSubmit()">Tớ đồng ý</button>
@@ -1224,7 +1178,6 @@
             btnStep1Next: "Tiếp tục nhận vé ->",
             step2Title: "Nội Quy Quán Nhỏ",
             rulesZoomNote: "Bấm vào ảnh để xem lưu ý rõ hơn",
-            rulesExtraNotice: "Lưu ý: khi vào chơi phòng gấu mèo trường hợp bị cào, cắn quán sẽ không chịu trách nhiệm, mong quý khách cân nhắc kĩ và dưới 18 tuổi phải có phụ huynh vào chung.",
             agreeRules: "TÔI ĐÃ ĐỌC VÀ HIỂU NỘI QUY",
             btnRuleNext: "Đồng ý & Tiếp tục ->",
             step3Title: "Chọn Vé & Gọi Món",
@@ -1239,9 +1192,6 @@
             ticketRedTitle: "Vé Đỏ (Combo 2)",
             ticketRedPrice: "110.000đ / vé",
             ticketRedDesc: "Trải nghiệm: Đầy đủ khu vực Vé Xanh + Được vào khu VIP vui chơi, ôm ấp \"bộ trưởng ngoại giao\" Capybara và cho các bé Gấu Mèo (Raccoon) tinh nghịch ăn!",
-            ticketCombo3Title: "Vé Combo 3 (Chi Nhánh 1 + Chi Nhánh 2)",
-            ticketCombo3Price: "180.000đ / vé",
-            ticketCombo3Desc: "Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat, Lạc đà Alpaca)!",
             selectDrink: "Chọn danh mục món bên dưới:",
             tabFood: "🍖 THỨC ĂN THÚ",
             tabDrinks: "🍹 NƯỚC UỐNG",
@@ -1263,14 +1213,13 @@
             tcheckNo: "Quay lại",
             tcheckYes: "Đúng vậy",
             riskTitle: "Một chút lưu ý nhỏ bạn nha!",
-            riskDesc: "Khi vào chơi phòng gấu mèo trường hợp bị cào, cắn quán sẽ không chịu trách nhiệm, mong quý khách cân nhắc kĩ và dưới 18 tuổi phải có phụ huynh vào chung.",
+            riskDesc: "Các bé thú cưng đôi lúc sẽ vô tình cào nhẹ hoặc phản ứng tự vệ nếu chúng ta tương tác sai cách (không đúng nội quy). Để đảm bảo an toàn, bạn vui lòng tự lưu ý và đồng ý chịu trách nhiệm cho các rủi ro va quẹt, trầy xước ngoài ý muốn trong quá trình vui chơi nhé.",
             riskNo: "Hủy bỏ",
             riskYes: "Tớ đồng ý",
             alertFillInfo: "Bạn vui lòng nhập đầy đủ Họ tên và Số điện thoại nhé!",
             alertPhoneFormat: "Số điện thoại không đúng cấu trúc rồi ạ (Bắt đầu bằng số 0 và từ 10 số trở lên)!",
             ticketGreenBillName: "Vé Xanh (Combo 1)",
             ticketRedBillName: "Vé Đỏ (Combo 2)",
-            ticketCombo3BillName: "Vé Combo 3 (CN1 + CN2)",
             noTicketBillNote: "Chưa chọn vé & món (Sẽ gọi thêm khi vào trong)",
             pinSuccess: "Mã PIN chính xác! Đơn hàng đã được xác nhận.",
             pinError: "Mã PIN không đúng, vui lòng thử lại."
@@ -1287,7 +1236,6 @@
             btnStep1Next: "Continue to Tickets ->",
             step2Title: "House Rules",
             rulesZoomNote: "Tap on the image to enlarge guidelines",
-            rulesExtraNotice: "Note: Please be aware that the establishment assumes no liability for any scratches or bites that may occur while visiting the raccoon room; we ask that you consider this carefully. Visitors under the age of 18 must be accompanied by a parent or guardian.",
             agreeRules: "I HAVE READ & AGREE TO THE RULES",
             btnRuleNext: "Agree & Continue ->",
             step3Title: "Select Tickets & Drinks",
@@ -1302,9 +1250,6 @@
             ticketRedTitle: "Red Ticket (Combo 2)",
             ticketRedPrice: "110,000 VND / ticket",
             ticketRedDesc: "Experience: Includes all Green Ticket areas + VIP area access to hug Capybaras and feed playful Raccoons!",
-            ticketCombo3Title: "Combo 3 Ticket (Branch 1 + Branch 2)",
-            ticketCombo3Price: "180,000 VND / ticket",
-            ticketCombo3Desc: "Experience both branches: Branch 1 (Dogs, Cats, Raccoons, Capybaras) & Branch 2 (Dogs, Cats, Parrots, Meerkats, Alpacas)!",
             selectDrink: "Select item category below:",
             tabFood: "🍖 PET FOOD",
             tabDrinks: "🍹 DRINKS",
@@ -1326,14 +1271,13 @@
             tcheckNo: "Go Back",
             tcheckYes: "Yes, I understand",
             riskTitle: "Important Safety Note!",
-            riskDesc: "Khi vào chơi phòng gấu mèo trường hợp bị cào, cắn quán sẽ không chịu trách nhiệm, mong quý khách cân nhắc kĩ và dưới 18 tuổi phải có phụ huynh vào chung.",
+            riskDesc: "Our pets may accidentally scratch or react defensively if handled incorrectly. For safety, please be careful and accept personal responsibility for any accidental scratches during playtime.",
             riskNo: "Cancel",
             riskYes: "I Agree",
             alertFillInfo: "Please enter your full Name and Phone number!",
             alertPhoneFormat: "Invalid phone number format (Must start with 0 and have at least 10 digits)!",
             ticketGreenBillName: "Green Ticket (Combo 1)",
             ticketRedBillName: "Red Ticket (Combo 2)",
-            ticketCombo3BillName: "Combo 3 Ticket (Branch 1 + 2)",
             noTicketBillNote: "No ticket/drink selected (Will order inside)",
             pinSuccess: "Correct PIN! Order verified successfully.",
             pinError: "Incorrect PIN, please try again."
@@ -1345,7 +1289,6 @@
         phone: '',
         ticketGreen: 0,
         ticketRed: 0,
-        ticketCombo3: 0,
         drinks: {} 
     };
 
@@ -1370,7 +1313,6 @@
 
         document.getElementById('txt-step2-title').innerText = t.step2Title;
         document.getElementById('txt-rules-zoom-note').innerText = t.rulesZoomNote;
-        document.getElementById('txt-rules-extra-notice').innerText = t.rulesExtraNotice;
         document.getElementById('txt-agree-rules').innerText = t.agreeRules;
         document.getElementById('btn-rule-next').innerText = t.btnRuleNext;
 
@@ -1388,9 +1330,6 @@
         document.getElementById('txt-ticket-red-title').innerText = t.ticketRedTitle;
         document.getElementById('txt-ticket-red-price').innerText = t.ticketRedPrice;
         document.getElementById('txt-ticket-red-desc').innerText = t.ticketRedDesc;
-        document.getElementById('txt-ticket-combo3-title').innerText = t.ticketCombo3Title;
-        document.getElementById('txt-ticket-combo3-price').innerText = t.ticketCombo3Price;
-        document.getElementById('txt-ticket-combo3-desc').innerText = t.ticketCombo3Desc;
         document.getElementById('lbl-select-drink').innerText = t.selectDrink;
         document.getElementById('txt-tab-food').innerText = t.tabFood;
         document.getElementById('txt-tab-drinks').innerText = t.tabDrinks;
@@ -1524,7 +1463,7 @@
         const listContainer = document.getElementById('cart-items-list');
         const activeDrinkIds = Object.keys(orderState.drinks);
 
-        let totalItemsCount = orderState.ticketGreen + orderState.ticketRed + orderState.ticketCombo3;
+        let totalItemsCount = orderState.ticketGreen + orderState.ticketRed;
 
         activeDrinkIds.forEach(id => {
             totalItemsCount += orderState.drinks[id];
@@ -1581,7 +1520,6 @@
 
         if (type === 'green') orderState.ticketGreen = currentVal;
         if (type === 'red') orderState.ticketRed = currentVal;
-        if (type === 'combo3') orderState.ticketCombo3 = currentVal;
 
         updateSelectedCart();
         updateTotalCost();
@@ -1591,7 +1529,6 @@
         let total = 0;
         total += orderState.ticketGreen * 80000;  
         total += orderState.ticketRed * 110000;  
-        total += orderState.ticketCombo3 * 180000;
 
         allDrinks = getAllDrinksList();
         for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
@@ -1709,12 +1646,10 @@
     }
 
     function handleOrderConfirmation() {
-        if (orderState.ticketGreen === 0 && orderState.ticketRed === 0 && orderState.ticketCombo3 === 0) {
+        if (orderState.ticketGreen === 0 && orderState.ticketRed === 0) {
             document.getElementById('ticket-check-modal').style.display = 'flex';
-        } else if (orderState.ticketRed > 0 || orderState.ticketCombo3 > 0) {
-            document.getElementById('risk-confirm-modal').style.display = 'flex';
         } else {
-            submitOrder();
+            triggerRiskModal();
         }
     }
 
@@ -1724,7 +1659,11 @@
 
     function acceptNoTicketAndContinue() {
         closeTicketCheckModal();
-        submitOrder();
+        triggerRiskModal();
+    }
+
+    function triggerRiskModal() {
+        document.getElementById('risk-confirm-modal').style.display = 'flex';
     }
 
     function closeRiskModal() {
@@ -1733,42 +1672,36 @@
 
     function confirmRiskAndSubmit() {
         closeRiskModal();
-        submitOrder();
+        showConfirmation();
     }
 
-    function submitOrder() {
+    function showConfirmation() {
         const t = translations[currentLang];
         const now = new Date();
-        const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' - ' + now.toLocaleDateString('vi-VN');
+        const dateString = now.toLocaleDateString(currentLang === 'vi' ? 'vi-VN' : 'en-US');
+        const timeString = now.toLocaleTimeString(currentLang === 'vi' ? 'vi-VN' : 'en-US', { hour: '2-digit', minute: '2-digit' });
 
         document.getElementById('summary-name').innerText = orderState.name;
         document.getElementById('summary-phone').innerText = orderState.phone;
-        document.getElementById('summary-time').innerText = timeStr;
+        document.getElementById('summary-time').innerText = `${timeString} - ${dateString}`;
 
+        const billContainer = document.getElementById('bill-items-container');
         let billHtml = '';
-        let total = calculateTotal();
 
         if (orderState.ticketGreen > 0) {
             billHtml += `
                 <div class="bill-row">
-                    <span>${t.ticketGreenBillName} (x${orderState.ticketGreen})</span>
+                    <span>${t.ticketGreenBillName} x ${orderState.ticketGreen}</span>
                     <span>${(orderState.ticketGreen * 80000).toLocaleString('vi-VN')}đ</span>
                 </div>
             `;
         }
+
         if (orderState.ticketRed > 0) {
             billHtml += `
                 <div class="bill-row">
-                    <span>${t.ticketRedBillName} (x${orderState.ticketRed})</span>
+                    <span>${t.ticketRedBillName} x ${orderState.ticketRed}</span>
                     <span>${(orderState.ticketRed * 110000).toLocaleString('vi-VN')}đ</span>
-                </div>
-            `;
-        }
-        if (orderState.ticketCombo3 > 0) {
-            billHtml += `
-                <div class="bill-row">
-                    <span>${t.ticketCombo3BillName} (x${orderState.ticketCombo3})</span>
-                    <span>${(orderState.ticketCombo3 * 180000).toLocaleString('vi-VN')}đ</span>
                 </div>
             `;
         }
@@ -1779,44 +1712,115 @@
             if (drink) {
                 billHtml += `
                     <div class="bill-row">
-                        <span>${drink.name} (x${qty})</span>
+                        <span>${drink.name} x ${qty}</span>
                         <span>${(drink.price * qty).toLocaleString('vi-VN')}đ</span>
                     </div>
                 `;
             }
         }
 
-        if (!billHtml) {
-            billHtml = `<div class="bill-row" style="justify-content:center; font-style:italic;">${t.noTicketBillNote}</div>`;
+        if (billHtml === '') {
+            billHtml = `<div class="bill-row" style="justify-content: center; font-style: italic;">${t.noTicketBillNote}</div>`;
         }
 
-        document.getElementById('bill-items-container').innerHTML = billHtml;
-        document.getElementById('summary-grand-total').innerText = total.toLocaleString('vi-VN') + 'đ';
+        billContainer.innerHTML = billHtml;
 
-        switchStep('step-3', 'step-success');
+        const grandTotal = calculateTotal();
+        document.getElementById('summary-grand-total').innerText = grandTotal.toLocaleString('vi-VN') + 'đ';
+
+        document.getElementById('staff-pin').value = '';
+        document.getElementById('staff-pin').disabled = false;
+        document.getElementById('pin-message').style.display = 'none';
+
+        switchStep('step-3', 'step-success', 'animate__zoomIn');
+    }
+
+    function saveOrderToFirebase(staffInfo = null) {
+        const now = new Date();
+        const timestamp = now.getTime();
+        
+        let orderedDrinks = {};
+        allDrinks = getAllDrinksList();
+        for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
+            const drink = allDrinks.find(d => d.id === drinkId);
+            if (drink) {
+                orderedDrinks[drinkId] = {
+                    name: drink.name,
+                    quantity: qty,
+                    price: drink.price,
+                    subtotal: drink.price * qty
+                };
+            }
+        }
+
+        const orderData = {
+            customerName: orderState.name,
+            customerPhone: orderState.phone,
+            ticketGreenQty: orderState.ticketGreen,
+            ticketRedQty: orderState.ticketRed,
+            drinks: orderedDrinks,
+            totalAmount: calculateTotal(),
+            createdAt: now.toLocaleString('vi-VN'),
+            timestamp: timestamp,
+            language: currentLang,
+            confirmedBy: staffInfo ? staffInfo.name : "N/A",
+            confirmedByCode: staffInfo ? staffInfo.code : "N/A"
+        };
+
+        database.ref('orders').push(orderData)
+            .then(() => {
+                console.log("Đơn hàng đã được đồng bộ lên Firebase thành công!");
+            })
+            .catch((error) => {
+                console.error("Lỗi khi lưu đơn hàng lên Firebase: ", error);
+            });
     }
 
     function checkStaffPin() {
-        const pinInput = document.getElementById('staff-pin').value.trim();
-        const messageEl = document.getElementById('pin-message');
         const t = translations[currentLang];
+        const pinInput = document.getElementById('staff-pin');
+        const pinMessage = document.getElementById('pin-message');
+        const inputCode = pinInput.value.trim();
+        
+        // Tìm thông tin nhân viên từ biến staffCodes (được cập nhật realtime từ Firebase)
+        let foundStaff = staffCodes[inputCode];
+        
+        // Hỗ trợ trường hợp nếu lưu object trên Firebase mà thuộc tính code khác tên key
+        if (!foundStaff && typeof staffCodes === 'object') {
+            const matchingKey = Object.keys(staffCodes).find(key => staffCodes[key] && staffCodes[key].code === inputCode);
+            if (matchingKey) {
+                foundStaff = staffCodes[matchingKey];
+            }
+        }
 
-        if (Object.values(staffCodes).includes(pinInput)) {
-            messageEl.style.display = 'block';
-            messageEl.style.color = '#10b981';
-            messageEl.innerText = t.pinSuccess;
-        } else if (pinInput.length >= 4) {
-            messageEl.style.display = 'block';
-            messageEl.style.color = '#d90429';
-            messageEl.innerText = t.pinError;
+        if (foundStaff) {
+            const staffName = foundStaff.name || "Nhân viên";
+            const staffCode = foundStaff.code || inputCode;
+
+            pinMessage.style.display = 'block';
+            pinMessage.style.color = '#2e7d32';
+            pinMessage.innerText = `${t.pinSuccess} (NV: ${staffName})`;
+            pinInput.disabled = true;
+
+            saveOrderToFirebase({ name: staffName, code: staffCode });
+
+        } else if (inputCode.length >= 3) {
+            pinMessage.style.display = 'block';
+            pinMessage.style.color = '#d90429';
+            pinMessage.innerText = t.pinError;
         } else {
-            messageEl.style.display = 'none';
+            pinMessage.style.display = 'none';
         }
     }
 
     function goBackToOrder() {
         switchStep('step-success', 'step-3', 'animate__fadeInLeft');
     }
+
+    window.onload = function() {
+        allDrinks = getAllDrinksList();
+        initDrinkCategories();
+    };
 </script>
 
 </body>
