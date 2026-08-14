@@ -308,6 +308,9 @@
         .ticket-option.red { border-color: #ffdad3; background: linear-gradient(180deg, #ffffff 0%, #fff5f3 100%); }
         .ticket-option.red::before { background-color: var(--red-pastel); }
 
+        .ticket-option.purple { border-color: #e2d6ff; background: linear-gradient(180deg, #ffffff 0%, #f8f0ff 100%); }
+        .ticket-option.purple::before { background-color: #9d4edd; }
+
         .badge-hot {
             position: absolute;
             top: 0; right: 0;
@@ -331,6 +334,7 @@
         }
         .ticket-info.green h3 { color: #52796f; }
         .ticket-info.red h3 { color: #d90429; }
+        .ticket-info.purple h3 { color: #7b2cbf; }
         .ticket-price { font-size: 14px; font-weight: 700; color: #6d6875; }
 
         .ticket-description {
@@ -341,6 +345,7 @@
         }
         .ticket-option.green .ticket-description { color: #52796f; }
         .ticket-option.red .ticket-description { color: #b7094c; }
+        .ticket-option.purple .ticket-description { color: #5a189a; }
 
         .included-animals { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
         .animal-tag {
@@ -352,6 +357,7 @@
         }
         .ticket-option.green .animal-tag { background: #e8f5e9; color: #2e7d32; }
         .ticket-option.red .animal-tag { background: #ffebee; color: #c62828; }
+        .ticket-option.purple .animal-tag { background: #f3e5f5; color: #6a1b9a; }
 
         .quantity-selector {
             display: flex;
@@ -836,6 +842,26 @@
             </div>
         </div>
 
+        <!-- VÉ COMBO 3 -->
+        <div class="ticket-option purple animate__animated animate__fadeInUp">
+            <div class="badge-hot" style="background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);">SUPER COMBO</div>
+            <div class="ticket-info purple">
+                <h3 id="txt-ticket-combo3-title">Vé Combo 3 (Chi Nhánh 1 + Chi Nhánh 2)</h3>
+                <span class="ticket-price" id="txt-ticket-combo3-price">180.000đ / vé</span>
+                <p class="ticket-description" id="txt-ticket-combo3-desc">
+                    Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat, Lạc đà Alpaca)!
+                </p>
+                <div class="included-animals">
+                    <span class="animal-tag">Chó</span><span class="animal-tag">Mèo</span><span class="animal-tag">Gấu Mèo</span><span class="animal-tag">Capybara</span><span class="animal-tag">Vẹt</span><span class="animal-tag">Cầy Meerkat</span><span class="animal-tag">Lạc đà Alpaca</span>
+                </div>
+            </div>
+            <div class="quantity-selector">
+                <button class="qty-btn" onclick="changeTicketQty('combo3', -1)">-</button>
+                <input type="number" id="qty-combo3" class="qty-input" value="0" min="0" readonly>
+                <button class="qty-btn" onclick="changeTicketQty('combo3', 1)">+</button>
+            </div>
+        </div>
+
         <!-- KHU VỰC CHỌN MÓN ĐƯỢC ĐƯA NƯỚC UỐNG LÊN TRƯỚC VÀ TÁCH TÁCH XA RA -->
         <div class="search-drink-box">
             <label style="color: #ff758f; margin-bottom: 12px; display: block; font-weight: 800;" id="lbl-select-drink">Chọn danh mục món bên dưới:</label>
@@ -1213,6 +1239,9 @@
             ticketRedTitle: "Vé Đỏ (Combo 2)",
             ticketRedPrice: "110.000đ / vé",
             ticketRedDesc: "Trải nghiệm: Đầy đủ khu vực Vé Xanh + Được vào khu VIP vui chơi, ôm ấp \"bộ trưởng ngoại giao\" Capybara và cho các bé Gấu Mèo (Raccoon) tinh nghịch ăn!",
+            ticketCombo3Title: "Vé Combo 3 (Chi Nhánh 1 + Chi Nhánh 2)",
+            ticketCombo3Price: "180.000đ / vé",
+            ticketCombo3Desc: "Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat, Lạc đà Alpaca)!",
             selectDrink: "Chọn danh mục món bên dưới:",
             tabFood: "🍖 THỨC ĂN THÚ",
             tabDrinks: "🍹 NƯỚC UỐNG",
@@ -1241,6 +1270,7 @@
             alertPhoneFormat: "Số điện thoại không đúng cấu trúc rồi ạ (Bắt đầu bằng số 0 và từ 10 số trở lên)!",
             ticketGreenBillName: "Vé Xanh (Combo 1)",
             ticketRedBillName: "Vé Đỏ (Combo 2)",
+            ticketCombo3BillName: "Vé Combo 3 (CN1 + CN2)",
             noTicketBillNote: "Chưa chọn vé & món (Sẽ gọi thêm khi vào trong)",
             pinSuccess: "Mã PIN chính xác! Đơn hàng đã được xác nhận.",
             pinError: "Mã PIN không đúng, vui lòng thử lại."
@@ -1272,6 +1302,9 @@
             ticketRedTitle: "Red Ticket (Combo 2)",
             ticketRedPrice: "110,000 VND / ticket",
             ticketRedDesc: "Experience: Includes all Green Ticket areas + VIP area access to hug Capybaras and feed playful Raccoons!",
+            ticketCombo3Title: "Combo 3 Ticket (Branch 1 + Branch 2)",
+            ticketCombo3Price: "180,000 VND / ticket",
+            ticketCombo3Desc: "Experience both branches: Branch 1 (Dogs, Cats, Raccoons, Capybaras) & Branch 2 (Dogs, Cats, Parrots, Meerkats, Alpacas)!",
             selectDrink: "Select item category below:",
             tabFood: "🍖 PET FOOD",
             tabDrinks: "🍹 DRINKS",
@@ -1300,6 +1333,7 @@
             alertPhoneFormat: "Invalid phone number format (Must start with 0 and have at least 10 digits)!",
             ticketGreenBillName: "Green Ticket (Combo 1)",
             ticketRedBillName: "Red Ticket (Combo 2)",
+            ticketCombo3BillName: "Combo 3 Ticket (Branch 1 + 2)",
             noTicketBillNote: "No ticket/drink selected (Will order inside)",
             pinSuccess: "Correct PIN! Order verified successfully.",
             pinError: "Incorrect PIN, please try again."
@@ -1311,6 +1345,7 @@
         phone: '',
         ticketGreen: 0,
         ticketRed: 0,
+        ticketCombo3: 0,
         drinks: {} 
     };
 
@@ -1353,6 +1388,9 @@
         document.getElementById('txt-ticket-red-title').innerText = t.ticketRedTitle;
         document.getElementById('txt-ticket-red-price').innerText = t.ticketRedPrice;
         document.getElementById('txt-ticket-red-desc').innerText = t.ticketRedDesc;
+        document.getElementById('txt-ticket-combo3-title').innerText = t.ticketCombo3Title;
+        document.getElementById('txt-ticket-combo3-price').innerText = t.ticketCombo3Price;
+        document.getElementById('txt-ticket-combo3-desc').innerText = t.ticketCombo3Desc;
         document.getElementById('lbl-select-drink').innerText = t.selectDrink;
         document.getElementById('txt-tab-food').innerText = t.tabFood;
         document.getElementById('txt-tab-drinks').innerText = t.tabDrinks;
@@ -1486,7 +1524,7 @@
         const listContainer = document.getElementById('cart-items-list');
         const activeDrinkIds = Object.keys(orderState.drinks);
 
-        let totalItemsCount = orderState.ticketGreen + orderState.ticketRed;
+        let totalItemsCount = orderState.ticketGreen + orderState.ticketRed + orderState.ticketCombo3;
 
         activeDrinkIds.forEach(id => {
             totalItemsCount += orderState.drinks[id];
@@ -1543,6 +1581,7 @@
 
         if (type === 'green') orderState.ticketGreen = currentVal;
         if (type === 'red') orderState.ticketRed = currentVal;
+        if (type === 'combo3') orderState.ticketCombo3 = currentVal;
 
         updateSelectedCart();
         updateTotalCost();
@@ -1552,6 +1591,7 @@
         let total = 0;
         total += orderState.ticketGreen * 80000;  
         total += orderState.ticketRed * 110000;  
+        total += orderState.ticketCombo3 * 180000;
 
         allDrinks = getAllDrinksList();
         for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
@@ -1669,10 +1709,12 @@
     }
 
     function handleOrderConfirmation() {
-        if (orderState.ticketGreen === 0 && orderState.ticketRed === 0) {
+        if (orderState.ticketGreen === 0 && orderState.ticketRed === 0 && orderState.ticketCombo3 === 0) {
             document.getElementById('ticket-check-modal').style.display = 'flex';
+        } else if (orderState.ticketRed > 0 || orderState.ticketCombo3 > 0) {
+            document.getElementById('risk-confirm-modal').style.display = 'flex';
         } else {
-            triggerRiskModal();
+            submitOrder();
         }
     }
 
@@ -1682,11 +1724,7 @@
 
     function acceptNoTicketAndContinue() {
         closeTicketCheckModal();
-        triggerRiskModal();
-    }
-
-    function triggerRiskModal() {
-        document.getElementById('risk-confirm-modal').style.display = 'flex';
+        submitOrder();
     }
 
     function closeRiskModal() {
@@ -1695,36 +1733,42 @@
 
     function confirmRiskAndSubmit() {
         closeRiskModal();
-        showConfirmation();
+        submitOrder();
     }
 
-    function showConfirmation() {
+    function submitOrder() {
         const t = translations[currentLang];
         const now = new Date();
-        const dateString = now.toLocaleDateString(currentLang === 'vi' ? 'vi-VN' : 'en-US');
-        const timeString = now.toLocaleTimeString(currentLang === 'vi' ? 'vi-VN' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+        const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' - ' + now.toLocaleDateString('vi-VN');
 
         document.getElementById('summary-name').innerText = orderState.name;
         document.getElementById('summary-phone').innerText = orderState.phone;
-        document.getElementById('summary-time').innerText = `${timeString} - ${dateString}`;
+        document.getElementById('summary-time').innerText = timeStr;
 
-        const billContainer = document.getElementById('bill-items-container');
         let billHtml = '';
+        let total = calculateTotal();
 
         if (orderState.ticketGreen > 0) {
             billHtml += `
                 <div class="bill-row">
-                    <span>${t.ticketGreenBillName} x ${orderState.ticketGreen}</span>
+                    <span>${t.ticketGreenBillName} (x${orderState.ticketGreen})</span>
                     <span>${(orderState.ticketGreen * 80000).toLocaleString('vi-VN')}đ</span>
                 </div>
             `;
         }
-
         if (orderState.ticketRed > 0) {
             billHtml += `
                 <div class="bill-row">
-                    <span>${t.ticketRedBillName} x ${orderState.ticketRed}</span>
+                    <span>${t.ticketRedBillName} (x${orderState.ticketRed})</span>
                     <span>${(orderState.ticketRed * 110000).toLocaleString('vi-VN')}đ</span>
+                </div>
+            `;
+        }
+        if (orderState.ticketCombo3 > 0) {
+            billHtml += `
+                <div class="bill-row">
+                    <span>${t.ticketCombo3BillName} (x${orderState.ticketCombo3})</span>
+                    <span>${(orderState.ticketCombo3 * 180000).toLocaleString('vi-VN')}đ</span>
                 </div>
             `;
         }
@@ -1735,115 +1779,44 @@
             if (drink) {
                 billHtml += `
                     <div class="bill-row">
-                        <span>${drink.name} x ${qty}</span>
+                        <span>${drink.name} (x${qty})</span>
                         <span>${(drink.price * qty).toLocaleString('vi-VN')}đ</span>
                     </div>
                 `;
             }
         }
 
-        if (billHtml === '') {
-            billHtml = `<div class="bill-row" style="justify-content: center; font-style: italic;">${t.noTicketBillNote}</div>`;
+        if (!billHtml) {
+            billHtml = `<div class="bill-row" style="justify-content:center; font-style:italic;">${t.noTicketBillNote}</div>`;
         }
 
-        billContainer.innerHTML = billHtml;
+        document.getElementById('bill-items-container').innerHTML = billHtml;
+        document.getElementById('summary-grand-total').innerText = total.toLocaleString('vi-VN') + 'đ';
 
-        const grandTotal = calculateTotal();
-        document.getElementById('summary-grand-total').innerText = grandTotal.toLocaleString('vi-VN') + 'đ';
-
-        document.getElementById('staff-pin').value = '';
-        document.getElementById('staff-pin').disabled = false;
-        document.getElementById('pin-message').style.display = 'none';
-
-        switchStep('step-3', 'step-success', 'animate__zoomIn');
-    }
-
-    function saveOrderToFirebase(staffInfo = null) {
-        const now = new Date();
-        const timestamp = now.getTime();
-        
-        let orderedDrinks = {};
-        allDrinks = getAllDrinksList();
-        for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
-            const drink = allDrinks.find(d => d.id === drinkId);
-            if (drink) {
-                orderedDrinks[drinkId] = {
-                    name: drink.name,
-                    quantity: qty,
-                    price: drink.price,
-                    subtotal: drink.price * qty
-                };
-            }
-        }
-
-        const orderData = {
-            customerName: orderState.name,
-            customerPhone: orderState.phone,
-            ticketGreenQty: orderState.ticketGreen,
-            ticketRedQty: orderState.ticketRed,
-            drinks: orderedDrinks,
-            totalAmount: calculateTotal(),
-            createdAt: now.toLocaleString('vi-VN'),
-            timestamp: timestamp,
-            language: currentLang,
-            confirmedBy: staffInfo ? staffInfo.name : "N/A",
-            confirmedByCode: staffInfo ? staffInfo.code : "N/A"
-        };
-
-        database.ref('orders').push(orderData)
-            .then(() => {
-                console.log("Đơn hàng đã được đồng bộ lên Firebase thành công!");
-            })
-            .catch((error) => {
-                console.error("Lỗi khi lưu đơn hàng lên Firebase: ", error);
-            });
+        switchStep('step-3', 'step-success');
     }
 
     function checkStaffPin() {
+        const pinInput = document.getElementById('staff-pin').value.trim();
+        const messageEl = document.getElementById('pin-message');
         const t = translations[currentLang];
-        const pinInput = document.getElementById('staff-pin');
-        const pinMessage = document.getElementById('pin-message');
-        const inputCode = pinInput.value.trim();
-        
-        // Tìm thông tin nhân viên từ biến staffCodes (được cập nhật realtime từ Firebase)
-        let foundStaff = staffCodes[inputCode];
-        
-        // Hỗ trợ trường hợp nếu lưu object trên Firebase mà thuộc tính code khác tên key
-        if (!foundStaff && typeof staffCodes === 'object') {
-            const matchingKey = Object.keys(staffCodes).find(key => staffCodes[key] && staffCodes[key].code === inputCode);
-            if (matchingKey) {
-                foundStaff = staffCodes[matchingKey];
-            }
-        }
 
-        if (foundStaff) {
-            const staffName = foundStaff.name || "Nhân viên";
-            const staffCode = foundStaff.code || inputCode;
-
-            pinMessage.style.display = 'block';
-            pinMessage.style.color = '#2e7d32';
-            pinMessage.innerText = `${t.pinSuccess} (NV: ${staffName})`;
-            pinInput.disabled = true;
-
-            saveOrderToFirebase({ name: staffName, code: staffCode });
-
-        } else if (inputCode.length >= 3) {
-            pinMessage.style.display = 'block';
-            pinMessage.style.color = '#d90429';
-            pinMessage.innerText = t.pinError;
+        if (Object.values(staffCodes).includes(pinInput)) {
+            messageEl.style.display = 'block';
+            messageEl.style.color = '#10b981';
+            messageEl.innerText = t.pinSuccess;
+        } else if (pinInput.length >= 4) {
+            messageEl.style.display = 'block';
+            messageEl.style.color = '#d90429';
+            messageEl.innerText = t.pinError;
         } else {
-            pinMessage.style.display = 'none';
+            messageEl.style.display = 'none';
         }
     }
 
     function goBackToOrder() {
         switchStep('step-success', 'step-3', 'animate__fadeInLeft');
     }
-
-    window.onload = function() {
-        allDrinks = getAllDrinksList();
-        initDrinkCategories();
-    };
 </script>
 
 </body>
