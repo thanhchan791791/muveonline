@@ -14,6 +14,7 @@
             --text-dark: #4a4e69;
             --green-pastel: #a7c957;
             --red-pastel: #f35b04;
+            --purple-pastel: #7209b7;
             --accent-yellow: #fee440;
             --ios-radius: 24px;
         }
@@ -294,10 +295,24 @@
         .ticket-option.red { border-color: #ffdad3; background: linear-gradient(180deg, #ffffff 0%, #fff5f3 100%); }
         .ticket-option.red::before { background-color: var(--red-pastel); }
 
+        .ticket-option.purple { border-color: #e2d9f0; background: linear-gradient(180deg, #ffffff 0%, #f8f3ff 100%); }
+        .ticket-option.purple::before { background-color: var(--purple-pastel); }
+
         .badge-hot {
             position: absolute;
             top: 0; right: 0;
             background: linear-gradient(135deg, #ff4d6d 0%, #ff758f 100%);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        .badge-combo {
+            position: absolute;
+            top: 0; right: 0;
+            background: linear-gradient(135deg, #7209b7 0%, #3f37c9 100%);
             color: white;
             font-size: 10px;
             font-weight: 800;
@@ -317,6 +332,7 @@
         }
         .ticket-info.green h3 { color: #52796f; }
         .ticket-info.red h3 { color: #d90429; }
+        .ticket-info.purple h3 { color: #7209b7; }
         .ticket-price { font-size: 14px; font-weight: 700; color: #6d6875; }
 
         .ticket-description {
@@ -327,6 +343,7 @@
         }
         .ticket-option.green .ticket-description { color: #52796f; }
         .ticket-option.red .ticket-description { color: #b7094c; }
+        .ticket-option.purple .ticket-description { color: #5c0099; }
 
         .included-animals { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
         .animal-tag {
@@ -338,6 +355,7 @@
         }
         .ticket-option.green .animal-tag { background: #e8f5e9; color: #2e7d32; }
         .ticket-option.red .animal-tag { background: #ffebee; color: #c62828; }
+        .ticket-option.purple .animal-tag { background: #f3e5f5; color: #6a1b9a; }
 
         .quantity-selector {
             display: flex;
@@ -816,6 +834,26 @@
             </div>
         </div>
 
+        <!-- COMBO 3 (CHI NHÁNH 1 + CHI NHÁNH 2) -->
+        <div class="ticket-option purple animate__animated animate__fadeInLeft">
+            <div class="badge-combo">COMBO</div>
+            <div class="ticket-info purple">
+                <h3 id="txt-ticket-purple-title">Combo Chi Nhánh 1 + Chi Nhánh 2</h3>
+                <span class="ticket-price" id="txt-ticket-purple-price">180.000đ / vé</span>
+                <p class="ticket-description" id="txt-ticket-purple-desc">
+                    Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat, Lạc đà Alpaca)!
+                </p>
+                <div class="included-animals">
+                    <span class="animal-tag" id="tag-dog3">Chó</span><span class="animal-tag" id="tag-cat3">Mèo</span><span class="animal-tag" id="tag-raccoon2">Gấu Mèo</span><span class="animal-tag">Capybara</span><span class="animal-tag" id="tag-parrot">Vẹt</span><span class="animal-tag" id="tag-meerkat">Cầy Meerkat</span><span class="animal-tag" id="tag-alpaca">Lạc đà Alpaca</span>
+                </div>
+            </div>
+            <div class="quantity-selector">
+                <button class="qty-btn" onclick="changeTicketQty('purple', -1)">-</button>
+                <input type="number" id="qty-purple" class="qty-input" value="0" min="0" readonly>
+                <button class="qty-btn" onclick="changeTicketQty('purple', 1)">+</button>
+            </div>
+        </div>
+
         <!-- KHU VỰC CHỌN MÓN ĐƯỢC ĐƯA NƯỚC UỐNG LÊN TRƯỚC VÀ TÁCH TÁCH XA RA -->
         <div class="search-drink-box">
             <label style="color: #ff758f; margin-bottom: 12px; display: block; font-weight: 800;" id="lbl-select-drink">Chọn danh mục món bên dưới:</label>
@@ -1189,9 +1227,15 @@
             tagDog: "Chó",
             tagCat: "Mèo",
             tagRaccoon: "Gấu Mèo",
+            tagParrot: "Vẹt",
+            tagMeerkat: "Cầy Meerkat",
+            tagAlpaca: "Lạc đà Alpaca",
             ticketRedTitle: "Vé Đỏ (Combo 2)",
             ticketRedPrice: "110.000đ / vé",
             ticketRedDesc: "Trải nghiệm: Đầy đủ khu vực Vé Xanh + Được vào khu VIP vui chơi, ôm ấp \"bộ trưởng ngoại giao\" Capybara và cho các bé Gấu Mèo (Raccoon) tinh nghịch ăn!",
+            ticketPurpleTitle: "Combo Chi Nhánh 1 + Chi Nhánh 2",
+            ticketPurplePrice: "180.000đ / vé",
+            ticketPurpleDesc: "Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat, Lạc đà Alpaca)!",
             selectDrink: "Chọn danh mục món bên dưới:",
             tabFood: "🍖 THỨC ĂN THÚ",
             tabDrinks: "🍹 NƯỚC UỐNG",
@@ -1220,6 +1264,7 @@
             alertPhoneFormat: "Số điện thoại không đúng cấu trúc rồi ạ (Bắt đầu bằng số 0 và từ 10 số trở lên)!",
             ticketGreenBillName: "Vé Xanh (Combo 1)",
             ticketRedBillName: "Vé Đỏ (Combo 2)",
+            ticketPurpleBillName: "Combo Chi Nhánh 1 + Chi Nhánh 2",
             noTicketBillNote: "Chưa chọn vé & món (Sẽ gọi thêm khi vào trong)",
             pinSuccess: "Mã PIN chính xác! Đơn hàng đã được xác nhận.",
             pinError: "Mã PIN không đúng, vui lòng thử lại."
@@ -1247,9 +1292,15 @@
             tagDog: "Dog",
             tagCat: "Cat",
             tagRaccoon: "Raccoon",
+            tagParrot: "Parrot",
+            tagMeerkat: "Meerkat",
+            tagAlpaca: "Alpaca",
             ticketRedTitle: "Red Ticket (Combo 2)",
             ticketRedPrice: "110,000 VND / ticket",
             ticketRedDesc: "Experience: Includes all Green Ticket areas + VIP area access to hug Capybaras and feed playful Raccoons!",
+            ticketPurpleTitle: "Combo Branch 1 + Branch 2",
+            ticketPurplePrice: "180,000 VND / ticket",
+            ticketPurpleDesc: "Experience both branches: Branch 1 (Dog, Cat, Raccoon, Capybara) & Branch 2 (Dog, Cat, Parrot, Meerkat, Alpaca)!",
             selectDrink: "Select item category below:",
             tabFood: "🍖 PET FOOD",
             tabDrinks: "🍹 DRINKS",
@@ -1278,6 +1329,7 @@
             alertPhoneFormat: "Invalid phone number format (Must start with 0 and have at least 10 digits)!",
             ticketGreenBillName: "Green Ticket (Combo 1)",
             ticketRedBillName: "Red Ticket (Combo 2)",
+            ticketPurpleBillName: "Combo Branch 1 + Branch 2",
             noTicketBillNote: "No ticket/drink selected (Will order inside)",
             pinSuccess: "Correct PIN! Order verified successfully.",
             pinError: "Incorrect PIN, please try again."
@@ -1289,6 +1341,7 @@
         phone: '',
         ticketGreen: 0,
         ticketRed: 0,
+        ticketPurple: 0,
         drinks: {} 
     };
 
@@ -1330,6 +1383,15 @@
         document.getElementById('txt-ticket-red-title').innerText = t.ticketRedTitle;
         document.getElementById('txt-ticket-red-price').innerText = t.ticketRedPrice;
         document.getElementById('txt-ticket-red-desc').innerText = t.ticketRedDesc;
+        document.getElementById('txt-ticket-purple-title').innerText = t.ticketPurpleTitle;
+        document.getElementById('txt-ticket-purple-price').innerText = t.ticketPurplePrice;
+        document.getElementById('txt-ticket-purple-desc').innerText = t.ticketPurpleDesc;
+        document.getElementById('tag-dog3').innerText = t.tagDog;
+        document.getElementById('tag-cat3').innerText = t.tagCat;
+        document.getElementById('tag-raccoon2').innerText = t.tagRaccoon;
+        document.getElementById('tag-parrot').innerText = t.tagParrot;
+        document.getElementById('tag-meerkat').innerText = t.tagMeerkat;
+        document.getElementById('tag-alpaca').innerText = t.tagAlpaca;
         document.getElementById('lbl-select-drink').innerText = t.selectDrink;
         document.getElementById('txt-tab-food').innerText = t.tabFood;
         document.getElementById('txt-tab-drinks').innerText = t.tabDrinks;
@@ -1463,7 +1525,7 @@
         const listContainer = document.getElementById('cart-items-list');
         const activeDrinkIds = Object.keys(orderState.drinks);
 
-        let totalItemsCount = orderState.ticketGreen + orderState.ticketRed;
+        let totalItemsCount = orderState.ticketGreen + orderState.ticketRed + orderState.ticketPurple;
 
         activeDrinkIds.forEach(id => {
             totalItemsCount += orderState.drinks[id];
@@ -1520,6 +1582,7 @@
 
         if (type === 'green') orderState.ticketGreen = currentVal;
         if (type === 'red') orderState.ticketRed = currentVal;
+        if (type === 'purple') orderState.ticketPurple = currentVal;
 
         updateSelectedCart();
         updateTotalCost();
@@ -1529,6 +1592,7 @@
         let total = 0;
         total += orderState.ticketGreen * 80000;  
         total += orderState.ticketRed * 110000;  
+        total += orderState.ticketPurple * 180000;  
 
         allDrinks = getAllDrinksList();
         for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
@@ -1646,7 +1710,7 @@
     }
 
     function handleOrderConfirmation() {
-        if (orderState.ticketGreen === 0 && orderState.ticketRed === 0) {
+        if (orderState.ticketGreen === 0 && orderState.ticketRed === 0 && orderState.ticketPurple === 0) {
             document.getElementById('ticket-check-modal').style.display = 'flex';
         } else {
             triggerRiskModal();
@@ -1706,6 +1770,15 @@
             `;
         }
 
+        if (orderState.ticketPurple > 0) {
+            billHtml += `
+                <div class="bill-row">
+                    <span>${t.ticketPurpleBillName} x ${orderState.ticketPurple}</span>
+                    <span>${(orderState.ticketPurple * 180000).toLocaleString('vi-VN')}đ</span>
+                </div>
+            `;
+        }
+
         allDrinks = getAllDrinksList();
         for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
             const drink = allDrinks.find(d => d.id === drinkId);
@@ -1758,6 +1831,7 @@
             customerPhone: orderState.phone,
             ticketGreenQty: orderState.ticketGreen,
             ticketRedQty: orderState.ticketRed,
+            ticketPurpleQty: orderState.ticketPurple,
             drinks: orderedDrinks,
             totalAmount: calculateTotal(),
             createdAt: now.toLocaleString('vi-VN'),
