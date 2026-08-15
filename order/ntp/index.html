@@ -1649,8 +1649,7 @@
         const phone = document.getElementById('phone').value.trim();
         
         // Cấu trúc Regex: bắt đầu từ 0 và tổng chữ số từ 10 trở lên
-        const phoneRegex = /^0[0-9]{9,}$/;
-
+const phoneRegex = /^[0-9]+$/;
         if (!name || !phone) {
             triggerErrorShake();
             alert(t.alertFillInfo);
