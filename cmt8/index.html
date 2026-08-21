@@ -2,454 +2,607 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cherry Pet Coffee - Hệ Thống Quản Lý</title>
-    
-    <link rel="icon" type="image/png" href="logocherry.png">
-    <link rel="apple-touch-icon" href="logocherry.png">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Cherry Coffee">
-
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quản lý Menu iOS Style</title>
     <style>
         :root {
-            --ios-blue: #007AFF;
-            --ios-system-bg: #F2F2F7;
-            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --card-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
-            --inner-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4);
-            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --bg-color: #f2f2f7;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(255, 255, 255, 0.4);
+            --primary-color: #007aff;
+            --danger-color: #ff3b30;
+            --text-color: #1c1c1e;
+            --secondary-text: #8e8e93;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        body, html {
             margin: 0;
             padding: 0;
-            height: 100vh;
-            height: -webkit-fill-available; 
-            background: linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 100%);
-            color: #1D1D1F;
-            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
         }
 
-        /* --- LOGIN SCREEN --- */
-        #login-screen {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            background: radial-gradient(circle at top left, #EEF2FF 0%, #E0E7FF 100%);
-            transition: var(--transition);
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 90px;
+            overflow-x: hidden;
         }
 
-        .login-card {
-            width: 90%;
-            max-width: 400px;
-            padding: 40px 30px;
-            border-radius: 32px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: var(--card-shadow);
-            text-align: center;
-            animation: cardAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes cardAppear {
-            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .logo {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 24px;
-            border-radius: 24px;
-            object-fit: cover;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            border: 3px solid #fff;
-        }
-
-        h2 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 30px;
-            letter-spacing: -0.5px;
-            background: linear-gradient(90deg, #1e293b, #475569);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        input {
-            width: 100%;
-            padding: 16px 20px;
-            margin: 10px 0;
-            border: 1px solid rgba(0,0,0,0.05);
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.8);
-            font-size: 16px;
-            font-weight: 500;
-            transition: var(--transition);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #6366f1;
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
-            transform: translateY(-1px);
-        }
-
-        button.btn-login {
-            width: 100%;
-            padding: 16px;
-            margin-top: 24px;
-            border: none;
-            border-radius: 16px;
-            background: var(--primary-gradient);
-            color: white;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
-            transition: var(--transition);
-        }
-
-        button.btn-login:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
-        }
-
-        button.btn-login:active {
-            transform: scale(0.97);
-        }
-
-        /* --- MAIN APP --- */
-        #main-app {
-            display: none;
-            height: 100vh;
-            flex-direction: column;
-            opacity: 0;
-            transform: scale(1.05);
-            transition: var(--transition);
-        }
-
+        /* iOS Header */
         header {
-            padding: 12px 20px;
-            padding-top: calc(12px + env(safe-area-inset-top)); 
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 100;
+            background: rgba(242, 242, 247, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 16px 20px;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
         }
 
         header h1 {
-            margin: 0;
-            font-size: 18px;
+            font-size: 24px;
             font-weight: 700;
-            letter-spacing: 0.5px;
-            color: #1D1D1F;
-            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
         }
 
-        .logout-btn-top {
-            position: absolute;
-            right: 15px;
-            top: calc(50% + (env(safe-area-inset-top) / 2));
-            transform: translateY(-50%);
-            background: rgba(255, 59, 48, 0.1);
-            color: #FF3B30;
+        /* Controls Area (Search & Language) */
+        .controls-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            background: rgba(118, 118, 128, 0.12);
             border: none;
-            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            color: var(--text-color);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            background: rgba(118, 118, 128, 0.18);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-text);
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .lang-picker {
+            display: flex;
+            background: rgba(118, 118, 128, 0.12);
+            padding: 2px;
+            border-radius: var(--radius-md);
+            flex-shrink: 0;
+        }
+
+        .lang-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 12px;
             border-radius: 12px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
+            color: var(--text-color);
             cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .lang-btn.active {
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* iOS Card Item */
+        .category-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: -0.1px;
+            margin: 20px 0 8px 12px;
+        }
+
+        .menu-list {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .item-card {
             display: flex;
             align-items: center;
-            gap: 5px;
-            transition: var(--transition);
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 0.5px solid rgba(60, 60, 67, 0.12);
+            transition: background 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .logout-btn-top:active {
-            transform: translateY(-50%) scale(0.9);
-            background: rgba(255, 59, 48, 0.2);
+        .item-card:last-child {
+            border-bottom: none;
         }
 
-        /* --- MENU GRID --- */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            padding: 25px;
-            padding-bottom: calc(25px + env(safe-area-inset-bottom));
-            overflow-y: auto;
-            flex-grow: 1;
+        .item-card:active {
+            background: rgba(0, 0, 0, 0.05);
+            transform: scale(0.98);
         }
 
-        @media (min-width: 768px) {
-            .menu-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        .menu-item {
-            background: #FFFFFF;
-            padding: 24px 15px;
-            border-radius: 28px;
-            text-align: center;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(255,255,255,0.7);
-            cursor: pointer;
-            transition: var(--transition);
+        .item-info {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            gap: 2px;
         }
 
-        .menu-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        .item-name {
+            font-size: 16px;
+            font-weight: 500;
         }
 
-        .menu-item:active {
-            transform: scale(0.94);
-            background: #F2F2F7;
+        .item-id {
+            font-size: 12px;
+            color: var(--secondary-text);
         }
 
-        .icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-            color: #4f46e5;
-            transition: var(--transition);
-        }
-
-        .menu-item:hover .icon {
-            transform: scale(1.2) rotate(5deg);
-        }
-
-        .menu-item span {
-            display: block;
-            font-size: 14px;
+        .item-price {
+            font-size: 16px;
             font-weight: 600;
-            color: #1D1D1F;
+            color: var(--primary-color);
         }
 
-        /* --- IFRAME CONTAINER --- */
-        .iframe-container {
-            flex-grow: 1;
-            position: relative;
-            background: #fff;
-            display: none;
-            margin: 10px;
-            margin-bottom: calc(10px + env(safe-area-inset-bottom));
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
+        .action-btn {
             border: none;
-        }
-
-        /* --- BACK BUTTON --- */
-        .back-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: white;
-            width: 44px;
-            height: 44px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            z-index: 100;
-            border: none;
-            cursor: pointer;
-            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            transition: transform 0.15s ease;
         }
 
-        .back-btn i {
-            font-size: 18px;
+        .action-btn:active {
+            transform: scale(0.85);
         }
 
-        .back-btn:hover {
-            background: rgba(0,0,0,0.8);
-            transform: scale(1.1);
+        .edit-btn { background: rgba(0, 122, 255, 0.1); color: var(--primary-color); }
+        .delete-btn { background: rgba(255, 59, 48, 0.1); color: var(--danger-color); }
+
+        /* Floating Action Button (FAB) */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 90;
         }
 
-        .back-btn:active {
+        .fab:active {
             transform: scale(0.9);
         }
 
-        /* --- SUCCESS STATE --- */
-        .show-app {
-            display: flex !important;
-            opacity: 1 !important;
-            transform: scale(1) !important;
+        /* Modal Sheets (iOS Style Bottom Sheet) */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            40% { transform: translateX(8px); }
-            60% { transform: translateX(-8px); }
-            80% { transform: translateX(8px); }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-sheet {
+            background: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 20px;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .modal-overlay.active .modal-sheet {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--secondary-text);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: #f2f2f7;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            background: #ffffff;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            border-radius: var(--radius-md);
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-card">
-            <img src="logocherry.png" alt="Logo" class="logo" onerror="this.src='https://ui-avatars.com/api/?name=Cherry+Coffee&background=6366f1&color=fff&size=128'">
-            <h2>Hệ Thống Quản Lý</h2>
-            <input type="text" id="username" placeholder="Tên đăng nhập" autocomplete="off">
-            <input type="password" id="password" placeholder="Mật khẩu">
-            <button class="btn-login" onclick="handleLogin()">Đăng nhập</button>
-            <p id="error-msg" style="color: #FF3B30; font-size: 14px; margin-top: 15px; font-weight: 500; display: none;">Thông tin đăng nhập không chính xác</p>
+    <header>
+        <h1>Quản lý Menu</h1>
+        <div class="controls-bar">
+            <!-- Cụm nút ngôn ngữ VI EN nằm bên trái -->
+            <div class="lang-picker">
+                <button class="lang-btn active" onclick="switchLang('vi', event)">VI</button>
+                <button class="lang-btn" onclick="switchLang('en', event)">EN</button>
+            </div>
+            <!-- Ô tìm kiếm nằm bên phải -->
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Tìm món..." oninput="renderMenu()">
+            </div>
+        </div>
+    </header>
+
+    <div class="container" id="menu-container">
+        <!-- Render danh sách menu tại đây -->
+    </div>
+
+    <!-- Nút Thêm Món (FAB) -->
+    <button class="fab" onclick="openModal()">+</button>
+
+    <!-- Modal iOS Bottom Sheet (Thêm/Sửa Món) -->
+    <div class="modal-overlay" id="itemModal">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">Thêm món mới</span>
+                <button class="action-btn delete-btn" onclick="closeModal()">✕</button>
+            </div>
+            <form id="itemForm">
+                <input type="hidden" id="editType"> <!-- 'drinks' hoặc 'food' -->
+                <input type="hidden" id="categoryIdx">
+                <input type="hidden" id="itemIdx">
+
+                <div class="form-group">
+                    <label>Loại danh mục</label>
+                    <select id="typeSelect" class="form-control" onchange="updateCategorySelect()">
+                        <option value="drinks">Đồ uống (Drinks)</option>
+                        <option value="food">Thức ăn (Food)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Danh mục (Category)</label>
+                    <select id="categorySelect" class="form-control"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Mã món (ID)</label>
+                    <input type="text" id="itemId" class="form-control" placeholder="Ví dụ: cf6" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Tên món</label>
+                    <input type="text" id="itemName" class="form-control" placeholder="Tên món..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>Giá tiền (VNĐ)</label>
+                    <input type="number" id="itemPrice" class="form-control" placeholder="40000" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Lưu lại</button>
+            </form>
         </div>
     </div>
 
-    <div id="main-app">
-        <header>
-            <h1>Cherry Pet Coffee</h1>
-            <button class="logout-btn-top" onclick="handleLogout()">
-                <i class="fas fa-sign-out-alt"></i> Thoát
-            </button>
-        </header>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        <div class="menu-grid" id="menu-grid">
-            <div class="menu-item" onclick="loadPage('menu.html')">
-                <div class="icon"><i class="fas fa-utensils"></i></div>
-                <span>Thực đơn</span>
-            </div>
-            <div class="menu-item" onclick="loadPage('https://thanhchan791791.github.io/hihihi/quytrinh/admin.html')">
-                <div class="icon"><i class="fas fa-tasks"></i></div>
-                <span>Quản lý order</span>
-            </div>
-            <div class="menu-item" onclick="loadPage('quanlypet.html')">
-                <div class="icon"><i class="fas fa-notes-medical"></i></div>
-                <span>Sổ sức khỏe Pet</span>
-            </div>
-            <div class="menu-item" onclick="loadPage('thuchi.html')">
-                <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
-                <span>Thu chi</span>
-            </div>
-            <div class="menu-item" onclick="loadPage('viduytri.html')">
-                <div class="icon"><i class="fas fa-credit-card"></i></div>
-                <span>Ví duy trì</span>
-            </div>
-        </div>
+        // Cấu hình Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV7r-rjXo6U62LX1AA7c7DAHb8GhOOOsg",
+            authDomain: "saigon-dalat.firebaseapp.com",
+            databaseURL: "https://saigon-dalat-default-rtdb.firebaseio.com",
+            projectId: "saigon-dalat",
+            storageBucket: "saigon-dalat.firebasestorage.app",
+            messagingSenderId: "339735183485",
+            appId: "1:339735183485:web:bc23cd740104d272577114"
+        };
 
-        <div class="iframe-container" id="iframe-container">
-            <button class="back-btn" onclick="closeIframe()">
-                <i class="fas fa-reply"></i>
-            </button>
-            <iframe id="app-frame" src=""></iframe>
-        </div>
-    </div>
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
 
-    <script>
-        window.onload = function() {
-            const isLoggedIn = localStorage.getItem('cherry_isLoggedIn');
-            if (isLoggedIn === 'true') {
-                showMainApp(true);
+        // State dữ liệu
+        let currentLang = 'vi';
+        let menuData = { vi: { food: [], drinks: [] }, en: { food: [], drinks: [] } };
+
+        // Lắng nghe dữ liệu thời gian thực
+        const menuRef = ref(database, 'branch2_menu');
+        onValue(menuRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                menuData = data;
+                renderMenu();
+            }
+        });
+
+        // Hàm chuẩn hóa chuỗi (Bỏ dấu tiếng Việt, chuyển chữ thường, xóa khoảng trắng)
+        function normalizeString(str) {
+            if (!str) return '';
+            return str
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/đ/g, "d")
+                .replace(/Đ/g, "d")
+                .replace(/\s+/g, "");
+        }
+
+        // Hàm render Menu
+        window.renderMenu = function() {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = '';
+
+            const searchInput = document.getElementById('searchInput');
+            const keyword = searchInput ? normalizeString(searchInput.value) : '';
+
+            const langData = menuData[currentLang] || { food: [], drinks: [] };
+
+            ['drinks', 'food'].forEach(type => {
+                const categories = langData[type] || [];
+                categories.forEach((cat, catIdx) => {
+                    if (!cat.drinks || cat.drinks.length === 0) return;
+
+                    // Lọc danh sách món dựa trên từ khóa tìm kiếm (Tên món hoặc ID món)
+                    const filteredDrinks = cat.drinks.map((item, itemIdx) => ({ item, itemIdx })).filter(({ item }) => {
+                        const normName = normalizeString(item.name);
+                        const normId = normalizeString(item.id);
+                        return normName.includes(keyword) || normId.includes(keyword);
+                    });
+
+                    if (filteredDrinks.length === 0) return;
+
+                    const catTitle = document.createElement('div');
+                    catTitle.className = 'category-title';
+                    catTitle.innerText = cat.categoryName;
+                    container.appendChild(catTitle);
+
+                    const listContainer = document.createElement('div');
+                    listContainer.className = 'menu-list';
+
+                    filteredDrinks.forEach(({ item, itemIdx }) => {
+                        const card = document.createElement('div');
+                        card.className = 'item-card';
+                        card.innerHTML = `
+                            <div class="item-info">
+                                <span class="item-name">${item.name}</span>
+                                <span class="item-id">ID: ${item.id}</span>
+                            </div>
+                            <div class="item-actions">
+                                <span class="item-price">${item.price.toLocaleString('vi-VN')} đ</span>
+                                <button class="action-btn edit-btn" onclick="openModal('${type}', ${catIdx}, ${itemIdx})">✎</button>
+                                <button class="action-btn delete-btn" onclick="deleteItem('${type}', ${catIdx}, ${itemIdx})">✕</button>
+                            </div>
+                        `;
+                        listContainer.appendChild(card);
+                    });
+
+                    container.appendChild(listContainer);
+                });
+            });
+        };
+
+        // Chuyển đổi Ngôn ngữ
+        window.switchLang = function(lang, evt) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            if (evt && evt.target) {
+                evt.target.classList.add('active');
+            }
+            renderMenu();
+        };
+
+        // Xóa Món
+        window.deleteItem = function(type, catIdx, itemIdx) {
+            if (confirm("Bạn có chắc muốn xóa món này?")) {
+                menuData[currentLang][type][catIdx].drinks.splice(itemIdx, 1);
+                saveToFirebase();
             }
         };
 
-        function showMainApp(immediate = false) {
-            const loginScreen = document.getElementById('login-screen');
-            const mainApp = document.getElementById('main-app');
-            
-            if (immediate) {
-                loginScreen.style.display = 'none';
-                mainApp.classList.add('show-app');
+        // Modal Controls
+        window.openModal = function(type = null, catIdx = null, itemIdx = null) {
+            const modal = document.getElementById('itemModal');
+            const typeSelect = document.getElementById('typeSelect');
+
+            if (type !== null && catIdx !== null && itemIdx !== null) {
+                // Mode: Sửa món
+                document.getElementById('modalTitle').innerText = 'Chỉnh sửa món';
+                document.getElementById('editType').value = type;
+                document.getElementById('categoryIdx').value = catIdx;
+                document.getElementById('itemIdx').value = itemIdx;
+
+                typeSelect.value = type;
+                typeSelect.disabled = true;
+                updateCategorySelect(catIdx);
+
+                const item = menuData[currentLang][type][catIdx].drinks[itemIdx];
+                document.getElementById('itemId').value = item.id;
+                document.getElementById('itemName').value = item.name;
+                document.getElementById('itemPrice').value = item.price;
             } else {
-                loginScreen.style.opacity = '0';
-                loginScreen.style.transform = 'scale(1.1)';
-                setTimeout(() => {
-                    loginScreen.style.display = 'none';
-                    mainApp.classList.add('show-app');
-                }, 400);
+                // Mode: Thêm mới
+                document.getElementById('modalTitle').innerText = 'Thêm món mới';
+                document.getElementById('itemForm').reset();
+                document.getElementById('editType').value = '';
+                typeSelect.disabled = false;
+                updateCategorySelect();
             }
-        }
 
-        function handleLogin() {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            const error = document.getElementById('error-msg');
-            const loginCard = document.querySelector('.login-card');
+            modal.classList.add('active');
+        };
 
-            if (user === 'admin' && pass === 'cherrypetcoffeecmt8') {
-                localStorage.setItem('cherry_isLoggedIn', 'true');
-                showMainApp();
+        window.closeModal = function() {
+            document.getElementById('itemModal').classList.remove('active');
+        };
+
+        window.updateCategorySelect = function(selectedCatIdx = 0) {
+            const type = document.getElementById('typeSelect').value;
+            const categorySelect = document.getElementById('categorySelect');
+            categorySelect.innerHTML = '';
+
+            const categories = menuData[currentLang][type] || [];
+            categories.forEach((cat, idx) => {
+                const option = document.createElement('option');
+                option.value = idx;
+                option.innerText = cat.categoryName;
+                if (idx == selectedCatIdx) option.selected = true;
+                categorySelect.appendChild(option);
+            });
+        };
+
+        // Submit Form (Thêm / Sửa)
+        document.getElementById('itemForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editType = document.getElementById('editType').value;
+            const type = document.getElementById('typeSelect').value;
+            const catIdx = parseInt(document.getElementById('categorySelect').value);
+            const itemIdx = document.getElementById('itemIdx').value;
+
+            const newItem = {
+                id: document.getElementById('itemId').value,
+                name: document.getElementById('itemName').value,
+                price: Number(document.getElementById('itemPrice').value)
+            };
+
+            if (editType) {
+                // Cập nhật
+                menuData[currentLang][type][catIdx].drinks[parseInt(itemIdx)] = newItem;
             } else {
-                error.style.display = 'block';
-                loginCard.style.animation = 'none';
-                void loginCard.offsetWidth;
-                loginCard.style.animation = 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both';
+                // Thêm mới
+                if (!menuData[currentLang][type][catIdx].drinks) {
+                    menuData[currentLang][type][catIdx].drinks = [];
+                }
+                menuData[currentLang][type][catIdx].drinks.push(newItem);
             }
-        }
 
-        function handleLogout() {
-            localStorage.removeItem('cherry_isLoggedIn');
-            location.reload();
-        }
-
-        function loadPage(url) {
-            const frame = document.getElementById('app-frame');
-            const container = document.getElementById('iframe-container');
-            const grid = document.getElementById('menu-grid');
-
-            frame.src = url;
-            grid.style.display = 'none';
-            container.style.display = 'block';
-        }
-
-        function closeIframe() {
-            const container = document.getElementById('iframe-container');
-            const grid = document.getElementById('menu-grid');
-            const frame = document.getElementById('app-frame');
-
-            container.style.display = 'none';
-            grid.style.display = 'grid';
-            frame.src = ""; 
-        }
-
-        document.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                handleLogin();
-            }
+            saveToFirebase();
+            closeModal();
         });
+
+        // Đồng bộ dữ liệu lên Firebase
+        function saveToFirebase() {
+            set(ref(database, 'branch2_menu'), menuData)
+                .then(() => renderMenu())
+                .catch((error) => alert("Lỗi khi lưu dữ liệu: " + error.message));
+        }
+
+        // Khởi tạo các danh mục ban đầu cho Select modal
+        updateCategorySelect();
     </script>
 </body>
 </html>
