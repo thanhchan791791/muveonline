@@ -1029,196 +1029,35 @@
     });
 
     let currentLang = 'vi';
+    let menuDataByLang = { vi: { food: [], drinks: [] }, en: { food: [], drinks: [] } };
 
-    /* DANH SÁCH THỰC ĐƠN CHI NHÁNH 2 (ĐÃ BỎ: Thanh long lựu đỏ, Thái xanh macchiato, Trà sen, Kem cheese) */
-    const menuDataByLang = {
-        vi: {
-            food: [
-                {
-                    categoryName: "THỨC ĂN CHO THÚ (PET FOOD)",
-                    drinks: [
-                        { id: "pf3", name: "Jerhigh", price: 70000 },
-                        { id: "pf5", name: "Gà chiết", price: 45000 },
-                        { id: "pf7", name: "Cà rốt cho lạc đà", price: 20000 }
-                    ]
-                }
-            ],
-            drinks: [
-                {
-                    categoryName: "CÀ PHÊ (COFFEE)",
-                    drinks: [
-                        { id: "cf1", name: "Cà Phê Đen", price: 40000 },
-                        { id: "cf2", name: "Cà Phê Sữa", price: 40000 },
-                        { id: "cf3", name: "Bạc Xỉu", price: 40000 },
-                        { id: "cf4", name: "Cacao Đá", price: 40000 },
-                        { id: "cf5", name: "Matcha Latte", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "TRÀ TRÁI CÂY (TEA)",
-                    drinks: [
-                        { id: "te1", name: "Vải Hoa Hồng", price: 40000 },
-                        { id: "te3", name: "Trà Tắc Thái Xanh", price: 40000 },
-                        { id: "te4", name: "Dâu Tầm Sim Rừng", price: 40000 },
-                        { id: "te6", name: "Gạo Rang Hạt Sen", price: 40000 },
-                        { id: "te8", name: "Đào Mơ Sơ Rị Hạt Chia", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "TRÀ SỮA (MILK TEA)",
-                    drinks: [
-                        { id: "mt1", name: "Trà Sữa Cherry", price: 40000 },
-                        { id: "mt3", name: "Gạo Rang", price: 40000 },
-                        { id: "mt4", name: "Olong Lá Nếp", price: 40000 },
-                        { id: "mt5", name: "TS Chocolate", price: 40000 },
-                        { id: "mt6", name: "TS Matcha", price: 40000 },
-                        { id: "mt7", name: "Sữa tươi TC đường đen", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "SỮA CHUA (YOGURT)",
-                    drinks: [
-                        { id: "yg1", name: "Sữa chua", price: 40000 },
-                        { id: "yg2", name: "Sữa chua đào", price: 40000 },
-                        { id: "yg3", name: "Sữa chua vải", price: 40000 },
-                        { id: "yg4", name: "Sữa chua đá", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "SODA",
-                    drinks: [
-                        { id: "sd1", name: "Soda Dâu Tầm Sim", price: 40000 },
-                        { id: "sd2", name: "Soda Blue", price: 40000 },
-                        { id: "sd3", name: "Soda Đào Mơ", price: 40000 },
-                        { id: "sd4", name: "Soda Đá", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "ĐÁ XAY (ICE BLENDED)",
-                    drinks: [
-                        { id: "ib1", name: "Matcha Đá Xay", price: 40000 },
-                        { id: "ib2", name: "Mocha Đá Xay", price: 40000 },
-                        { id: "ib3", name: "Chanh Tuyết", price: 40000 },
-                        { id: "ib4", name: "Cookie Chocolate", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "NƯỚC NGỌT & NƯỚC ÉP",
-                    drinks: [
-                        { id: "nn1", name: "Coca", price: 40000 },
-                        { id: "nn2", name: "Sting", price: 40000 },
-                        { id: "nn3", name: "7 up", price: 40000 },
-                        { id: "nn4", name: "Nước Suối", price: 40000 },
-                        { id: "nn5", name: "Cam", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "TOPPING",
-                    drinks: [
-                        { id: "tp1", name: "Trân Châu Caramel", price: 10000 },
-                        { id: "tp2", name: "Trân Châu Trắng", price: 10000 }
-                    ]
-                }
-            ]
-        },
-        en: {
-            food: [
-                {
-                    categoryName: "PET FOOD",
-                    drinks: [
-                        { id: "pf3", name: "Jerhigh Treats", price: 70000 },
-                        { id: "pf5", name: "Chicken Treats", price: 45000 },
-                        { id: "pf7", name: "Carrot for Alpaca", price: 20000 }
-                    ]
-                }
-            ],
-            drinks: [
-                {
-                    categoryName: "COFFEE",
-                    drinks: [
-                        { id: "cf1", name: "Black Coffee", price: 40000 },
-                        { id: "cf2", name: "Condensed Milk Coffee", price: 40000 },
-                        { id: "cf3", name: "Vietnamese White Coffee (Bac Xiu)", price: 40000 },
-                        { id: "cf4", name: "Iced Cocoa", price: 40000 },
-                        { id: "cf5", name: "Matcha Latte", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "TEA & FRUIT TEA",
-                    drinks: [
-                        { id: "te1", name: "Rose Lychee Tea", price: 40000 },
-                        { id: "te3", name: "Green Thai Kumquat Tea", price: 40000 },
-                        { id: "te4", name: "Wild Mulberry & Sim Berry Tea", price: 40000 },
-                        { id: "te6", name: "Roasted Rice & Lotus Seed Tea", price: 40000 },
-                        { id: "te8", name: "Peach, Apricot, Cherry & Chia Seed Tea", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "MILK TEA",
-                    drinks: [
-                        { id: "mt1", name: "Cherry Milk Tea", price: 40000 },
-                        { id: "mt3", name: "Roasted Rice Milk Tea", price: 40000 },
-                        { id: "mt4", name: "Pandan Oolong Milk Tea", price: 40000 },
-                        { id: "mt5", name: "Chocolate Milk Tea", price: 40000 },
-                        { id: "mt6", name: "Matcha Milk Tea", price: 40000 },
-                        { id: "mt7", name: "Fresh Milk w/ Brown Sugar Boba", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "YOGURT",
-                    drinks: [
-                        { id: "yg1", name: "Plain Yogurt", price: 40000 },
-                        { id: "yg2", name: "Peach Yogurt", price: 40000 },
-                        { id: "yg3", name: "Lychee Yogurt", price: 40000 },
-                        { id: "yg4", name: "Iced Yogurt", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "SODA",
-                    drinks: [
-                        { id: "sd1", name: "Mulberry & Sim Berry Soda", price: 40000 },
-                        { id: "sd2", name: "Blue Ocean Soda", price: 40000 },
-                        { id: "sd3", name: "Peach & Apricot Soda", price: 40000 },
-                        { id: "sd4", name: "Iced Soda", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "ICE BLENDED",
-                    drinks: [
-                        { id: "ib1", name: "Matcha Ice Blended", price: 40000 },
-                        { id: "ib2", name: "Mocha Ice Blended", price: 40000 },
-                        { id: "ib3", name: "Lemon Slush / Frozen Lemonade", price: 40000 },
-                        { id: "ib4", name: "Chocolate Cookie Blended", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "SOFT DRINKS & JUICE",
-                    drinks: [
-                        { id: "nn1", name: "Coca-Cola", price: 40000 },
-                        { id: "nn2", name: "Sting Energy Drink", price: 40000 },
-                        { id: "nn3", name: "7Up", price: 40000 },
-                        { id: "nn4", name: "Bottled Water", price: 40000 },
-                        { id: "nn5", name: "Fresh Orange Juice", price: 40000 }
-                    ]
-                },
-                {
-                    categoryName: "TOPPING",
-                    drinks: [
-                        { id: "tp1", name: "Caramel Boba", price: 10000 },
-                        { id: "tp2", name: "White Boba", price: 10000 }
-                    ]
-                }
-            ]
+    /* LẤY DỮ LIỆU MENU TỪ NODE branch2_menu TRÊN FIREBASE REALTIME DATABASE */
+    database.ref('branch2_menu').on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            const val = snapshot.val();
+            menuDataByLang.vi = {
+                food: val.vi && val.vi.food ? val.vi.food : [],
+                drinks: val.vi && val.vi.drinks ? val.vi.drinks : []
+            };
+            menuDataByLang.en = {
+                food: val.en && val.en.food ? val.en.food : [],
+                drinks: val.en && val.en.drinks ? val.en.drinks : []
+            };
+            allDrinks = getAllDrinksList();
+            initDrinkCategories();
+            console.log("Đã tải dữ liệu menu từ Firebase branch2_menu thành công!");
+        } else {
+            console.warn("Không tìm thấy dữ liệu tại node branch2_menu.");
         }
-    };
+    });
 
     let allDrinks = [];
 
     function getAllDrinksList() {
-        const currentData = menuDataByLang[currentLang];
+        const currentData = menuDataByLang[currentLang] || { food: [], drinks: [] };
         let list = [];
-        currentData.food.forEach(cat => list = list.concat(cat.drinks));
-        currentData.drinks.forEach(cat => list = list.concat(cat.drinks));
+        if (currentData.food) currentData.food.forEach(cat => { if (cat.drinks) list = list.concat(cat.drinks); });
+        if (currentData.drinks) currentData.drinks.forEach(cat => { if (cat.drinks) list = list.concat(cat.drinks); });
         return list;
     }
 
@@ -1440,45 +1279,50 @@
 
     function renderCategoryList(containerId, categoriesData, prefixKey) {
         const container = document.getElementById(containerId);
+        if (!container) return;
         let html = '';
 
-        categoriesData.forEach((cat, catIdx) => {
-            let itemsHtml = '';
-            cat.drinks.forEach(drink => {
-                const currentQty = orderState.drinks[drink.id] || 0;
-                itemsHtml += `
-                    <div class="drink-search-item">
-                        <div>
-                            <span class="drink-search-name">${drink.name}</span>
-                            <span class="drink-search-price">${(drink.price/1000)}k</span>
+        if (categoriesData && Array.isArray(categoriesData)) {
+            categoriesData.forEach((cat, catIdx) => {
+                let itemsHtml = '';
+                if (cat.drinks && Array.isArray(cat.drinks)) {
+                    cat.drinks.forEach(drink => {
+                        const currentQty = orderState.drinks[drink.id] || 0;
+                        itemsHtml += `
+                            <div class="drink-search-item">
+                                <div>
+                                    <span class="drink-search-name">${drink.name}</span>
+                                    <span class="drink-search-price">${(drink.price/1000)}k</span>
+                                </div>
+                                <div class="quantity-selector">
+                                    <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', -1, event)">-</button>
+                                    <input type="number" id="qty-${drink.id}" class="qty-input" value="${currentQty}" min="0" readonly>
+                                    <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', 1, event)">+</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                const uniqueCatId = `${prefixKey}-${catIdx}`;
+                html += `
+                    <div class="category-item" id="cat-item-${uniqueCatId}">
+                        <div class="category-header" onclick="toggleCategory('${uniqueCatId}')">
+                            <span>${cat.categoryName}</span>
                         </div>
-                        <div class="quantity-selector">
-                            <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', -1, event)">-</button>
-                            <input type="number" id="qty-${drink.id}" class="qty-input" value="${currentQty}" min="0" readonly>
-                            <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', 1, event)">+</button>
+                        <div class="category-content" id="cat-content-${uniqueCatId}">
+                            ${itemsHtml}
                         </div>
                     </div>
                 `;
             });
-
-            const uniqueCatId = `${prefixKey}-${catIdx}`;
-            html += `
-                <div class="category-item" id="cat-item-${uniqueCatId}">
-                    <div class="category-header" onclick="toggleCategory('${uniqueCatId}')">
-                        <span>${cat.categoryName}</span>
-                    </div>
-                    <div class="category-content" id="cat-content-${uniqueCatId}">
-                        ${itemsHtml}
-                    </div>
-                </div>
-            `;
-        });
+        }
 
         container.innerHTML = html;
     }
 
     function initDrinkCategories() {
-        const currentData = menuDataByLang[currentLang];
+        const currentData = menuDataByLang[currentLang] || { food: [], drinks: [] };
         renderCategoryList('food-categories-container', currentData.food, 'food');
         renderCategoryList('drinks-categories-container', currentData.drinks, 'drink');
     }
