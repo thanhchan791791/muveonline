@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Quản Lý Thú Cưng</title>
+    <style>
+        :root {
+            --bg-color: #f2f2f7;
+            --card-bg: rgba(255, 255, 255, 0.82);
+            --card-border: rgba(255, 255, 255, 0.6);
+            --primary: #007aff;
+            --danger: #ff3b30;
+            --text-main: #000000;
+            --text-sub: #8e8e93;
+            --ios-radius: 18px;
+            --ios-cubic: cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            overflow-x: hidden;
+        }
+
+        /* iOS Navigation Header */
+        .ios-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(242, 242, 247, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 16px 20px 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .ios-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .btn-add-trigger {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 22px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            transition: transform 0.2s var(--ios-cubic);
+        }
+
+        .btn-add-trigger:active {
+            transform: scale(0.9);
+        }
+
+        .container {
+            padding: 16px 20px;
+        }
+
+        /* iOS Bottom Sheet Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s var(--ios-cubic);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            padding: 12px 20px 30px 20px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 201;
+            transform: translateY(100%);
+            transition: transform 0.4s var(--ios-cubic);
+            border-top: 1px solid var(--card-border);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .bottom-sheet {
+            transform: translateY(0);
+        }
+
+        .sheet-handle {
+            width: 36px;
+            height: 5px;
+            background: #d1d1d6;
+            border-radius: 3px;
+            margin: 0 auto 16px auto;
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sheet-title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.25s var(--ios-cubic);
+            user-select: text;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="text"]:focus, select:focus, textarea:focus {
+            background: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+        }
+
+        .media-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .btn-media {
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            color: var(--primary);
+            background: rgba(0, 122, 255, 0.1);
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s var(--ios-cubic), background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-media:active {
+            transform: scale(0.96);
+            background: rgba(0, 122, 255, 0.2);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            background: var(--primary);
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s var(--ios-cubic), opacity 0.2s;
+            box-shadow: 0 4px 14px rgba(0, 122, 255, 0.3);
+            margin-top: 10px;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+
+        .btn-cancel {
+            background: rgba(142, 142, 147, 0.15);
+            color: var(--text-main);
+            box-shadow: none;
+            margin-top: 10px;
+        }
+
+        #preview-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 14px;
+            display: none;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Dog List Cards */
+        .dog-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .dog-item {
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 12px;
+            gap: 14px;
+            transition: transform 0.25s var(--ios-cubic), box-shadow 0.25s var(--ios-cubic);
+            animation: fadeIn 0.4s var(--ios-cubic);
+        }
+
+        .dog-item:active {
+            transform: scale(0.98);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dog-item img {
+            width: 90px;
+            height: 90px;
+            border-radius: 14px;
+            object-fit: cover;
+            background: #e5e5ea;
+            flex-shrink: 0;
+        }
+
+        .dog-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .dog-info h3 {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            letter-spacing: -0.3px;
+        }
+
+        .dog-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+
+        .dog-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--primary);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .dog-badge.branch-badge {
+            background: rgba(52, 199, 89, 0.1);
+            color: #34c759;
+        }
+
+        .dog-traits {
+            font-size: 14px;
+            color: #6c6c70;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .dog-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .dog-actions button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f2f2f7;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s var(--ios-cubic);
+        }
+
+        .dog-actions button:active {
+            transform: scale(0.88);
+        }
+
+        .btn-edit { color: var(--primary); }
+        .btn-delete { color: var(--danger); }
+
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- iOS Top Navigation -->
+    <div class="ios-header">
+        <h1>Danh Sách Cún</h1>
+        <button class="btn-add-trigger" id="btn-open-modal">+</button>
+    </div>
+
+    <div class="container">
+        <!-- Danh sách cún -->
+        <div class="dog-list" id="dog-list">
+            <p style="text-align: center; color: var(--text-sub); margin-top: 40px;">Đang tải dữ liệu...</p>
+        </div>
+    </div>
+
+    <!-- iOS Bottom Sheet Modal Form -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <span class="sheet-title" id="form-title">Thêm Thú Cưng</span>
+            </div>
+
+            <input type="hidden" id="dog-id">
+            <div class="form-group">
+                <label>Chi nhánh</label>
+                <select id="dog-branch">
+                    <option value="Chi nhánh 1">Chi nhánh 1</option>
+                    <option value="Chi nhánh 2">Chi nhánh 2</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tên cún</label>
+                <input type="text" id="dog-name" placeholder="Ví dụ: Milu">
+            </div>
+            <div class="form-group">
+                <label>Giống loài</label>
+                <input type="text" id="dog-breed" placeholder="Ví dụ: Corgi, Poodle...">
+            </div>
+            <div class="form-group">
+                <label>Tính cách</label>
+                <textarea id="dog-traits" rows="2" placeholder="Ví dụ: Năng động, thích ăn thịt gà..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Hình ảnh</label>
+                <div class="media-actions">
+                    <label for="input-camera" class="btn-media">📷 Chụp ảnh</label>
+                    <input type="file" id="input-camera" accept="image/*" capture="environment">
+
+                    <label for="input-album" class="btn-media">🖼️ Từ album</label>
+                    <input type="file" id="input-album" accept="image/*">
+                </div>
+                <img id="preview-img" src="" alt="Preview">
+            </div>
+
+            <button class="btn-submit" id="btn-save">Lưu Thông Tin</button>
+            <button class="btn-submit btn-cancel" id="btn-cancel">Hủy Bỏ</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Modular (v10+) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
+            authDomain: "dogs-be72b.firebaseapp.com",
+            databaseURL: "https://dogs-be72b-default-rtdb.firebaseio.com",
+            projectId: "dogs-be72b",
+            storageBucket: "dogs-be72b.firebasestorage.app",
+            messagingSenderId: "1003873040746",
+            appId: "1:1003873040746:web:607f4ff587afc430d3cd13",
+            measurementId: "G-Y72BF1RQ2C"
+        };
+
+        // Khởi tạo Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+        const dogsRef = ref(db, 'dogs');
+
+        let base64Image = "";
+
+        // Elements DOM
+        const elId = document.getElementById('dog-id');
+        const elBranch = document.getElementById('dog-branch');
+        const elName = document.getElementById('dog-name');
+        const elBreed = document.getElementById('dog-breed');
+        const elTraits = document.getElementById('dog-traits');
+        const elPreview = document.getElementById('preview-img');
+        const btnSave = document.getElementById('btn-save');
+        const btnCancel = document.getElementById('btn-cancel');
+        const dogListEl = document.getElementById('dog-list');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const btnOpenModal = document.getElementById('btn-open-modal');
+        const formTitle = document.getElementById('form-title');
+
+        // Modal Handlers
+        const openModal = () => {
+            modalOverlay.classList.add('active');
+        };
+
+        const closeModal = () => {
+            modalOverlay.classList.remove('active');
+            setTimeout(resetForm, 300);
+        };
+
+        btnOpenModal.addEventListener('click', () => {
+            resetForm();
+            formTitle.textContent = "Thêm Thú Cưng";
+            openModal();
+        });
+
+        btnCancel.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        // Xử lý nén & mã hóa ảnh thành Base64
+        const handleImageUpload = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600;
+                    const scaleFactor = MAX_WIDTH / img.width;
+                    
+                    if (scaleFactor < 1) {
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleFactor;
+                    } else {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                    }
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    base64Image = canvas.toDataURL('image/jpeg', 0.7);
+                    elPreview.src = base64Image;
+                    elPreview.style.display = 'block';
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        document.getElementById('input-camera').addEventListener('change', handleImageUpload);
+        document.getElementById('input-album').addEventListener('change', handleImageUpload);
+
+        // Reset form
+        const resetForm = () => {
+            elId.value = '';
+            elBranch.value = 'Chi nhánh 1';
+            elName.value = '';
+            elBreed.value = '';
+            elTraits.value = '';
+            base64Image = '';
+            elPreview.src = '';
+            elPreview.style.display = 'none';
+            btnSave.textContent = 'Lưu Thông Tin';
+        };
+
+        // Thêm / Cập nhật cún
+        btnSave.addEventListener('click', () => {
+            const branch = elBranch.value;
+            const name = elName.value.trim();
+            const breed = elBreed.value.trim();
+            const traits = elTraits.value.trim();
+            const id = elId.value;
+
+            if (!name || !breed) {
+                alert('Vui lòng nhập tên và giống cún!');
+                return;
+            }
+
+            const dogData = {
+                branch: branch,
+                name: name,
+                breed: breed,
+                traits: traits,
+                updatedAt: Date.now()
+            };
+
+            if (base64Image) {
+                dogData.image = base64Image;
+            }
+
+            if (id) {
+                // Cập nhật
+                update(ref(db, `dogs/${id}`), dogData)
+                    .then(() => {
+                        closeModal();
+                    })
+                    .catch(err => alert("Lỗi khi cập nhật: " + err.message));
+            } else {
+                // Thêm mới
+                if (!base64Image) {
+                    alert('Vui lòng chọn hoặc chụp ảnh cún!');
+                    return;
+                }
+                const newRef = push(dogsRef);
+                set(newRef, dogData)
+                    .then(() => {
+                        closeModal();
+                    })
+                    .catch(err => alert("Lỗi khi thêm mới: " + err.message));
+            }
+        });
+
+        // Lấy danh sách thời gian thực từ Realtime Database
+        onValue(dogsRef, (snapshot) => {
+            dogListEl.innerHTML = '';
+            const data = snapshot.val();
+
+            if (!data) {
+                dogListEl.innerHTML = '<p style="text-align: center; color: var(--text-sub); margin-top: 40px;">Chưa có dữ liệu cún nào.</p>';
+                return;
+            }
+
+            Object.keys(data).reverse().forEach((key) => {
+                const dog = data[key];
+                const item = document.createElement('div');
+                item.className = 'dog-item';
+                item.innerHTML = `
+                    <img src="${dog.image || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${dog.name}">
+                    <div class="dog-info">
+                        <h3>${dog.name}</h3>
+                        <div class="dog-badges">
+                            <span class="dog-badge branch-badge">${dog.branch || 'Chi nhánh 1'}</span>
+                            <span class="dog-badge">${dog.breed}</span>
+                        </div>
+                        <p class="dog-traits">${dog.traits || 'Chưa có thông tin tính cách.'}</p>
+                    </div>
+                    <div class="dog-actions">
+                        <button class="btn-edit" data-id="${key}">✏️</button>
+                        <button class="btn-delete" data-id="${key}">🗑️</button>
+                    </div>
+                `;
+                dogListEl.appendChild(item);
+            });
+
+            // Gán sự kiện cho nút Sửa & Xóa
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = e.currentTarget.getAttribute('data-id');
+                    if (confirm('Bạn có chắc muốn xóa cún này?')) {
+                        remove(ref(db, `dogs/${id}`));
+                    }
+                });
+            });
+
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = e.currentTarget.getAttribute('data-id');
+                    const dog = data[id];
+                    
+                    elId.value = id;
+                    elBranch.value = dog.branch || 'Chi nhánh 1';
+                    elName.value = dog.name;
+                    elBreed.value = dog.breed;
+                    elTraits.value = dog.traits || '';
+                    
+                    if (dog.image) {
+                        base64Image = dog.image;
+                        elPreview.src = dog.image;
+                        elPreview.style.display = 'block';
+                    } else {
+                        base64Image = '';
+                        elPreview.src = '';
+                        elPreview.style.display = 'none';
+                    }
+
+                    btnSave.textContent = 'Cập Nhật Thông Tin';
+                    formTitle.textContent = "Chỉnh Sửa Thú Cưng";
+                    openModal();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
