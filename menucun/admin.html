@@ -81,6 +81,31 @@
             padding: 16px 20px;
         }
 
+        /* Branch Sections Styling */
+        .branch-section {
+            margin-bottom: 24px;
+        }
+
+        .branch-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .branch-title::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background-color: var(--primary);
+            border-radius: 2px;
+        }
+
         /* iOS Bottom Sheet Modal */
         .modal-overlay {
             position: fixed;
@@ -373,7 +398,7 @@
 
     <div class="container">
         <!-- Danh sách cún -->
-        <div class="dog-list" id="dog-list">
+        <div id="dog-list">
             <p style="text-align: center; color: var(--text-sub); margin-top: 40px;">Đang tải dữ liệu...</p>
         </div>
     </div>
@@ -589,27 +614,62 @@
                 return;
             }
 
+            const branch1Dogs = [];
+            const branch2Dogs = [];
+
             Object.keys(data).reverse().forEach((key) => {
                 const dog = data[key];
-                const item = document.createElement('div');
-                item.className = 'dog-item';
-                item.innerHTML = `
-                    <img src="${dog.image || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${dog.name}">
-                    <div class="dog-info">
-                        <h3>${dog.name}</h3>
-                        <div class="dog-badges">
-                            <span class="dog-badge branch-badge">${dog.branch || 'Chi nhánh 1'}</span>
-                            <span class="dog-badge">${dog.breed}</span>
+                dog.id = key;
+                if (dog.branch === 'Chi nhánh 2') {
+                    branch2Dogs.push(dog);
+                } else {
+                    branch1Dogs.push(dog);
+                }
+            });
+
+            const renderDogCard = (dog) => {
+                return `
+                    <div class="dog-item">
+                        <img src="${dog.image || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${dog.name}">
+                        <div class="dog-info">
+                            <h3>${dog.name}</h3>
+                            <div class="dog-badges">
+                                <span class="dog-badge branch-badge">${dog.branch || 'Chi nhánh 1'}</span>
+                                <span class="dog-badge">${dog.breed}</span>
+                            </div>
+                            <p class="dog-traits">${dog.traits || 'Chưa có thông tin tính cách.'}</p>
                         </div>
-                        <p class="dog-traits">${dog.traits || 'Chưa có thông tin tính cách.'}</p>
-                    </div>
-                    <div class="dog-actions">
-                        <button class="btn-edit" data-id="${key}">✏️</button>
-                        <button class="btn-delete" data-id="${key}">🗑️</button>
+                        <div class="dog-actions">
+                            <button class="btn-edit" data-id="${dog.id}">✏️</button>
+                            <button class="btn-delete" data-id="${dog.id}">🗑️</button>
+                        </div>
                     </div>
                 `;
-                dogListEl.appendChild(item);
-            });
+            };
+
+            let html = '';
+
+            // Mục Chi nhánh 1
+            html += `<div class="branch-section">`;
+            html += `<h2 class="branch-title">Chi nhánh 1 (${branch1Dogs.length})</h2>`;
+            if (branch1Dogs.length === 0) {
+                html += `<p style="color: var(--text-sub); font-size: 14px; padding: 8px 0;">Chưa có cún nào ở Chi nhánh 1.</p>`;
+            } else {
+                html += `<div class="dog-list">${branch1Dogs.map(renderDogCard).join('')}</div>`;
+            }
+            html += `</div>`;
+
+            // Mục Chi nhánh 2
+            html += `<div class="branch-section">`;
+            html += `<h2 class="branch-title">Chi nhánh 2 (${branch2Dogs.length})</h2>`;
+            if (branch2Dogs.length === 0) {
+                html += `<p style="color: var(--text-sub); font-size: 14px; padding: 8px 0;">Chưa có cún nào ở Chi nhánh 2.</p>`;
+            } else {
+                html += `<div class="dog-list">${branch2Dogs.map(renderDogCard).join('')}</div>`;
+            }
+            html += `</div>`;
+
+            dogListEl.innerHTML = html;
 
             // Gán sự kiện cho nút Sửa & Xóa
             document.querySelectorAll('.btn-delete').forEach(btn => {
