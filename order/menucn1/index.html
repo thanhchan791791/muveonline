@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quản Lý Menu - iOS Style</title>
+    <style>
+        :root {
+            --ios-bg: #f2f2f7;
+            --ios-card: rgba(255, 255, 255, 0.82);
+            --ios-card-solid: #ffffff;
+            --ios-primary: #007aff;
+            --ios-success: #34c759;
+            --ios-danger: #ff3b30;
+            --ios-text: #000000;
+            --ios-subtext: #8e8e93;
+            --ios-border: rgba(60, 60, 67, 0.12);
+            --ios-glass: rgba(255, 255, 255, 0.75);
+            --ios-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--ios-bg);
+            color: var(--ios-text);
+            padding: 20px 12px 60px 12px;
+            max-width: 768px;
+            margin: 0 auto;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* iOS Header Style */
+        .header {
+            margin-bottom: 16px;
+            padding: 10px 8px;
+            animation: fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #1c1c1e;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--ios-subtext);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Search Bar */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            background: rgba(239, 239, 244, 0.9);
+            border: 1px solid var(--ios-border);
+            border-radius: 12px;
+            font-size: 15px;
+            color: var(--ios-text);
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .search-input:focus {
+            background: #ffffff;
+            border-color: var(--ios-primary);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ios-subtext);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Glassmorphism Cards */
+        .ios-card {
+            background: var(--ios-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--ios-shadow);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ios-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            letter-spacing: -0.3px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-icon {
+            width: 28px;
+            height: 28px;
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--ios-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .collapsible-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, margin-top 0.3s ease;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .ios-card.active .collapsible-body {
+            max-height: 800px;
+            opacity: 1;
+            margin-top: 16px;
+        }
+
+        .ios-card.active .toggle-icon {
+            transform: rotate(45deg);
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--ios-danger);
+        }
+
+        /* iOS Form Elements */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 576px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group.full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 576px) {
+            .input-group.full-width { grid-column: span 1; }
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ios-subtext);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 4px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(239, 239, 244, 0.7);
+            border: 1px solid transparent;
+            border-radius: 12px;
+            font-size: 15px;
+            color: var(--ios-text);
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        input:focus, select:focus {
+            background: #ffffff;
+            border-color: var(--ios-primary);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+        }
+
+        /* iOS Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            opacity: 0.8;
+        }
+
+        .btn-primary {
+            background: var(--ios-primary);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-action-edit {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--ios-primary);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-edit:active {
+            background: var(--ios-primary);
+            color: #ffffff;
+            transform: scale(0.95);
+        }
+
+        .btn-action-delete {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--ios-danger);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-delete:active {
+            background: var(--ios-danger);
+            color: #ffffff;
+            transform: scale(0.95);
+        }
+
+        .btn-cancel {
+            background: #e5e5ea;
+            color: var(--ios-text);
+        }
+
+        /* Menu Render List Style */
+        .cat-group {
+            background: var(--ios-card-solid);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid var(--ios-border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease;
+        }
+
+        .cat-header {
+            padding: 16px;
+            background: rgba(248, 248, 248, 0.8);
+            border-bottom: 1px solid var(--ios-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cat-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1c1c1e;
+        }
+
+        .cat-subtitle {
+            font-size: 13px;
+            color: var(--ios-subtext);
+            font-weight: 400;
+            margin-left: 4px;
+        }
+
+        .item-list {
+            list-style: none;
+        }
+
+        .item-row {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--ios-border);
+            transition: background 0.2s ease;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-row:hover {
+            background-color: rgba(242, 242, 247, 0.5);
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .item-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ios-text);
+        }
+
+        .item-subtext {
+            font-size: 12px;
+            color: var(--ios-subtext);
+        }
+
+        .item-price {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ios-primary);
+            margin-top: 2px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Modal Popup Glassmorphism */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: rgba(255, 255, 255, 0.95);
+            width: 90%;
+            max-width: 440px;
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .empty-state {
+            padding: 30px;
+            text-align: center;
+            color: var(--ios-subtext);
+            font-size: 14px;
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div class="header">
+    <h1>Menu Management</h1>
+    <p>Chi nhánh 1 • Cập nhật Realtime</p>
+</div>
+
+<!-- FORM THÊM DANH MỤC VIỆT -->
+<div class="ios-card" id="card-add-cat-vi">
+    <div class="ios-card-title" onclick="toggleForm('card-add-cat-vi')">
+        <span>📂 Thêm Danh Mục (Tiếng Việt)</span>
+        <div class="toggle-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+    </div>
+    <div class="collapsible-body">
+        <div class="form-grid">
+            <div class="input-group full-width">
+                <label>Loại Menu</label>
+                <select id="new-cat-type-vi">
+                    <option value="drinks">🍹 Nước Uống (Drinks)</option>
+                    <option value="food">🍖 Thức Ăn Thú (Pet Food)</option>
+                </select>
+            </div>
+            <div class="input-group full-width">
+                <label>Tên Danh Mục (Tiếng Việt)</label>
+                <input type="text" id="new-cat-vi" placeholder="Ví dụ: Cà Phê">
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="addCategoryLang('vi')">+ Tạo Danh Mục (VI)</button>
+    </div>
+</div>
+
+<!-- FORM THÊM DANH MỤC ANH -->
+<div class="ios-card" id="card-add-cat-en">
+    <div class="ios-card-title" onclick="toggleForm('card-add-cat-en')">
+        <span>🌐 Thêm Danh Mục (Tiếng Anh)</span>
+        <div class="toggle-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+    </div>
+    <div class="collapsible-body">
+        <div class="form-grid">
+            <div class="input-group full-width">
+                <label>Loại Menu</label>
+                <select id="new-cat-type-en">
+                    <option value="drinks">🍹 Nước Uống (Drinks)</option>
+                    <option value="food">🍖 Thức Ăn Thú (Pet Food)</option>
+                </select>
+            </div>
+            <div class="input-group full-width">
+                <label>Tên Danh Mục (English)</label>
+                <input type="text" id="new-cat-en" placeholder="Ví dụ: Coffee">
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="addCategoryLang('en')">+ Tạo Danh Mục (EN)</button>
+    </div>
+</div>
+
+<!-- FORM THÊM MÓN VIỆT -->
+<div class="ios-card" id="card-add-item-vi">
+    <div class="ios-card-title" onclick="toggleForm('card-add-item-vi')">
+        <span>✨ Thêm Món Mới (Tiếng Việt)</span>
+        <div class="toggle-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+    </div>
+    <div class="collapsible-body">
+        <div class="form-grid">
+            <div class="input-group full-width">
+                <label>Danh Mục Tiếp Nhận (VI)</label>
+                <select id="select-cat-target-vi"></select>
+            </div>
+            <div class="input-group">
+                <label>Tên Món (Tiếng Việt)</label>
+                <input type="text" id="new-item-name-vi" placeholder="Ví dụ: Cà phê sữa">
+            </div>
+            <div class="input-group">
+                <label>Giá Bán (VNĐ)</label>
+                <input type="number" id="new-item-price-vi" placeholder="Ví dụ: 35000">
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="addItemLang('vi')">+ Thêm Món (VI)</button>
+    </div>
+</div>
+
+<!-- FORM THÊM MÓN ANH -->
+<div class="ios-card" id="card-add-item-en">
+    <div class="ios-card-title" onclick="toggleForm('card-add-item-en')">
+        <span>🌍 Thêm Món Mới (Tiếng Anh)</span>
+        <div class="toggle-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+    </div>
+    <div class="collapsible-body">
+        <div class="form-grid">
+            <div class="input-group full-width">
+                <label>Danh Mục Tiếp Nhận (EN)</label>
+                <select id="select-cat-target-en"></select>
+            </div>
+            <div class="input-group">
+                <label>Tên Món (English)</label>
+                <input type="text" id="new-item-name-en" placeholder="Ví dụ: Milk Coffee">
+            </div>
+            <div class="input-group">
+                <label>Giá Bán (VNĐ)</label>
+                <input type="number" id="new-item-price-en" placeholder="Ví dụ: 35000">
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="addItemLang('en')">+ Thêm Món (EN)</button>
+    </div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="search-box">
+    <div class="search-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    </div>
+    <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm món ăn, nước uống..." oninput="renderAdminMenu()">
+</div>
+
+<!-- DANH SÁCH MENU -->
+<div class="ios-card">
+    <div class="ios-card-title">📋 Danh Sách Món Hiện Tại</div>
+    <div id="menu-tree-container" style="margin-top: 16px;">
+        <div class="empty-state">Đang tải dữ liệu menu...</div>
+    </div>
+</div>
+
+<!-- MODAL SỬA MÓN -->
+<div id="edit-modal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-title">Sửa Thông Tin Món</div>
+        <input type="hidden" id="edit-lang">
+        <input type="hidden" id="edit-type">
+        <input type="hidden" id="edit-cat-index">
+        <input type="hidden" id="edit-item-index">
+        
+        <div class="form-grid" style="grid-template-columns: 1fr; gap: 12px; margin-bottom: 20px;">
+            <div class="input-group">
+                <label id="edit-name-label">Tên Món</label>
+                <input type="text" id="edit-name">
+            </div>
+            <div class="input-group">
+                <label>Giá Tiền (VNĐ)</label>
+                <input type="number" id="edit-price">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button class="btn btn-cancel" onclick="closeEditModal()">Hủy</button>
+            <button class="btn btn-primary" onclick="saveItemEdit()">Lưu</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    firebase.initializeApp({
+        apiKey: "AIzaSyAV7r-rjXo6U62LX1AA7c7DAHb8GhOOOsg",
+        authDomain: "saigon-dalat.firebaseapp.com",
+        databaseURL: "https://saigon-dalat-default-rtdb.firebaseio.com",
+        projectId: "saigon-dalat",
+        storageBucket: "saigon-dalat.firebasestorage.app",
+        messagingSenderId: "339735183485",
+        appId: "1:339735183485:web:bc23cd740104d272577114",
+        measurementId: "G-FDLZXR2X8P"
+    });
+    const db = firebase.database();
+    let rawMenuData = { vi: { food: [], drinks: [] }, en: { food: [], drinks: [] } };
+
+    // Bật/tắt mở rộng form
+    function toggleForm(cardId) {
+        const card = document.getElementById(cardId);
+        card.classList.toggle('active');
+    }
+
+    // Chuẩn hóa chuỗi: xóa dấu và xóa tất cả khoảng trắng
+    function removeAccentsAndSpaces(str) {
+        if (!str) return '';
+        return str.normalize('NFD')
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+                  .replace(/\s+/g, '')
+                  .toLowerCase();
+    }
+
+    // Realtime Sync
+    db.ref('menu_branch_1').on('value', snap => {
+        const val = snap.val();
+        if (val) {
+            rawMenuData = {
+                vi: { food: val.vi?.food || [], drinks: val.vi?.drinks || [] },
+                en: { food: val.en?.food || [], drinks: val.en?.drinks || [] }
+            };
+            renderAdminMenu();
+            renderCategoryDropdowns();
+        } else {
+            document.getElementById('menu-tree-container').innerHTML = '<div class="empty-state">Chưa có dữ liệu menu trên Database.</div>';
+        }
+    });
+
+    function renderCategoryDropdowns() {
+        ['vi', 'en'].forEach(lang => {
+            const select = document.getElementById(`select-cat-target-${lang}`);
+            select.innerHTML = `<option value="">-- Chọn Danh Mục (${lang.toUpperCase()}) --</option>`;
+            
+            ['drinks', 'food'].forEach(type => {
+                const label = type === 'drinks' ? '🍹 Nước Uống' : '🍖 Thức Ăn Thú';
+                (rawMenuData[lang][type] || []).forEach((cat, idx) => {
+                    select.innerHTML += `<option value="${type}_${idx}">${label} ➔ ${cat.categoryName}</option>`;
+                });
+            });
+        });
+    }
+
+    function renderAdminMenu() {
+        const container = document.getElementById('menu-tree-container');
+        const searchTerm = removeAccentsAndSpaces(document.getElementById('search-input').value);
+        let html = '';
+
+        ['drinks', 'food'].forEach(type => {
+            ['vi', 'en'].forEach(lang => {
+                const langLabel = lang === 'vi' ? 'Tiếng Việt' : 'English';
+                const categories = rawMenuData[lang][type] || [];
+
+                categories.forEach((cat, cIdx) => {
+                    const drinks = cat.drinks || [];
+
+                    // Lọc món theo từ khóa (không dấu, không cách)
+                    const filteredDrinks = drinks.filter(d => {
+                        const nameNorm = removeAccentsAndSpaces(d.name);
+                        const idNorm = removeAccentsAndSpaces(d.id);
+                        return nameNorm.includes(searchTerm) || idNorm.includes(searchTerm);
+                    });
+
+                    if (filteredDrinks.length > 0 || !searchTerm) {
+                        html += `<div class="cat-group">
+                            <div class="cat-header">
+                                <div>
+                                    <span class="cat-title">${cat.categoryName}</span>
+                                    <span class="cat-subtitle">[${langLabel} • ${type === 'drinks' ? 'Nước' : 'Thức ăn'}]</span>
+                                </div>
+                                <button class="btn-action-delete" onclick="deleteCategory('${lang}', '${type}', ${cIdx})">Xóa Mục</button>
+                            </div>
+                            <ul class="item-list">`;
+                        
+                        filteredDrinks.forEach((d) => {
+                            const dIdx = drinks.findIndex(item => item.id === d.id);
+                            html += `<li class="item-row">
+                                <div class="item-info">
+                                    <span class="item-name">${d.name}</span>
+                                    <span class="item-subtext">ID: ${d.id}</span>
+                                    <span class="item-price">${d.price.toLocaleString('vi-VN')} đ</span>
+                                </div>
+                                <div class="item-actions">
+                                    <button class="btn-action-edit" onclick="openEditModal('${lang}', '${type}', ${cIdx}, ${dIdx})">Sửa</button>
+                                    <button class="btn-action-delete" onclick="deleteItem('${lang}', '${type}', ${cIdx}, '${d.id}')">Xóa</button>
+                                </div>
+                            </li>`;
+                        });
+
+                        if (filteredDrinks.length === 0) {
+                            html += `<li class="empty-state">Chưa có món trong danh mục này</li>`;
+                        }
+
+                        html += `</ul></div>`;
+                    }
+                });
+            });
+        });
+
+        container.innerHTML = html || '<div class="empty-state">Không tìm thấy món nào phù hợp.</div>';
+    }
+
+    function addCategoryLang(lang) {
+        const type = document.getElementById(`new-cat-type-${lang}`).value;
+        const name = document.getElementById(`new-cat-${lang}`).value.trim();
+
+        if (!name) return alert('Vui lòng nhập tên Danh mục!');
+
+        if (!rawMenuData[lang][type]) rawMenuData[lang][type] = [];
+
+        rawMenuData[lang][type].push({ categoryName: name, drinks: [] });
+
+        saveToFirebase(() => {
+            document.getElementById(`new-cat-${lang}`).value = '';
+            document.getElementById(`card-add-cat-${lang}`).classList.remove('active');
+        });
+    }
+
+    function deleteCategory(lang, type, catIndex) {
+        if (!confirm('Xóa danh mục này sẽ xóa tất cả món bên trong. Bạn chắc chắn chứ?')) return;
+        
+        rawMenuData[lang][type].splice(catIndex, 1);
+
+        saveToFirebase();
+    }
+
+    function addItemLang(lang) {
+        const targetVal = document.getElementById(`select-cat-target-${lang}`).value;
+        const price = parseInt(document.getElementById(`new-item-price-${lang}`).value);
+        const name = document.getElementById(`new-item-name-${lang}`).value.trim();
+
+        if (!targetVal) return alert('Vui lòng chọn Danh mục!');
+        if (isNaN(price) || !name) return alert('Vui lòng điền đầy đủ thông tin tên món và giá bán!');
+
+        const [type, catIdxStr] = targetVal.split('_');
+        const catIdx = parseInt(catIdxStr);
+
+        // Tự động sinh mã ID bằng timestamp hệ thống
+        const id = 'item_' + Date.now();
+
+        if (!rawMenuData[lang][type][catIdx].drinks) rawMenuData[lang][type][catIdx].drinks = [];
+
+        rawMenuData[lang][type][catIdx].drinks.push({ id, name, price });
+
+        saveToFirebase(() => {
+            document.getElementById(`new-item-price-${lang}`).value = '';
+            document.getElementById(`new-item-name-${lang}`).value = '';
+            document.getElementById(`card-add-item-${lang}`).classList.remove('active');
+        });
+    }
+
+    function deleteItem(lang, type, catIdx, itemId) {
+        if (!confirm('Xác nhận xóa món này?')) return;
+
+        rawMenuData[lang][type][catIdx].drinks = rawMenuData[lang][type][catIdx].drinks.filter(d => d.id !== itemId);
+
+        saveToFirebase();
+    }
+
+    function openEditModal(lang, type, catIdx, itemIdx) {
+        const item = rawMenuData[lang][type][catIdx].drinks[itemIdx];
+
+        document.getElementById('edit-lang').value = lang;
+        document.getElementById('edit-type').value = type;
+        document.getElementById('edit-cat-index').value = catIdx;
+        document.getElementById('edit-item-index').value = itemIdx;
+        
+        document.getElementById('edit-name-label').innerText = `Tên Món (${lang.toUpperCase()})`;
+        document.getElementById('edit-price').value = item.price;
+        document.getElementById('edit-name').value = item.name;
+
+        document.getElementById('edit-modal').classList.add('active');
+    }
+
+    function closeEditModal() { 
+        document.getElementById('edit-modal').classList.remove('active'); 
+    }
+
+    function saveItemEdit() {
+        const lang = document.getElementById('edit-lang').value;
+        const type = document.getElementById('edit-type').value;
+        const catIdx = parseInt(document.getElementById('edit-cat-index').value);
+        const itemIdx = parseInt(document.getElementById('edit-item-index').value);
+
+        const newPrice = parseInt(document.getElementById('edit-price').value);
+        const newName = document.getElementById('edit-name').value.trim();
+
+        if (isNaN(newPrice) || !newName) return alert('Vui lòng nhập đầy đủ thông tin!');
+
+        const target = rawMenuData[lang][type][catIdx].drinks[itemIdx];
+        target.name = newName;
+        target.price = newPrice;
+
+        saveToFirebase(() => {
+            closeEditModal();
+        });
+    }
+
+    function saveToFirebase(callback) {
+        db.ref('menu_branch_1').set(rawMenuData)
+            .then(() => { if (callback) callback(); })
+            .catch(err => alert('Lỗi Firebase: ' + err.message));
+    }
+</script>
+</body>
+</html>
