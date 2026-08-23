@@ -115,7 +115,6 @@
 
 <div class="container animate__animated animate__fadeInUp" id="main-container">
 
-    <!-- BƯỚC 0 -->
     <div id="step-0" class="step active">
         <div class="logo-wrapper"><img src="logo.png" class="shop-logo" alt="Logo"></div>
         <h2>Chọn Ngôn Ngữ / Language</h2>
@@ -124,7 +123,6 @@
         <button class="lang-option-btn" onclick="selectLanguage('en')">English</button>
     </div>
 
-    <!-- BƯỚC 1 -->
     <div id="step-1" class="step">
         <div class="logo-wrapper"><img src="logo.png" class="shop-logo" alt="Logo"></div>
         <h2 id="txt-step1-title">Chào Bạn Nhỏ!</h2>
@@ -144,7 +142,6 @@
         <button class="btn" id="btn-step1-next" onclick="goToStep2()">Tiếp tục nhận vé -></button>
     </div>
 
-    <!-- BƯỚC 2 -->
     <div id="step-2" class="step">
         <h2 id="txt-step2-title">Nội Quy Quán Nhỏ</h2>
         <div class="rules-img-container" onclick="openRulesModal()">
@@ -158,7 +155,6 @@
         <button class="btn" id="btn-rule-next" disabled onclick="goToStep3()">Đồng ý & Tiếp tục -></button>
     </div>
 
-    <!-- BƯỚC 3 -->
     <div id="step-3" class="step">
         <h2 id="txt-step3-title">Chọn Vé & Gọi Món</h2>
         <div class="menu-top-section">
@@ -171,7 +167,6 @@
             Vé vào cửa BẮT BUỘC mua trước.<br>Nước uống KHÔNG BẮT BUỘC, bạn tùy ý lựa chọn nhé!
         </div>
 
-        <!-- VÉ XANH -->
         <div class="ticket-option green animate__animated animate__fadeInLeft">
             <div class="ticket-info green">
                 <h3 id="txt-ticket-green-title">Vé Xanh (Combo 1)</h3>
@@ -186,7 +181,6 @@
             </div>
         </div>
 
-        <!-- VÉ ĐỎ -->
         <div class="ticket-option red animate__animated animate__fadeInRight">
             <div class="badge-hot">HOT</div>
             <div class="ticket-info red">
@@ -204,7 +198,6 @@
             </div>
         </div>
 
-        <!-- COMBO 3 -->
         <div class="ticket-option purple animate__animated animate__fadeInLeft">
             <div class="badge-combo">COMBO</div>
             <div class="ticket-info purple">
@@ -222,7 +215,6 @@
             </div>
         </div>
 
-        <!-- MENU MON -->
         <div class="search-drink-box">
             <label style="color:#ff758f; margin-bottom:12px; display:block; font-weight:800;" id="lbl-select-drink">Chọn danh mục món bên dưới:</label>
             <div class="menu-tabs">
@@ -245,7 +237,6 @@
         </div>
     </div>
 
-    <!-- BƯỚC THÀNH CÔNG -->
     <div id="step-success" class="step success-card">
         <h2 id="txt-success-title">Đặt Vé Thành Công!</h2>
         <div class="customer-summary">
@@ -273,18 +264,15 @@
     </div>
 </div>
 
-<!-- FLOATING CART -->
 <div id="floating-cart" class="floating-cart-btn" onclick="scrollToCart()" style="display:none;">
     <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
     <div id="floating-cart-count" class="floating-cart-badge">0</div>
 </div>
 
-<!-- STICKY CONFIRM BAR -->
 <div id="sticky-confirm-bar" class="sticky-confirm-wrapper" style="display:none;">
     <button class="btn btn-sticky" id="btn-sticky-confirm" onclick="handleOrderConfirmation()">Xác nhận đơn hàng -></button>
 </div>
 
-<!-- MODALS -->
 <div id="menu-modal" class="modal-overlay zoom-mode" onclick="closeMenuModal()"><img id="modal-menu-img" src="menu.png" alt="Menu Phóng To" onerror="this.src='menu.jpg'"></div>
 <div id="rules-modal" class="modal-overlay zoom-mode" onclick="closeRulesModal()"><img id="modal-rules-img" src="luuy.png" alt="Lưu ý Phóng To" onerror="this.src='luuy.jpg'"></div>
 
@@ -324,112 +312,24 @@
     const database = firebase.database();
     let staffCodes = {}, currentLang = 'vi', allDrinks = [];
     let currentContactType = 'phone';
+    let menuDataByLang = { vi: { food: [], drinks: [] }, en: { food: [], drinks: [] } };
 
     database.ref('staff_codes').on('value', snap => { staffCodes = snap.val() || {}; });
 
-    const menuDataByLang = {
-        vi: {
-            food: [{ categoryName: "THỨC ĂN CHO THÚ (PET FOOD)", drinks: [
-                { id: "pf1", name: "Cỏ cho Capy", price: 20000 }, { id: "pf2", name: "Ciao", price: 15000 },
-                { id: "pf3", name: "Jerhigh", price: 70000 }, { id: "pf4", name: "Thức ăn cho Gấu Mèo", price: 25000 },
-                { id: "pf5", name: "Hạt chiết lớn", price: 70000 }, { id: "pf6", name: "Pate Nekko", price: 40000 }
-            ]}],
-            drinks: [
-                { categoryName: "CÀ PHÊ (COFFEE)", drinks: [
-                    { id: "cf1", name: "Espresso đá", price: 40000 }, { id: "cf2", name: "Cà phê sữa đá", price: 40000 },
-                    { id: "cf3", name: "Caramel coffee", price: 40000 }, { id: "cf4", name: "Chocolate latte", price: 40000 },
-                    { id: "cf5", name: "Matcha latte", price: 40000 }, { id: "cf6", name: "Cam ép", price: 40000 },
-                    { id: "cf7", name: "Bạc xỉu", price: 40000 }, { id: "cf8", name: "Americano (nóng/lạnh)", price: 40000 }
-                ]},
-                { categoryName: "CÁC LOẠI TRÀ (TEA)", drinks: [
-                    { id: "te1", name: "Trà đào", price: 40000 }, { id: "te2", name: "Trà đào cam sả", price: 40000 },
-                    { id: "te3", name: "Trà kiwi", price: 40000 }, { id: "te4", name: "Trà vải", price: 40000 },
-                    { id: "te5", name: "Trà dâu", price: 40000 }, { id: "te6", name: "Trà ổi hồng", price: 40000 },
-                    { id: "te7", name: "Lục trà tắc mật ong", price: 40000 }
-                ]},
-                { categoryName: "SODA SẢNG KHOÁI", drinks: [
-                    { id: "sd1", name: "Soda kiwi", price: 40000 }, { id: "sd2", name: "Soda blue", price: 40000 },
-                    { id: "sd3", name: "Soda chanh", price: 40000 }, { id: "sd4", name: "Soda bạc hà", price: 40000 },
-                    { id: "sd5", name: "Soda việt quất", price: 40000 }
-                ]},
-                { categoryName: "SỮA CHUA (YOGURT)", drinks: [
-                    { id: "yg1", name: "Sữa chua đá", price: 40000 }, { id: "yg2", name: "Sữa chua trân châu đường đen", price: 40000 },
-                    { id: "yg3", name: "Sữa chua cà phê", price: 40000 }, { id: "yg4", name: "Sữa chua hoa quả", price: 40000 },
-                    { id: "yg5", name: "Sữa chua việt quất", price: 40000 }
-                ]},
-                { categoryName: "ĐÁ XAY (ICE BLENDED)", drinks: [
-                    { id: "ib1", name: "Sinh tố việt quất", price: 40000 }, { id: "ib2", name: "Matcha blend", price: 40000 },
-                    { id: "ib3", name: "Matcha cookie blend", price: 40000 }, { id: "ib4", name: "Matcha chocolate blend", price: 40000 },
-                    { id: "ib5", name: "Chocolate blend", price: 40000 }, { id: "ib6", name: "Chocolate mint blend", price: 40000 },
-                    { id: "ib7", name: "Chocolate cookie", price: 40000 }
-                ]},
-                { categoryName: "SỮA TƯƠI (MILK)", drinks: [
-                    { id: "mk1", name: "Sữa tươi chocolate", price: 40000 }, { id: "mk2", name: "Sữa tươi matcha", price: 40000 },
-                    { id: "mk3", name: "Sữa tươi cacao", price: 40000 }, { id: "mk4", name: "Sữa tươi bạc hà", price: 40000 },
-                    { id: "mk5", name: "Sữa tươi trân châu đường đen", price: 40000 }
-                ]},
-                { categoryName: "TRÀ SỮA (MILK TEA)", drinks: [
-                    { id: "mt1", name: "Trà sữa truyền thống", price: 40000 }, { id: "mt2", name: "Trà sữa trân châu đường đen", price: 40000 },
-                    { id: "mt3", name: "Trà sữa matcha", price: 40000 }, { id: "mt4", name: "Trà sữa chocolate", price: 40000 },
-                    { id: "mt5", name: "Trà sữa chocolate mint", price: 40000 }
-                ]},
-                { categoryName: "NƯỚC NGỌT & NƯỚC SUỐI", drinks: [
-                    { id: "nn1", name: "Coca-7up", price: 40000 }, { id: "nn2", name: "Sting", price: 40000 }, { id: "nn3", name: "Nước suối", price: 30000 }
-                ]}
-            ]
-        },
-        en: {
-            food: [{ categoryName: "PET FOOD", drinks: [
-                { id: "pf1", name: "Grass for Capybara", price: 20000 }, { id: "pf2", name: "Ciao Treats", price: 15000 },
-                { id: "pf3", name: "Jerhigh Treats", price: 70000 }, { id: "pf4", name: "Raccoon Food", price: 25000 },
-                { id: "pf5", name: "Large Kibble Pack", price: 70000 }, { id: "pf6", name: "Nekko Pate", price: 40000 }
-            ]}],
-            drinks: [
-                { categoryName: "COFFEE", drinks: [
-                    { id: "cf1", name: "Iced Espresso", price: 40000 }, { id: "cf2", name: "Iced Condensed Milk Coffee", price: 40000 },
-                    { id: "cf3", name: "Caramel Coffee", price: 40000 }, { id: "cf4", name: "Chocolate Latte", price: 40000 },
-                    { id: "cf5", name: "Matcha Latte", price: 40000 }, { id: "cf6", name: "Fresh Orange Juice", price: 40000 },
-                    { id: "cf7", name: "Bac Xiu Coffee", price: 40000 }, { id: "cf8", name: "Americano (Hot/Iced)", price: 40000 }
-                ]},
-                { categoryName: "TEA SELECTION", drinks: [
-                    { id: "te1", name: "Peach Tea", price: 40000 }, { id: "te2", name: "Peach Orange Lemongrass Tea", price: 40000 },
-                    { id: "te3", name: "Kiwi Tea", price: 40000 }, { id: "te4", name: "Lychee Tea", price: 40000 },
-                    { id: "te5", name: "Strawberry Tea", price: 40000 }, { id: "te6", name: "Pink Guava Tea", price: 40000 },
-                    { id: "te7", name: "Honey Kumquat Green Tea", price: 40000 }
-                ]},
-                { categoryName: "REFRESHING SODA", drinks: [
-                    { id: "sd1", name: "Kiwi Soda", price: 40000 }, { id: "sd2", name: "Blue Curacao Soda", price: 40000 },
-                    { id: "sd3", name: "Lemon Soda", price: 40000 }, { id: "sd4", name: "Mint Soda", price: 40000 },
-                    { id: "sd5", name: "Blueberry Soda", price: 40000 }
-                ]},
-                { categoryName: "YOGURT", drinks: [
-                    { id: "yg1", name: "Iced Yogurt", price: 40000 }, { id: "yg2", name: "Yogurt with Black Sugar Boba", price: 40000 },
-                    { id: "yg3", name: "Coffee Yogurt", price: 40000 }, { id: "yg4", name: "Fresh Fruit Yogurt", price: 40000 },
-                    { id: "yg5", name: "Blueberry Yogurt", price: 40000 }
-                ]},
-                { categoryName: "ICE BLENDED", drinks: [
-                    { id: "ib1", name: "Blueberry Smoothie", price: 40000 }, { id: "ib2", name: "Matcha Blend", price: 40000 },
-                    { id: "ib3", name: "Matcha Cookie Blend", price: 40000 }, { id: "ib4", name: "Matcha Chocolate Blend", price: 40000 },
-                    { id: "ib5", name: "Chocolate Blend", price: 40000 }, { id: "ib6", name: "Chocolate Mint Blend", price: 40000 },
-                    { id: "ib7", name: "Chocolate Cookie Blend", price: 40000 }
-                ]},
-                { categoryName: "FRESH MILK", drinks: [
-                    { id: "mk1", name: "Chocolate Fresh Milk", price: 40000 }, { id: "mk2", name: "Matcha Fresh Milk", price: 40000 },
-                    { id: "mk3", name: "Cocoa Fresh Milk", price: 40000 }, { id: "mk4", name: "Mint Fresh Milk", price: 40000 },
-                    { id: "mk5", name: "Fresh Milk with Black Sugar Boba", price: 40000 }
-                ]},
-                { categoryName: "MILK TEA", drinks: [
-                    { id: "mt1", name: "Traditional Milk Tea", price: 40000 }, { id: "mt2", name: "Black Sugar Boba Milk Tea", price: 40000 },
-                    { id: "mt3", name: "Matcha Milk Tea", price: 40000 }, { id: "mt4", name: "Chocolate Milk Tea", price: 40000 },
-                    { id: "mt5", name: "Chocolate Mint Milk Tea", price: 40000 }
-                ]},
-                { categoryName: "SOFT DRINKS & WATER", drinks: [
-                    { id: "nn1", name: "Coca-Cola / 7Up", price: 40000 }, { id: "nn2", name: "Sting Energy Drink", price: 40000 },
-                    { id: "nn3", name: "Mineral Water", price: 30000 }
-                ]}
-            ]
+    // Đồng bộ Realtime Menu từ Firebase Node `menu_branch_1`
+    database.ref('menu_branch_1').on('value', snap => {
+        const val = snap.val();
+        if (val) {
+            menuDataByLang = {
+                vi: { food: val.vi?.food || [], drinks: val.vi?.drinks || [] },
+                en: { food: val.en?.food || [], drinks: val.en?.drinks || [] }
+            };
+            allDrinks = getAllDrinksList();
+            initDrinkCategories();
+            updateSelectedCart();
+            updateTotalCost();
         }
-    };
+    });
 
     const translations = {
         vi: {
@@ -508,8 +408,10 @@
     }
 
     function getAllDrinksList() {
-        const data = menuDataByLang[currentLang];
-        return [...data.food.flatMap(c => c.drinks), ...data.drinks.flatMap(c => c.drinks)];
+        const data = menuDataByLang[currentLang] || { food: [], drinks: [] };
+        const foodList = (data.food || []).flatMap(c => c.drinks || []);
+        const drinksList = (data.drinks || []).flatMap(c => c.drinks || []);
+        return [...foodList, ...drinksList];
     }
 
     function selectLanguage(lang) {
@@ -553,8 +455,12 @@
     }
 
     function renderCategoryList(containerId, categoriesData, prefixKey) {
+        if (!categoriesData || categoriesData.length === 0) {
+            document.getElementById(containerId).innerHTML = '<div style="padding:15px; text-align:center; color:#8d99ae;">Đang tải menu...</div>';
+            return;
+        }
         document.getElementById(containerId).innerHTML = categoriesData.map((cat, catIdx) => {
-            const itemsHtml = cat.drinks.map(drink => {
+            const itemsHtml = (cat.drinks || []).map(drink => {
                 const qty = orderState.drinks[drink.id] || 0;
                 return `<div class="drink-search-item">
                     <div><span class="drink-search-name">${drink.name}</span><span class="drink-search-price">${drink.price/1000}k</span></div>
@@ -574,7 +480,7 @@
     }
 
     function initDrinkCategories() {
-        const data = menuDataByLang[currentLang];
+        const data = menuDataByLang[currentLang] || { food: [], drinks: [] };
         renderCategoryList('food-categories-container', data.food, 'food');
         renderCategoryList('drinks-categories-container', data.drinks, 'drink');
     }
