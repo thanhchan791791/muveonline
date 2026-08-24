@@ -348,8 +348,73 @@
             color: #34c759;
         }
 
+        /* iOS Toggle Switch Style */
+        .status-toggle-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .ios-switch {
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 24px;
+        }
+
+        .ios-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e5e5ea;
+            transition: 0.3s var(--ios-cubic);
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: 0.3s var(--ios-cubic);
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .slider {
+            background-color: #34c759;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+
+        .status-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+
+        .status-text.playing {
+            color: #34c759;
+        }
+
+        .status-text.resting {
+            color: #8e8e93;
+        }
+
         .dog-traits {
-            font-size: 14px;
+            font-size: 13px;
             color: #6c6c70;
             line-height: 1.3;
             display: -webkit-box;
@@ -428,6 +493,17 @@
                 <input type="text" id="dog-breed" placeholder="Ví dụ: Corgi, Poodle...">
             </div>
             <div class="form-group">
+                <label>Trạng thái</label>
+                <select id="dog-status">
+                    <option value="Đang chơi">Đang chơi</option>
+                    <option value="Nghỉ ngơi">Nghỉ ngơi</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ngoại hình</label>
+                <input type="text" id="dog-appearance" placeholder="Ví dụ: Lông vàng, đuôi ngắn, đeo nơ đỏ...">
+            </div>
+            <div class="form-group">
                 <label>Tính cách</label>
                 <textarea id="dog-traits" rows="2" placeholder="Ví dụ: Năng động, thích ăn thịt gà..."></textarea>
             </div>
@@ -478,6 +554,8 @@
         const elBranch = document.getElementById('dog-branch');
         const elName = document.getElementById('dog-name');
         const elBreed = document.getElementById('dog-breed');
+        const elStatus = document.getElementById('dog-status');
+        const elAppearance = document.getElementById('dog-appearance');
         const elTraits = document.getElementById('dog-traits');
         const elPreview = document.getElementById('preview-img');
         const btnSave = document.getElementById('btn-save');
@@ -550,6 +628,8 @@
             elBranch.value = 'Chi nhánh 1';
             elName.value = '';
             elBreed.value = '';
+            elStatus.value = 'Đang chơi';
+            elAppearance.value = '';
             elTraits.value = '';
             base64Image = '';
             elPreview.src = '';
@@ -562,6 +642,8 @@
             const branch = elBranch.value;
             const name = elName.value.trim();
             const breed = elBreed.value.trim();
+            const status = elStatus.value;
+            const appearance = elAppearance.value.trim();
             const traits = elTraits.value.trim();
             const id = elId.value;
 
@@ -574,6 +656,8 @@
                 branch: branch,
                 name: name,
                 breed: breed,
+                status: status,
+                appearance: appearance,
                 traits: traits,
                 updatedAt: Date.now()
             };
@@ -628,6 +712,9 @@
             });
 
             const renderDogCard = (dog) => {
+                const currentStatus = dog.status || 'Đang chơi';
+                const isPlaying = currentStatus === 'Đang chơi';
+
                 return `
                     <div class="dog-item">
                         <img src="${dog.image || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${dog.name}">
@@ -636,8 +723,16 @@
                             <div class="dog-badges">
                                 <span class="dog-badge branch-badge">${dog.branch || 'Chi nhánh 1'}</span>
                                 <span class="dog-badge">${dog.breed}</span>
+                                <div class="status-toggle-wrapper">
+                                    <label class="ios-switch">
+                                        <input type="checkbox" class="toggle-status" data-id="${dog.id}" ${isPlaying ? 'checked' : ''}>
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="status-text ${isPlaying ? 'playing' : 'resting'}">${currentStatus}</span>
+                                </div>
                             </div>
-                            <p class="dog-traits">${dog.traits || 'Chưa có thông tin tính cách.'}</p>
+                            ${dog.appearance ? `<p class="dog-traits" style="color: var(--primary); font-weight: 500; margin-bottom: 2px;">👀 ${dog.appearance}</p>` : ''}
+                            <p class="dog-traits">${dog.traits ? '📝 ' + dog.traits : 'Chưa có thông tin tính cách.'}</p>
                         </div>
                         <div class="dog-actions">
                             <button class="btn-edit" data-id="${dog.id}">✏️</button>
@@ -671,6 +766,19 @@
 
             dogListEl.innerHTML = html;
 
+            // Xử lý bật/tắt nhanh Trạng thái trực tiếp trên thẻ cún
+            document.querySelectorAll('.toggle-status').forEach(toggle => {
+                toggle.addEventListener('change', (e) => {
+                    e.stopPropagation();
+                    const id = e.target.getAttribute('data-id');
+                    const newStatus = e.target.checked ? 'Đang chơi' : 'Nghỉ ngơi';
+                    update(ref(db, `dogs/${id}`), {
+                        status: newStatus,
+                        updatedAt: Date.now()
+                    });
+                });
+            });
+
             // Gán sự kiện cho nút Sửa & Xóa
             document.querySelectorAll('.btn-delete').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -692,6 +800,8 @@
                     elBranch.value = dog.branch || 'Chi nhánh 1';
                     elName.value = dog.name;
                     elBreed.value = dog.breed;
+                    elStatus.value = dog.status || 'Đang chơi';
+                    elAppearance.value = dog.appearance || '';
                     elTraits.value = dog.traits || '';
                     
                     if (dog.image) {
