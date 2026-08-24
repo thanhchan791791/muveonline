@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Menu "Đào" - Chọn "Đào" Để Ôm</title>
+    <!-- Google Fonts & Font Awesome Icons Pro Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #fff5f7; /* Nền hồng pastel siêu cute */
+            --card-glass: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(255, 182, 193, 0.4);
+            --primary: #ff477e; /* Tone hồng dâu ngọt ngào */
+            --primary-light: #fff0f5;
+            --text-main: #2b2d42;
+            --text-sub: #8d99ae;
+            --ios-radius: 28px;
+            --ios-cubic: cubic-bezier(0.25, 1, 0.5, 1);
+            --shadow-soft: 0 10px 30px rgba(255, 182, 193, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Intro Screen với Khung Container Đàng Hoàng */
+        .intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            transition: opacity 0.6s var(--ios-cubic), visibility 0.6s var(--ios-cubic);
+        }
+
+        .intro-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Khung chứa Slide Intro dạng iOS Card */
+        .intro-card-container {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            height: 75vh;
+            max-height: 600px;
+            background: #ffe6ea;
+            border-radius: 36px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 71, 126, 0.3);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .intro-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+        }
+
+        .intro-slide.active {
+            opacity: 1;
+        }
+
+        /* Chữ mờ mờ nhấp nhô đặt ở chính giữa màn hình */
+        .intro-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            background: rgba(255, 71, 126, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: rgba(255, 255, 255, 0.95);
+            padding: 16px 28px;
+            border-radius: 50px;
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 25px rgba(255, 71, 126, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            animation: pulseGlowCenter 1.8s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlowCenter {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.7;
+                box-shadow: 0 8px 20px rgba(255, 71, 126, 0.3);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.08);
+                opacity: 1;
+                box-shadow: 0 12px 30px rgba(255, 71, 126, 0.6);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.7;
+                box-shadow: 0 8px 20px rgba(255, 71, 126, 0.3);
+            }
+        }
+
+        /* iOS Sticky Top Bar */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 245, 247, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px 20px 16px 20px;
+            border-bottom: 1px solid rgba(255, 182, 193, 0.2);
+        }
+
+        .header-top {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        /* Tăng kích thước Tiêu đề Menu "Đào" */
+        .header h1 {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -0.8px;
+            background: linear-gradient(135deg, #ff477e 0%, #ff70a6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 4px 15px rgba(255, 71, 126, 0.15);
+        }
+
+        .header h1 i {
+            -webkit-text-fill-color: initial;
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        /* Tăng kích thước Dòng phụ "Chọn Đào Để Ôm" */
+        .header-subtitle {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 6px;
+            letter-spacing: -0.3px;
+            background: rgba(255, 228, 233, 0.7);
+            padding: 6px 18px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(255, 71, 126, 0.1);
+        }
+
+        /* Branch Selector Segmented Control */
+        .segmented-control {
+            display: flex;
+            background: rgba(255, 228, 233, 0.6);
+            border-radius: 16px;
+            padding: 4px;
+            position: relative;
+        }
+
+        .segment-btn {
+            flex: 1;
+            padding: 9px 0;
+            border: none;
+            background: transparent;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-sub);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s var(--ios-cubic);
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .segment-btn.active {
+            color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(255, 71, 126, 0.15);
+        }
+
+        /* Main Container */
+        .container {
+            padding: 16px 18px;
+        }
+
+        /* Filter Chips */
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            scrollbar-width: none;
+        }
+
+        .filter-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip {
+            padding: 8px 18px;
+            background: #ffffff;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-sub);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.25s var(--ios-cubic);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chip.active {
+            background: linear-gradient(135deg, #ff477e 0%, #ff70a6 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(255, 71, 126, 0.25);
+        }
+
+        /* Dog Grid Cards */
+        .dog-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .dog-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: var(--ios-radius);
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s var(--ios-cubic), box-shadow 0.3s var(--ios-cubic);
+            animation: cardAppear 0.4s var(--ios-cubic) forwards;
+        }
+
+        .dog-card:active {
+            transform: scale(0.94);
+        }
+
+        .img-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            background: #ffe6ea;
+            overflow: hidden;
+        }
+
+        .img-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s var(--ios-cubic);
+        }
+
+        .dog-card:hover .img-wrapper img {
+            transform: scale(1.08);
+        }
+
+        /* Heart Decor Tag */
+        .cute-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 2;
+        }
+
+        /* Status Badge trên Card */
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 800;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 2;
+        }
+
+        .status-badge.playing {
+            background: rgba(52, 199, 89, 0.9);
+            color: #ffffff;
+        }
+
+        .status-badge.resting {
+            background: rgba(142, 142, 147, 0.9);
+            color: #ffffff;
+        }
+
+        .dog-card-body {
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .dog-name {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .dog-breed-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin: 0 auto 8px auto;
+        }
+
+        .dog-appearance-text {
+            font-size: 11.5px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dog-traits-text {
+            font-size: 12px;
+            color: var(--text-sub);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            grid-column: span 2;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-sub);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Modal Overlay & Pop-up Chi Tiết */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s var(--ios-cubic);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .detail-card-popup {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            width: 100%;
+            max-width: 380px;
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            transform: scale(0.7) translateY(40px);
+            opacity: 0;
+            transition: all 0.4s var(--ios-cubic);
+            position: relative;
+        }
+
+        .modal-overlay.active .detail-card-popup {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+            animation: bounceIn 0.5s var(--ios-cubic);
+        }
+
+        .popup-img-container {
+            width: 100%;
+            padding-top: 85%;
+            position: relative;
+            background: #ffe6ea;
+            overflow: hidden;
+        }
+
+        .popup-img-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s var(--ios-cubic);
+        }
+
+        .popup-img-container:hover img {
+            transform: scale(1.08);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            z-index: 10;
+            transition: transform 0.2s var(--ios-cubic), background 0.2s;
+        }
+
+        .close-btn:active {
+            transform: scale(0.85);
+            background: #ffffff;
+        }
+
+        .popup-body {
+            padding: 20px 22px 24px 22px;
+            text-align: center;
+        }
+
+        .popup-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .popup-breed {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 5px 14px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+        }
+
+        .popup-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .info-box {
+            background: rgba(255, 240, 245, 0.6);
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 182, 193, 0.3);
+        }
+
+        .info-box-label {
+            font-size: 11px;
+            color: var(--text-sub);
+            font-weight: 700;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .info-box-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .popup-appearance-box {
+            background: rgba(255, 240, 245, 0.6);
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            text-align: left;
+            margin-bottom: 12px;
+        }
+
+        .popup-traits {
+            font-size: 13.5px;
+            color: var(--text-main);
+            line-height: 1.5;
+            background: #ffffff;
+            padding: 14px;
+            border-radius: 18px;
+            border: 1px solid var(--card-border);
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            font-weight: 500;
+        }
+
+        /* Animations Dynamic */
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(24px) scale(0.92); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.7) translateY(40px); opacity: 0; }
+            70% { transform: scale(1.03) translateY(-6px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Màn hình Slide mở đầu có KHUNG NỔI CHUẨN iOS -->
+    <div class="intro-screen" id="intro-screen">
+        <div class="intro-card-container">
+            <img src="img1.jpg" class="intro-slide active" alt="Slide 1">
+            <img src="img2.jpg" class="intro-slide" alt="Slide 2">
+            <button class="intro-btn" onclick="enterMenu()">
+                <i class="fa-solid fa-heart"></i> Ấn vào đây để chọn "đào"
+            </button>
+        </div>
+    </div>
+
+    <!-- iOS Sticky Header -->
+    <div class="header">
+        <div class="header-top">
+            <h1><i class="fa-solid fa-heart"></i> Menu "Đào" <i class="fa-solid fa-paw"></i></h1>
+            <div class="header-subtitle"><i class="fa-solid fa-hand-holding-heart"></i> Chọn "đào" để ôm</div>
+        </div>
+        
+        <!-- Tab chuyển Chi Nhánh -->
+        <div class="segmented-control">
+            <button class="segment-btn active" id="tab-branch-1" onclick="switchBranch('Chi nhánh 1')"><i class="fa-solid fa-store"></i> Chi Nhánh 1</button>
+            <button class="segment-btn" id="tab-branch-2" onclick="switchBranch('Chi nhánh 2')"><i class="fa-solid fa-shop"></i> Chi Nhánh 2</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Filter Lọc theo Giống cún -->
+        <div class="filter-chips" id="filter-container">
+            <div class="chip active" onclick="filterBreed('ALL', this)"><i class="fa-solid fa-border-all"></i> Tất cả</div>
+        </div>
+
+        <!-- Dog Grid -->
+        <div class="dog-grid" id="dog-grid">
+            <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải danh sách các bé cún dễ thương...</div>
+        </div>
+    </div>
+
+    <!-- Modal Pop-up Hiển thị chi tiết cún -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="detail-card-popup" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModalDirect()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="popup-img-container">
+                <img id="popup-img" src="" alt="Cún cưng">
+            </div>
+            <div class="popup-body">
+                <h2 class="popup-title" id="popup-title">Tên Bạn Cún</h2>
+                <div class="popup-breed" id="popup-breed"><i class="fa-solid fa-shield-dog"></i> Giống cún</div>
+                
+                <div class="popup-info-grid">
+                    <div class="info-box">
+                        <div class="info-box-label"><i class="fa-solid fa-location-dot"></i> Chi nhánh</div>
+                        <div class="info-box-value" id="popup-branch">Chi nhánh 1</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-box-label"><i class="fa-solid fa-clock"></i> Trạng thái</div>
+                        <div class="info-box-value" id="popup-status">Đang chơi</div>
+                    </div>
+                </div>
+
+                <div class="popup-appearance-box" id="popup-appearance-container">
+                    <div class="info-box-label"><i class="fa-solid fa-eye"></i> Ngoại hình</div>
+                    <div class="info-box-value" id="popup-appearance">Lông xù, mặt tròn</div>
+                </div>
+
+                <div class="popup-traits" id="popup-traits">
+                    Mô tả đặc điểm đáng yêu của bạn cún...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script điều khiển Slide Intro -->
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.intro-slide');
+
+        setInterval(() => {
+            if (slides.length > 0) {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+        }, 3000);
+
+        function enterMenu() {
+            const introScreen = document.getElementById('intro-screen');
+            introScreen.classList.add('hide');
+        }
+    </script>
+
+    <!-- Firebase SDK Modular (v10+) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
+            authDomain: "dogs-be72b.firebaseapp.com",
+            databaseURL: "https://dogs-be72b-default-rtdb.firebaseio.com",
+            projectId: "dogs-be72b",
+            storageBucket: "dogs-be72b.firebasestorage.app",
+            messagingSenderId: "1003873040746",
+            appId: "1:1003873040746:web:607f4ff587afc430d3cd13"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dogsRef = ref(db, 'dogs');
+
+        let allDogsData = [];
+        let currentBranch = 'Chi nhánh 1';
+        let currentBreedFilter = 'ALL';
+
+        // DOM Elements
+        const dogGridEl = document.getElementById('dog-grid');
+        const filterContainer = document.getElementById('filter-container');
+        const modalOverlay = document.getElementById('modal-overlay');
+
+        // Fetch Realtime Data
+        onValue(dogsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                dogGridEl.innerHTML = '<div class="empty-state"><i class="fa-solid fa-heart-crack"></i> Hiện chưa có bé cún nào trên hệ thống.</div>';
+                return;
+            }
+
+            allDogsData = Object.keys(data).map(key => ({
+                id: key,
+                ...data[key]
+            }));
+
+            buildBreedFilters();
+            renderDogGrid();
+        });
+
+        // Switch Branch
+        window.switchBranch = (branchName) => {
+            currentBranch = branchName;
+            document.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
+            if(branchName === 'Chi nhánh 1') document.getElementById('tab-branch-1').classList.add('active');
+            else document.getElementById('tab-branch-2').classList.add('active');
+            
+            buildBreedFilters();
+            renderDogGrid();
+        };
+
+        // Filter Breed Chips
+        function buildBreedFilters() {
+            const branchDogs = allDogsData.filter(d => (d.branch || 'Chi nhánh 1') === currentBranch);
+            const breeds = ['ALL', ...new Set(branchDogs.map(d => d.breed).filter(Boolean))];
+
+            filterContainer.innerHTML = breeds.map(b => `
+                <div class="chip ${currentBreedFilter === b ? 'active' : ''}" onclick="filterBreed('${b}', this)">
+                    ${b === 'ALL' ? '<i class="fa-solid fa-border-all"></i> Tất cả' : '<i class="fa-solid fa-paw"></i> ' + b}
+                </div>
+            `).join('');
+        }
+
+        window.filterBreed = (breed, el) => {
+            currentBreedFilter = breed;
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            renderDogGrid();
+        };
+
+        // Render Cards Grid
+        function renderDogGrid() {
+            const filtered = allDogsData.filter(d => {
+                const matchBranch = (d.branch || 'Chi nhánh 1') === currentBranch;
+                const matchBreed = currentBreedFilter === 'ALL' || d.breed === currentBreedFilter;
+                return matchBranch && matchBreed;
+            });
+
+            if (filtered.length === 0) {
+                dogGridEl.innerHTML = '<div class="empty-state"><i class="fa-solid fa-face-smile-wink"></i> Không tìm thấy bạn cún nào ở mục này</div>';
+                return;
+            }
+
+            dogGridEl.innerHTML = filtered.map(dog => {
+                const status = dog.status || 'Đang chơi';
+                const isPlaying = status === 'Đang chơi';
+                const statusClass = isPlaying ? 'playing' : 'resting';
+                const statusIcon = isPlaying ? '<i class="fa-solid fa-gamepad"></i>' : '<i class="fa-solid fa-moon"></i>';
+
+                return `
+                    <div class="dog-card" id="card-${dog.id}" onclick="openDogDetail('${dog.id}')">
+                        <div class="status-badge ${statusClass}">${statusIcon} ${status}</div>
+                        <div class="cute-badge"><i class="fa-solid fa-heart"></i> Cute</div>
+                        <div class="img-wrapper">
+                            <img src="${dog.image || 'https://via.placeholder.com/300?text=Cute+Dog'}" alt="${dog.name}" loading="lazy">
+                        </div>
+                        <div class="dog-card-body">
+                            <div>
+                                <div class="dog-name">${dog.name}</div>
+                                <span class="dog-breed-tag"><i class="fa-solid fa-shield-dog"></i> ${dog.breed}</span>
+                                ${dog.appearance ? `<div class="dog-appearance-text"><i class="fa-solid fa-eye"></i> ${dog.appearance}</div>` : ''}
+                                <p class="dog-traits-text">${dog.traits || 'Thích chụp ảnh, thân thiện và rất quấn người.'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Open Detail Modal with Zoom & Bounce Animation
+        window.openDogDetail = (id) => {
+            const dog = allDogsData.find(d => d.id === id);
+            if (!dog) return;
+
+            document.getElementById('popup-img').src = dog.image || 'https://via.placeholder.com/400?text=Cute+Dog';
+            document.getElementById('popup-title').textContent = dog.name || 'Cún Cưng';
+            document.getElementById('popup-breed').innerHTML = `<i class="fa-solid fa-shield-dog"></i> ${dog.breed || 'Cún cưng'}`;
+            document.getElementById('popup-branch').textContent = dog.branch || 'Chi nhánh 1';
+            document.getElementById('popup-status').textContent = dog.status || 'Đang chơi';
+            
+            const appearanceContainer = document.getElementById('popup-appearance-container');
+            if (dog.appearance) {
+                document.getElementById('popup-appearance').textContent = dog.appearance;
+                appearanceContainer.style.display = 'block';
+            } else {
+                appearanceContainer.style.display = 'none';
+            }
+
+            document.getElementById('popup-traits').textContent = dog.traits || 'Rất thích tương tác, thích được vuốt ve và chụp hình cùng khách.';
+
+            modalOverlay.classList.add('active');
+        };
+
+        window.closeModal = (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        };
+
+        window.closeModalDirect = () => {
+            modalOverlay.classList.remove('active');
+        };
+    </script>
+</body>
+</html>
