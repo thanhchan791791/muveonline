@@ -59,11 +59,12 @@
             justify-content: center;
             padding: 20px;
             overflow: hidden;
-            transition: opacity 0.6s var(--ios-cubic), visibility 0.6s var(--ios-cubic);
+            transition: transform 0.8s var(--ios-cubic), opacity 0.8s var(--ios-cubic), visibility 0.8s var(--ios-cubic);
         }
 
         .intro-screen.hide {
             opacity: 0;
+            transform: translateY(-30px) scale(1.02);
             visibility: hidden;
             pointer-events: none;
         }
@@ -142,6 +143,26 @@
                 opacity: 0.7;
                 box-shadow: 0 8px 20px rgba(255, 71, 126, 0.3);
             }
+        }
+
+        /* --- CẤU TRÚC VÀ HIỆU ỨNG THÀNH PHẦN HIỂN THỊ CHẬM RÃI --- */
+        .header, .filter-chips, .dog-card {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s var(--ios-cubic), transform 0.7s var(--ios-cubic);
+        }
+
+        /* Khi khởi chạy xong intro, gắn class loaded để kích hoạt hiệu ứng xuất hiện */
+        body.loaded .header {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.15s;
+        }
+
+        body.loaded .filter-chips {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.3s;
         }
 
         /* iOS Sticky Top Bar */
@@ -296,8 +317,26 @@
             flex-direction: column;
             position: relative;
             cursor: pointer;
-            transition: transform 0.3s var(--ios-cubic), box-shadow 0.3s var(--ios-cubic);
-            animation: cardAppear 0.4s var(--ios-cubic) forwards;
+            transition: transform 0.3s var(--ios-cubic), box-shadow 0.3s var(--ios-cubic), opacity 0.6s var(--ios-cubic);
+        }
+
+        /* Hiệu ứng xuất hiện chậm rãi từng card một */
+        body.loaded .dog-card {
+            opacity: 1;
+            transform: translateY(0);
+            animation: cardFadeInSmooth 0.7s var(--ios-cubic) forwards;
+            animation-delay: calc(0.4s + (var(--card-index, 0) * 0.08s));
+        }
+
+        @keyframes cardFadeInSmooth {
+            0% {
+                opacity: 0;
+                transform: translateY(35px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .dog-card:active {
@@ -613,12 +652,6 @@
             font-weight: 500;
         }
 
-        /* Animations Dynamic */
-        @keyframes cardAppear {
-            from { opacity: 0; transform: translateY(24px) scale(0.92); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
         @keyframes bounceIn {
             0% { transform: scale(0.7) translateY(40px); opacity: 0; }
             70% { transform: scale(1.03) translateY(-6px); opacity: 1; }
@@ -715,6 +748,8 @@
         function enterMenu() {
             const introScreen = document.getElementById('intro-screen');
             introScreen.classList.add('hide');
+            // Kích hoạt animation xuất hiện từ từ cho giao diện chính
+            document.body.classList.add('loaded');
         }
     </script>
 
@@ -806,14 +841,14 @@
                 return;
             }
 
-            dogGridEl.innerHTML = filtered.map(dog => {
+            dogGridEl.innerHTML = filtered.map((dog, index) => {
                 const status = dog.status || 'Đang chơi';
                 const isPlaying = status === 'Đang chơi';
                 const statusClass = isPlaying ? 'playing' : 'resting';
                 const statusIcon = isPlaying ? '<i class="fa-solid fa-gamepad"></i>' : '<i class="fa-solid fa-moon"></i>';
 
                 return `
-                    <div class="dog-card" id="card-${dog.id}" onclick="openDogDetail('${dog.id}')">
+                    <div class="dog-card" id="card-${dog.id}" style="--card-index: ${index}" onclick="openDogDetail('${dog.id}')">
                         <div class="status-badge ${statusClass}">${statusIcon} ${status}</div>
                         <div class="cute-badge"><i class="fa-solid fa-heart"></i> Cute</div>
                         <div class="img-wrapper">
