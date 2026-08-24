@@ -428,10 +428,10 @@
     <p>Chi nhánh 1 • Cập nhật Realtime</p>
 </div>
 
-<!-- FORM THÊM DANH MỤC VIỆT -->
-<div class="ios-card" id="card-add-cat-vi">
-    <div class="ios-card-title" onclick="toggleForm('card-add-cat-vi')">
-        <span>📂 Thêm Danh Mục (Tiếng Việt)</span>
+<!-- FORM THÊM DANH MỤC -->
+<div class="ios-card" id="card-add-cat">
+    <div class="ios-card-title" onclick="toggleForm('card-add-cat')">
+        <span>📂 Thêm Danh Mục</span>
         <div class="toggle-icon">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </div>
@@ -440,50 +440,28 @@
         <div class="form-grid">
             <div class="input-group full-width">
                 <label>Loại Menu</label>
-                <select id="new-cat-type-vi">
+                <select id="new-cat-type">
                     <option value="drinks">🍹 Nước Uống (Drinks)</option>
                     <option value="food">🍖 Thức Ăn Thú (Pet Food)</option>
                 </select>
             </div>
-            <div class="input-group full-width">
-                <label>Tên Danh Mục (Tiếng Việt)</label>
+            <div class="input-group">
+                <label>Tên Tiếng Việt</label>
                 <input type="text" id="new-cat-vi" placeholder="Ví dụ: Cà Phê">
             </div>
-        </div>
-        <button class="btn btn-primary" onclick="addCategoryLang('vi')">+ Tạo Danh Mục (VI)</button>
-    </div>
-</div>
-
-<!-- FORM THÊM DANH MỤC ANH -->
-<div class="ios-card" id="card-add-cat-en">
-    <div class="ios-card-title" onclick="toggleForm('card-add-cat-en')">
-        <span>🌐 Thêm Danh Mục (Tiếng Anh)</span>
-        <div class="toggle-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        </div>
-    </div>
-    <div class="collapsible-body">
-        <div class="form-grid">
-            <div class="input-group full-width">
-                <label>Loại Menu</label>
-                <select id="new-cat-type-en">
-                    <option value="drinks">🍹 Nước Uống (Drinks)</option>
-                    <option value="food">🍖 Thức Ăn Thú (Pet Food)</option>
-                </select>
-            </div>
-            <div class="input-group full-width">
-                <label>Tên Danh Mục (English)</label>
+            <div class="input-group">
+                <label>Tên Tiếng Anh</label>
                 <input type="text" id="new-cat-en" placeholder="Ví dụ: Coffee">
             </div>
         </div>
-        <button class="btn btn-primary" onclick="addCategoryLang('en')">+ Tạo Danh Mục (EN)</button>
+        <button class="btn btn-primary" onclick="addCategory()">+ Tạo Danh Mục</button>
     </div>
 </div>
 
-<!-- FORM THÊM MÓN VIỆT -->
-<div class="ios-card" id="card-add-item-vi">
-    <div class="ios-card-title" onclick="toggleForm('card-add-item-vi')">
-        <span>✨ Thêm Món Mới (Tiếng Việt)</span>
+<!-- FORM THÊM MÓN -->
+<div class="ios-card" id="card-add-item">
+    <div class="ios-card-title" onclick="toggleForm('card-add-item')">
+        <span>✨ Thêm Món Mới</span>
         <div class="toggle-icon">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </div>
@@ -491,46 +469,27 @@
     <div class="collapsible-body">
         <div class="form-grid">
             <div class="input-group full-width">
-                <label>Danh Mục Tiếp Nhận (VI)</label>
-                <select id="select-cat-target-vi"></select>
+                <label>Danh Mục Tiếp Nhận</label>
+                <select id="select-cat-target"></select>
             </div>
             <div class="input-group">
-                <label>Tên Món (Tiếng Việt)</label>
-                <input type="text" id="new-item-name-vi" placeholder="Ví dụ: Cà phê sữa">
-            </div>
-            <div class="input-group">
-                <label>Giá Bán (VNĐ)</label>
-                <input type="number" id="new-item-price-vi" placeholder="Ví dụ: 35000">
-            </div>
-        </div>
-        <button class="btn btn-primary" onclick="addItemLang('vi')">+ Thêm Món (VI)</button>
-    </div>
-</div>
-
-<!-- FORM THÊM MÓN ANH -->
-<div class="ios-card" id="card-add-item-en">
-    <div class="ios-card-title" onclick="toggleForm('card-add-item-en')">
-        <span>🌍 Thêm Món Mới (Tiếng Anh)</span>
-        <div class="toggle-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        </div>
-    </div>
-    <div class="collapsible-body">
-        <div class="form-grid">
-            <div class="input-group full-width">
-                <label>Danh Mục Tiếp Nhận (EN)</label>
-                <select id="select-cat-target-en"></select>
-            </div>
-            <div class="input-group">
-                <label>Tên Món (English)</label>
-                <input type="text" id="new-item-name-en" placeholder="Ví dụ: Milk Coffee">
+                <label>Mã ID (Unique)</label>
+                <input type="text" id="new-item-id" placeholder="vd: cf_sua">
             </div>
             <div class="input-group">
                 <label>Giá Bán (VNĐ)</label>
-                <input type="number" id="new-item-price-en" placeholder="Ví dụ: 35000">
+                <input type="number" id="new-item-price" placeholder="vd: 35000">
+            </div>
+            <div class="input-group">
+                <label>Tên Món (VI)</label>
+                <input type="text" id="new-item-name-vi" placeholder="Cà phê sữa">
+            </div>
+            <div class="input-group">
+                <label>Tên Món (EN)</label>
+                <input type="text" id="new-item-name-en" placeholder="Milk Coffee">
             </div>
         </div>
-        <button class="btn btn-primary" onclick="addItemLang('en')">+ Thêm Món (EN)</button>
+        <button class="btn btn-primary" onclick="addItem()">+ Thêm Món Vào Menu</button>
     </div>
 </div>
 
@@ -554,19 +513,22 @@
 <div id="edit-modal" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-title">Sửa Thông Tin Món</div>
-        <input type="hidden" id="edit-lang">
         <input type="hidden" id="edit-type">
         <input type="hidden" id="edit-cat-index">
         <input type="hidden" id="edit-item-index">
         
         <div class="form-grid" style="grid-template-columns: 1fr; gap: 12px; margin-bottom: 20px;">
             <div class="input-group">
-                <label id="edit-name-label">Tên Món</label>
-                <input type="text" id="edit-name">
-            </div>
-            <div class="input-group">
                 <label>Giá Tiền (VNĐ)</label>
                 <input type="number" id="edit-price">
+            </div>
+            <div class="input-group">
+                <label>Tên Món (Tiếng Việt)</label>
+                <input type="text" id="edit-name-vi">
+            </div>
+            <div class="input-group">
+                <label>Tên Món (English)</label>
+                <input type="text" id="edit-name-en">
             </div>
         </div>
 
@@ -616,22 +578,20 @@
                 en: { food: val.en?.food || [], drinks: val.en?.drinks || [] }
             };
             renderAdminMenu();
-            renderCategoryDropdowns();
+            renderCategoryDropdown();
         } else {
             document.getElementById('menu-tree-container').innerHTML = '<div class="empty-state">Chưa có dữ liệu menu trên Database.</div>';
         }
     });
 
-    function renderCategoryDropdowns() {
-        ['vi', 'en'].forEach(lang => {
-            const select = document.getElementById(`select-cat-target-${lang}`);
-            select.innerHTML = `<option value="">-- Chọn Danh Mục (${lang.toUpperCase()}) --</option>`;
-            
-            ['drinks', 'food'].forEach(type => {
-                const label = type === 'drinks' ? '🍹 Nước Uống' : '🍖 Thức Ăn Thú';
-                (rawMenuData[lang][type] || []).forEach((cat, idx) => {
-                    select.innerHTML += `<option value="${type}_${idx}">${label} ➔ ${cat.categoryName}</option>`;
-                });
+    function renderCategoryDropdown() {
+        const select = document.getElementById('select-cat-target');
+        select.innerHTML = '<option value="">-- Chọn Danh Mục --</option>';
+        
+        ['drinks', 'food'].forEach(type => {
+            const label = type === 'drinks' ? '🍹 Nước Uống' : '🍖 Thức Ăn Thú';
+            (rawMenuData.vi[type] || []).forEach((cat, idx) => {
+                select.innerHTML += `<option value="${type}_${idx}">${label} ➔ ${cat.categoryName}</option>`;
             });
         });
     }
@@ -642,127 +602,148 @@
         let html = '';
 
         ['drinks', 'food'].forEach(type => {
-            ['vi', 'en'].forEach(lang => {
-                const langLabel = lang === 'vi' ? 'Tiếng Việt' : 'English';
-                const categories = rawMenuData[lang][type] || [];
+            const typeLabel = type === 'drinks' ? '🍹 NƯỚC UỐNG' : '🍖 THỨC ĂN THÚ';
+            const categoriesVI = rawMenuData.vi[type] || [];
+            const categoriesEN = rawMenuData.en[type] || [];
 
-                categories.forEach((cat, cIdx) => {
-                    const drinks = cat.drinks || [];
+            categoriesVI.forEach((catVI, cIdx) => {
+                const catEN = categoriesEN[cIdx] || { categoryName: '' };
+                const drinksVI = catVI.drinks || [];
+                const drinksEN = (catEN.drinks || []);
 
-                    // Lọc món theo từ khóa (không dấu, không cách)
-                    const filteredDrinks = drinks.filter(d => {
-                        const nameNorm = removeAccentsAndSpaces(d.name);
-                        const idNorm = removeAccentsAndSpaces(d.id);
-                        return nameNorm.includes(searchTerm) || idNorm.includes(searchTerm);
+                // Lọc món theo từ khóa (không dấu, không cách)
+                const filteredDrinks = drinksVI.filter(dVI => {
+                    const dEN = drinksEN.find(item => item.id === dVI.id) || { name: '' };
+                    const viNameNorm = removeAccentsAndSpaces(dVI.name);
+                    const enNameNorm = removeAccentsAndSpaces(dEN.name);
+                    const idNorm = removeAccentsAndSpaces(dVI.id);
+
+                    return viNameNorm.includes(searchTerm) || 
+                           enNameNorm.includes(searchTerm) || 
+                           idNorm.includes(searchTerm);
+                });
+
+                // Chỉ hiển thị danh mục nếu có món phù hợp hoặc không tìm kiếm
+                if (filteredDrinks.length > 0 || !searchTerm) {
+                    html += `<div class="cat-group">
+                        <div class="cat-header">
+                            <div>
+                                <span class="cat-title">${catVI.categoryName}</span>
+                                <span class="cat-subtitle">(${catEN.categoryName})</span>
+                            </div>
+                            <button class="btn-action-delete" onclick="deleteCategory('${type}', ${cIdx})">Xóa Mục</button>
+                        </div>
+                        <ul class="item-list">`;
+                    
+                    filteredDrinks.forEach((dVI) => {
+                        const dIdx = drinksVI.findIndex(item => item.id === dVI.id);
+                        const dEN = drinksEN.find(item => item.id === dVI.id) || { name: '' };
+                        html += `<li class="item-row">
+                            <div class="item-info">
+                                <span class="item-name">${dVI.name}</span>
+                                <span class="item-subtext">EN: ${dEN.name || '---'} • ID: ${dVI.id}</span>
+                                <span class="item-price">${dVI.price.toLocaleString('vi-VN')} đ</span>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn-action-edit" onclick="openEditModal('${type}', ${cIdx}, ${dIdx})">Sửa</button>
+                                <button class="btn-action-delete" onclick="deleteItem('${type}', ${cIdx}, '${dVI.id}')">Xóa</button>
+                            </div>
+                        </li>`;
                     });
 
-                    if (filteredDrinks.length > 0 || !searchTerm) {
-                        html += `<div class="cat-group">
-                            <div class="cat-header">
-                                <div>
-                                    <span class="cat-title">${cat.categoryName}</span>
-                                    <span class="cat-subtitle">[${langLabel} • ${type === 'drinks' ? 'Nước' : 'Thức ăn'}]</span>
-                                </div>
-                                <button class="btn-action-delete" onclick="deleteCategory('${lang}', '${type}', ${cIdx})">Xóa Mục</button>
-                            </div>
-                            <ul class="item-list">`;
-                        
-                        filteredDrinks.forEach((d) => {
-                            const dIdx = drinks.findIndex(item => item.id === d.id);
-                            html += `<li class="item-row">
-                                <div class="item-info">
-                                    <span class="item-name">${d.name}</span>
-                                    <span class="item-subtext">ID: ${d.id}</span>
-                                    <span class="item-price">${d.price.toLocaleString('vi-VN')} đ</span>
-                                </div>
-                                <div class="item-actions">
-                                    <button class="btn-action-edit" onclick="openEditModal('${lang}', '${type}', ${cIdx}, ${dIdx})">Sửa</button>
-                                    <button class="btn-action-delete" onclick="deleteItem('${lang}', '${type}', ${cIdx}, '${d.id}')">Xóa</button>
-                                </div>
-                            </li>`;
-                        });
-
-                        if (filteredDrinks.length === 0) {
-                            html += `<li class="empty-state">Chưa có món trong danh mục này</li>`;
-                        }
-
-                        html += `</ul></div>`;
+                    if (filteredDrinks.length === 0) {
+                        html += `<li class="empty-state">Chưa có món trong danh mục này</li>`;
                     }
-                });
+
+                    html += `</ul></div>`;
+                }
             });
         });
 
         container.innerHTML = html || '<div class="empty-state">Không tìm thấy món nào phù hợp.</div>';
     }
 
-    function addCategoryLang(lang) {
-        const type = document.getElementById(`new-cat-type-${lang}`).value;
-        const name = document.getElementById(`new-cat-${lang}`).value.trim();
+    function addCategory() {
+        const type = document.getElementById('new-cat-type').value;
+        const nameVI = document.getElementById('new-cat-vi').value.trim();
+        const nameEN = document.getElementById('new-cat-en').value.trim();
 
-        if (!name) return alert('Vui lòng nhập tên Danh mục!');
+        if (!nameVI || !nameEN) return alert('Vui lòng nhập đủ tên Danh mục Tiếng Việt và Tiếng Anh!');
 
-        if (!rawMenuData[lang][type]) rawMenuData[lang][type] = [];
+        if (!rawMenuData.vi[type]) rawMenuData.vi[type] = [];
+        if (!rawMenuData.en[type]) rawMenuData.en[type] = [];
 
-        rawMenuData[lang][type].push({ categoryName: name, drinks: [] });
+        rawMenuData.vi[type].push({ categoryName: nameVI, drinks: [] });
+        rawMenuData.en[type].push({ categoryName: nameEN, drinks: [] });
 
         saveToFirebase(() => {
-            document.getElementById(`new-cat-${lang}`).value = '';
-            document.getElementById(`card-add-cat-${lang}`).classList.remove('active');
+            document.getElementById('new-cat-vi').value = '';
+            document.getElementById('new-cat-en').value = '';
+            document.getElementById('card-add-cat').classList.remove('active');
         });
     }
 
-    function deleteCategory(lang, type, catIndex) {
+    function deleteCategory(type, catIndex) {
         if (!confirm('Xóa danh mục này sẽ xóa tất cả món bên trong. Bạn chắc chắn chứ?')) return;
         
-        rawMenuData[lang][type].splice(catIndex, 1);
+        rawMenuData.vi[type].splice(catIndex, 1);
+        rawMenuData.en[type].splice(catIndex, 1);
 
         saveToFirebase();
     }
 
-    function addItemLang(lang) {
-        const targetVal = document.getElementById(`select-cat-target-${lang}`).value;
-        const price = parseInt(document.getElementById(`new-item-price-${lang}`).value);
-        const name = document.getElementById(`new-item-name-${lang}`).value.trim();
+    function addItem() {
+        const targetVal = document.getElementById('select-cat-target').value;
+        const id = document.getElementById('new-item-id').value.trim().toLowerCase().replace(/\s+/g, '_');
+        const price = parseInt(document.getElementById('new-item-price').value);
+        const nameVI = document.getElementById('new-item-name-vi').value.trim();
+        const nameEN = document.getElementById('new-item-name-en').value.trim();
 
         if (!targetVal) return alert('Vui lòng chọn Danh mục!');
-        if (isNaN(price) || !name) return alert('Vui lòng điền đầy đủ thông tin tên món và giá bán!');
+        if (!id || isNaN(price) || !nameVI || !nameEN) return alert('Vui lòng điền đầy đủ các trường thông tin!');
 
         const [type, catIdxStr] = targetVal.split('_');
         const catIdx = parseInt(catIdxStr);
 
-        // Tự động sinh mã ID bằng timestamp hệ thống
-        const id = 'item_' + Date.now();
+        if (!rawMenuData.vi[type][catIdx].drinks) rawMenuData.vi[type][catIdx].drinks = [];
+        if (!rawMenuData.en[type][catIdx].drinks) rawMenuData.en[type][catIdx].drinks = [];
 
-        if (!rawMenuData[lang][type][catIdx].drinks) rawMenuData[lang][type][catIdx].drinks = [];
+        if (rawMenuData.vi[type][catIdx].drinks.some(d => d.id === id)) {
+            return alert('Mã ID này đã được sử dụng!');
+        }
 
-        rawMenuData[lang][type][catIdx].drinks.push({ id, name, price });
+        rawMenuData.vi[type][catIdx].drinks.push({ id, name: nameVI, price });
+        rawMenuData.en[type][catIdx].drinks.push({ id, name: nameEN, price });
 
         saveToFirebase(() => {
-            document.getElementById(`new-item-price-${lang}`).value = '';
-            document.getElementById(`new-item-name-${lang}`).value = '';
-            document.getElementById(`card-add-item-${lang}`).classList.remove('active');
+            document.getElementById('new-item-id').value = '';
+            document.getElementById('new-item-price').value = '';
+            document.getElementById('new-item-name-vi').value = '';
+            document.getElementById('new-item-name-en').value = '';
+            document.getElementById('card-add-item').classList.remove('active');
         });
     }
 
-    function deleteItem(lang, type, catIdx, itemId) {
+    function deleteItem(type, catIdx, itemId) {
         if (!confirm('Xác nhận xóa món này?')) return;
 
-        rawMenuData[lang][type][catIdx].drinks = rawMenuData[lang][type][catIdx].drinks.filter(d => d.id !== itemId);
+        rawMenuData.vi[type][catIdx].drinks = rawMenuData.vi[type][catIdx].drinks.filter(d => d.id !== itemId);
+        rawMenuData.en[type][catIdx].drinks = rawMenuData.en[type][catIdx].drinks.filter(d => d.id !== itemId);
 
         saveToFirebase();
     }
 
-    function openEditModal(lang, type, catIdx, itemIdx) {
-        const item = rawMenuData[lang][type][catIdx].drinks[itemIdx];
+    function openEditModal(type, catIdx, itemIdx) {
+        const itemVI = rawMenuData.vi[type][catIdx].drinks[itemIdx];
+        const itemEN = rawMenuData.en[type][catIdx].drinks.find(d => d.id === itemVI.id) || { name: '' };
 
-        document.getElementById('edit-lang').value = lang;
         document.getElementById('edit-type').value = type;
         document.getElementById('edit-cat-index').value = catIdx;
         document.getElementById('edit-item-index').value = itemIdx;
         
-        document.getElementById('edit-name-label').innerText = `Tên Món (${lang.toUpperCase()})`;
-        document.getElementById('edit-price').value = item.price;
-        document.getElementById('edit-name').value = item.name;
+        document.getElementById('edit-price').value = itemVI.price;
+        document.getElementById('edit-name-vi').value = itemVI.name;
+        document.getElementById('edit-name-en').value = itemEN.name;
 
         document.getElementById('edit-modal').classList.add('active');
     }
@@ -772,19 +753,26 @@
     }
 
     function saveItemEdit() {
-        const lang = document.getElementById('edit-lang').value;
         const type = document.getElementById('edit-type').value;
         const catIdx = parseInt(document.getElementById('edit-cat-index').value);
         const itemIdx = parseInt(document.getElementById('edit-item-index').value);
 
         const newPrice = parseInt(document.getElementById('edit-price').value);
-        const newName = document.getElementById('edit-name').value.trim();
+        const newNameVI = document.getElementById('edit-name-vi').value.trim();
+        const newNameEN = document.getElementById('edit-name-en').value.trim();
 
-        if (isNaN(newPrice) || !newName) return alert('Vui lòng nhập đầy đủ thông tin!');
+        if (isNaN(newPrice) || !newNameVI || !newNameEN) return alert('Vui lòng nhập đầy đủ thông tin!');
 
-        const target = rawMenuData[lang][type][catIdx].drinks[itemIdx];
-        target.name = newName;
-        target.price = newPrice;
+        const targetVI = rawMenuData.vi[type][catIdx].drinks[itemIdx];
+        const targetEN = rawMenuData.en[type][catIdx].drinks.find(d => d.id === targetVI.id);
+
+        targetVI.name = newNameVI;
+        targetVI.price = newPrice;
+
+        if (targetEN) {
+            targetEN.name = newNameEN;
+            targetEN.price = newPrice;
+        }
 
         saveToFirebase(() => {
             closeEditModal();
