@@ -146,7 +146,7 @@
         }
 
         /* --- CẤU TRÚC VÀ HIỆU ỨNG THÀNH PHẦN HIỂN THỊ CHẬM RÃI --- */
-        .header, .filter-chips, .dog-card {
+        .header, .filter-chips, .dog-card, .wheel-trigger-btn {
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.7s var(--ios-cubic), transform 0.7s var(--ios-cubic);
@@ -163,6 +163,12 @@
             opacity: 1;
             transform: translateY(0);
             transition-delay: 0.3s;
+        }
+
+        body.loaded .wheel-trigger-btn {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.35s;
         }
 
         /* iOS Sticky Top Bar */
@@ -296,6 +302,61 @@
             color: #ffffff;
             border-color: transparent;
             box-shadow: 0 4px 12px rgba(255, 71, 126, 0.25);
+        }
+
+        /* Lucky Wheel Trigger Button */
+        .wheel-trigger-btn {
+            width: 100%;
+            margin-bottom: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #ff477e 0%, #ff70a6 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 22px;
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 71, 126, 0.35);
+            transition: all 0.3s var(--ios-cubic);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wheel-trigger-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(30deg);
+            animation: shineBtn 3s infinite linear;
+        }
+
+        @keyframes shineBtn {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            20% { transform: translateX(100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+
+        .wheel-trigger-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 4px 15px rgba(255, 71, 126, 0.25);
+        }
+
+        .wheel-trigger-btn i {
+            font-size: 20px;
+            animation: spinIcon 8s infinite linear;
+        }
+
+        @keyframes spinIcon {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Dog Grid Cards */
@@ -657,6 +718,221 @@
             70% { transform: scale(1.03) translateY(-6px); opacity: 1; }
             100% { transform: scale(1) translateY(0); }
         }
+
+        /* --- STYLES VÒNG QUAY MAY MẮN (LUCKY WHEEL MODAL TO FULL MÀN HÌNH) --- */
+        .wheel-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s var(--ios-cubic), visibility 0.4s var(--ios-cubic);
+        }
+
+        .wheel-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .wheel-popup {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 36px;
+            border: 1.5px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 30px 60px rgba(255, 71, 126, 0.3), 0 0 40px rgba(0, 0, 0, 0.2);
+            padding: 20px 12px 24px 12px;
+            text-align: center;
+            position: relative;
+            transform: translateY(100vh) scale(0.8);
+            transition: transform 0.5s var(--ios-cubic);
+        }
+
+        .wheel-overlay.active .wheel-popup {
+            transform: translateY(0) scale(1);
+        }
+
+        .wheel-header {
+            margin-bottom: 12px;
+        }
+
+        .wheel-title {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff477e 0%, #ff70a6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .wheel-sub {
+            font-size: 13px;
+            color: var(--text-sub);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Canvas Wheel Container - Mở rộng kích thước tối đa */
+        .wheel-container {
+            position: relative;
+            width: 370px;
+            height: 370px;
+            max-width: 92vw;
+            max-height: 92vw;
+            margin: 0 auto 16px auto;
+            border-radius: 50%;
+            box-shadow: 0 10px 35px rgba(255, 71, 126, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+            padding: 6px;
+            border: 5px solid #ff477e;
+        }
+
+        /* Pin/Pointer ở đỉnh vòng quay */
+        .wheel-pointer {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 34px;
+            height: 40px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+
+        .wheel-pointer::before {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            border-left: 17px solid transparent;
+            border-right: 17px solid transparent;
+            border-top: 34px solid #ff477e;
+        }
+
+        .wheel-pointer::after {
+            content: '★';
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        canvas#wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .spin-btn {
+            background: linear-gradient(135deg, #ff477e 0%, #ff70a6 100%);
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 71, 126, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spin-btn:active {
+            transform: scale(0.95);
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Result Popup inside Wheel Modal */
+        .result-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            width: 85%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--primary);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s var(--ios-cubic);
+            z-index: 20;
+        }
+
+        .result-box.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .result-img-wrap {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            margin: 0 auto 12px auto;
+            border: 4px solid var(--primary);
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(255, 71, 126, 0.3);
+        }
+
+        .result-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .result-title {
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .result-name {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--text-main);
+            margin: 2px 0 10px 0;
+        }
+
+        /* Confetti Effect Canvas */
+        #confettiCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+        }
     </style>
 </head>
 <body>
@@ -687,6 +963,11 @@
     </div>
 
     <div class="container">
+        <!-- Nút Vòng Quay May Mắn -->
+        <button class="wheel-trigger-btn" onclick="openWheelModal()">
+            <i class="fa-solid fa-dharmachakra"></i> Vòng Quay Chọn "Đào" Ngẫu Nhiên
+        </button>
+
         <!-- Filter Lọc theo Giống cún -->
         <div class="filter-chips" id="filter-container">
             <div class="chip active" onclick="filterBreed('ALL', this)"><i class="fa-solid fa-border-all"></i> Tất cả</div>
@@ -695,6 +976,41 @@
         <!-- Dog Grid -->
         <div class="dog-grid" id="dog-grid">
             <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải danh sách các bé cún dễ thương...</div>
+        </div>
+    </div>
+
+    <!-- Modal Vòng Quay May Mắn -->
+    <div class="wheel-overlay" id="wheel-overlay" onclick="closeWheelModal(event)">
+        <div class="wheel-popup" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeWheelModalDirect()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="wheel-header">
+                <div class="wheel-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Vòng Quay May Mắn</div>
+                <div class="wheel-sub">Quay ngẫu nhiên chọn 1 bé cún đang chơi!</div>
+            </div>
+
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div>
+                <!-- Canvas kích thước thực 800x800 cho chất lượng hiển thị cực nét -->
+                <canvas id="wheelCanvas" width="800" height="800"></canvas>
+            </div>
+
+            <button class="spin-btn" id="spin-btn" onclick="spinWheel()">
+                <i class="fa-solid fa-play"></i> QUAY NGAY
+            </button>
+
+            <!-- Result Box Popup -->
+            <div class="result-box" id="result-box">
+                <div class="result-img-wrap">
+                    <img id="result-img" src="" alt="Cún cưng">
+                </div>
+                <div class="result-title">★ Chúc mừng bạn đã chọn được ★</div>
+                <div class="result-name" id="result-name">Tên Bạn Cún</div>
+                <button class="spin-btn" style="padding: 10px 24px; font-size: 14px;" onclick="viewWinnerDetail()">
+                    <i class="fa-solid fa-heart"></i> Xem Chi Tiết
+                </button>
+            </div>
+
+            <canvas id="confettiCanvas"></canvas>
         </div>
     </div>
 
@@ -775,6 +1091,13 @@
         let allDogsData = [];
         let currentBranch = 'Chi nhánh 1';
         let currentBreedFilter = 'ALL';
+        let playingDogsList = [];
+
+        // Wheel State Variables
+        let startAngle = 0;
+        let isSpinning = false;
+        let loadedImages = {};
+        let winningDog = null;
 
         // DOM Elements
         const dogGridEl = document.getElementById('dog-grid');
@@ -796,6 +1119,7 @@
 
             buildBreedFilters();
             renderDogGrid();
+            updatePlayingDogs();
         });
 
         // Switch Branch
@@ -807,6 +1131,7 @@
             
             buildBreedFilters();
             renderDogGrid();
+            updatePlayingDogs();
         };
 
         // Filter Breed Chips
@@ -900,6 +1225,261 @@
         window.closeModalDirect = () => {
             modalOverlay.classList.remove('active');
         };
+
+        /* --- VÒNG QUAY MAY MẮN LOGIC --- */
+        function updatePlayingDogs() {
+            // Lọc danh sách bé cún đang chơi thuộc chi nhánh chọn
+            playingDogsList = allDogsData.filter(d => {
+                const matchBranch = (d.branch || 'Chi nhánh 1') === currentBranch;
+                const isPlaying = (d.status || 'Đang chơi') === 'Đang chơi';
+                return matchBranch && isPlaying;
+            });
+
+            // Preload ảnh để vẽ lên vòng quay mượt mà
+            loadedImages = {};
+            playingDogsList.forEach(dog => {
+                if (dog.image) {
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    img.src = dog.image;
+                    img.onload = () => {
+                        loadedImages[dog.id] = img;
+                        drawWheel();
+                    };
+                }
+            });
+
+            drawWheel();
+        }
+
+        window.openWheelModal = () => {
+            document.getElementById('wheel-overlay').classList.add('active');
+            document.getElementById('result-box').classList.remove('show');
+            updatePlayingDogs();
+        };
+
+        window.closeWheelModal = (e) => {
+            if (e.target === document.getElementById('wheel-overlay') && !isSpinning) {
+                document.getElementById('wheel-overlay').classList.remove('active');
+            }
+        };
+
+        window.closeWheelModalDirect = () => {
+            if (!isSpinning) {
+                document.getElementById('wheel-overlay').classList.remove('active');
+            }
+        };
+
+        const colors = ['#ff477e', '#ff70a6', '#ff85a1', '#fbb1bd', '#f7cad0', '#ff99ac', '#ff5c8a'];
+
+        function drawWheel() {
+            const canvas = document.getElementById('wheelCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const numSegments = playingDogsList.length;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (numSegments === 0) {
+                ctx.fillStyle = '#ff477e';
+                ctx.font = 'bold 32px "Plus Jakarta Sans"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Không có bé nào đang chơi', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            const sliceAngle = (2 * Math.PI) / numSegments;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2;
+
+            for (let i = 0; i < numSegments; i++) {
+                const angle = startAngle + i * sliceAngle;
+
+                // Draw Slice
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, angle, angle + sliceAngle);
+                ctx.closePath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+
+                // Draw Dog Image & Text
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle + sliceAngle / 2);
+
+                const dog = playingDogsList[i];
+                const imgObj = loadedImages[dog.id];
+
+                if (imgObj && imgObj.complete) {
+                    ctx.save();
+                    ctx.beginPath();
+                    // Nâng bán kính hình tròn chứa ảnh cún lên 72px (đường kính 144px) siêu to
+                    const imgRadius = 72;
+                    // Đặt tọa độ tâm ảnh ra phía ngoài để tận dụng không gian rộng nhất
+                    const imgCenterX = radius * 0.58; 
+                    
+                    ctx.arc(imgCenterX, 0, imgRadius, 0, Math.PI * 2);
+                    ctx.closePath();
+                    ctx.clip();
+                    ctx.drawImage(imgObj, imgCenterX - imgRadius, -imgRadius, imgRadius * 2, imgRadius * 2);
+                    ctx.restore();
+
+                    // Viền trắng bao quanh ảnh cún
+                    ctx.beginPath();
+                    ctx.arc(imgCenterX, 0, imgRadius, 0, Math.PI * 2);
+                    ctx.lineWidth = 5;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.stroke();
+                }
+
+                // Text Tên Cún
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 24px "Plus Jakarta Sans"';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 6;
+                ctx.fillText(dog.name || '', radius * 0.35, 0);
+
+                ctx.restore();
+            }
+
+            // Draw Center Cap
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 32, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = '#ff477e';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 14, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff477e';
+            ctx.fill();
+        }
+
+        window.spinWheel = () => {
+            if (isSpinning || playingDogsList.length === 0) return;
+            isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('result-box').classList.remove('show');
+
+            const numSegments = playingDogsList.length;
+            const winnerIndex = Math.floor(Math.random() * numSegments);
+            winningDog = playingDogsList[winnerIndex];
+
+            const sliceAngle = (2 * Math.PI) / numSegments;
+            // Align target angle so the pointer (-Math.PI/2) points to winner segment center
+            const targetSliceCenterAngle = winnerIndex * sliceAngle + sliceAngle / 2;
+            const desiredStartAngle = -Math.PI / 2 - targetSliceCenterAngle;
+
+            const extraRotations = (5 + Math.floor(Math.random() * 4)) * 2 * Math.PI;
+            const currentStartNormalized = startAngle % (2 * Math.PI);
+            const targetAngle = startAngle + extraRotations + (desiredStartAngle - currentStartNormalized);
+
+            const duration = 4500;
+            const startTime = performance.now();
+            const initialAngle = startAngle;
+
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                if (elapsed < duration) {
+                    const t = elapsed / duration;
+                    // Ease out cubic
+                    const easeOut = 1 - Math.pow(1 - t, 3);
+                    startAngle = initialAngle + (targetAngle - initialAngle) * easeOut;
+                    drawWheel();
+                    requestAnimationFrame(animate);
+                } else {
+                    startAngle = targetAngle;
+                    drawWheel();
+                    isSpinning = false;
+                    document.getElementById('spin-btn').disabled = false;
+                    showResult(winningDog);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        };
+
+        function showResult(dog) {
+            document.getElementById('result-img').src = dog.image || 'https://via.placeholder.com/300?text=Cute+Dog';
+            document.getElementById('result-name').textContent = dog.name;
+            document.getElementById('result-box').classList.add('show');
+            launchConfetti();
+        }
+
+        window.viewWinnerDetail = () => {
+            document.getElementById('wheel-overlay').classList.remove('active');
+            if (winningDog) {
+                window.openDogDetail(winningDog.id);
+            }
+        };
+
+        // Confetti Animation
+        function launchConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            const particles = [];
+            const particleCount = 60;
+            const confettiColors = ['#ff477e', '#ff70a6', '#ffd166', '#06d6a0', '#118ab2', '#ffffff'];
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.8) * 12,
+                    size: Math.random() * 8 + 4,
+                    color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+                    rotation: Math.random() * 360,
+                    rSpeed: (Math.random() - 0.5) * 10
+                });
+            }
+
+            let animationFrame;
+            const startTime = performance.now();
+
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.3; // Gravity
+                    p.rotation += p.rSpeed;
+
+                    if (p.y < canvas.height) alive = true;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                if (alive && performance.now() - startTime < 3000) {
+                    animationFrame = requestAnimationFrame(render);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            render();
+        }
     </script>
 </body>
 </html>
