@@ -580,7 +580,7 @@
 
         function selectImageAndStart(src) {
             if (checkDailyLimit()) {
-                showAlert('Hết Lượt Chơi!', 'Mỗi thiết bị chỉ được chơi 1 lần mỗi ngày. Hãy quay lại vào ngày mai nhé!', false);
+                showAlert('Hết Lượt Chơi!', 'Bạn đã hoàn thành 1 bức ảnh hôm nay rồi. Mỗi máy chỉ được chiến thắng 1 lần mỗi ngày, hãy quay lại vào ngày mai nhé!', false);
                 return;
             }
 
@@ -589,7 +589,6 @@
             document.getElementById('game-screen').classList.remove('hidden');
             previewImg.src = src;
             
-            markPlayedToday();
             startShuffleAndPlay();
         }
 
@@ -664,7 +663,7 @@
                 if (timeRemaining <= 0) {
                     stopTimer();
                     isGameActive = false;
-                    showAlert('Thất Bại!', 'Rất tiếc! Đã hết thời gian 10 phút mất rồi.', false);
+                    showAlert('Thất Bại!', 'Rất tiếc! Đã hết thời gian 10 phút mất rồi. Bạn hãy thử lại nhé!', false);
                 }
             }, 1000);
         }
@@ -772,6 +771,7 @@
             if (isWin) {
                 isGameActive = false;
                 stopTimer();
+                markPlayedToday(); // Chỉ khóa lượt chơi sau khi đã xếp THÀNH CÔNG!
                 const timeSpentSeconds = GAME_DURATION - timeRemaining;
                 const mins = Math.floor(timeSpentSeconds / 60);
                 const secs = timeSpentSeconds % 60;
