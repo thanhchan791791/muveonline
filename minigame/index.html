@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sweet Pink Puzzle 25 Mảnh</title>
-    <!-- Lucide Icons Library -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -425,7 +424,6 @@
     </div>
 
     <div class="container">
-        <!-- Screen 1: Choose Image -->
         <div id="selection-screen" class="selection-screen">
             <div class="category-tabs">
                 <button class="cat-tab active" onclick="switchCategory('cat')">
@@ -439,16 +437,14 @@
             <div id="image-grid" class="image-grid"></div>
         </div>
 
-        <!-- Screen 2: Game Board -->
         <div id="game-screen" class="selection-screen hidden">
-            <!-- Stats -->
             <div class="stats-card">
                 <div class="stat-item">
                     <div class="stat-header">
                         <i data-lucide="clock" size="14"></i>
                         <span>Còn Lại</span>
                     </div>
-                    <span class="stat-value" id="timer">15:00</span>
+                    <span class="stat-value" id="timer">10:00</span>
                 </div>
                 <div style="width: 2px; height: 28px; background: #ffe1e8; border-radius: 2px;"></div>
                 <div class="stat-item">
@@ -460,7 +456,6 @@
                 </div>
             </div>
 
-            <!-- Buttons -->
             <div class="controls">
                 <button class="cute-btn cute-btn-secondary" onclick="showSelectionScreen()">
                     <i data-lucide="arrow-left" size="18"></i>
@@ -468,27 +463,24 @@
                 </button>
                 
                 <button class="cute-btn" id="start-btn" onclick="startShuffleAndPlay()">
-                    <i data-lucide="play" size="18"></i>
-                    <span>Bắt Đầu Xếp</span>
+                    <i data-lucide="rotate-cw" size="18"></i>
+                    <span>Xáo Trộn Lại</span>
                 </button>
             </div>
 
-            <!-- Preview Card -->
             <div class="preview-card">
                 <img id="preview-img" src="" alt="Ảnh mẫu">
                 <div class="preview-info">
-                    <span class="preview-title" id="preview-title">Ảnh Mẫu Hoàn Chỉnh</span>
-                    <span class="preview-desc" id="preview-desc">Bấm "Bắt Đầu Xếp" để xáo trộn mảnh ghép</span>
+                    <span class="preview-title" id="preview-title">Bức Ảnh Mẫu</span>
+                    <span class="preview-desc" id="preview-desc">Kéo 25 mảnh ghép bên dưới vào khung</span>
                 </div>
             </div>
 
-            <!-- Board -->
             <span class="section-title">
                 <i data-lucide="grid" size="14"></i> Khung Xếp Hình (5x5)
             </span>
             <div id="board"></div>
 
-            <!-- Pieces Pool -->
             <span class="section-title">
                 <i data-lucide="shapes" size="14"></i> Kho Mảnh Ghép
             </span>
@@ -496,7 +488,6 @@
         </div>
     </div>
 
-    <!-- Cute Alert -->
     <div id="cute-alert">
         <div class="alert-box">
             <div class="alert-icon-wrapper" id="alert-icon">
@@ -512,7 +503,7 @@
         const COLS = 5;
         const ROWS = 5;
         const TOTAL_PIECES = COLS * ROWS;
-        const GAME_DURATION = 15 * 60; // 15 phút tính theo giây
+        const GAME_DURATION = 10 * 60; // 10 phút tính theo giây
 
         const catImages = [
             { id: 1, src: 'img1.jpg', title: 'Mèo 1' },
@@ -546,6 +537,17 @@
 
         let boardWidth, boardHeight, pieceWidth, pieceHeight;
 
+        function checkDailyLimit() {
+            const today = new Date().toDateString();
+            const lastPlayed = localStorage.getItem('puzzle_last_play_date');
+            return lastPlayed === today;
+        }
+
+        function markPlayedToday() {
+            const today = new Date().toDateString();
+            localStorage.setItem('puzzle_last_play_date', today);
+        }
+
         function switchCategory(category) {
             currentCategory = category;
             const tabs = document.querySelectorAll('.cat-tab');
@@ -577,10 +579,18 @@
         }
 
         function selectImageAndStart(src) {
+            if (checkDailyLimit()) {
+                showAlert('Hết Lượt Chơi!', 'Mỗi thiết bị chỉ được chơi 1 lần mỗi ngày. Hãy quay lại vào ngày mai nhé!', false);
+                return;
+            }
+
             currentImageSrc = src;
             document.getElementById('selection-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
-            showPreviewBoard(src);
+            previewImg.src = src;
+            
+            markPlayedToday();
+            startShuffleAndPlay();
         }
 
         function updateDimensions() {
@@ -595,48 +605,6 @@
             renderPiecesSizes();
         });
 
-        /* Bước 1: Hiển thị hình hoàn chỉnh đúng vị trí cho khách hình dung */
-        function showPreviewBoard(src) {
-            stopTimer();
-            isGameActive = false;
-            board.innerHTML = '';
-            piecesPool.innerHTML = '';
-            previewImg.src = src;
-            moveCount = 0;
-            movesElement.innerText = moveCount;
-            timerElement.innerText = "15:00";
-
-            document.getElementById('preview-title').innerText = "Hình Mẫu Ban Đầu";
-            document.getElementById('preview-desc').innerText = "Xem kĩ hình rồi nhấn 'Bắt Đầu Xếp' nhé!";
-            
-            const startBtn = document.getElementById('start-btn');
-            startBtn.innerHTML = `<i data-lucide="play" size="18"></i><span>Bắt Đầu Xếp</span>`;
-
-            updateDimensions();
-
-            for (let i = 0; i < TOTAL_PIECES; i++) {
-                const zone = document.createElement('div');
-                zone.classList.add('drop-zone');
-                zone.dataset.index = i;
-
-                const piece = document.createElement('div');
-                piece.classList.add('piece');
-                piece.dataset.correctIndex = i;
-
-                const row = Math.floor(i / ROWS);
-                const col = i % COLS;
-
-                piece.dataset.row = row;
-                piece.dataset.col = col;
-
-                setupPieceStyle(piece, row, col);
-                zone.appendChild(piece);
-                board.appendChild(zone);
-            }
-            lucide.createIcons();
-        }
-
-        /* Bước 2: Khi bấm 'Bắt Đầu Xếp' -> Xáo trộn mảnh ghép vào kho và tính giờ */
         function startShuffleAndPlay() {
             board.innerHTML = '';
             piecesPool.innerHTML = '';
@@ -696,7 +664,7 @@
                 if (timeRemaining <= 0) {
                     stopTimer();
                     isGameActive = false;
-                    showAlert('Thất Bại!', 'Rất tiếc! Đã hết thời gian 15 phút mất rồi.', false);
+                    showAlert('Thất Bại!', 'Rất tiếc! Đã hết thời gian 10 phút mất rồi.', false);
                 }
             }, 1000);
         }
