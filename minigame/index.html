@@ -37,12 +37,13 @@
             user-select: none;
             -webkit-user-select: none;
             overflow-x: hidden;
+            touch-action: manipulation;
         }
 
         /* Header Cute */
         .pink-header {
             width: 100%;
-            padding: 16px 20px;
+            padding: 12px 20px;
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -53,7 +54,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
+        }
+
+        .header-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffe1e8;
+            box-shadow: 0 2px 6px rgba(255, 117, 140, 0.2);
         }
 
         .pink-header h1 {
@@ -287,16 +297,17 @@
             border-radius: 6px;
             box-shadow: 0 4px 8px rgba(180, 120, 150, 0.2);
             touch-action: none;
-            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 1px solid rgba(255, 255, 255, 0.8);
             background-repeat: no-repeat;
+            will-change: transform;
         }
 
         .piece.dragging {
             opacity: 0.9;
-            transform: scale(1.12);
             z-index: 1000 !important;
             position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
             pointer-events: none;
             box-shadow: 0 10px 20px rgba(255, 117, 140, 0.4);
         }
@@ -381,6 +392,7 @@
 <body>
 
     <div class="pink-header">
+        <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
         <i data-lucide="sparkles"></i>
         <h1>Sweet Puzzle 30 Mảnh</h1>
     </div>
@@ -527,6 +539,7 @@
         function showSelectionScreen() {
             stopTimer();
             isGameActive = false;
+            resetActivePiece();
             document.getElementById('selection-screen').classList.remove('hidden');
             document.getElementById('game-screen').classList.add('hidden');
         }
@@ -557,6 +570,7 @@
         });
 
         function startShuffleAndPlay() {
+            resetActivePiece();
             board.innerHTML = '';
             piecesPool.innerHTML = '';
             moveCount = 0;
@@ -649,11 +663,23 @@
         let activePiece = null;
         let touchOffsetX = 0, touchOffsetY = 0;
 
+        function resetActivePiece() {
+            if (activePiece) {
+                activePiece.classList.remove('dragging');
+                activePiece.style.transform = '';
+                activePiece.style.left = '';
+                activePiece.style.top = '';
+                activePiece = null;
+            }
+        }
+
         function addTouchAndDragEvents(piece) {
-            piece.addEventListener('touchstart', e => {
+            const onStart = (e) => {
                 if (!isGameActive) return;
+                resetActivePiece();
                 activePiece = piece;
-                const touch = e.touches[0];
+                
+                const touch = e.touches ? e.touches[0] : e;
                 const rect = piece.getBoundingClientRect();
                 
                 touchOffsetX = touch.clientX - rect.left;
@@ -661,19 +687,21 @@
 
                 piece.classList.add('dragging');
                 moveAt(touch.clientX, touch.clientY);
-            }, { passive: false });
+            };
 
-            piece.addEventListener('touchmove', e => {
-                if (!activePiece) return;
-                e.preventDefault();
-                const touch = e.touches[0];
+            const onMove = (e) => {
+                if (!activePiece || activePiece !== piece) return;
+                if (e.cancelable) e.preventDefault();
+                const touch = e.touches ? e.touches[0] : e;
                 moveAt(touch.clientX, touch.clientY);
-            }, { passive: false });
+            };
 
-            piece.addEventListener('touchend', e => {
-                if (!activePiece) return;
-                const touch = e.changedTouches[0];
+            const onEnd = (e) => {
+                if (!activePiece || activePiece !== piece) return;
+                const touch = e.changedTouches ? e.changedTouches[0] : e;
+                
                 piece.classList.remove('dragging');
+                piece.style.transform = '';
                 piece.style.left = '';
                 piece.style.top = '';
 
@@ -681,13 +709,27 @@
                 handlePieceDrop(piece, elemBelow);
 
                 activePiece = null;
-            });
+            };
+
+            piece.addEventListener('touchstart', onStart, { passive: false });
+            piece.addEventListener('touchmove', onMove, { passive: false });
+            piece.addEventListener('touchend', onEnd);
+            piece.addEventListener('touchcancel', onEnd);
         }
+
+        // Tự dọn dẹp mảnh treo nếu ứng dụng mất tập trung/chuyển tab
+        window.addEventListener('blur', resetActivePiece);
+        window.addEventListener('touchend', (e) => {
+            if (activePiece && e.touches.length === 0) {
+                resetActivePiece();
+            }
+        });
 
         function moveAt(pageX, pageY) {
             if (!activePiece) return;
-            activePiece.style.left = `${pageX - touchOffsetX}px`;
-            activePiece.style.top = `${pageY - touchOffsetY}px`;
+            const x = pageX - touchOffsetX;
+            const y = pageY - touchOffsetY;
+            activePiece.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.12)`;
         }
 
         function handlePieceDrop(piece, targetElem) {
@@ -720,7 +762,7 @@
             if (isWin) {
                 isGameActive = false;
                 stopTimer();
-                markPlayedToday(); // Chỉ khóa lượt chơi sau khi đã xếp THÀNH CÔNG!
+                markPlayedToday();
                 const timeSpentSeconds = GAME_DURATION - timeRemaining;
                 const mins = Math.floor(timeSpentSeconds / 60);
                 const secs = timeSpentSeconds % 60;
