@@ -53,6 +53,87 @@
             position: relative;
         }
 
+        /* Màn hình Chọn Chi Nhánh */
+        .branch-selector-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #FFF5F5 0%, #E6E6FA 100%);
+            border-radius: 32px;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .branch-selector-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .branch-logo {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            border-radius: 50%;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 20px rgba(255, 107, 139, 0.2);
+        }
+
+        .branch-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--pink-accent);
+            margin-bottom: 6px;
+        }
+
+        .branch-subtitle {
+            font-size: 15px;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .branch-buttons {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .btn-branch {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 20px;
+            border: 2px solid var(--pink-main);
+            background: white;
+            color: var(--pink-accent);
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.3);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-branch:hover, .btn-branch:active {
+            background: var(--pink-accent);
+            color: white;
+            border-color: var(--pink-accent);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(255, 107, 139, 0.4);
+        }
+
         /* Header */
         header {
             width: 100%;
@@ -94,7 +175,6 @@
             line-height: 1.1;
         }
 
-        /* Keyframe hiệu ứng nhấp nhô & phát sáng thu hút ánh nhìn */
         @keyframes pulseGlow {
             0% {
                 transform: scale(1);
@@ -110,7 +190,6 @@
             }
         }
 
-        /* Đã chỉnh: to ra, xích xuống dưới và không bị khuất */
         header p {
             font-size: 22px;
             font-weight: 900;
@@ -128,7 +207,6 @@
             z-index: 12;
         }
 
-        /* Dòng đếm nằm chính giữa gần trên cùng của bức ảnh */
         .counter-badge {
             position: absolute;
             top: 15px;
@@ -150,7 +228,6 @@
             pointer-events: none;
         }
 
-        /* Toast Alert Popup */
         .toast-notification {
             position: absolute;
             top: 70px;
@@ -175,7 +252,6 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* Card Deck View */
         .card-deck {
             position: relative;
             width: 100%;
@@ -206,7 +282,6 @@
             cursor: grabbing;
         }
 
-        /* Card Image Container - Full Screen Image */
         .card-image-wrapper {
             position: absolute;
             top: 0;
@@ -224,7 +299,6 @@
             pointer-events: none;
         }
 
-        /* Card Info Overlaid on Image */
         .card-info {
             position: absolute;
             bottom: 0;
@@ -275,14 +349,12 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
-        /* Keyframe cho hiệu ứng nhấp nhô / mạch đập mạnh & rõ hơn */
         @keyframes heartBeatPulse {
             0% { transform: translate(-50%, -50%) scale(1.0); }
             50% { transform: translate(-50%, -50%) scale(1.65); }
             100% { transform: translate(-50%, -50%) scale(1.0); }
         }
 
-        /* Center Heart/Cross Animation Overlay */
         .center-icon {
             position: absolute;
             top: 50%;
@@ -308,7 +380,6 @@
             color: rgba(255, 89, 94, 0.85);
         }
 
-        /* Stamp fallback indicator */
         .stamp {
             position: absolute;
             top: 30px;
@@ -340,7 +411,6 @@
             transform: rotate(-15deg);
         }
 
-        /* Controls Floating Over Card Deck */
         .controls {
             position: absolute;
             bottom: 45px;
@@ -390,7 +460,6 @@
             font-size: 40px;
         }
 
-        /* Animation nhấp nhô cho nút bấm */
         @keyframes bounceAnim {
             0% { transform: scale(1); }
             40% { transform: scale(1.35); }
@@ -402,7 +471,6 @@
             animation: bounceAnim 0.4s ease-in-out;
         }
 
-        /* Results Screen */
         .results-screen {
             position: absolute;
             top: 0;
@@ -482,24 +550,39 @@
             font-weight: 700;
         }
 
-        .btn-reset {
+        .action-buttons {
+            display: flex;
+            gap: 10px;
             margin-top: 16px;
-            padding: 12px 32px;
+        }
+
+        .btn-reset, .btn-change-branch {
+            padding: 12px 20px;
             border-radius: 24px;
             border: none;
-            background: var(--pink-accent);
-            color: white;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 6px 16px rgba(255, 107, 139, 0.4);
             transition: transform 0.2s ease;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .btn-reset:hover {
+        .btn-reset {
+            background: var(--pink-accent);
+            color: white;
+            box-shadow: 0 6px 16px rgba(255, 107, 139, 0.4);
+        }
+
+        .btn-change-branch {
+            background: white;
+            color: var(--pink-accent);
+            border: 2px solid var(--pink-main);
+            box-shadow: 0 6px 16px rgba(255, 182, 193, 0.3);
+        }
+
+        .btn-reset:hover, .btn-change-branch:hover {
             transform: scale(1.05);
         }
 
@@ -521,7 +604,6 @@
             color: var(--pink-accent);
         }
 
-        /* Loading Spinner */
         .loading-spinner {
             display: flex;
             flex-direction: column;
@@ -539,24 +621,36 @@
 <body>
 
     <div class="app-container">
+        <div class="branch-selector-screen" id="branchSelectorScreen">
+            <img src="logo.png" alt="Logo" class="branch-logo">
+            <h2 class="branch-title"><i class="fa-solid fa-paw"></i> TinĐào</h2>
+            <p class="branch-subtitle">Chọn chi nhánh để hẹn hò cùng đào xinh nhé!</p>
+            <div class="branch-buttons">
+                <button class="btn-branch" data-branch="1">
+                    <i class="fa-solid fa-store"></i> Chi Nhánh 1
+                </button>
+                <button class="btn-branch" data-branch="2">
+                    <i class="fa-solid fa-store"></i> Chi Nhánh 2
+                </button>
+            </div>
+        </div>
+
         <header>
             <img src="logo.png" alt="Logo" class="header-logo">
             <h1><i class="fa-solid fa-paw"></i> TinĐào</h1>
-            <span class="header-subtitle">hẹn hò cùng đào quán em</span>
+            <span class="header-subtitle" id="headerSubtitle">hẹn hò cùng đào quán em</span>
             <p>quẹt đào để ôm</p>
         </header>
 
-        <!-- Thông báo Toast -->
         <div class="toast-notification" id="toastNotification">
             <i class="fa-solid fa-circle-exclamation"></i> bé này chưa tới ca làm
         </div>
 
         <div class="card-deck" id="cardDeck">
-            <!-- Counter badge nằm chính giữa phía trên ảnh -->
             <div class="counter-badge" id="counterBadge">0/3 em đào</div>
             <div class="loading-spinner">
                 <i class="fa-solid fa-spinner fa-spin"></i>
-                <span>Đang tải danh sách cún CN2...</span>
+                <span>Đang tải danh sách cún...</span>
             </div>
         </div>
 
@@ -569,11 +663,13 @@
             <h2 class="results-title">Danh sách bạn đã thả tim! <i class="fa-solid fa-heart"></i></h2>
             <div class="grid-container" id="gridContainer">
             </div>
-            <button class="btn-reset" id="resetBtn"><i class="fa-solid fa-rotate-right"></i> Thử lại từ đầu</button>
+            <div class="action-buttons">
+                <button class="btn-reset" id="resetBtn"><i class="fa-solid fa-rotate-right"></i> Thử lại</button>
+                <button class="btn-change-branch" id="changeBranchBtn"><i class="fa-solid fa-location-dot"></i> Đổi CN</button>
+            </div>
         </div>
     </div>
 
-    <!-- Firebase SDK Modular -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -594,10 +690,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        let selectedBranch = null;
         let petsData = [];
         let likedList = [];
         const MAX_LIKES = 3;
 
+        const branchSelectorScreen = document.getElementById('branchSelectorScreen');
         const cardDeck = document.getElementById('cardDeck');
         const resultsScreen = document.getElementById('resultsScreen');
         const gridContainer = document.getElementById('gridContainer');
@@ -605,6 +703,29 @@
         const likeBtn = document.getElementById('likeBtn');
         const skipBtn = document.getElementById('skipBtn');
         const toastNotification = document.getElementById('toastNotification');
+        const headerSubtitle = document.getElementById('headerSubtitle');
+
+        // Bắt sự kiện chọn Chi Nhánh
+        document.querySelectorAll('.btn-branch').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const branch = e.currentTarget.dataset.branch;
+                selectBranch(branch);
+            });
+        });
+
+        document.getElementById('changeBranchBtn').addEventListener('click', showBranchSelector);
+
+        function selectBranch(branch) {
+            selectedBranch = branch;
+            headerSubtitle.textContent = `hẹn hò cùng đào - Chi nhánh ${branch}`;
+            branchSelectorScreen.classList.add('hidden');
+            fetchPetsFromFirebase();
+        }
+
+        function showBranchSelector() {
+            resultsScreen.classList.remove('active');
+            branchSelectorScreen.classList.remove('hidden');
+        }
 
         let toastTimeout;
         function showToast(message) {
@@ -616,7 +737,6 @@
             }, 2000);
         }
 
-        // Hàm cập nhật số lượng đã chọn
         function updateCounter() {
             const el = document.getElementById('counterBadge');
             if (el) {
@@ -624,28 +744,33 @@
             }
         }
 
-        // Hàm tạo hiệu ứng nhấp nhô cho nút
         function triggerButtonBounce(btn) {
             btn.classList.remove('bounce');
             void btn.offsetWidth;
             btn.classList.add('bounce');
         }
 
-        // Fetch data from Firebase Realtime Database and filter for Branch 2
+        // Fetch data from Firebase Realtime Database and filter for Selected Branch
         async function fetchPetsFromFirebase() {
+            cardDeck.innerHTML = `
+                <div class="counter-badge" id="counterBadge">0/3 em đào</div>
+                <div class="loading-spinner">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <span>Đang tải danh sách cún CN${selectedBranch}...</span>
+                </div>`;
+
             try {
                 const dogsRef = ref(db, 'dogs');
                 const snapshot = await get(dogsRef);
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     
-                    // Lọc dữ liệu chỉ lấy cún thuộc chi nhánh 2
+                    // Lọc dữ liệu theo chi nhánh đã chọn
                     petsData = Object.keys(data)
                         .map(key => {
                             let statusText = data[key].status || "Đang làm";
                             const rawStatus = statusText.toString().toLowerCase();
                             
-                            // Chuẩn hóa trạng thái về "Đang làm" hoặc "Hết ca"
                             if (rawStatus.includes('hết') || rawStatus.includes('het') || rawStatus.includes('off')) {
                                 statusText = "Hết ca";
                             } else {
@@ -665,7 +790,11 @@
                         })
                         .filter(pet => {
                             const b = pet.branch.toString().toLowerCase();
-                            return b.includes('2') || b.includes('cn2') || b.includes('chi nhánh 2');
+                            if (selectedBranch === "1") {
+                                return b.includes('1') || b.includes('cn1') || b.includes('chi nhánh 1');
+                            } else {
+                                return b.includes('2') || b.includes('cn2') || b.includes('chi nhánh 2');
+                            }
                         });
 
                     initDeck();
@@ -682,7 +811,6 @@
             }
         }
 
-        // Render All Cards Stack
         function initDeck() {
             cardDeck.innerHTML = '<div class="counter-badge" id="counterBadge">0/3 em đào</div>';
             likedList = [];
@@ -691,7 +819,7 @@
             controls.style.display = 'flex';
 
             if (petsData.length === 0) {
-                cardDeck.innerHTML += `<div class="empty-text"><i class="fa-solid fa-dog"></i><span>Chưa có cún nào ở Chi Nhánh 2!</span></div>`;
+                cardDeck.innerHTML += `<div class="empty-text"><i class="fa-solid fa-dog"></i><span>Chưa có cún nào ở Chi Nhánh ${selectedBranch}!</span></div>`;
                 return;
             }
 
@@ -702,7 +830,6 @@
             setupTopCardDrag();
         }
 
-        // Create Individual Card DOM Element
         function createCardElement(data, index) {
             const card = document.createElement('div');
             card.classList.add('card');
@@ -734,7 +861,6 @@
             return card;
         }
 
-        // Setup Drag Events for Top Card
         function setupTopCardDrag() {
             if (likedList.length >= MAX_LIKES) {
                 showResults();
@@ -833,7 +959,6 @@
             document.addEventListener('touchend', onPointerUp);
         }
 
-        // Programmatic & Drag Swipe Handler
         function swipeCard(direction, card = null) {
             if (likedList.length >= MAX_LIKES) {
                 showResults();
@@ -849,7 +974,6 @@
             const dataIndex = parseInt(card.dataset.index);
             const item = petsData[dataIndex];
 
-            // Nếu quẹt thả tim (right) nhưng bé đang Hết ca
             if (direction === 'right' && item.status === "Hết ca") {
                 card.style.transition = 'transform 0.4s ease';
                 card.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
@@ -900,7 +1024,6 @@
             }, 300);
         }
 
-        // Show Final Liked Grid Results Screen
         function showResults() {
             controls.style.display = 'none';
             resultsScreen.classList.add('active');
@@ -934,13 +1057,9 @@
             });
         }
 
-        // Button Event Handlers
         likeBtn.addEventListener('click', () => swipeCard('right'));
         skipBtn.addEventListener('click', () => swipeCard('left'));
         document.getElementById('resetBtn').addEventListener('click', initDeck);
-
-        // Khởi chạy ứng dụng
-        fetchPetsFromFirebase();
     </script>
 </body>
 </html>
