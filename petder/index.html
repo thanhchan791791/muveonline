@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petder - Quẹt đào để ôm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #FFF5F5;
+            --pink-main: #FFB6C1;
+            --pink-accent: #FF6B8B;
+            --purple-light: #E6E6FA;
+            --text-color: #4A4A4A;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --shadow-soft: 0 12px 32px rgba(255, 182, 193, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #FFF5F5 0%, #E6E6FA 100%);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* App Container (iOS Mobile Frame) */
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            max-height: 820px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Header */
+        header {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5px 0;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--pink-accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #888;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Card Deck View */
+        .card-deck {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 32px;
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: grab;
+            touch-action: none;
+            will-change: transform;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .card:active {
+            cursor: grabbing;
+        }
+
+        /* Card Image Container - Full Screen Image */
+        .card-image-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 32px;
+        }
+
+        .card-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        /* Card Info Overlaid on Image */
+        .card-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px 20px 80px 20px; /* Thêm padding-bottom để không bị che bởi nút */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .card-info h2 {
+            font-size: 24px;
+            color: #ffffff;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-info .tag {
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            color: #fff;
+            backdrop-filter: blur(4px);
+        }
+
+        .card-info p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 4px;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Center Heart/Cross Animation Overlay */
+        .center-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            font-size: 80px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+            transition: opacity 0.15s ease;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
+        }
+
+        .center-icon.like {
+            color: #FF477E;
+        }
+
+        .center-icon.skip {
+            color: #FF595E;
+        }
+
+        /* Stamp fallback indicator */
+        .stamp {
+            position: absolute;
+            top: 30px;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s ease;
+            z-index: 5;
+        }
+
+        .stamp.like {
+            right: 20px;
+            color: #4E9F3D;
+            border: 3px solid #4E9F3D;
+            background: rgba(255, 255, 255, 0.85);
+            transform: rotate(15deg);
+        }
+
+        .stamp.skip {
+            left: 20px;
+            color: #FF595E;
+            border: 3px solid #FF595E;
+            background: rgba(255, 255, 255, 0.85);
+            transform: rotate(-15deg);
+        }
+
+        /* Controls Floating Over Card Deck */
+        .controls {
+            position: absolute;
+            bottom: 35px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 28px;
+            padding-bottom: 10px;
+            z-index: 12;
+        }
+
+        .btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: none;
+            outline: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+        }
+
+        .btn:active {
+            transform: scale(0.9);
+        }
+
+        .btn-skip {
+            color: #FF6B6B;
+            background: #FFF0F0;
+        }
+
+        .btn-like {
+            color: #FF477E;
+            background: #FFE5EC;
+            font-size: 28px;
+        }
+
+        /* Animation nhấp nhô cho nút bấm */
+        @keyframes bounceAnim {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.35); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        .btn.bounce {
+            animation: bounceAnim 0.4s ease-in-out;
+        }
+
+        /* Results Screen */
+        .results-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            border-radius: 32px;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 20;
+        }
+
+        .results-screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .results-title {
+            font-size: 20px;
+            color: var(--pink-accent);
+            margin-bottom: 16px;
+            text-align: center;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .grid-container {
+            width: 100%;
+            flex: 1;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 4px;
+        }
+
+        .grid-item {
+            width: 100%;
+            height: 160px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
+            background: white;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .grid-item:hover img {
+            transform: scale(1.08);
+        }
+
+        .grid-item-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.6));
+            color: white;
+            padding: 8px;
+            font-size: 13px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .btn-reset {
+            margin-top: 16px;
+            padding: 12px 32px;
+            border-radius: 24px;
+            border: none;
+            background: var(--pink-accent);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(255, 107, 139, 0.4);
+            transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-reset:hover {
+            transform: scale(1.05);
+        }
+
+        .empty-text {
+            grid-column: span 2;
+            text-align: center;
+            margin-top: 40px;
+            color: #888;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .empty-text i {
+            font-size: 36px;
+            color: var(--pink-accent);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            color: var(--pink-accent);
+            font-weight: 700;
+        }
+
+        .loading-spinner i {
+            font-size: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1><i class="fa-solid fa-paw"></i> Petder</h1>
+            <p>quẹt đào để ôm</p>
+        </header>
+
+        <div class="card-deck" id="cardDeck">
+            <div class="loading-spinner">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Đang tải danh sách cún...</span>
+            </div>
+        </div>
+
+        <div class="controls" id="controls">
+            <button class="btn btn-skip" id="skipBtn" aria-label="Skip"><i class="fa-solid fa-xmark"></i></button>
+            <button class="btn btn-like" id="likeBtn" aria-label="Like"><i class="fa-solid fa-heart"></i></button>
+        </div>
+
+        <div class="results-screen" id="resultsScreen">
+            <h2 class="results-title">Danh sách bạn đã thả tim! <i class="fa-solid fa-heart"></i></h2>
+            <div class="grid-container" id="gridContainer">
+            </div>
+            <button class="btn-reset" id="resetBtn"><i class="fa-solid fa-rotate-right"></i> Thử lại từ đầu</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Modular -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBNB1acbPtKox8eTjth3FtWuDOLhueRIys",
+            authDomain: "dogs-be72b.firebaseapp.com",
+            databaseURL: "https://dogs-be72b-default-rtdb.firebaseio.com",
+            projectId: "dogs-be72b",
+            storageBucket: "dogs-be72b.firebasestorage.app",
+            messagingSenderId: "1003873040746",
+            appId: "1:1003873040746:web:607f4ff587afc430d3cd13",
+            measurementId: "G-Y72BF1RQ2C"
+        };
+
+        // Initialize Firebase & Database
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let petsData = [];
+        let likedList = [];
+        const MAX_LIKES = 3;
+
+        const cardDeck = document.getElementById('cardDeck');
+        const resultsScreen = document.getElementById('resultsScreen');
+        const gridContainer = document.getElementById('gridContainer');
+        const controls = document.getElementById('controls');
+        const likeBtn = document.getElementById('likeBtn');
+        const skipBtn = document.getElementById('skipBtn');
+
+        // Hàm tạo hiệu ứng nhấp nhô cho nút
+        function triggerButtonBounce(btn) {
+            btn.classList.remove('bounce');
+            void btn.offsetWidth;
+            btn.classList.add('bounce');
+        }
+
+        // Fetch data from Firebase Realtime Database
+        async function fetchPetsFromFirebase() {
+            try {
+                const dogsRef = ref(db, 'dogs');
+                const snapshot = await get(dogsRef);
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    petsData = Object.keys(data).map(key => ({
+                        id: key,
+                        name: data[key].name || "Chú cún vô danh",
+                        breed: data[key].breed || "",
+                        appearance: data[key].appearance || "",
+                        traits: data[key].traits || "",
+                        status: data[key].status || "",
+                        branch: data[key].branch || "",
+                        img: data[key].image || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80"
+                    }));
+                    initDeck();
+                } else {
+                    cardDeck.innerHTML = `<div class="empty-text"><i class="fa-solid fa-dog"></i><span>Không tìm thấy dữ liệu cún!</span></div>`;
+                }
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu từ Firebase:", error);
+                cardDeck.innerHTML = `<div class="empty-text"><i class="fa-solid fa-triangle-exclamation"></i><span>Không thể tải dữ liệu cún</span></div>`;
+            }
+        }
+
+        // Render All Cards Stack
+        function initDeck() {
+            cardDeck.innerHTML = '';
+            likedList = [];
+            resultsScreen.classList.remove('active');
+            controls.style.display = 'flex';
+
+            if (petsData.length === 0) {
+                cardDeck.innerHTML = `<div class="empty-text"><i class="fa-solid fa-dog"></i><span>Chưa có cún nào sẵn sàng!</span></div>`;
+                return;
+            }
+
+            for (let i = petsData.length - 1; i >= 0; i--) {
+                const card = createCardElement(petsData[i], i);
+                cardDeck.appendChild(card);
+            }
+            setupTopCardDrag();
+        }
+
+        // Create Individual Card DOM Element
+        function createCardElement(data, index) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.dataset.index = index;
+
+            // Tổng hợp bio ngắn gọn từ các trường thông tin trong firebase
+            let bioText = [];
+            if (data.appearance) bioText.push(data.appearance);
+            if (data.traits) bioText.push(`Tính cách: ${data.traits}`);
+            if (data.branch) bioText.push(`📍 ${data.branch}`);
+
+            card.innerHTML = `
+                <div class="stamp like">LIKE</div>
+                <div class="stamp skip">SKIP</div>
+                <div class="card-image-wrapper">
+                    <img src="${data.img}" alt="${data.name}" loading="lazy">
+                    <div class="center-icon like"><i class="fa-solid fa-heart"></i></div>
+                    <div class="center-icon skip"><i class="fa-solid fa-xmark"></i></div>
+                </div>
+                <div class="card-info">
+                    <h2>
+                        <span>${data.name} ${data.breed ? `(${data.breed})` : ''}</span>
+                        ${data.status ? `<span class="tag">${data.status}</span>` : ''}
+                    </h2>
+                    <p>${bioText.join(' • ')}</p>
+                </div>
+            `;
+            return card;
+        }
+
+        // Setup Drag Events for Top Card
+        function setupTopCardDrag() {
+            if (likedList.length >= MAX_LIKES) {
+                showResults();
+                return;
+            }
+
+            const cards = cardDeck.querySelectorAll('.card');
+            if (cards.length === 0) {
+                showResults();
+                return;
+            }
+
+            const topCard = cards[cards.length - 1];
+            let startX = 0, startY = 0, currentX = 0, currentY = 0;
+            let isDragging = false;
+
+            const likeStamp = topCard.querySelector('.stamp.like');
+            const skipStamp = topCard.querySelector('.stamp.skip');
+            const centerLikeIcon = topCard.querySelector('.center-icon.like');
+            const centerSkipIcon = topCard.querySelector('.center-icon.skip');
+
+            function onPointerDown(e) {
+                isDragging = true;
+                startX = e.clientX || (e.touches && e.touches[0].clientX);
+                startY = e.clientY || (e.touches && e.touches[0].clientY);
+                topCard.style.transition = 'none';
+            }
+
+            function onPointerMove(e) {
+                if (!isDragging) return;
+
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+                currentX = clientX - startX;
+                currentY = clientY - startY;
+
+                const rotate = currentX * 0.08;
+                topCard.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotate(${rotate}deg)`;
+
+                const ratio = Math.min(Math.abs(currentX) / 100, 1);
+                const scale = 0.5 + (ratio * 0.7);
+
+                if (currentX > 0) {
+                    likeStamp.style.opacity = ratio;
+                    skipStamp.style.opacity = 0;
+                    
+                    centerLikeIcon.style.opacity = ratio;
+                    centerLikeIcon.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                    centerSkipIcon.style.opacity = 0;
+                } else {
+                    skipStamp.style.opacity = ratio;
+                    likeStamp.style.opacity = 0;
+
+                    centerSkipIcon.style.opacity = ratio;
+                    centerSkipIcon.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                    centerLikeIcon.style.opacity = 0;
+                }
+            }
+
+            function onPointerUp() {
+                if (!isDragging) return;
+                isDragging = false;
+                topCard.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+
+                const threshold = 100;
+                if (currentX > threshold) {
+                    swipeCard('right', topCard);
+                } else if (currentX < -threshold) {
+                    swipeCard('left', topCard);
+                } else {
+                    topCard.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
+                    likeStamp.style.opacity = 0;
+                    skipStamp.style.opacity = 0;
+                    centerLikeIcon.style.opacity = 0;
+                    centerSkipIcon.style.opacity = 0;
+                }
+
+                currentX = 0;
+                currentY = 0;
+            }
+
+            topCard.addEventListener('mousedown', onPointerDown);
+            document.addEventListener('mousemove', onPointerMove);
+            document.addEventListener('mouseup', onPointerUp);
+
+            topCard.addEventListener('touchstart', onPointerDown, { passive: true });
+            document.addEventListener('touchmove', onPointerMove, { passive: true });
+            document.addEventListener('touchend', onPointerUp);
+        }
+
+        // Programmatic & Drag Swipe Handler
+        function swipeCard(direction, card = null) {
+            if (likedList.length >= MAX_LIKES) {
+                showResults();
+                return;
+            }
+
+            if (!card) {
+                const cards = cardDeck.querySelectorAll('.card');
+                if (cards.length === 0) return;
+                card = cards[cards.length - 1];
+            }
+
+            const dataIndex = parseInt(card.dataset.index);
+            const item = petsData[dataIndex];
+
+            const centerLikeIcon = card.querySelector('.center-icon.like');
+            const centerSkipIcon = card.querySelector('.center-icon.skip');
+
+            card.style.transition = 'transform 0.5s ease, opacity 0.4s ease';
+
+            if (direction === 'right') {
+                triggerButtonBounce(likeBtn);
+                if (centerLikeIcon) {
+                    centerLikeIcon.style.opacity = '1';
+                    centerLikeIcon.style.transform = 'translate(-50%, -50%) scale(1.3)';
+                }
+                card.style.transform = `translate3d(${window.innerWidth}px, 0, 0) rotate(30deg)`;
+                likedList.push(item);
+            } else {
+                triggerButtonBounce(skipBtn);
+                if (centerSkipIcon) {
+                    centerSkipIcon.style.opacity = '1';
+                    centerSkipIcon.style.transform = 'translate(-50%, -50%) scale(1.3)';
+                }
+                card.style.transform = `translate3d(-${window.innerWidth}px, 0, 0) rotate(-30deg)`;
+            }
+
+            card.style.opacity = '0';
+
+            setTimeout(() => {
+                card.remove();
+                if (likedList.length >= MAX_LIKES) {
+                    showResults();
+                } else {
+                    setupTopCardDrag();
+                }
+            }, 300);
+        }
+
+        // Show Final Liked Grid Results Screen
+        function showResults() {
+            controls.style.display = 'none';
+            resultsScreen.classList.add('active');
+            gridContainer.innerHTML = '';
+
+            if (likedList.length === 0) {
+                gridContainer.innerHTML = `
+                    <div class="empty-text">
+                        <i class="fa-solid fa-face-sad-tear"></i>
+                        <span>Bạn chưa thả tim bé nào cả!</span>
+                    </div>`;
+                return;
+            }
+
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+
+            likedList.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.classList.add('grid-item');
+                itemEl.innerHTML = `
+                    <img src="${item.img}" alt="${item.name}">
+                    <div class="grid-item-name">${item.name}</div>
+                `;
+                gridContainer.appendChild(itemEl);
+            });
+        }
+
+        // Button Event Handlers
+        likeBtn.addEventListener('click', () => swipeCard('right'));
+        skipBtn.addEventListener('click', () => swipeCard('left'));
+        document.getElementById('resetBtn').addEventListener('click', initDeck);
+
+        // Khởi chạy ứng dụng
+        fetchPetsFromFirebase();
+    </script>
+</body>
+</html>
