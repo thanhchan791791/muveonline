@@ -65,6 +65,23 @@
             position: relative;
         }
 
+        .header-logo {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            border-radius: 50%;
+            margin-bottom: 4px;
+        }
+
+        .header-subtitle {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--pink-accent);
+            text-transform: lowercase;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+
         header h1 {
             font-size: 26px;
             font-weight: 800;
@@ -515,6 +532,8 @@
 
     <div class="app-container">
         <header>
+            <img src="logo.png" alt="Logo" class="header-logo">
+            <span class="header-subtitle">hẹn hò cùng đào quán em</span>
             <h1><i class="fa-solid fa-paw"></i> Petder</h1>
             <p>quẹt đào để ôm</p>
         </header>
