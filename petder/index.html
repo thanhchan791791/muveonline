@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petder - Quẹt đào để ôm</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -62,6 +62,7 @@
             align-items: center;
             padding: 5px 0;
             z-index: 10;
+            position: relative;
         }
 
         header h1 {
@@ -73,11 +74,80 @@
             gap: 8px;
         }
 
+        /* Keyframe hiệu ứng nhấp nhô & phát sáng thu hút ánh nhìn */
+        @keyframes pulseGlow {
+            0% {
+                transform: scale(1);
+                filter: drop-shadow(0 2px 8px rgba(255, 107, 139, 0.3));
+            }
+            50% {
+                transform: scale(1.08);
+                filter: drop-shadow(0 4px 16px rgba(255, 71, 126, 0.6));
+            }
+            100% {
+                transform: scale(1);
+                filter: drop-shadow(0 2px 8px rgba(255, 107, 139, 0.3));
+            }
+        }
+
         header p {
+            font-size: 20px;
+            font-weight: 900;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: linear-gradient(45deg, #FF477E, #FF6B8B, #FF8E53);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulseGlow 1.8s infinite ease-in-out;
+            display: inline-block;
+        }
+
+        /* Dòng đếm nằm chính giữa gần trên cùng của bức ảnh */
+        .counter-badge {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--pink-main);
+            color: var(--pink-accent);
+            padding: 6px 16px;
+            border-radius: 20px;
             font-size: 14px;
-            color: #888;
-            font-weight: 600;
-            margin-top: 2px;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: none;
+        }
+
+        /* Toast Alert Popup */
+        .toast-notification {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(255, 71, 126, 0.95);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 800;
+            box-shadow: 0 8px 24px rgba(255, 71, 126, 0.4);
+            z-index: 30;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
         /* Card Deck View */
@@ -135,7 +205,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 24px 20px 80px 20px; /* Thêm padding-bottom để không bị che bởi nút */
+            padding: 24px 20px 115px 20px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -157,11 +227,19 @@
         .card-info .tag {
             font-size: 12px;
             background: rgba(255, 255, 255, 0.25);
-            padding: 3px 10px;
+            padding: 4px 12px;
             border-radius: 12px;
-            font-weight: 700;
+            font-weight: 800;
             color: #fff;
             backdrop-filter: blur(4px);
+        }
+
+        .card-info .tag.off-duty {
+            background: rgba(255, 89, 94, 0.75);
+        }
+
+        .card-info .tag.on-duty {
+            background: rgba(78, 159, 61, 0.75);
         }
 
         .card-info p {
@@ -172,26 +250,37 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
+        /* Keyframe cho hiệu ứng nhấp nhô / mạch đập mạnh & rõ hơn */
+        @keyframes heartBeatPulse {
+            0% { transform: translate(-50%, -50%) scale(1.0); }
+            50% { transform: translate(-50%, -50%) scale(1.65); }
+            100% { transform: translate(-50%, -50%) scale(1.0); }
+        }
+
         /* Center Heart/Cross Animation Overlay */
         .center-icon {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
-            font-size: 80px;
+            transform: translate(-50%, -50%) scale(0.6);
+            font-size: 180px;
             opacity: 0;
             pointer-events: none;
             z-index: 10;
-            transition: opacity 0.15s ease;
-            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            filter: drop-shadow(0 10px 28px rgba(0,0,0,0.45));
         }
 
         .center-icon.like {
-            color: #FF477E;
+            color: rgba(255, 71, 126, 0.85);
+        }
+
+        .center-icon.like.pulsing {
+            animation: heartBeatPulse 0.8s infinite ease-in-out;
         }
 
         .center-icon.skip {
-            color: #FF595E;
+            color: rgba(255, 89, 94, 0.85);
         }
 
         /* Stamp fallback indicator */
@@ -229,31 +318,32 @@
         /* Controls Floating Over Card Deck */
         .controls {
             position: absolute;
-            bottom: 35px;
+            bottom: 45px;
             left: 0;
             width: 100%;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 28px;
-            padding-bottom: 10px;
-            z-index: 12;
+            padding: 0 40px;
+            z-index: 15;
+            pointer-events: none;
         }
 
         .btn {
-            width: 64px;
-            height: 64px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             border: none;
             outline: none;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: 36px;
             cursor: pointer;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             background: white;
+            pointer-events: auto;
         }
 
         .btn:hover {
@@ -272,7 +362,7 @@
         .btn-like {
             color: #FF477E;
             background: #FFE5EC;
-            font-size: 28px;
+            font-size: 40px;
         }
 
         /* Animation nhấp nhô cho nút bấm */
@@ -429,10 +519,17 @@
             <p>quẹt đào để ôm</p>
         </header>
 
+        <!-- Thông báo Toast -->
+        <div class="toast-notification" id="toastNotification">
+            <i class="fa-solid fa-circle-exclamation"></i> bé này chưa tới ca làm
+        </div>
+
         <div class="card-deck" id="cardDeck">
+            <!-- Counter badge nằm chính giữa phía trên ảnh -->
+            <div class="counter-badge" id="counterBadge">0/3 em đào</div>
             <div class="loading-spinner">
                 <i class="fa-solid fa-spinner fa-spin"></i>
-                <span>Đang tải danh sách cún...</span>
+                <span>Đang tải danh sách cún CN2...</span>
             </div>
         </div>
 
@@ -480,6 +577,23 @@
         const controls = document.getElementById('controls');
         const likeBtn = document.getElementById('likeBtn');
         const skipBtn = document.getElementById('skipBtn');
+        const counterBadge = document.getElementById('counterBadge');
+        const toastNotification = document.getElementById('toastNotification');
+
+        let toastTimeout;
+        function showToast(message) {
+            toastNotification.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${message}`;
+            toastNotification.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toastNotification.classList.remove('show');
+            }, 2000);
+        }
+
+        // Hàm cập nhật số lượng đã chọn
+        function updateCounter() {
+            counterBadge.textContent = `${likedList.length}/${MAX_LIKES} em đào`;
+        }
 
         // Hàm tạo hiệu ứng nhấp nhô cho nút
         function triggerButtonBounce(btn) {
@@ -488,42 +602,67 @@
             btn.classList.add('bounce');
         }
 
-        // Fetch data from Firebase Realtime Database
+        // Fetch data from Firebase Realtime Database and filter for Branch 2
         async function fetchPetsFromFirebase() {
             try {
                 const dogsRef = ref(db, 'dogs');
                 const snapshot = await get(dogsRef);
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    petsData = Object.keys(data).map(key => ({
-                        id: key,
-                        name: data[key].name || "Chú cún vô danh",
-                        breed: data[key].breed || "",
-                        appearance: data[key].appearance || "",
-                        traits: data[key].traits || "",
-                        status: data[key].status || "",
-                        branch: data[key].branch || "",
-                        img: data[key].image || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80"
-                    }));
+                    
+                    // Lọc dữ liệu chỉ lấy cún thuộc chi nhánh 2
+                    petsData = Object.keys(data)
+                        .map(key => {
+                            let statusText = data[key].status || "Đang làm";
+                            const rawStatus = statusText.toString().toLowerCase();
+                            
+                            // Chuẩn hóa trạng thái về "Đang làm" hoặc "Hết ca"
+                            if (rawStatus.includes('hết') || rawStatus.includes('het') || rawStatus.includes('off')) {
+                                statusText = "Hết ca";
+                            } else {
+                                statusText = "Đang làm";
+                            }
+
+                            return {
+                                id: key,
+                                name: data[key].name || "Chú cún vô danh",
+                                breed: data[key].breed || "",
+                                appearance: data[key].appearance || "",
+                                traits: data[key].traits || "",
+                                status: statusText,
+                                branch: data[key].branch || "",
+                                img: data[key].image || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80"
+                            };
+                        })
+                        .filter(pet => {
+                            const b = pet.branch.toString().toLowerCase();
+                            return b.includes('2') || b.includes('cn2') || b.includes('chi nhánh 2');
+                        });
+
                     initDeck();
                 } else {
-                    cardDeck.innerHTML = `<div class="empty-text"><i class="fa-solid fa-dog"></i><span>Không tìm thấy dữ liệu cún!</span></div>`;
+                    cardDeck.innerHTML = `
+                        <div class="counter-badge" id="counterBadge">0/3 em đào</div>
+                        <div class="empty-text"><i class="fa-solid fa-dog"></i><span>Không tìm thấy dữ liệu cún!</span></div>`;
                 }
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu từ Firebase:", error);
-                cardDeck.innerHTML = `<div class="empty-text"><i class="fa-solid fa-triangle-exclamation"></i><span>Không thể tải dữ liệu cún</span></div>`;
+                cardDeck.innerHTML = `
+                    <div class="counter-badge" id="counterBadge">0/3 em đào</div>
+                    <div class="empty-text"><i class="fa-solid fa-triangle-exclamation"></i><span>Không thể tải dữ liệu cún</span></div>`;
             }
         }
 
         // Render All Cards Stack
         function initDeck() {
-            cardDeck.innerHTML = '';
+            cardDeck.innerHTML = '<div class="counter-badge" id="counterBadge">0/3 em đào</div>';
             likedList = [];
+            updateCounter();
             resultsScreen.classList.remove('active');
             controls.style.display = 'flex';
 
             if (petsData.length === 0) {
-                cardDeck.innerHTML = `<div class="empty-text"><i class="fa-solid fa-dog"></i><span>Chưa có cún nào sẵn sàng!</span></div>`;
+                cardDeck.innerHTML += `<div class="empty-text"><i class="fa-solid fa-dog"></i><span>Chưa có cún nào ở Chi Nhánh 2!</span></div>`;
                 return;
             }
 
@@ -540,11 +679,12 @@
             card.classList.add('card');
             card.dataset.index = index;
 
-            // Tổng hợp bio ngắn gọn từ các trường thông tin trong firebase
             let bioText = [];
             if (data.appearance) bioText.push(data.appearance);
             if (data.traits) bioText.push(`Tính cách: ${data.traits}`);
-            if (data.branch) bioText.push(`📍 ${data.branch}`);
+
+            const isOffDuty = data.status === "Hết ca";
+            const statusClass = isOffDuty ? "off-duty" : "on-duty";
 
             card.innerHTML = `
                 <div class="stamp like">LIKE</div>
@@ -557,7 +697,7 @@
                 <div class="card-info">
                     <h2>
                         <span>${data.name} ${data.breed ? `(${data.breed})` : ''}</span>
-                        ${data.status ? `<span class="tag">${data.status}</span>` : ''}
+                        <span class="tag ${statusClass}">${data.status}</span>
                     </h2>
                     <p>${bioText.join(' • ')}</p>
                 </div>
@@ -607,7 +747,7 @@
                 topCard.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotate(${rotate}deg)`;
 
                 const ratio = Math.min(Math.abs(currentX) / 100, 1);
-                const scale = 0.5 + (ratio * 0.7);
+                const scale = 0.6 + (ratio * 0.8);
 
                 if (currentX > 0) {
                     likeStamp.style.opacity = ratio;
@@ -615,6 +755,7 @@
                     
                     centerLikeIcon.style.opacity = ratio;
                     centerLikeIcon.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                    centerLikeIcon.classList.add('pulsing');
                     centerSkipIcon.style.opacity = 0;
                 } else {
                     skipStamp.style.opacity = ratio;
@@ -623,6 +764,7 @@
                     centerSkipIcon.style.opacity = ratio;
                     centerSkipIcon.style.transform = `translate(-50%, -50%) scale(${scale})`;
                     centerLikeIcon.style.opacity = 0;
+                    centerLikeIcon.classList.remove('pulsing');
                 }
             }
 
@@ -637,15 +779,20 @@
                 } else if (currentX < -threshold) {
                     swipeCard('left', topCard);
                 } else {
-                    topCard.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
-                    likeStamp.style.opacity = 0;
-                    skipStamp.style.opacity = 0;
-                    centerLikeIcon.style.opacity = 0;
-                    centerSkipIcon.style.opacity = 0;
+                    resetCardPos();
                 }
 
                 currentX = 0;
                 currentY = 0;
+            }
+
+            function resetCardPos() {
+                topCard.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
+                likeStamp.style.opacity = 0;
+                skipStamp.style.opacity = 0;
+                centerLikeIcon.style.opacity = 0;
+                centerLikeIcon.classList.remove('pulsing');
+                centerSkipIcon.style.opacity = 0;
             }
 
             topCard.addEventListener('mousedown', onPointerDown);
@@ -673,6 +820,23 @@
             const dataIndex = parseInt(card.dataset.index);
             const item = petsData[dataIndex];
 
+            // Nếu quẹt thả tim (right) nhưng bé đang Hết ca
+            if (direction === 'right' && item.status === "Hết ca") {
+                card.style.transition = 'transform 0.4s ease';
+                card.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
+                
+                const centerLikeIcon = card.querySelector('.center-icon.like');
+                const likeStamp = card.querySelector('.stamp.like');
+                if (centerLikeIcon) {
+                    centerLikeIcon.style.opacity = 0;
+                    centerLikeIcon.classList.remove('pulsing');
+                }
+                if (likeStamp) likeStamp.style.opacity = 0;
+
+                showToast("bé này chưa tới ca làm");
+                return;
+            }
+
             const centerLikeIcon = card.querySelector('.center-icon.like');
             const centerSkipIcon = card.querySelector('.center-icon.skip');
 
@@ -682,15 +846,15 @@
                 triggerButtonBounce(likeBtn);
                 if (centerLikeIcon) {
                     centerLikeIcon.style.opacity = '1';
-                    centerLikeIcon.style.transform = 'translate(-50%, -50%) scale(1.3)';
+                    centerLikeIcon.classList.add('pulsing');
                 }
                 card.style.transform = `translate3d(${window.innerWidth}px, 0, 0) rotate(30deg)`;
                 likedList.push(item);
+                updateCounter();
             } else {
                 triggerButtonBounce(skipBtn);
                 if (centerSkipIcon) {
                     centerSkipIcon.style.opacity = '1';
-                    centerSkipIcon.style.transform = 'translate(-50%, -50%) scale(1.3)';
                 }
                 card.style.transform = `translate3d(-${window.innerWidth}px, 0, 0) rotate(-30deg)`;
             }
