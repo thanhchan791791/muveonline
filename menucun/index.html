@@ -398,8 +398,13 @@
 
         .modal-overlay.active .detail-card-popup, .wishlist-overlay.active .detail-card-popup { transform: scale(1) translateY(0); }
 
-        .popup-img-container { width: 100%; padding-top: 85%; position: relative; background: #f1f5f9; }
-        .popup-img-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .popup-img-container { width: 100%; padding-top: 85%; position: relative; background: #f1f5f9; overflow: hidden; }
+        .popup-img-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: filter 0.3s ease; }
+        
+        /* Hiệu ứng làm mờ ảnh popup khi nghỉ ngơi */
+        .popup-img-container.resting img {
+            filter: opacity(0.55) grayscale(20%);
+        }
 
         .close-btn {
             position: absolute; top: 14px; right: 14px; width: 36px; height: 36px;
@@ -612,8 +617,11 @@
     <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
         <div class="detail-card-popup" onclick="event.stopPropagation()">
             <button class="close-btn" onclick="closeModalDirect()"><i class="fa-solid fa-xmark"></i></button>
-            <div class="popup-img-container">
+            <div class="popup-img-container" id="popup-img-container">
                 <img id="popup-img" src="" alt="Dog Detail">
+                <div id="popup-resting-overlay" class="resting-overlay" style="display: none;">
+                    <i class="fa-solid fa-moon"></i> Đang nghỉ ngơi
+                </div>
             </div>
             <div class="popup-body">
                 <h2 class="popup-title" id="popup-title">Tên Bạn Cún</h2>
@@ -865,11 +873,36 @@
             if (!dog) return;
 
             activeDogId = id;
+            const status = dog.status || 'Đang chơi';
+            const isPlaying = status === 'Đang chơi';
+
             document.getElementById('popup-img').src = dog.image || 'https://via.placeholder.com/400';
             document.getElementById('popup-title').textContent = dog.name || 'Cún Cưng';
             document.getElementById('popup-breed').innerHTML = `<i class="fa-solid fa-shield-dog"></i> ${dog.breed || 'Cún cưng'}`;
             document.getElementById('popup-branch').textContent = dog.branch || 'Chi nhánh 1';
-            document.getElementById('popup-status').textContent = dog.status || 'Đang chơi';
+
+            const popupImgContainer = document.getElementById('popup-img-container');
+            const popupRestingOverlay = document.getElementById('popup-resting-overlay');
+            const popupStatusEl = document.getElementById('popup-status');
+
+            if (!isPlaying) {
+                popupImgContainer.classList.add('resting');
+                popupRestingOverlay.style.display = 'flex';
+
+                // Xử lý logic hiển thị ca làm theo giờ hiện tại
+                const currentHour = new Date().getHours();
+                if (currentHour >= 15) {
+                    popupStatusEl.textContent = 'Làm ca sáng';
+                } else if (currentHour < 13) {
+                    popupStatusEl.textContent = 'Làm ca tối';
+                } else {
+                    popupStatusEl.textContent = status;
+                }
+            } else {
+                popupImgContainer.classList.remove('resting');
+                popupRestingOverlay.style.display = 'none';
+                popupStatusEl.textContent = status;
+            }
             
             const appearanceContainer = document.getElementById('popup-appearance-container');
             if (dog.appearance) {
