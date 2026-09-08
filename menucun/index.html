@@ -892,9 +892,9 @@
                 // Xử lý logic hiển thị ca làm theo giờ hiện tại
                 const currentHour = new Date().getHours();
                 if (currentHour >= 15) {
-                    popupStatusEl.textContent = 'Làm ca sáng';
+                    popupStatusEl.textContent = 'Làm ca tối';
                 } else if (currentHour < 13) {
-                    popupStatusEl.textContent = 'Làm ca tối';
+                    popupStatusEl.textContent = 'Làm ca sáng';
                 } else {
                     popupStatusEl.textContent = status;
                 }
