@@ -226,6 +226,11 @@
             align-items: center;
             gap: 6px;
             pointer-events: none;
+            transition: transform 0.2s ease;
+        }
+
+        .counter-badge.pulse {
+            transform: translateX(-50%) scale(1.15);
         }
 
         .toast-notification {
@@ -311,6 +316,7 @@
             background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
             z-index: 2;
             pointer-events: none;
+            transition: opacity 0.2s ease;
         }
 
         .card-info h2 {
@@ -469,6 +475,30 @@
 
         .btn.bounce {
             animation: bounceAnim 0.4s ease-in-out;
+        }
+
+        /* KHU VỰC CHỨA CÁC ĐÀO ĐÃ CHỌN NẰM SÁT GÓC DƯỚI BÊN PHẢI */
+        .selected-bottom-tray {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            z-index: 40;
+            pointer-events: none;
+        }
+
+        .selected-thumb-item {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            object-fit: cover;
+            margin-left: -16px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            background: #fff;
         }
 
         .results-screen {
@@ -647,7 +677,7 @@
         </div>
 
         <div class="card-deck" id="cardDeck">
-            <div class="counter-badge" id="counterBadge">0/3 em đào</div>
+            <div class="counter-badge" id="counterBadge">Đã chọn 0 em đào</div>
             <div class="loading-spinner">
                 <i class="fa-solid fa-spinner fa-spin"></i>
                 <span>Đang tải danh sách cún...</span>
@@ -658,6 +688,9 @@
             <button class="btn btn-skip" id="skipBtn" aria-label="Skip"><i class="fa-solid fa-xmark"></i></button>
             <button class="btn btn-like" id="likeBtn" aria-label="Like"><i class="fa-solid fa-heart"></i></button>
         </div>
+
+        <!-- Khay chứa hình thu nhỏ các em đào đã chọn sát góc dưới bên phải -->
+        <div class="selected-bottom-tray" id="selectedBottomTray"></div>
 
         <div class="results-screen" id="resultsScreen">
             <h2 class="results-title">Danh sách bạn đã thả tim! <i class="fa-solid fa-heart"></i></h2>
@@ -693,7 +726,6 @@
         let selectedBranch = null;
         let petsData = [];
         let likedList = [];
-        const MAX_LIKES = 3;
 
         const branchSelectorScreen = document.getElementById('branchSelectorScreen');
         const cardDeck = document.getElementById('cardDeck');
@@ -704,6 +736,7 @@
         const skipBtn = document.getElementById('skipBtn');
         const toastNotification = document.getElementById('toastNotification');
         const headerSubtitle = document.getElementById('headerSubtitle');
+        const selectedBottomTray = document.getElementById('selectedBottomTray');
 
         // Bắt sự kiện chọn Chi Nhánh
         document.querySelectorAll('.btn-branch').forEach(btn => {
@@ -724,6 +757,7 @@
 
         function showBranchSelector() {
             resultsScreen.classList.remove('active');
+            selectedBottomTray.style.display = 'none';
             branchSelectorScreen.classList.remove('hidden');
         }
 
@@ -740,7 +774,10 @@
         function updateCounter() {
             const el = document.getElementById('counterBadge');
             if (el) {
-                el.textContent = `${likedList.length}/${MAX_LIKES} em đào`;
+                el.textContent = `Đã chọn ${likedList.length} em đào`;
+                el.classList.remove('pulse');
+                void el.offsetWidth;
+                el.classList.add('pulse');
             }
         }
 
@@ -753,7 +790,7 @@
         // Fetch data from Firebase Realtime Database and filter for Selected Branch
         async function fetchPetsFromFirebase() {
             cardDeck.innerHTML = `
-                <div class="counter-badge" id="counterBadge">0/3 em đào</div>
+                <div class="counter-badge" id="counterBadge">Đã chọn 0 em đào</div>
                 <div class="loading-spinner">
                     <i class="fa-solid fa-spinner fa-spin"></i>
                     <span>Đang tải danh sách cún CN${selectedBranch}...</span>
@@ -800,20 +837,22 @@
                     initDeck();
                 } else {
                     cardDeck.innerHTML = `
-                        <div class="counter-badge" id="counterBadge">0/3 em đào</div>
+                        <div class="counter-badge" id="counterBadge">Đã chọn 0 em đào</div>
                         <div class="empty-text"><i class="fa-solid fa-dog"></i><span>Không tìm thấy dữ liệu cún!</span></div>`;
                 }
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu từ Firebase:", error);
                 cardDeck.innerHTML = `
-                    <div class="counter-badge" id="counterBadge">0/3 em đào</div>
+                    <div class="counter-badge" id="counterBadge">Đã chọn 0 em đào</div>
                     <div class="empty-text"><i class="fa-solid fa-triangle-exclamation"></i><span>Không thể tải dữ liệu cún</span></div>`;
             }
         }
 
         function initDeck() {
-            cardDeck.innerHTML = '<div class="counter-badge" id="counterBadge">0/3 em đào</div>';
+            cardDeck.innerHTML = '<div class="counter-badge" id="counterBadge">Đã chọn 0 em đào</div>';
             likedList = [];
+            selectedBottomTray.innerHTML = '';
+            selectedBottomTray.style.display = 'flex';
             updateCounter();
             resultsScreen.classList.remove('active');
             controls.style.display = 'flex';
@@ -862,11 +901,6 @@
         }
 
         function setupTopCardDrag() {
-            if (likedList.length >= MAX_LIKES) {
-                showResults();
-                return;
-            }
-
             const cards = cardDeck.querySelectorAll('.card');
             if (cards.length === 0) {
                 showResults();
@@ -960,11 +994,6 @@
         }
 
         function swipeCard(direction, card = null) {
-            if (likedList.length >= MAX_LIKES) {
-                showResults();
-                return;
-            }
-
             if (!card) {
                 const cards = cardDeck.querySelectorAll('.card');
                 if (cards.length === 0) return;
@@ -993,39 +1022,85 @@
             const centerLikeIcon = card.querySelector('.center-icon.like');
             const centerSkipIcon = card.querySelector('.center-icon.skip');
 
-            card.style.transition = 'transform 0.5s ease, opacity 0.4s ease';
-
             if (direction === 'right') {
                 triggerButtonBounce(likeBtn);
                 if (centerLikeIcon) {
                     centerLikeIcon.style.opacity = '1';
                     centerLikeIcon.classList.add('pulsing');
                 }
-                card.style.transform = `translate3d(${window.innerWidth}px, 0, 0) rotate(30deg)`;
+
+                // Tính vị trí chuẩn của điểm đích nằm ở khay sát góc dưới bên phải
+                const cardRect = card.getBoundingClientRect();
+                const trayRect = selectedBottomTray.getBoundingClientRect();
+
+                // Tính khoảng cách offset tương đối
+                const targetX = trayRect.right - 35;
+                const targetY = trayRect.bottom - 35;
+                const deltaX = targetX - (cardRect.left + cardRect.width / 2);
+                const deltaY = targetY - (cardRect.top + cardRect.height / 2);
+
+                card.style.pointerEvents = 'none';
+                card.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.5s ease';
+                
+                // Ẩn thông tin chữ đi để chỉ thu gọn phần ảnh mượt mà
+                const cardInfo = card.querySelector('.card-info');
+                if (cardInfo) cardInfo.style.opacity = '0';
+
+                // Thu nhỏ về kích thước khoảng 48px và di chuyển xuống góc dưới phải
+                card.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0) scale(0.1) rotate(10deg)`;
+                card.style.opacity = '0.2';
+
                 likedList.push(item);
-                updateCounter();
+
+                // Thêm hình tròn thu nhỏ nằm cố định góc dưới bên phải
+                const thumb = document.createElement('img');
+                thumb.src = item.img;
+                thumb.alt = item.name;
+                thumb.classList.add('selected-thumb-item');
+                thumb.style.opacity = '0';
+                thumb.style.transform = 'scale(0)';
+
+                selectedBottomTray.appendChild(thumb);
+
+                setTimeout(() => {
+                    card.remove();
+                    updateCounter();
+
+                    // Hiện hình tròn thu nhỏ nằm sát góc dưới bên phải
+                    thumb.style.opacity = '1';
+                    thumb.style.transform = 'scale(1)';
+
+                    const remainingCards = cardDeck.querySelectorAll('.card');
+                    if (remainingCards.length === 0) {
+                        showResults();
+                    } else {
+                        setupTopCardDrag();
+                    }
+                }, 550);
             } else {
                 triggerButtonBounce(skipBtn);
                 if (centerSkipIcon) {
                     centerSkipIcon.style.opacity = '1';
                 }
+                card.style.transition = 'transform 0.5s ease, opacity 0.4s ease';
                 card.style.transform = `translate3d(-${window.innerWidth}px, 0, 0) rotate(-30deg)`;
+                card.style.opacity = '0';
+
+                setTimeout(() => {
+                    card.remove();
+                    const remainingCards = cardDeck.querySelectorAll('.card');
+                    if (remainingCards.length === 0) {
+                        showResults();
+                    } else {
+                        setupTopCardDrag();
+                    }
+                }, 300);
             }
-
-            card.style.opacity = '0';
-
-            setTimeout(() => {
-                card.remove();
-                if (likedList.length >= MAX_LIKES) {
-                    showResults();
-                } else {
-                    setupTopCardDrag();
-                }
-            }, 300);
         }
 
         function showResults() {
             controls.style.display = 'none';
+            selectedBottomTray.style.display = 'none';
             resultsScreen.classList.add('active');
             gridContainer.innerHTML = '';
 
