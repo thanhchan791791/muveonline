@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sweet Pink Puzzle 30 Mảnh</title>
+    <title>Sweet Pink Puzzle 100 Mảnh</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
@@ -254,17 +254,17 @@
             gap: 6px;
         }
 
-        /* Board - Tỉ lệ 5:6 cho 5x6 */
+        /* Board - Tỉ lệ 1:1 cho 10x10 */
         #board {
             width: 100%;
-            aspect-ratio: 5 / 6;
+            aspect-ratio: 1 / 1;
             background-color: #ffd6e0;
             border-radius: var(--radius-round);
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(6, 1fr);
-            gap: 2px;
-            padding: 6px;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            gap: 1px;
+            padding: 4px;
             box-shadow: inset 0 3px 8px rgba(255, 117, 140, 0.15), var(--shadow-card);
             border: 3px solid #ffffff;
             overflow: hidden;
@@ -272,7 +272,7 @@
 
         .drop-zone {
             background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 6px;
+            border-radius: 2px;
         }
 
         /* Pieces Pool */
@@ -284,7 +284,7 @@
             padding: 12px;
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 3px;
             justify-content: center;
             align-content: flex-start;
             box-shadow: var(--shadow-card);
@@ -294,10 +294,10 @@
         /* Piece */
         .piece {
             cursor: grab;
-            border-radius: 6px;
-            box-shadow: 0 4px 8px rgba(180, 120, 150, 0.2);
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(180, 120, 150, 0.2);
             touch-action: none;
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            border: 0.5px solid rgba(255, 255, 255, 0.8);
             background-repeat: no-repeat;
             will-change: transform;
         }
@@ -394,7 +394,7 @@
     <div class="pink-header">
         <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
         <i data-lucide="sparkles"></i>
-        <h1>Sweet Puzzle 30 Mảnh</h1>
+        <h1>Sweet Puzzle 100 Mảnh</h1>
     </div>
 
     <div class="container">
@@ -418,7 +418,7 @@
                         <i data-lucide="clock" size="14"></i>
                         <span>Còn Lại</span>
                     </div>
-                    <span class="stat-value" id="timer">10:00</span>
+                    <span class="stat-value" id="timer">20:00</span>
                 </div>
                 <div style="width: 2px; height: 28px; background: #ffe1e8; border-radius: 2px;"></div>
                 <div class="stat-item">
@@ -443,7 +443,7 @@
             </div>
 
             <span class="section-title">
-                <i data-lucide="grid" size="14"></i> Khung Xếp Hình (5x6)
+                <i data-lucide="grid" size="14"></i> Khung Xếp Hình (10x10)
             </span>
             <div id="board"></div>
 
@@ -466,10 +466,10 @@
     </div>
 
     <script>
-        const COLS = 5;
-        const ROWS = 6;
+        const COLS = 10;
+        const ROWS = 10;
         const TOTAL_PIECES = COLS * ROWS;
-        const GAME_DURATION = 10 * 60; // 10 phút tính theo giây
+        const GAME_DURATION = 20 * 60; // 20 phút tính theo giây
 
         const catImages = [
             { id: 1, src: 'img1.jpg', title: 'Mèo 1' },
@@ -626,7 +626,7 @@
                 if (timeRemaining <= 0) {
                     stopTimer();
                     isGameActive = false;
-                    showAlert('Thất Bại!', 'Rất tiếc! Đã hết thời gian 10 phút mất rồi. Bạn hãy thử lại nhé!', false);
+                    showAlert('Thất Bại!', 'Rất tiếc! Đã hết thời gian 20 phút mất rồi. Bạn hãy thử lại nhé!', false);
                 }
             }, 1000);
         }
@@ -766,7 +766,7 @@
                 const timeSpentSeconds = GAME_DURATION - timeRemaining;
                 const mins = Math.floor(timeSpentSeconds / 60);
                 const secs = timeSpentSeconds % 60;
-                showAlert('Xuất Sắc Quá!', `Thành công! Bạn đã xếp xong 30 mảnh ghép trong ${mins} phút ${secs} giây với ${moveCount} bước!`, true);
+                showAlert('Xuất Sắc Quá!', `Thành công! Bạn đã xếp xong 100 mảnh ghép trong ${mins} phút ${secs} giây với ${moveCount} bước!`, true);
             }
         }
 
