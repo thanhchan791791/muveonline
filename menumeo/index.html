@@ -87,7 +87,7 @@
             animation: puddingJump 0.5s ease-in-out;
         }
 
-        /* Floating Bounce Animation cho chữ "đào ế" */
+        /* Floating Bounce Animation cho chữ nhấp nhô */
         @keyframes floatBounce {
             0%, 100% {
                 transform: translate(-50%, -50%) translateY(0) scale(1);
@@ -173,6 +173,12 @@
                 <button onclick="setFilter('Thèm ăn', this)" class="filter-chip px-3.5 py-1.5 rounded-full bg-white/80 text-gray-600 whitespace-nowrap shadow-sm border border-white/90">
                     Thèm ăn
                 </button>
+                <button onclick="setFilter('Ham ăn', this)" class="filter-chip px-3.5 py-1.5 rounded-full bg-white/80 text-gray-600 whitespace-nowrap shadow-sm border border-white/90">
+                    Ham ăn
+                </button>
+                <button onclick="setFilter('Làm biếng', this)" class="filter-chip px-3.5 py-1.5 rounded-full bg-white/80 text-gray-600 whitespace-nowrap shadow-sm border border-white/90">
+                    Làm biếng
+                </button>
             </div>
         </div>
     </header>
@@ -241,145 +247,149 @@
     </div>
 
     <script>
-        // Data Sample: 20 Cats
+        // Data Sample: Đủ 20 Hoàng Thượng
         const catData = [
+            {
+                id: 16,
+                name: "Gold",
+                overlayText: "mắc dạy",
+                tags: ["Ăn ảnh", "Chảnh xả", "Không thích sờ"],
+                desc: "Lông vàng óng ánh như hoàng kim, dáng điệu kiêu kỳ chuẩn hoàng tộc.",
+                image: "16.jpg"
+            },
+            {
+                id: 14,
+                name: "Cáo em",
+                overlayText: "đẹp trai",
+                tags: ["Dịu dàng", "Ham ăn", "Thèm ăn"],
+                desc: "Đôi mắt tròn xoe ngơ ngác vô cùng đáng yêu, thích quấn quýt bên anh và xin đồ ăn.",
+                image: "14.jpg"
+            },
+            {
+                id: 7,
+                name: "Bạch Tuyết",
+                overlayText: "làm biếng",
+                tags: ["Ăn ảnh", "Ngoan ngoãn", "Làm biếng", "Không thích sờ"],
+                desc: "Bộ lông trắng tinh khôi không chút gợn, vẻ đẹp công chúa thu hút mọi ánh nhìn.",
+                image: "7.jpg"
+            },
             {
                 id: 1,
                 name: "Thị Nở",
-                tags: ["Thèm ăn", "Ngoan ngoãn", "Ăn ảnh"],
+                overlayText: "ham ăn",
+                tags: ["Ham ăn", "Ngoan ngoãn", "Ăn ảnh"],
                 desc: "Khuôn mặt độc lạ vui nhộn, cực kỳ háu ăn và thích được quấn quít bên khách.",
                 image: "1.jpg"
             },
             {
                 id: 2,
                 name: "Xám",
-                tags: ["Ngoan ngoãn", "Thích bế", "Dịu dàng"],
+                tags: ["Ngoan ngoãn", "Thích bế", "Làm biếng", "Không thích sờ"],
                 desc: "Bộ lông màu xám khói sang trọng, tính tình đầm thắm và rất thích nằm gọn trong lòng bạn.",
                 image: "2.jpg"
             },
             {
                 id: 3,
                 name: "Euro",
-                tags: ["Ăn ảnh", "Chảnh xả", "Thích bế"],
+                tags: ["Ăn ảnh", "Chảnh xả", "Không thích sờ", "Ham ăn"],
                 desc: "Phong thái quý tộc, biết canh góc chụp hình đẹp xuất sắc cho các bộ ảnh sống ảo.",
                 image: "3.jpg"
             },
             {
                 id: 4,
-                name: "Xịn",
-                tags: ["Thích bế", "Ăn ảnh"],
+                name: "Xị",
+                tags: ["Thích bế", "Ăn ảnh", "Ham ăn", "Dịu dàng"],
                 desc: "Cực kỳ hợp cạ với các bạn nhỏ, thích tạo dáng dễ thương và không bao giờ biết sợ ống kính.",
                 image: "4.jpg"
             },
             {
                 id: 5,
                 name: "Matcha",
-                tags: ["Ngoan ngoãn", "Dịu dàng"],
+                tags: ["Ngoan ngoãn", "Làm biếng"],
                 desc: "Ngọt ngào như một ly trà xanh, luôn dịu dàng nằm cho khách vuốt ve cằm.",
                 image: "5.jpg"
             },
             {
                 id: 6,
                 name: "Diệu",
-                tags: ["Thích bế", "Ngoan ngoãn"],
+                tags: ["Thích bế", "Ngoan ngoãn", "Ham ăn"],
                 desc: "Đúng như cái tên, bé vô cùng dịu dàng, nhẹ nhàng và luôn thích được ôm nũng nịu.",
                 image: "6.jpg"
             },
             {
-                id: 7,
-                name: "Bạch Tuyết",
-                tags: ["Ăn ảnh", "Ngoan ngoãn"],
-                desc: "Bộ lông trắng tinh khôi không chút gợn, vẻ đẹp công chúa thu hút mọi ánh nhìn.",
-                image: "7.jpg"
-            },
-            {
                 id: 8,
                 name: "Tai ngắn",
-                tags: ["Chân ngắn", "Thèm ăn"],
+                tags: ["Chân ngắn", "Ham ăn", "Làm biếng"],
                 desc: "Đôi tai cụp ngắn đáng yêu, đôi chân lùn tịt chạy lạch bạch cực hài hước.",
                 image: "8.jpg"
             },
             {
                 id: 9,
                 name: "Lisa",
-                tags: ["Ăn ảnh", "Thích bế"],
+                tags: ["Ăn ảnh", "Thích bế", "Không thích sờ"],
                 desc: "Thần thái chuẩn idol, bộ lông mượt mà và cực kỳ thần thái trước camera.",
                 image: "9.jpg"
             },
             {
                 id: 10,
                 name: "Itachi",
-                tags: ["Ngầu lòi", "Ngoan ngoãn"],
+                tags: ["Ngầu lòi", "Ngoan ngoãn", "Làm biếng"],
                 desc: "Vẻ ngoài bí ẩn ngầu lòi như ninja nhưng bên trong lại là một bé mèo vô cùng quấn người.",
                 image: "10.jpg"
             },
             {
                 id: 11,
                 name: "Thổ sa",
-                tags: ["Ngoan ngoãn", "Thích bế"],
+                tags: ["Ngoan ngoãn", "Thích bế", "Ham ăn"],
                 desc: "Bé có nét quyến rũ riêng, tính tình điềm đạm, thích được nâng niu và ở bên cạnh khách.",
                 image: "11.jpg"
             },
             {
                 id: 12,
                 name: "Hoả sa",
-                tags: ["Năng động", "Ăn ảnh"],
+                tags: ["Năng động", "Ăn ảnh", "Không thích sờ"],
                 desc: "Năng lượng dồi dào, luôn chủ động gây sự chú ý và thích nô đùa cùng các bạn.",
                 image: "12.jpg"
             },
             {
                 id: 13,
                 name: "Cáo anh",
-                tags: ["Ngầu lòi", "Thích bế"],
+                tags: ["Ngầu lòi", "Thích bế", "Làm biếng"],
                 desc: "Dáng vẻ chững chạc như người anh lớn, rất biết chăm sóc và nhường nhịn các em.",
                 image: "13.jpg"
             },
             {
-                id: 14,
-                name: "Cáo em",
-                tags: ["Dịu dàng", "Thèm ăn"],
-                desc: "Đôi mắt tròn xoe ngơ ngác vô cùng đáng yêu, thích quấn quýt bên anh và xin đồ ăn.",
-                image: "14.jpg"
-            },
-            {
                 id: 15,
                 name: "Đen",
-                tags: ["Ngầu lòi", "Ngoan ngoãn"],
+                tags: ["Ngầu lòi", "Ngoan ngoãn", "Không thích sờ"],
                 desc: "Bộ lông đen tuyền huyền bí, cực kỳ thông minh và quấn người một cách lặng lẽ.",
                 image: "15.jpg"
             },
             {
-                id: 16,
-                name: "Gold",
-                tags: ["Ăn ảnh", "Chảnh xả"],
-                desc: "Lông vàng óng ánh như hoàng kim, dáng điệu kiêu kỳ chuẩn hoàng tộc.",
-                image: "16.jpg"
-            },
-            {
                 id: 17,
                 name: "Cáo nhỏ",
-                tags: ["Chân ngắn", "Thích bế"],
+                tags: ["Chân ngắn", "Thích bế", "Ham ăn"],
                 desc: "Bé tí hon siêu tinh nghịch, thích leo trèo vào lòng khách để nũng nịu.",
                 image: "17.jpg"
             },
             {
                 id: 18,
                 name: "Tẹt",
-                tags: ["Thèm ăn", "Ngoan ngoãn"],
+                tags: ["Ham ăn", "Ngoan ngoãn", "Làm biếng"],
                 desc: "Khuôn mặt tẹt ngộ nghĩnh đáng yêu, tâm hồn ăn uống bất tận.",
                 image: "18.jpg"
             },
             {
                 id: 19,
                 name: "Cáo lớn",
-                tags: ["Ngoan ngoãn", "Dịu dàng"],
+                tags: ["Ngoan ngoãn", "Dịu dàng", "Làm biếng"],
                 desc: "Thân hình to lớn ấm áp, thích nằm phơi nắng và cho khách vuốt ve.",
                 image: "19.jpg"
             },
             {
                 id: 20,
                 name: "Dâu Da",
-                tags: ["Ăn ảnh", "Thích bế"],
+                tags: ["Ăn ảnh", "Thích bế", "Ham ăn"],
                 desc: "Ngọt ngào và đáng yêu như trái dâu da, thích chụp hình và làm nũng với mọi người.",
                 image: "20.jpg"
             }
@@ -397,8 +407,8 @@
 
             const filteredCats = catData.filter(cat => {
                 const matchesSearch = cat.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                     cat.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-                const matchesFilter = currentFilter === 'all' || cat.tags.includes(currentFilter);
+                                     (cat.tags && cat.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+                const matchesFilter = currentFilter === 'all' || (cat.tags && cat.tags.includes(currentFilter));
                 return matchesSearch && matchesFilter;
             });
 
@@ -410,34 +420,49 @@
 
             filteredCats.forEach(cat => {
                 const card = document.createElement('div');
-                card.className = `glass-card rounded-3xl p-2.5 sm:p-3 relative flex flex-col justify-between cursor-pointer`;
+                card.className = `glass-card rounded-3xl p-2.5 sm:p-3 relative flex flex-col justify-between cursor-pointer h-full`;
                 card.id = `cat-card-${cat.id}`;
                 card.onclick = (e) => handleCardClick(e, cat.id);
 
-                // Kiểm tra xem có phải mèo Gold không để thêm chữ "đào ế" nhấp nhô giữa ảnh
-                const isGold = cat.name.toLowerCase() === 'gold' || cat.id === 16;
-                const daoEOverlay = isGold ? `
-                    <div class="absolute top-1/2 left-1/2 animate-float-text z-10 pointer-events-none bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/40 shadow-lg">
-                        <span class="text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase drop-shadow-md">đào ế</span>
-                    </div>
-                ` : '';
+                // Kiểm tra chữ overlay
+                const overlayText = cat.overlayText;
+                let overlayHtml = '';
+                
+                if (overlayText) {
+                    const isMacDay = overlayText.toLowerCase() === 'mắc dạy';
+                    const borderStyle = isMacDay 
+                        ? 'border-2 border-red-500 bg-red-500/20 text-red-200' 
+                        : 'border border-white/40 bg-black/40 text-white';
+
+                    overlayHtml = `
+                        <div class="absolute top-1/2 left-1/2 animate-float-text z-10 pointer-events-none backdrop-blur-md px-3 py-1 rounded-full ${borderStyle} shadow-lg w-max whitespace-nowrap">
+                            <span class="font-extrabold text-xs sm:text-sm tracking-wider uppercase drop-shadow-md">${overlayText}</span>
+                        </div>
+                    `;
+                }
+
+                const tagsHtml = (cat.tags && cat.tags.length > 0) 
+                    ? cat.tags.map(tag => `<span class="px-2 py-0.5 bg-pink-100/80 text-pink-600 rounded-md text-[10px] font-bold">${tag}</span>`).join('') 
+                    : '';
 
                 card.innerHTML = `
-                    <div>
-                        <!-- Cat Image Wrapper -->
-                        <div class="relative w-full h-36 sm:h-44 rounded-2xl overflow-hidden mb-2.5 shadow-sm bg-gray-100 group">
-                            <img src="${cat.image}" alt="${cat.name}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                            ${daoEOverlay}
+                    <div class="flex flex-col h-full justify-between">
+                        <div>
+                            <!-- Cat Image Wrapper -->
+                            <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-2.5 shadow-sm bg-gray-100 group">
+                                <img src="${cat.image}" alt="${cat.name}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                ${overlayHtml}
+                            </div>
+
+                            <!-- Name -->
+                            <div class="px-1 mb-1.5">
+                                <h3 class="font-extrabold text-sm sm:text-base text-gray-800 line-clamp-1">${cat.name}</h3>
+                            </div>
                         </div>
 
-                        <!-- Name & Tags (Tính cách) -->
-                        <div class="px-1">
-                            <h3 class="font-extrabold text-sm sm:text-base text-gray-800 line-clamp-1 mb-1">${cat.name}</h3>
-                            
-                            <!-- Tính cách (Tags) -->
-                            <div class="flex flex-wrap gap-1">
-                                ${cat.tags.map(tag => `<span class="px-2 py-0.5 bg-pink-100/80 text-pink-600 rounded-md text-[10px] font-bold">${tag}</span>`).join('')}
-                            </div>
+                        <!-- Tính cách (Tags) -->
+                        <div class="px-1 flex flex-wrap gap-1 mt-auto">
+                            ${tagsHtml}
                         </div>
                     </div>
                 `;
@@ -499,20 +524,27 @@
             document.getElementById('modalCatName').innerText = cat.name;
             document.getElementById('modalCatDesc').innerText = cat.desc;
 
-            // Xử lý chữ nhấp nhô "đào ế" trong modal phóng to ảnh của bé Gold
+            // Xử lý chữ nhấp nhô overlay trong modal phóng to
             const modalImgContainer = document.getElementById('modalImgContainer');
-            const existingOverlay = modalImgContainer.querySelector('.modal-dao-e');
+            const existingOverlay = modalImgContainer.querySelector('.modal-floating-overlay');
             if (existingOverlay) existingOverlay.remove();
 
-            if (cat.name.toLowerCase() === 'gold' || cat.id === 16) {
+            if (cat.overlayText) {
+                const isMacDay = cat.overlayText.toLowerCase() === 'mắc dạy';
+                const borderStyle = isMacDay 
+                    ? 'border-2 border-red-500 bg-red-500/20 text-red-200' 
+                    : 'border border-white/40 bg-black/40 text-white';
+
                 const modalOverlay = document.createElement('div');
-                modalOverlay.className = 'modal-dao-e absolute top-1/2 left-1/2 animate-float-text z-10 pointer-events-none bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/40 shadow-xl';
-                modalOverlay.innerHTML = '<span class="text-white font-black text-sm sm:text-base tracking-wider uppercase drop-shadow-md">đào ế</span>';
+                modalOverlay.className = `modal-floating-overlay absolute top-1/2 left-1/2 animate-float-text z-10 pointer-events-none backdrop-blur-md px-4 py-1.5 rounded-full ${borderStyle} shadow-xl w-max whitespace-nowrap`;
+                modalOverlay.innerHTML = `<span class="font-black text-sm sm:text-base tracking-wider uppercase drop-shadow-md">${cat.overlayText}</span>`;
                 modalImgContainer.appendChild(modalOverlay);
             }
 
             const tagsContainer = document.getElementById('modalCatTags');
-            tagsContainer.innerHTML = cat.tags.map(t => `<span class="px-3 py-1 bg-pink-100 text-pink-600 rounded-lg text-xs font-bold">${t}</span>`).join('');
+            tagsContainer.innerHTML = (cat.tags && cat.tags.length > 0) 
+                ? cat.tags.map(t => `<span class="px-3 py-1 bg-pink-100 text-pink-600 rounded-lg text-xs font-bold">${t}</span>`).join('')
+                : '';
 
             const modal = document.getElementById('detailModal');
             const modalContent = document.getElementById('detailModalContent');
