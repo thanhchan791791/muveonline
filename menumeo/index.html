@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Menu Hoàng Thượng - Cherrypet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Grandstander:wght@700;800;900&family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Nunito', 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+            user-select: none;
+        }
+
+        .title-cute {
+            font-family: 'Grandstander', 'Nunito', cursive, sans-serif;
+            background: linear-gradient(135deg, #FF4565, #FF8DA1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(255, 141, 161, 0.3));
+        }
+
+        /* Gradient Background Theme */
+        body {
+            background: linear-gradient(135deg, #FFE4E1 0%, #FFFDD0 35%, #FFB6C1 70%, #E6E6FA 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 40px;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(255, 182, 193, 0.25), 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .glass-card:active {
+            transform: scale(0.95);
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .glass-modal {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+        }
+
+        /* Floating Background Elements */
+        .bg-floating-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        /* Pudding Jump Animation */
+        @keyframes puddingJump {
+            0% { transform: scale(1, 1); }
+            30% { transform: scale(1.12, 0.88); }
+            40% { transform: scale(0.88, 1.12); }
+            50% { transform: scale(1.06, 0.94); }
+            65% { transform: scale(0.97, 1.03); }
+            75% { transform: scale(1.02, 0.98); }
+            100% { transform: scale(1, 1); }
+        }
+
+        .animate-pudding {
+            animation: puddingJump 0.5s ease-in-out;
+        }
+
+        /* Floating Bounce Animation cho chữ "đào ế" */
+        @keyframes floatBounce {
+            0%, 100% {
+                transform: translate(-50%, -50%) translateY(0) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) translateY(-8px) scale(1.05);
+            }
+        }
+
+        .animate-float-text {
+            animation: floatBounce 1.5s infinite ease-in-out;
+        }
+
+        /* Custom Scrollbar Hide */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Tag pill scroll styling */
+        .filter-chip {
+            transition: all 0.25s ease;
+        }
+        .filter-chip.active {
+            background: linear-gradient(135deg, #FF8DA1, #FFB6C1);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 141, 161, 0.35);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="relative text-gray-800">
+
+    <div id="bgContainer" class="bg-floating-container"></div>
+
+    <header class="sticky top-0 z-30 glass-nav px-4 pt-3 pb-3 rounded-b-3xl mb-4 transition-all duration-300">
+        <div class="max-w-md mx-auto">
+            <!-- Title Bar -->
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2.5">
+                    <!-- Logo Image -->
+                    <div class="w-12 h-12 rounded-2xl bg-white shadow-md overflow-hidden flex items-center justify-center p-0.5 border border-pink-100 shrink-0">
+                        <img src="logo.PNG" alt="Logo" class="w-full h-full object-cover rounded-xl" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/616/616430.png';">
+                    </div>
+                    <div>
+                        <h1 class="font-black text-2xl sm:text-3xl title-cute tracking-wide leading-none flex items-center gap-1.5">
+                            Menu Hoàng Thượng
+                        </h1>
+                        <p class="text-xs text-pink-600 font-bold mt-1 tracking-wider uppercase">cherrypet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative mb-3">
+                <input type="text" id="searchInput" oninput="filterCats()" placeholder="Tìm tên mèo, tính cách..." 
+                    class="w-full pl-4 pr-8 py-2 bg-white/70 backdrop-blur-md rounded-2xl text-xs sm:text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-300 border border-white/80 shadow-inner transition-all">
+                <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 font-bold text-xs">
+                    X
+                </button>
+            </div>
+
+            <!-- Tags Filter Horizontal Scroll -->
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-xs font-semibold">
+                <button onclick="setFilter('all', this)" class="filter-chip active px-3.5 py-1.5 rounded-full bg-white/80 text-gray-600 whitespace-nowrap shadow-sm border border-white/90">
+                    Tất cả
+                </button>
+                <button onclick="setFilter('Thích bế', this)" class="filter-chip px-3.5 py-1.5 rounded-full bg-white/80 text-gray-600 whitespace-nowrap shadow-sm border border-white/90">
+                    Thích bế
+                </button>
+                <button onclick="setFilter('Chân ngắn', this)" class="filter-chip px-3.5 py-1.5 rounded-full bg-white/80 text-gray-600 whitespace-nowrap shadow-sm border border-white/90">
+                    Chân ngắn
+                </button>
+                <button onclick="setFilter('Ăn ảnh', this)" class="filter-chip px-3.5 py-1.5 rounded-full bg-white/80 text-gray-600 whitespace-nowrap shadow-sm border border-white/90">
+                    Ăn ảnh
+                </button>
+                <button onclick="setFilter('Ngoan ngoãn', this)" class="filter-chip px-3.5 py-1.5 rounded-full bg-white/80 text-gray-600 whitespace-nowrap shadow-sm border border-white/90">
+                    Dịu dàng
+                </button>
+                <button onclick="setFilter('Thèm ăn', this)" class="filter-chip px-3.5 py-1.5 rounded-full bg-white/80 text-gray-600 whitespace-nowrap shadow-sm border border-white/90">
+                    Thèm ăn
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto px-3.5 relative z-10">
+        <!-- Banner Mini Announcement -->
+        <div class="bg-gradient-to-r from-amber-100/90 to-pink-100/90 backdrop-blur-md p-3 rounded-2xl mb-4 border border-amber-200/60 shadow-sm flex items-center gap-3">
+            <div class="text-xs text-amber-900">
+                <p class="font-bold">Menu xem thông tin Hoàng Thượng:</p>
+                <p class="text-amber-800/90">Chạm vào bé mèo bất kỳ để xem ảnh phóng to & tính cách chi tiết nhé!</p>
+            </div>
+        </div>
+
+        <!-- Cats Grid Container (2 Columns on Mobile) -->
+        <div id="catsGrid" class="grid grid-cols-2 gap-3">
+            <!-- Cat cards will be inserted dynamically -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <p class="font-bold text-gray-600">Không tìm thấy Hoàng Thượng phù hợp!</p>
+            <p class="text-xs text-gray-400 mt-1">Hãy thử tìm từ khóa khác xem sao nhé.</p>
+        </div>
+    </main>
+
+    <!-- Detail Modal Popup -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm transition-opacity duration-300">
+        <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden max-h-[90vh] flex flex-col transform transition-all duration-300 translate-y-full sm:translate-y-0" id="detailModalContent">
+            
+            <!-- Top Image & Close Button -->
+            <div class="relative h-72 sm:h-80 w-full bg-gray-900 overflow-hidden" id="modalImgContainer">
+                <!-- Background mờ -->
+                <img id="modalCatImgBg" src="" alt="Cat Background" class="absolute inset-0 w-full h-full object-cover opacity-30 filter blur-md">
+                <!-- Ảnh chính hiển thị đầy đủ không bị cắt -->
+                <img id="modalCatImg" src="" alt="Cat Image" class="relative z-0 w-full h-full object-contain">
+                
+                <!-- Close Button -->
+                <button onclick="closeDetailModal()" class="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/40 text-white backdrop-blur-md flex items-center justify-center hover:bg-black/60 transition-colors font-bold text-sm">
+                    X
+                </button>
+            </div>
+
+            <!-- Scrollable Info Area -->
+            <div class="p-5 overflow-y-auto space-y-4 text-xs sm:text-sm">
+                <div>
+                    <h2 id="modalCatName" class="text-2xl font-black text-gray-800">Tên Mèo</h2>
+                    <p id="modalCatDesc" class="text-gray-600 mt-2 leading-relaxed text-sm">Mô tả tính cách</p>
+                </div>
+
+                <!-- Personality Tags -->
+                <div>
+                    <p class="text-xs text-gray-400 font-bold mb-2 tracking-wider">TÍNH CÁCH NỔI BẬT</p>
+                    <div id="modalCatTags" class="flex flex-wrap gap-2">
+                        <!-- Tags inserted dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer Close -->
+            <div class="p-4 bg-white/60 border-t border-gray-100">
+                <button onclick="closeDetailModal()" class="w-full py-3 bg-gradient-to-r from-pink-400 to-rose-400 text-white rounded-2xl font-extrabold shadow-md hover:opacity-95 active:scale-95 transition-all text-center">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Sample: 20 Cats
+        const catData = [
+            {
+                id: 1,
+                name: "Thị Nở",
+                tags: ["Thèm ăn", "Ngoan ngoãn", "Ăn ảnh"],
+                desc: "Khuôn mặt độc lạ vui nhộn, cực kỳ háu ăn và thích được quấn quít bên khách.",
+                image: "1.jpg"
+            },
+            {
+                id: 2,
+                name: "Xám",
+                tags: ["Ngoan ngoãn", "Thích bế", "Dịu dàng"],
+                desc: "Bộ lông màu xám khói sang trọng, tính tình đầm thắm và rất thích nằm gọn trong lòng bạn.",
+                image: "2.jpg"
+            },
+            {
+                id: 3,
+                name: "Euro",
+                tags: ["Ăn ảnh", "Chảnh xả", "Thích bế"],
+                desc: "Phong thái quý tộc, biết canh góc chụp hình đẹp xuất sắc cho các bộ ảnh sống ảo.",
+                image: "3.jpg"
+            },
+            {
+                id: 4,
+                name: "Xịn",
+                tags: ["Thích bế", "Ăn ảnh"],
+                desc: "Cực kỳ hợp cạ với các bạn nhỏ, thích tạo dáng dễ thương và không bao giờ biết sợ ống kính.",
+                image: "4.jpg"
+            },
+            {
+                id: 5,
+                name: "Matcha",
+                tags: ["Ngoan ngoãn", "Dịu dàng"],
+                desc: "Ngọt ngào như một ly trà xanh, luôn dịu dàng nằm cho khách vuốt ve cằm.",
+                image: "5.jpg"
+            },
+            {
+                id: 6,
+                name: "Diệu",
+                tags: ["Thích bế", "Ngoan ngoãn"],
+                desc: "Đúng như cái tên, bé vô cùng dịu dàng, nhẹ nhàng và luôn thích được ôm nũng nịu.",
+                image: "6.jpg"
+            },
+            {
+                id: 7,
+                name: "Bạch Tuyết",
+                tags: ["Ăn ảnh", "Ngoan ngoãn"],
+                desc: "Bộ lông trắng tinh khôi không chút gợn, vẻ đẹp công chúa thu hút mọi ánh nhìn.",
+                image: "7.jpg"
+            },
+            {
+                id: 8,
+                name: "Tai ngắn",
+                tags: ["Chân ngắn", "Thèm ăn"],
+                desc: "Đôi tai cụp ngắn đáng yêu, đôi chân lùn tịt chạy lạch bạch cực hài hước.",
+                image: "8.jpg"
+            },
+            {
+                id: 9,
+                name: "Lisa",
+                tags: ["Ăn ảnh", "Thích bế"],
+                desc: "Thần thái chuẩn idol, bộ lông mượt mà và cực kỳ thần thái trước camera.",
+                image: "9.jpg"
+            },
+            {
+                id: 10,
+                name: "Itachi",
+                tags: ["Ngầu lòi", "Ngoan ngoãn"],
+                desc: "Vẻ ngoài bí ẩn ngầu lòi như ninja nhưng bên trong lại là một bé mèo vô cùng quấn người.",
+                image: "10.jpg"
+            },
+            {
+                id: 11,
+                name: "Thổ sa",
+                tags: ["Ngoan ngoãn", "Thích bế"],
+                desc: "Bé có nét quyến rũ riêng, tính tình điềm đạm, thích được nâng niu và ở bên cạnh khách.",
+                image: "11.jpg"
+            },
+            {
+                id: 12,
+                name: "Hoả sa",
+                tags: ["Năng động", "Ăn ảnh"],
+                desc: "Năng lượng dồi dào, luôn chủ động gây sự chú ý và thích nô đùa cùng các bạn.",
+                image: "12.jpg"
+            },
+            {
+                id: 13,
+                name: "Cáo anh",
+                tags: ["Ngầu lòi", "Thích bế"],
+                desc: "Dáng vẻ chững chạc như người anh lớn, rất biết chăm sóc và nhường nhịn các em.",
+                image: "13.jpg"
+            },
+            {
+                id: 14,
+                name: "Cáo em",
+                tags: ["Dịu dàng", "Thèm ăn"],
+                desc: "Đôi mắt tròn xoe ngơ ngác vô cùng đáng yêu, thích quấn quýt bên anh và xin đồ ăn.",
+                image: "14.jpg"
+            },
+            {
+                id: 15,
+                name: "Đen",
+                tags: ["Ngầu lòi", "Ngoan ngoãn"],
+                desc: "Bộ lông đen tuyền huyền bí, cực kỳ thông minh và quấn người một cách lặng lẽ.",
+                image: "15.jpg"
+            },
+            {
+                id: 16,
+                name: "Gold",
+                tags: ["Ăn ảnh", "Chảnh xả"],
+                desc: "Lông vàng óng ánh như hoàng kim, dáng điệu kiêu kỳ chuẩn hoàng tộc.",
+                image: "16.jpg"
+            },
+            {
+                id: 17,
+                name: "Cáo nhỏ",
+                tags: ["Chân ngắn", "Thích bế"],
+                desc: "Bé tí hon siêu tinh nghịch, thích leo trèo vào lòng khách để nũng nịu.",
+                image: "17.jpg"
+            },
+            {
+                id: 18,
+                name: "Tẹt",
+                tags: ["Thèm ăn", "Ngoan ngoãn"],
+                desc: "Khuôn mặt tẹt ngộ nghĩnh đáng yêu, tâm hồn ăn uống bất tận.",
+                image: "18.jpg"
+            },
+            {
+                id: 19,
+                name: "Cáo lớn",
+                tags: ["Ngoan ngoãn", "Dịu dàng"],
+                desc: "Thân hình to lớn ấm áp, thích nằm phơi nắng và cho khách vuốt ve.",
+                image: "19.jpg"
+            },
+            {
+                id: 20,
+                name: "Dâu Da",
+                tags: ["Ăn ảnh", "Thích bế"],
+                desc: "Ngọt ngào và đáng yêu như trái dâu da, thích chụp hình và làm nũng với mọi người.",
+                image: "20.jpg"
+            }
+        ];
+
+        // State Management
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        // Render Cats List
+        function renderCats() {
+            const grid = document.getElementById('catsGrid');
+            const emptyState = document.getElementById('emptyState');
+            grid.innerHTML = '';
+
+            const filteredCats = catData.filter(cat => {
+                const matchesSearch = cat.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                     cat.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+                const matchesFilter = currentFilter === 'all' || cat.tags.includes(currentFilter);
+                return matchesSearch && matchesFilter;
+            });
+
+            if (filteredCats.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            filteredCats.forEach(cat => {
+                const card = document.createElement('div');
+                card.className = `glass-card rounded-3xl p-2.5 sm:p-3 relative flex flex-col justify-between cursor-pointer`;
+                card.id = `cat-card-${cat.id}`;
+                card.onclick = (e) => handleCardClick(e, cat.id);
+
+                // Kiểm tra xem có phải mèo Gold không để thêm chữ "đào ế" nhấp nhô giữa ảnh
+                const isGold = cat.name.toLowerCase() === 'gold' || cat.id === 16;
+                const daoEOverlay = isGold ? `
+                    <div class="absolute top-1/2 left-1/2 animate-float-text z-10 pointer-events-none bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/40 shadow-lg">
+                        <span class="text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase drop-shadow-md">đào ế</span>
+                    </div>
+                ` : '';
+
+                card.innerHTML = `
+                    <div>
+                        <!-- Cat Image Wrapper -->
+                        <div class="relative w-full h-36 sm:h-44 rounded-2xl overflow-hidden mb-2.5 shadow-sm bg-gray-100 group">
+                            <img src="${cat.image}" alt="${cat.name}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            ${daoEOverlay}
+                        </div>
+
+                        <!-- Name & Tags (Tính cách) -->
+                        <div class="px-1">
+                            <h3 class="font-extrabold text-sm sm:text-base text-gray-800 line-clamp-1 mb-1">${cat.name}</h3>
+                            
+                            <!-- Tính cách (Tags) -->
+                            <div class="flex flex-wrap gap-1">
+                                ${cat.tags.map(tag => `<span class="px-2 py-0.5 bg-pink-100/80 text-pink-600 rounded-md text-[10px] font-bold">${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Handle Click on Cat Card
+        function handleCardClick(e, id) {
+            const card = document.getElementById(`cat-card-${id}`);
+            if (card) {
+                card.classList.remove('animate-pudding');
+                void card.offsetWidth; // Trigger reflow
+                card.classList.add('animate-pudding');
+            }
+
+            setTimeout(() => {
+                openDetailModal(id);
+            }, 150);
+        }
+
+        // Filtering & Search
+        function filterCats() {
+            const input = document.getElementById('searchInput');
+            searchQuery = input.value.trim();
+            
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (searchQuery.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            renderCats();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            renderCats();
+        }
+
+        function setFilter(tag, btn) {
+            currentFilter = tag;
+            document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+            btn.classList.add('active');
+            renderCats();
+        }
+
+        // Modal Detail Handling
+        function openDetailModal(id) {
+            const cat = catData.find(c => c.id === id);
+            if (!cat) return;
+
+            document.getElementById('modalCatImg').src = cat.image;
+            document.getElementById('modalCatImgBg').src = cat.image;
+            document.getElementById('modalCatName').innerText = cat.name;
+            document.getElementById('modalCatDesc').innerText = cat.desc;
+
+            // Xử lý chữ nhấp nhô "đào ế" trong modal phóng to ảnh của bé Gold
+            const modalImgContainer = document.getElementById('modalImgContainer');
+            const existingOverlay = modalImgContainer.querySelector('.modal-dao-e');
+            if (existingOverlay) existingOverlay.remove();
+
+            if (cat.name.toLowerCase() === 'gold' || cat.id === 16) {
+                const modalOverlay = document.createElement('div');
+                modalOverlay.className = 'modal-dao-e absolute top-1/2 left-1/2 animate-float-text z-10 pointer-events-none bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/40 shadow-xl';
+                modalOverlay.innerHTML = '<span class="text-white font-black text-sm sm:text-base tracking-wider uppercase drop-shadow-md">đào ế</span>';
+                modalImgContainer.appendChild(modalOverlay);
+            }
+
+            const tagsContainer = document.getElementById('modalCatTags');
+            tagsContainer.innerHTML = cat.tags.map(t => `<span class="px-3 py-1 bg-pink-100 text-pink-600 rounded-lg text-xs font-bold">${t}</span>`).join('');
+
+            const modal = document.getElementById('detailModal');
+            const modalContent = document.getElementById('detailModalContent');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('translate-y-full');
+            }, 10);
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('detailModal');
+            const modalContent = document.getElementById('detailModalContent');
+            
+            modalContent.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 250);
+        }
+
+        window.onload = function() {
+            renderCats();
+        };
+    </script>
+</body>
+</html>
