@@ -1,3 +1,33 @@
+thanhchan791791
+muveonline
+Repository navigation
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security and quality
+10
+ (10)
+Insights
+Settings
+muveonline/order/cmt8
+/index.html
+Go to file
+t
+T
+thanhchan791791
+thanhchan791791
+Update index.html
+b218b85
+ · 
+2 weeks ago
+
+Code
+
+Blame
+1771 lines (1584 loc) · 69.5 KB
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -849,7 +879,7 @@
                     Trải nghiệm: Tham quan tự do, vuốt ve và chơi đùa thoải mái cùng các bé Chó, Mèo, Vẹt, Cầy Meerkat siêu thân thiện.
                 </p>
                 <div class="included-animals">
-                    <span class="animal-tag" id="tag-dog">Chó</span><span class="animal-tag" id="tag-cat">Mèo</span><span class="animal-tag" id="tag-parrot">Vẹt</span><span class="animal-tag" id="tag-meerkat">Cầy Meerkat</span>
+                    <span class="animal-tag" id="tag-dog">Chó</span><span class="animal-tag" id="tag-cat">Mèo</span><span class="animal-tag" id="tag-parrot">Vẹt</span><span class="animal-tag" id="tag-meerkat">Cầy Meerkat</span><span class="animal-tag" id="tag-alpaca">Lạc đà Alpaca</span>
                 </div>
             </div>
             <div class="quantity-selector">
@@ -869,7 +899,7 @@
                     Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat)!
                 </p>
                 <div class="included-animals">
-                    <span class="animal-tag" id="tag-dog2">Chó</span><span class="animal-tag" id="tag-cat2">Mèo</span><span class="animal-tag" id="tag-raccoon">Gấu Mèo</span><span class="animal-tag" id="tag-capybara">Capybara</span><span class="animal-tag" id="tag-parrot2">Vẹt</span><span class="animal-tag" id="tag-meerkat2">Cầy Meerkat</span>
+                    <span class="animal-tag" id="tag-dog2">Chó</span><span class="animal-tag" id="tag-cat2">Mèo</span><span class="animal-tag" id="tag-raccoon">Gấu Mèo</span><span class="animal-tag" id="tag-capybara">Capybara</span><span class="animal-tag" id="tag-parrot2">Vẹt</span><span class="animal-tag" id="tag-meerkat2">Cầy Meerkat</span><span class="animal-tag" id="tag-alpaca2">Lạc đà Alpaca</span>
                 </div>
             </div>
             <div class="quantity-selector">
@@ -1031,34 +1061,21 @@
     let currentLang = 'vi';
     let menuDataByLang = { vi: { food: [], drinks: [] }, en: { food: [], drinks: [] } };
 
-    /* LẤY DỮ LIỆU MENU TỪ NODE branch2_menu TRÊN FIREBASE REALTIME DATABASE & ĐƯA GIÁ NƯỚC VỀ 0 ĐỒNG */
+    /* LẤY DỮ LIỆU MENU TỪ NODE branch2_menu TRÊN FIREBASE REALTIME DATABASE */
     database.ref('branch2_menu').on('value', (snapshot) => {
         if (snapshot.exists()) {
             const val = snapshot.val();
-            
-            const processMenuData = (data) => {
-                if (!data) return { food: [], drinks: [] };
-                
-                const processCategories = (catList) => {
-                    if (!catList || !Array.isArray(catList)) return [];
-                    return catList.map(cat => ({
-                        ...cat,
-                        drinks: cat.drinks ? cat.drinks.map(item => ({ ...item, price: 0 })) : []
-                    }));
-                };
-
-                return {
-                    food: processCategories(data.food),
-                    drinks: processCategories(data.drinks)
-                };
+            menuDataByLang.vi = {
+                food: val.vi && val.vi.food ? val.vi.food : [],
+                drinks: val.vi && val.vi.drinks ? val.vi.drinks : []
             };
-
-            menuDataByLang.vi = processMenuData(val.vi);
-            menuDataByLang.en = processMenuData(val.en);
-
+            menuDataByLang.en = {
+                food: val.en && val.en.food ? val.en.food : [],
+                drinks: val.en && val.en.drinks ? val.en.drinks : []
+            };
             allDrinks = getAllDrinksList();
             initDrinkCategories();
-            console.log("Đã tải dữ liệu menu từ Firebase branch2_menu và chuyển giá nước thành 0đ thành công!");
+            console.log("Đã tải dữ liệu menu từ Firebase branch2_menu thành công!");
         } else {
             console.warn("Không tìm thấy dữ liệu tại node branch2_menu.");
         }
@@ -1094,16 +1111,17 @@
             noticeBox: "Vé vào cửa BẮT BUỘC mua trước.<br>Nước uống KHÔNG BẮT BUỘC, bạn tùy ý lựa chọn nhé!",
             ticketGreenTitle: "Vé vào cổng",
             ticketGreenPrice: "110.000đ / vé",
-            ticketGreenDesc: "Trải nghiệm: Tham quan tự do, vuốt ve và chơi đùa thoải mái cùng các bé Chó, Mèo, Vẹt, Cầy Meerkat siêu thân thiện.",
+            ticketGreenDesc: "Trải nghiệm: Tham quan tự do, vuốt ve và chơi đùa thoải mái cùng các bé Chó, Mèo, Vẹt, Cầy Meerkat, Lạc đà Alpaca siêu thân thiện.",
             tagDog: "Chó",
             tagCat: "Mèo",
             tagParrot: "Vẹt",
             tagMeerkat: "Cầy Meerkat",
+            tagAlpaca: "Lạc đà Alpaca",
             tagRaccoon: "Gấu Mèo",
             tagCapybara: "Capybara",
             ticketRedTitle: "Combo Chi Nhánh 1 + Chi Nhánh 2",
             ticketRedPrice: "180.000đ / vé",
-            ticketRedDesc: "Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat)!",
+            ticketRedDesc: "Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat, Lạc đà Alpaca)!",
             selectDrink: "Chọn danh mục món bên dưới:",
             tabFood: "THỨC ĂN THÚ",
             tabDrinks: "NƯỚC UỐNG",
@@ -1156,16 +1174,17 @@
             noticeBox: "Entrance tickets are REQUIRED in advance.<br>Drinks are OPTIONAL, feel free to choose!",
             ticketGreenTitle: "Entrance Ticket",
             ticketGreenPrice: "110,000 VND / ticket",
-            ticketGreenDesc: "Experience: Free walk-through, pet and play with friendly Dogs, Cats, Parrots, and Meerkats.",
+            ticketGreenDesc: "Experience: Free walk-through, pet and play with friendly Dogs, Cats, Parrots, Meerkats, and Alpacas.",
             tagDog: "Dog",
             tagCat: "Cat",
             tagParrot: "Parrot",
             tagMeerkat: "Meerkat",
+            tagAlpaca: "Alpaca",
             tagRaccoon: "Raccoon",
             tagCapybara: "Capybara",
             ticketRedTitle: "Combo Branch 1 + Branch 2",
             ticketRedPrice: "180,000 VND / ticket",
-            ticketRedDesc: "Experience both branches: Branch 1 (Dog, Cat, Raccoon, Capybara) & Branch 2 (Dog, Cat, Parrot, Meerkat)!",
+            ticketRedDesc: "Experience both branches: Branch 1 (Dog, Cat, Raccoon, Capybara) & Branch 2 (Dog, Cat, Parrot, Meerkat, Alpaca)!",
             selectDrink: "Select item category below:",
             tabFood: "PET FOOD",
             tabDrinks: "DRINKS",
@@ -1243,6 +1262,7 @@
         document.getElementById('tag-cat').innerText = t.tagCat;
         document.getElementById('tag-parrot').innerText = t.tagParrot;
         document.getElementById('tag-meerkat').innerText = t.tagMeerkat;
+        document.getElementById('tag-alpaca').innerText = t.tagAlpaca;
 
         document.getElementById('tag-dog2').innerText = t.tagDog;
         document.getElementById('tag-cat2').innerText = t.tagCat;
@@ -1250,6 +1270,7 @@
         document.getElementById('tag-capybara').innerText = t.tagCapybara;
         document.getElementById('tag-parrot2').innerText = t.tagParrot;
         document.getElementById('tag-meerkat2').innerText = t.tagMeerkat;
+        document.getElementById('tag-alpaca2').innerText = t.tagAlpaca;
 
         document.getElementById('txt-ticket-red-title').innerText = t.ticketRedTitle;
         document.getElementById('txt-ticket-red-price').innerText = t.ticketRedPrice;
@@ -1301,7 +1322,7 @@
                             <div class="drink-search-item">
                                 <div>
                                     <span class="drink-search-name">${drink.name}</span>
-                                    <span class="drink-search-price">0đ</span>
+                                    <span class="drink-search-price">${(drink.price/1000)}k</span>
                                 </div>
                                 <div class="quantity-selector">
                                     <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', -1, event)">-</button>
@@ -1408,7 +1429,7 @@
         for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
             const drink = allDrinks.find(d => d.id === drinkId);
             if (drink) {
-                total += 0 * qty; // Giá nước = 0đ
+                total += drink.price * qty;
             }
         }
         return total;
@@ -1493,7 +1514,7 @@
                     <div class="cart-item-row">
                         <div class="cart-item-info">
                             <div class="cart-item-title">${drink.name}</div>
-                            <div class="cart-item-sub">0đ</div>
+                            <div class="cart-item-sub">${(drink.price).toLocaleString('vi-VN')}đ</div>
                         </div>
                         <div class="quantity-selector">
                             <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', -1, event)">-</button>
@@ -1673,7 +1694,7 @@
                 billHtml += `
                     <div class="bill-row">
                         <span>${drink.name} x ${qty}</span>
-                        <span>0đ</span>
+                        <span>${(drink.price * qty).toLocaleString('vi-VN')}đ</span>
                     </div>
                 `;
             }
@@ -1708,8 +1729,8 @@
                 orderedDrinks[drinkId] = {
                     name: drink.name,
                     quantity: qty,
-                    price: 0,
-                    subtotal: 0
+                    price: drink.price,
+                    subtotal: drink.price * qty
                 };
             }
         }
