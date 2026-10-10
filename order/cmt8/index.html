@@ -1031,7 +1031,7 @@
     let currentLang = 'vi';
     let menuDataByLang = { vi: { food: [], drinks: [] }, en: { food: [], drinks: [] } };
 
-    /* LẤY DỮ LIỆU MENU TỪ NODE branch2_menu TRÊN FIREBASE REALTIME DATABASE & ĐƯA GIÁ NƯỚC VỀ 0 ĐỒNG */
+    /* LẤY DỮ LIỆU MENU TỪ NODE branch2_menu TRÊN FIREBASE REALTIME DATABASE & ĐIỀU CHỈNH GIÁ MÓN */
     database.ref('branch2_menu').on('value', (snapshot) => {
         if (snapshot.exists()) {
             const val = snapshot.val();
@@ -1041,10 +1041,19 @@
                 
                 const processCategories = (catList) => {
                     if (!catList || !Array.isArray(catList)) return [];
-                    return catList.map(cat => ({
-                        ...cat,
-                        drinks: cat.drinks ? cat.drinks.map(item => ({ ...item, price: 0 })) : []
-                    }));
+                    return catList.map(cat => {
+                        const nameLower = (cat.categoryName || "").toLowerCase();
+                        // Kiểm tra nếu tên danh mục chứa từ khóa sữa chua, yogurt, đá xay hoặc ice blend
+                        const isYogurtOrIceBlend = nameLower.includes('sữa chua') || nameLower.includes('yogurt') || nameLower.includes('đá xay') || nameLower.includes('ice blend');
+                        
+                        return {
+                            ...cat,
+                            drinks: cat.drinks ? cat.drinks.map(item => ({ 
+                                ...item, 
+                                price: isYogurtOrIceBlend ? 40000 : 0 
+                            })) : []
+                        };
+                    });
                 };
 
                 return {
@@ -1058,7 +1067,7 @@
 
             allDrinks = getAllDrinksList();
             initDrinkCategories();
-            console.log("Đã tải dữ liệu menu từ Firebase branch2_menu và chuyển giá nước thành 0đ thành công!");
+            console.log("Đã tải dữ liệu menu từ Firebase branch2_menu và thiết lập giá món thành công!");
         } else {
             console.warn("Không tìm thấy dữ liệu tại node branch2_menu.");
         }
@@ -1297,11 +1306,12 @@
                 if (cat.drinks && Array.isArray(cat.drinks)) {
                     cat.drinks.forEach(drink => {
                         const currentQty = orderState.drinks[drink.id] || 0;
+                        const priceFormatted = (drink.price > 0) ? drink.price.toLocaleString('vi-VN') + 'đ' : '0đ';
                         itemsHtml += `
                             <div class="drink-search-item">
                                 <div>
                                     <span class="drink-search-name">${drink.name}</span>
-                                    <span class="drink-search-price">0đ</span>
+                                    <span class="drink-search-price">${priceFormatted}</span>
                                 </div>
                                 <div class="quantity-selector">
                                     <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', -1, event)">-</button>
@@ -1408,7 +1418,7 @@
         for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
             const drink = allDrinks.find(d => d.id === drinkId);
             if (drink) {
-                total += 0 * qty; // Giá nước = 0đ
+                total += (drink.price || 0) * qty;
             }
         }
         return total;
@@ -1489,11 +1499,12 @@
         for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
             const drink = allDrinks.find(d => d.id === drinkId);
             if (drink) {
+                const priceFormatted = (drink.price > 0) ? drink.price.toLocaleString('vi-VN') + 'đ' : '0đ';
                 html += `
                     <div class="cart-item-row">
                         <div class="cart-item-info">
                             <div class="cart-item-title">${drink.name}</div>
-                            <div class="cart-item-sub">0đ</div>
+                            <div class="cart-item-sub">${priceFormatted}</div>
                         </div>
                         <div class="quantity-selector">
                             <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', -1, event)">-</button>
@@ -1552,7 +1563,6 @@
         const name = document.getElementById('fullname').value.trim();
         const phone = document.getElementById('phone').value.trim();
 
-        /* Chỉ kiểm tra có nhập nội dung vào 2 ô hay chưa, không ràng buộc định dạng/độ dài SĐT */
         if (!name || !phone) {
             triggerErrorShake();
             alert(t.alertFillInfo);
@@ -1670,10 +1680,11 @@
         for (const [drinkId, qty] of Object.entries(orderState.drinks)) {
             const drink = allDrinks.find(d => d.id === drinkId);
             if (drink) {
+                const subtotal = (drink.price || 0) * qty;
                 billHtml += `
                     <div class="bill-row">
                         <span>${drink.name} x ${qty}</span>
-                        <span>0đ</span>
+                        <span>${subtotal.toLocaleString('vi-VN')}đ</span>
                     </div>
                 `;
             }
@@ -1708,8 +1719,8 @@
                 orderedDrinks[drinkId] = {
                     name: drink.name,
                     quantity: qty,
-                    price: 0,
-                    subtotal: 0
+                    price: drink.price || 0,
+                    subtotal: (drink.price || 0) * qty
                 };
             }
         }
