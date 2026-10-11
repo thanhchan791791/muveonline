@@ -1030,7 +1030,7 @@
 
     let currentLang = 'vi';
 
-    /* KHAI BÁO DỮ LIỆU MENU CỐ ĐỊNH CHÍNH XÁC THEO MẸO ĐÃ CUNG CẤP */
+    /* CẬP NHẬT MENU ĐỒ UỐNG CHÍNH XÁC THEO YÊU CẦU CHO CẢ TIẾNG VIỆT VÀ TIẾNG ANH */
     let menuDataByLang = {
         vi: {
             food: [],
@@ -1206,18 +1206,20 @@
         }
     };
 
-    /* ĐỌC DỮ LIỆU TỪ FIREBASE ĐỂ CẬP NHẬT (NẾU CÓ) HOẶC DÙNG DỮ LIỆU CỐ ĐỊNH BAN ĐẦU */
+   /* SỬ DỤNG TRỰC TIẾP DỮ LIỆU MENU CỐ ĐỊNH CHUẨN XÁC KHÔNG BỊ FIREBASE ĐÈ GIÁ */
     database.ref('branch2_menu').on('value', (snapshot) => {
         if (snapshot.exists()) {
-            const val = snapshot.val();
-            if (val.vi) menuDataByLang.vi = val.vi;
-            if (val.en) menuDataByLang.en = val.en;
-
-            allDrinks = getAllDrinksList();
-            initDrinkCategories();
-            console.log("Đã đồng bộ menu từ Firebase!");
+            console.log("Đã kết nối Firebase thành công (Giữ nguyên giá menu cố định).");
+        } else {
+            console.warn("Không tìm thấy dữ liệu tại node branch2_menu, sử dụng menu mặc định.");
         }
     });
+
+    // Khởi tạo ngay lập tức danh sách món và danh mục dựa trên menu bạn vừa cấu hình
+    window.onload = function() {
+        allDrinks = getAllDrinksList();
+        initDrinkCategories();
+    };
 
     let allDrinks = [];
 
