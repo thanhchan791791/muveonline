@@ -1029,47 +1029,193 @@
     });
 
     let currentLang = 'vi';
-    let menuDataByLang = { vi: { food: [], drinks: [] }, en: { food: [], drinks: [] } };
 
-    /* LẤY DỮ LIỆU MENU TỪ NODE branch2_menu TRÊN FIREBASE REALTIME DATABASE & ĐIỀU CHỈNH GIÁ MÓN */
+    /* KHAI BÁO DỮ LIỆU MENU CỐ ĐỊNH CHÍNH XÁC THEO MẸO ĐÃ CUNG CẤP */
+    let menuDataByLang = {
+        vi: {
+            food: [],
+            drinks: [
+                {
+                    categoryName: "COFFEE",
+                    drinks: [
+                        { id: "cf_den", name: "Cà Phê Đen", price: 0 },
+                        { id: "cf_sua", name: "Cà Phê Sữa", price: 0 },
+                        { id: "cf_bacxiu", name: "Bạc Xỉu", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "NƯỚC NGỌT",
+                    drinks: [
+                        { id: "nn_coca", name: "Coca", price: 0 },
+                        { id: "nn_sting", name: "Sting", price: 0 },
+                        { id: "nn_7up", name: "7 up", price: 0 },
+                        { id: "nn_suoi", name: "Nước Suối", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "SODA",
+                    drinks: [
+                        { id: "sd_dautamsim", name: "Soda Dâu Tằm Sim", price: 0 },
+                        { id: "sd_blue", name: "Soda Blue", price: 0 },
+                        { id: "sd_daomo", name: "Soda Đào Mơ", price: 0 },
+                        { id: "sd_chanh", name: "Soda Chanh", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "NƯỚC ÉP",
+                    drinks: [
+                        { id: "ne_camep", name: "Cam ép", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "TEA",
+                    drinks: [
+                        { id: "tr_vaihoahong", name: "Trà Vải Hoa Hồng", price: 0 },
+                        { id: "tr_tacthaixanh", name: "Trà Tắc Thái Xanh", price: 0 },
+                        { id: "tr_dautamsimrung", name: "Trà Dâu Tằm Sim Rừng", price: 0 },
+                        { id: "tr_dao", name: "Trà Đào", price: 0 },
+                        { id: "tr_oihong", name: "Trà Ổi Hồng", price: 0 },
+                        { id: "tr_atisodo", name: "Trà Atiso Đỏ", price: 0 },
+                        { id: "tr_daomosori", name: "Trà Đào Mơ Sơ Ri Hạt Chia", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "MILK TEA",
+                    drinks: [
+                        { id: "ts_truyenthong", name: "Trà Sữa Truyền Thống", price: 0 },
+                        { id: "ts_gaorang", name: "Trà Sữa Gạo Rang", price: 0 },
+                        { id: "ts_olonglanep", name: "Trà Sữa Olong Lá Nếp", price: 0 },
+                        { id: "ts_chocolate", name: "Trà Sữa Chocolate", price: 0 },
+                        { id: "ts_matcha", name: "Trà Sữa Matcha", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "YOGURT",
+                    drinks: [
+                        { id: "yg_vietquat", name: "Sữa chua việt quất", price: 40000 },
+                        { id: "yg_dao", name: "Sữa chua đào", price: 40000 },
+                        { id: "yg_vai", name: "Sữa chua vải", price: 40000 },
+                        { id: "yg_da", name: "Sữa chua đá", price: 40000 }
+                    ]
+                },
+                {
+                    categoryName: "ICE BLENDED",
+                    drinks: [
+                        { id: "ib_matchadaxay", name: "Matcha Đá Xay", price: 40000 },
+                        { id: "ib_mochadaxay", name: "Mocha Đá Xay", price: 40000 },
+                        { id: "ib_chanhtuyet", name: "Chanh Tuyết", price: 40000 },
+                        { id: "ib_cookiechoco", name: "Cookie Chocolate", price: 40000 },
+                        { id: "ib_sinhtovietquat", name: "Sinh tố Việt Quất", price: 40000 },
+                        { id: "ib_cacaoda", name: "Cacao Đá", price: 40000 },
+                        { id: "ib_matchalatte", name: "Matcha Latte", price: 40000 }
+                    ]
+                },
+                {
+                    categoryName: "TOPPING",
+                    drinks: [
+                        { id: "tp_tranchaucaramel", name: "Trân Châu Caramel", price: 10000 }
+                    ]
+                }
+            ]
+        },
+        en: {
+            food: [],
+            drinks: [
+                {
+                    categoryName: "COFFEE",
+                    drinks: [
+                        { id: "cf_den_en", name: "Black Coffee", price: 0 },
+                        { id: "cf_sua_en", name: "Milk Coffee", price: 0 },
+                        { id: "cf_bacxiu_en", name: "White Coffee", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "SOFT DRINKS",
+                    drinks: [
+                        { id: "nn_coca_en", name: "Coca", price: 0 },
+                        { id: "nn_sting_en", name: "Sting", price: 0 },
+                        { id: "nn_7up_en", name: "7 up", price: 0 },
+                        { id: "nn_suoi_en", name: "Water", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "SODA",
+                    drinks: [
+                        { id: "sd_chanh_en", name: "Lemon Soda", price: 0 },
+                        { id: "sd_dautamsim_en", name: "Wild Berry Soda", price: 0 },
+                        { id: "sd_blue_en", name: "Blue Soda", price: 0 },
+                        { id: "sd_daomo_en", name: "Peach Apricot Soda", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "JUICE",
+                    drinks: [
+                        { id: "ne_camep_en", name: "Fresh Orange Juice", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "TEA",
+                    drinks: [
+                        { id: "tr_vaihoahong_en", name: "Rose Lychee Tea", price: 0 },
+                        { id: "tr_tacthaixanh_en", name: "Thai Green Tea with Kumquat", price: 0 },
+                        { id: "tr_dautamsimrung_en", name: "Mulberry & Wild Rose Myrtle Tea", price: 0 },
+                        { id: "tr_dao_en", name: "Peach Tea", price: 0 },
+                        { id: "tr_oihong_en", name: "Pink Guava Tea", price: 0 },
+                        { id: "tr_atisodo_en", name: "Roselle Tea", price: 0 },
+                        { id: "tr_daomosori_en", name: "Peach, Apricot & Acerola Tea with Chia Seeds", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "MILK TEA",
+                    drinks: [
+                        { id: "ts_truyenthong_en", name: "Milk Tea", price: 0 },
+                        { id: "ts_gaorang_en", name: "Roasted Rice Tea", price: 0 },
+                        { id: "ts_olonglanep_en", name: "Pandan Oolong Tea", price: 0 },
+                        { id: "ts_chocolate_en", name: "Chocolate Milk Tea", price: 0 },
+                        { id: "ts_matcha_en", name: "Matcha Milk Tea", price: 0 }
+                    ]
+                },
+                {
+                    categoryName: "YOGURT",
+                    drinks: [
+                        { id: "yg_vietquat_en", name: "Blueberry yogurt", price: 40000 },
+                        { id: "yg_dao_en", name: "Peach Yogurt", price: 40000 },
+                        { id: "yg_vai_en", name: "Lychee Yogurt", price: 40000 },
+                        { id: "yg_da_en", name: "Iced Yogurt", price: 40000 }
+                    ]
+                },
+                {
+                    categoryName: "ICE BLENDED",
+                    drinks: [
+                        { id: "ib_matchadaxay_en", name: "Matcha blend", price: 40000 },
+                        { id: "ib_mochadaxay_en", name: "Mocha blend", price: 40000 },
+                        { id: "ib_chanhtuyet_en", name: "Lemon Snow", price: 40000 },
+                        { id: "ib_cookiechoco_en", name: "Chocolate Cookies", price: 40000 },
+                        { id: "ib_sinhtovietquat_en", name: "Blueberry Smoothie", price: 40000 },
+                        { id: "ib_cacaoda_en", name: "Iced Cocoa", price: 40000 },
+                        { id: "ib_matchalatte_en", name: "Matcha Latte", price: 40000 }
+                    ]
+                },
+                {
+                    categoryName: "TOPPING",
+                    drinks: [
+                        { id: "tp_tranchaucaramel_en", name: "Caramel Pearls", price: 10000 }
+                    ]
+                }
+            ]
+        }
+    };
+
+    /* ĐỌC DỮ LIỆU TỪ FIREBASE ĐỂ CẬP NHẬT (NẾU CÓ) HOẶC DÙNG DỮ LIỆU CỐ ĐỊNH BAN ĐẦU */
     database.ref('branch2_menu').on('value', (snapshot) => {
         if (snapshot.exists()) {
             const val = snapshot.val();
-            
-            const processMenuData = (data) => {
-                if (!data) return { food: [], drinks: [] };
-                
-                const processCategories = (catList) => {
-                    if (!catList || !Array.isArray(catList)) return [];
-                    return catList.map(cat => {
-                        const nameLower = (cat.categoryName || "").toLowerCase();
-                        // Kiểm tra nếu tên danh mục chứa từ khóa sữa chua, yogurt, đá xay hoặc ice blend
-                        const isYogurtOrIceBlend = nameLower.includes('sữa chua') || nameLower.includes('yogurt') || nameLower.includes('đá xay') || nameLower.includes('ice blend');
-                        
-                        return {
-                            ...cat,
-                            drinks: cat.drinks ? cat.drinks.map(item => ({ 
-                                ...item, 
-                                price: isYogurtOrIceBlend ? 40000 : 0 
-                            })) : []
-                        };
-                    });
-                };
-
-                return {
-                    food: processCategories(data.food),
-                    drinks: processCategories(data.drinks)
-                };
-            };
-
-            menuDataByLang.vi = processMenuData(val.vi);
-            menuDataByLang.en = processMenuData(val.en);
+            if (val.vi) menuDataByLang.vi = val.vi;
+            if (val.en) menuDataByLang.en = val.en;
 
             allDrinks = getAllDrinksList();
             initDrinkCategories();
-            console.log("Đã tải dữ liệu menu từ Firebase branch2_menu và thiết lập giá món thành công!");
-        } else {
-            console.warn("Không tìm thấy dữ liệu tại node branch2_menu.");
+            console.log("Đã đồng bộ menu từ Firebase!");
         }
     });
 
