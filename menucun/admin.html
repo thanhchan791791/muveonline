@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Quản Lý Thú Cưng</title>
+    <title>Quản Lý Thú Cưng & Background</title>
     <style>
         :root {
             --bg-color: #f2f2f7;
@@ -51,9 +51,30 @@
         }
 
         .ios-header h1 {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             letter-spacing: -0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-header-action {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--primary);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: transform 0.2s var(--ios-cubic);
         }
 
         .btn-add-trigger {
@@ -73,7 +94,7 @@
             transition: transform 0.2s var(--ios-cubic);
         }
 
-        .btn-add-trigger:active {
+        .btn-header-action:active, .btn-add-trigger:active {
             transform: scale(0.9);
         }
 
@@ -265,7 +286,7 @@
             margin-top: 10px;
         }
 
-        #preview-img {
+        #preview-img, #preview-bg-upload {
             width: 100%;
             height: 160px;
             object-fit: cover;
@@ -450,6 +471,87 @@
         .btn-edit { color: var(--primary); }
         .btn-delete { color: var(--danger); }
 
+        /* Background Grid in Modal */
+        .bg-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .bg-item-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(0,0,0,0.08);
+            background: #fff;
+            padding: 4px;
+        }
+
+        .bg-item-card img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .bg-item-card button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 59, 48, 0.9);
+            color: white;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-category-section {
+            margin-bottom: 16px;
+        }
+
+        .bg-category-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Thêm danh mục mới */
+        .category-input-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn-small-add {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--primary);
+            border: none;
+            padding: 0 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: transform 0.2s var(--ios-cubic);
+        }
+
+        .btn-small-add:active {
+            transform: scale(0.95);
+        }
+
         input[type="file"] { display: none; }
     </style>
 </head>
@@ -458,7 +560,10 @@
     <!-- iOS Top Navigation -->
     <div class="ios-header">
         <h1>Danh Sách Cún</h1>
-        <button class="btn-add-trigger" id="btn-open-modal">+</button>
+        <div class="header-actions">
+            <button class="btn-header-action" id="btn-open-bg-modal">🖼️ Kho Background</button>
+            <button class="btn-add-trigger" id="btn-open-modal">+</button>
+        </div>
     </div>
 
     <div class="container">
@@ -468,7 +573,7 @@
         </div>
     </div>
 
-    <!-- iOS Bottom Sheet Modal Form -->
+    <!-- iOS Bottom Sheet Modal Form (Thêm/Sửa Cún) -->
     <div class="modal-overlay" id="modal-overlay">
         <div class="bottom-sheet">
             <div class="sheet-handle"></div>
@@ -524,6 +629,51 @@
         </div>
     </div>
 
+    <!-- Modal Quản Lý Kho Background Chụp Ảnh -->
+    <div class="modal-overlay" id="bg-modal-overlay">
+        <div class="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <span class="sheet-title">Kho Background Chụp Ảnh</span>
+            </div>
+            
+            <div class="form-group">
+                <label>Danh mục background</label>
+                <select id="bg-category">
+                    <option value="Trong nhà">Trong nhà</option>
+                    <option value="Ngoài sân">Ngoài sân</option>
+                </select>
+
+                <div class="category-input-row" style="margin-top: 8px;">
+                    <input type="text" id="new-bg-category-input" placeholder="Tên danh mục mới (ví dụ: Phòng Studio, Bãi biển...)" style="padding: 10px 14px; font-size: 14px;">
+                    <button class="btn-small-add" id="btn-add-bg-category">➕ Thêm DM</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Tải ảnh background mới lên</label>
+                <div class="media-actions">
+                    <label for="input-bg-camera" class="btn-media">📷 Chụp background</label>
+                    <input type="file" id="input-bg-camera" accept="image/*" capture="environment">
+
+                    <label for="input-bg-album" class="btn-media">🖼️ Chọn từ album</label>
+                    <input type="file" id="input-bg-album" accept="image/*">
+                </div>
+                <img id="preview-bg-upload" src="" alt="Preview BG">
+            </div>
+            <button class="btn-submit" id="btn-save-bg" style="display: none; margin-bottom: 12px;">Lưu Background Này Vào Kho</button>
+
+            <div class="form-group" style="margin-top: 10px;">
+                <label>Danh sách background hiện có:</label>
+                <div id="bg-list-container">
+                    <p style="text-align: center; color: var(--text-sub); font-size: 14px; padding: 20px 0;">Chưa có background nào.</p>
+                </div>
+            </div>
+
+            <button class="btn-submit btn-cancel" id="btn-close-bg-modal">Đóng</button>
+        </div>
+    </div>
+
     <!-- Firebase SDK Modular (v10+) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -546,10 +696,14 @@
         const analytics = getAnalytics(app);
         const db = getDatabase(app);
         const dogsRef = ref(db, 'dogs');
+        const backgroundsRef = ref(db, 'backgrounds');
+        const bgCategoriesRef = ref(db, 'bg_categories');
 
         let base64Image = "";
+        let base64BgUpload = "";
+        let customCategories = ["Trong nhà", "Ngoài sân"];
 
-        // Elements DOM
+        // Elements DOM Cún
         const elId = document.getElementById('dog-id');
         const elBranch = document.getElementById('dog-branch');
         const elName = document.getElementById('dog-name');
@@ -565,15 +719,20 @@
         const btnOpenModal = document.getElementById('btn-open-modal');
         const formTitle = document.getElementById('form-title');
 
-        // Modal Handlers
-        const openModal = () => {
-            modalOverlay.classList.add('active');
-        };
+        // Elements DOM Background Modal
+        const bgModalOverlay = document.getElementById('bg-modal-overlay');
+        const btnOpenBgModal = document.getElementById('btn-open-bg-modal');
+        const btnCloseBgModal = document.getElementById('btn-close-bg-modal');
+        const previewBgUpload = document.getElementById('preview-bg-upload');
+        const btnSaveBg = document.getElementById('btn-save-bg');
+        const bgListContainer = document.getElementById('bg-list-container');
+        const bgCategorySelect = document.getElementById('bg-category');
+        const newBgCategoryInput = document.getElementById('new-bg-category-input');
+        const btnAddBgCategory = document.getElementById('btn-add-bg-category');
 
-        const closeModal = () => {
-            modalOverlay.classList.remove('active');
-            setTimeout(resetForm, 300);
-        };
+        // Modal Cún Handlers
+        const openModal = () => { modalOverlay.classList.add('active'); };
+        const closeModal = () => { modalOverlay.classList.remove('active'); setTimeout(resetForm, 300); };
 
         btnOpenModal.addEventListener('click', () => {
             resetForm();
@@ -582,21 +741,66 @@
         });
 
         btnCancel.addEventListener('click', closeModal);
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) closeModal();
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+
+        // Modal Background Handlers
+        btnOpenBgModal.addEventListener('click', () => { bgModalOverlay.classList.add('active'); });
+        btnCloseBgModal.addEventListener('click', () => { bgModalOverlay.classList.remove('active'); });
+        bgModalOverlay.addEventListener('click', (e) => { if (e.target === bgModalOverlay) bgModalOverlay.classList.remove('active'); });
+
+        // Lấy và đồng bộ danh mục từ Firebase
+        onValue(bgCategoriesRef, (snapshot) => {
+            const data = snapshot.val();
+            const setCategories = new Set(["Trong nhà", "Ngoài sân"]);
+            if (data) {
+                Object.values(data).forEach(cat => {
+                    if (cat && cat.name) setCategories.add(cat.name);
+                });
+            }
+            customCategories = Array.from(setCategories);
+            updateCategoryDropdown();
         });
 
-        // Xử lý nén & mã hóa ảnh thành Base64
-        const handleImageUpload = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+        const updateCategoryDropdown = () => {
+            const currentVal = bgCategorySelect.value;
+            bgCategorySelect.innerHTML = customCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            if (customCategories.includes(currentVal)) {
+                bgCategorySelect.value = currentVal;
+            }
+        };
 
+        // Thêm danh mục mới vào Firebase
+        btnAddBgCategory.addEventListener('click', () => {
+            const newCat = newBgCategoryInput.value.trim();
+            if (!newCat) {
+                alert('Vui lòng nhập tên danh mục mới!');
+                return;
+            }
+            if (customCategories.includes(newCat)) {
+                alert('Danh mục này đã tồn tại!');
+                return;
+            }
+
+            const newRef = push(bgCategoriesRef);
+            set(newRef, {
+                name: newCat,
+                createdAt: Date.now()
+            }).then(() => {
+                newBgCategoryInput.value = '';
+                bgCategorySelect.value = newCat;
+                alert(`Đã thêm danh mục "${newCat}" thành công!`);
+            }).catch(err => alert("Lỗi: " + err.message));
+        });
+
+        // Hàm nén ảnh chung
+        const compressImage = (file, callback) => {
+            if (!file) return;
             const reader = new FileReader();
             reader.onload = function (event) {
                 const img = new Image();
                 img.onload = function () {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 600;
+                    const MAX_WIDTH = 800;
                     const scaleFactor = MAX_WIDTH / img.width;
                     
                     if (scaleFactor < 1) {
@@ -609,20 +813,119 @@
 
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    base64Image = canvas.toDataURL('image/jpeg', 0.7);
-                    elPreview.src = base64Image;
-                    elPreview.style.display = 'block';
+                    callback(canvas.toDataURL('image/jpeg', 0.75));
                 };
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         };
 
-        document.getElementById('input-camera').addEventListener('change', handleImageUpload);
-        document.getElementById('input-album').addEventListener('change', handleImageUpload);
+        // Xử lý chọn ảnh cún
+        document.getElementById('input-camera').addEventListener('change', (e) => {
+            compressImage(e.target.files[0], (data) => {
+                base64Image = data;
+                elPreview.src = base64Image;
+                elPreview.style.display = 'block';
+            });
+        });
+        document.getElementById('input-album').addEventListener('change', (e) => {
+            compressImage(e.target.files[0], (data) => {
+                base64Image = data;
+                elPreview.src = base64Image;
+                elPreview.style.display = 'block';
+            });
+        });
 
-        // Reset form
+        // Xử lý chọn ảnh Background tải lên
+        const handleBgFileSelect = (e) => {
+            compressImage(e.target.files[0], (data) => {
+                base64BgUpload = data;
+                previewBgUpload.src = base64BgUpload;
+                previewBgUpload.style.display = 'block';
+                btnSaveBg.style.display = 'block';
+            });
+        };
+
+        document.getElementById('input-bg-camera').addEventListener('change', handleBgFileSelect);
+        document.getElementById('input-bg-album').addEventListener('change', handleBgFileSelect);
+
+        // Lưu background mới lên Firebase kèm danh mục
+        btnSaveBg.addEventListener('click', () => {
+            if (!base64BgUpload) return;
+            const selectedCat = bgCategorySelect.value || "Trong nhà";
+            const newRef = push(backgroundsRef);
+            set(newRef, {
+                image: base64BgUpload,
+                category: selectedCat,
+                createdAt: Date.now()
+            }).then(() => {
+                base64BgUpload = "";
+                previewBgUpload.src = "";
+                previewBgUpload.style.display = 'none';
+                btnSaveBg.style.display = 'none';
+                alert(`Đã thêm ảnh background thành công vào danh mục "${selectedCat}"!`);
+            }).catch(err => alert("Lỗi: " + err.message));
+        });
+
+        // Lấy danh sách Background từ Firebase hiển thị phân nhóm động theo danh mục
+        onValue(backgroundsRef, (snapshot) => {
+            bgListContainer.innerHTML = '';
+            const data = snapshot.val();
+            if (!data) {
+                bgListContainer.innerHTML = '<p style="text-align: center; color: var(--text-sub); font-size: 14px; padding: 20px 0;">Chưa có background nào.</p>';
+                return;
+            }
+
+            const groupedBgs = {};
+
+            Object.keys(data).reverse().forEach((key) => {
+                const bg = data[key];
+                bg.id = key;
+                const cat = bg.category || 'Trong nhà';
+                if (!groupedBgs[cat]) {
+                    groupedBgs[cat] = [];
+                }
+                groupedBgs[cat].push(bg);
+            });
+
+            const renderBgCard = (bg) => `
+                <div class="bg-item-card">
+                    <img src="${bg.image}" alt="Background">
+                    <button class="btn-delete-bg" data-id="${bg.id}">×</button>
+                </div>
+            `;
+
+            let html = '';
+
+            // Lấy danh sách các danh mục có dữ liệu + danh mục hiện có
+            const allCats = Array.from(new Set([...customCategories, ...Object.keys(groupedBgs)]));
+
+            allCats.forEach(cat => {
+                const bgs = groupedBgs[cat] || [];
+                html += `<div class="bg-category-section">`;
+                html += `<div class="bg-category-title">📂 ${cat} (${bgs.length})</div>`;
+                if (bgs.length === 0) {
+                    html += `<p style="color: var(--text-sub); font-size: 13px; margin-bottom: 8px;">Chưa có background nào trong danh mục này.</p>`;
+                } else {
+                    html += `<div class="bg-grid">${bgs.map(renderBgCard).join('')}</div>`;
+                }
+                html += `</div>`;
+            });
+
+            bgListContainer.innerHTML = html;
+
+            // Xóa background
+            document.querySelectorAll('.btn-delete-bg').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    if (confirm('Bạn có chắc muốn xóa background này khỏi kho?')) {
+                        remove(ref(db, `backgrounds/${id}`));
+                    }
+                });
+            });
+        });
+
+        // Reset form cún
         const resetForm = () => {
             elId.value = '';
             elBranch.value = 'Chi nhánh 1';
@@ -667,28 +970,22 @@
             }
 
             if (id) {
-                // Cập nhật
                 update(ref(db, `dogs/${id}`), dogData)
-                    .then(() => {
-                        closeModal();
-                    })
+                    .then(() => closeModal())
                     .catch(err => alert("Lỗi khi cập nhật: " + err.message));
             } else {
-                // Thêm mới
                 if (!base64Image) {
                     alert('Vui lòng chọn hoặc chụp ảnh cún!');
                     return;
                 }
                 const newRef = push(dogsRef);
                 set(newRef, dogData)
-                    .then(() => {
-                        closeModal();
-                    })
+                    .then(() => closeModal())
                     .catch(err => alert("Lỗi khi thêm mới: " + err.message));
             }
         });
 
-        // Lấy danh sách thời gian thực từ Realtime Database
+        // Lấy danh sách thời gian thực từ Realtime Database cho Cún
         onValue(dogsRef, (snapshot) => {
             dogListEl.innerHTML = '';
             const data = snapshot.val();
@@ -744,7 +1041,6 @@
 
             let html = '';
 
-            // Mục Chi nhánh 1
             html += `<div class="branch-section">`;
             html += `<h2 class="branch-title">Chi nhánh 1 (${branch1Dogs.length})</h2>`;
             if (branch1Dogs.length === 0) {
@@ -754,7 +1050,6 @@
             }
             html += `</div>`;
 
-            // Mục Chi nhánh 2
             html += `<div class="branch-section">`;
             html += `<h2 class="branch-title">Chi nhánh 2 (${branch2Dogs.length})</h2>`;
             if (branch2Dogs.length === 0) {
@@ -766,7 +1061,6 @@
 
             dogListEl.innerHTML = html;
 
-            // Xử lý bật/tắt nhanh Trạng thái trực tiếp trên thẻ cún
             document.querySelectorAll('.toggle-status').forEach(toggle => {
                 toggle.addEventListener('change', (e) => {
                     e.stopPropagation();
@@ -779,7 +1073,6 @@
                 });
             });
 
-            // Gán sự kiện cho nút Sửa & Xóa
             document.querySelectorAll('.btn-delete').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
