@@ -151,18 +151,37 @@
         .btn-fund-out { background: var(--ios-purple); color: white; box-shadow: 0 4px 12px rgba(88, 86, 214, 0.3); }
         .btn-fund-in { background: rgba(88, 86, 214, 0.1); color: var(--ios-purple); border: 1px solid rgba(88, 86, 214, 0.2); }
 
-        /* BỔ SUNG GIAO DIỆN CHỈNH SỬA VÀ LỊCH SỬ CHỈNH SỬA */
+        /* BỔ SUNG GIAO DIỆN CHỈNH SỬA VÀ XÓA */
+        .item-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: 4px;
+        }
         .btn-edit-item {
             background: none;
             border: none;
             color: var(--ios-blue);
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 4px 6px;
             font-size: 12px;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
+        }
+        .btn-delete-item {
+            background: none;
+            border: none;
+            color: var(--ios-red);
+            cursor: pointer;
+            padding: 4px 6px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
         }
         .edited-badge {
             font-size: 11px;
@@ -307,7 +326,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB8uLkLJFlzmCodcawJhs2dRckHQzO5y10",
@@ -400,6 +419,23 @@
 
             document.getElementById('chitiet').value = item.chitiet || "";
             document.getElementById('inputOverlay').classList.add('show');
+        };
+
+        // XÓA GIAO DỊCH
+        window.deleteTransaction = (id) => {
+            const item = window.rawItemsMap[id];
+            if (!item) return;
+
+            const confirmMsg = `Bạn có chắc chắn muốn xóa giao dịch này?\n\n- Ngày: ${item.ngay.split('-').reverse().join('/')}\n- Số tiền: ${Number(item.sotien).toLocaleString('vi-VN')} đ\n- Ghi chú: ${item.chitiet || 'Không có'}`;
+            
+            if (confirm(confirmMsg)) {
+                const itemRef = ref(db, `vi/lichsu/${id}`);
+                remove(itemRef).then(() => {
+                    alert("Đã xóa giao dịch thành công!");
+                }).catch((err) => {
+                    alert("Lỗi khi xóa giao dịch: " + err.message);
+                });
+            }
         };
 
         window.saveData = () => {
@@ -526,6 +562,12 @@
             const container = document.getElementById("detailContent");
             document.getElementById("detailDateTitle").innerText = date.split('-').reverse().join('/');
             let html = "";
+            
+            if (items.length === 0) {
+                toggleDetail(false);
+                return;
+            }
+
             items.forEach(item => {
                 let label = 'Biến động';
                 let color = '#000';
@@ -546,9 +588,14 @@
                     </div>
                     <div style="text-align:right">
                         <div style="font-weight:700; color:${color}">${prefix}${item.sotien.toLocaleString('vi-VN')}</div>
-                        <button class="btn-edit-item" onclick="openEditForm('${item.id}')">
-                            <i data-lucide="edit-3" style="width:14px; height:14px;"></i> Sửa
-                        </button>
+                        <div class="item-actions">
+                            <button class="btn-edit-item" onclick="openEditForm('${item.id}')">
+                                <i data-lucide="edit-3" style="width:14px; height:14px;"></i> Sửa
+                            </button>
+                            <button class="btn-delete-item" onclick="deleteTransaction('${item.id}')">
+                                <i data-lucide="trash-2" style="width:14px; height:14px;"></i> Xóa
+                            </button>
+                        </div>
                     </div>
                 </div>`;
             });
@@ -658,9 +705,13 @@
             });
             fundHistoryContent.innerHTML = fundHtml || "<p style='text-align:center; color:gray; font-size:14px; margin-top:15px;'>Chưa có biến động quỹ</p>";
 
-            // Nút cập nhật lại trang chi tiết đang mở (nếu có)
-            if (currentDetailDate && window.fullDataStore[currentDetailDate]) {
-                window.showDayDetail(currentDetailDate);
+            // Cập nhật lại màn hình chi tiết ngày đang xem
+            if (currentDetailDate) {
+                if (window.fullDataStore[currentDetailDate]) {
+                    window.showDayDetail(currentDetailDate);
+                } else {
+                    toggleDetail(false);
+                }
             }
 
             lucide.createIcons();
