@@ -131,11 +131,11 @@
         .daily-item { padding: 18px; background: #F9F9F9; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         
         /* FORM OVERLAY */
-        #inputOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 3000; opacity: 0; visibility: hidden; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
-        #inputOverlay.show { opacity: 1; visibility: visible; }
-        .form-card { width: 90%; max-width: 350px; background: #fff; border-radius: 28px; padding: 30px; transform: scale(0.8); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        #inputOverlay.show .form-card { transform: scale(1); }
-        input, textarea { width: 100%; padding: 16px; margin-bottom: 15px; border-radius: 15px; border: 1px solid #E5E5EA; background: #F2F2F7; font-size: 16px; box-sizing: border-box; outline: none; }
+        #inputOverlay, #editLogsOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 3000; opacity: 0; visibility: hidden; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+        #inputOverlay.show, #editLogsOverlay.show { opacity: 1; visibility: visible; }
+        .form-card { width: 90%; max-width: 350px; background: #fff; border-radius: 28px; padding: 30px; transform: scale(0.8); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 85vh; overflow-y: auto; }
+        #inputOverlay.show .form-card, #editLogsOverlay.show .form-card { transform: scale(1); }
+        input, textarea, select { width: 100%; padding: 16px; margin-bottom: 15px; border-radius: 15px; border: 1px solid #E5E5EA; background: #F2F2F7; font-size: 16px; box-sizing: border-box; outline: none; }
         #saveBtn, .btn-block { width: 100%; padding: 16px; border-radius: 15px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
         #saveBtn { background: var(--ios-blue); color: #fff; }
         .btn-block:active { transform: scale(0.96); opacity: 0.9; }
@@ -150,6 +150,41 @@
         .fund-actions { display: flex; gap: 15px; margin-bottom: 25px; }
         .btn-fund-out { background: var(--ios-purple); color: white; box-shadow: 0 4px 12px rgba(88, 86, 214, 0.3); }
         .btn-fund-in { background: rgba(88, 86, 214, 0.1); color: var(--ios-purple); border: 1px solid rgba(88, 86, 214, 0.2); }
+
+        /* BỔ SUNG GIAO DIỆN CHỈNH SỬA VÀ LỊCH SỬ CHỈNH SỬA */
+        .btn-edit-item {
+            background: none;
+            border: none;
+            color: var(--ios-blue);
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .edited-badge {
+            font-size: 11px;
+            color: var(--ios-purple);
+            background: rgba(88, 86, 214, 0.1);
+            padding: 2px 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 4px;
+            display: inline-block;
+        }
+        .log-item {
+            font-size: 13px;
+            border-bottom: 1px dashed var(--ios-separator);
+            padding: 10px 0;
+        }
+        .log-time {
+            font-weight: bold;
+            color: var(--ios-gray);
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
     </style>
 </head>
 <body>
@@ -248,6 +283,12 @@
     <div id="inputOverlay" onclick="if(event.target === this) closeForm()">
         <div class="form-card">
             <h2 id="formTitle" style="margin-top:0; text-align:center"></h2>
+            <select id="loaiGiaoDich" style="display:none;">
+                <option value="thu">Thu nhập (+)</option>
+                <option value="chi">Chi tiêu (-)</option>
+                <option value="trich_quy">Trích 20% vào quỹ (-)</option>
+                <option value="nap_tu_quy">Nạp lại ví chính từ Quỹ (+)</option>
+            </select>
             <input type="date" id="ngay">
             <input type="text" id="sotien" placeholder="0" oninput="formatNumber(this)" inputmode="numeric">
             <textarea id="chitiet" placeholder="Ghi chú nội dung..."></textarea>
@@ -255,9 +296,18 @@
         </div>
     </div>
 
+    <!-- OVERLAY XEM LỊCH SỬ CHỈNH SỬA -->
+    <div id="editLogsOverlay" onclick="if(event.target === this) closeLogsOverlay()">
+        <div class="form-card">
+            <h3 style="margin-top:0; text-align:center; color:var(--ios-purple);">LỊCH SỬ CHỈNH SỬA</h3>
+            <div id="logsContent"></div>
+            <button class="btn-block" onclick="closeLogsOverlay()" style="background:#E5E5EA; color:#000; margin-top:15px;">ĐÓNG</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB8uLkLJFlzmCodcawJhs2dRckHQzO5y10",
@@ -276,8 +326,12 @@
 
         lucide.createIcons();
         window.fullDataStore = {};
+        window.rawItemsMap = {};
         let currentWalletBalance = 0;
         let currentFundBalance = 0;
+        let editingItemId = null;
+        let editingItemRawData = null;
+        let currentDetailDate = null;
 
         window.toggleHistory = (open) => document.getElementById('historySheet').classList.toggle('open', open);
         window.toggleFund = (open) => document.getElementById('fundSheet').classList.toggle('open', open);
@@ -288,11 +342,18 @@
             if (value) {
                 input.setAttribute('data-val', value);
                 input.value = Number(value).toLocaleString('vi-VN') + " đ";
+            } else {
+                input.removeAttribute('data-val');
+                input.value = "";
             }
         };
 
         window.openForm = (type) => {
+            editingItemId = null;
+            editingItemRawData = null;
             window.currentType = type;
+            document.getElementById('loaiGiaoDich').style.display = 'none';
+
             if (type === 'thu') {
                 document.getElementById('formTitle').innerHTML = '<span style="color:var(--ios-green)">THU NHẬP</span>';
             } else if (type === 'chi') {
@@ -301,6 +362,9 @@
                 document.getElementById('formTitle').innerHTML = '<span style="color:var(--ios-purple)">NẠP LẠI VÍ CHÍNH</span>';
             }
             document.getElementById('ngay').value = new Date().toISOString().split('T')[0];
+            document.getElementById('sotien').value = "";
+            document.getElementById('sotien').removeAttribute('data-val');
+            document.getElementById('chitiet').value = "";
             document.getElementById('inputOverlay').classList.add('show');
         };
 
@@ -314,24 +378,95 @@
 
         window.closeForm = () => document.getElementById('inputOverlay').classList.remove('show');
 
+        // MỞ FORM CHỈNH SỬA GIAO DỊCH
+        window.openEditForm = (id) => {
+            const item = window.rawItemsMap[id];
+            if (!item) return;
+
+            editingItemId = id;
+            editingItemRawData = item;
+            window.currentType = item.loai;
+
+            document.getElementById('formTitle').innerHTML = '<span style="color:var(--ios-blue)">CHỈNH SỬA GIAO DỊCH</span>';
+            const selectLoai = document.getElementById('loaiGiaoDich');
+            selectLoai.style.display = 'block';
+            selectLoai.value = item.loai;
+
+            document.getElementById('ngay').value = item.ngay;
+            
+            const sotienInput = document.getElementById('sotien');
+            sotienInput.setAttribute('data-val', item.sotien);
+            sotienInput.value = Number(item.sotien).toLocaleString('vi-VN') + " đ";
+
+            document.getElementById('chitiet').value = item.chitiet || "";
+            document.getElementById('inputOverlay').classList.add('show');
+        };
+
         window.saveData = () => {
             const sotien = Number(document.getElementById('sotien').getAttribute('data-val') || 0);
             const ngay = document.getElementById('ngay').value;
             const chitiet = document.getElementById('chitiet').value;
             if (!sotien) return;
 
-            if (window.currentType === 'nap_tu_quy' && sotien > currentFundBalance) {
-                alert("Số tiền vượt quá số dư hiện tại của Quỹ!");
-                return;
-            }
+            // NẾU ĐANG TRONG CHẾ ĐỘ CHỈNH SỬA
+            if (editingItemId && editingItemRawData) {
+                const newLoai = document.getElementById('loaiGiaoDich').value;
 
-            push(lichsuRef, { loai: window.currentType, ngay, sotien, chitiet, time: Date.now() })
-            .then(() => { 
-                closeForm(); 
-                document.getElementById('sotien').value = ""; 
-                document.getElementById('chitiet').value = "";
-                document.getElementById('sotien').removeAttribute('data-val');
-            });
+                // Kiểm tra điều kiện nạp lại ví
+                if (newLoai === 'nap_tu_quy') {
+                    const availableFund = currentFundBalance + (editingItemRawData.loai === 'trich_quy' ? editingItemRawData.sotien : 0) - (editingItemRawData.loai === 'nap_tu_quy' ? editingItemRawData.sotien : 0);
+                    if (sotien > availableFund) {
+                        alert("Số tiền vượt quá số dư hiện tại của Quỹ!");
+                        return;
+                    }
+                }
+
+                // Ghi lại lịch sử chỉnh sửa (Audit logs)
+                const editLogs = editingItemRawData.editLogs || [];
+                const logEntry = {
+                    editedAt: new Date().toLocaleString('vi-VN'),
+                    oldData: {
+                        loai: editingItemRawData.loai,
+                        ngay: editingItemRawData.ngay,
+                        sotien: editingItemRawData.sotien,
+                        chitiet: editingItemRawData.chitiet || ''
+                    },
+                    newData: {
+                        loai: newLoai,
+                        ngay: ngay,
+                        sotien: sotien,
+                        chitiet: chitiet
+                    }
+                };
+                editLogs.push(logEntry);
+
+                const itemRef = ref(db, `vi/lichsu/${editingItemId}`);
+                update(itemRef, {
+                    loai: newLoai,
+                    ngay: ngay,
+                    sotien: sotien,
+                    chitiet: chitiet,
+                    editLogs: editLogs
+                }).then(() => {
+                    closeForm();
+                    if (currentDetailDate) window.showDayDetail(currentDetailDate);
+                });
+
+            } else {
+                // TẠO MỚI GIAO DỊCH
+                if (window.currentType === 'nap_tu_quy' && sotien > currentFundBalance) {
+                    alert("Số tiền vượt quá số dư hiện tại của Quỹ!");
+                    return;
+                }
+
+                push(lichsuRef, { loai: window.currentType, ngay, sotien, chitiet, time: Date.now() })
+                .then(() => { 
+                    closeForm(); 
+                    document.getElementById('sotien').value = ""; 
+                    document.getElementById('chitiet').value = "";
+                    document.getElementById('sotien').removeAttribute('data-val');
+                });
+            }
         };
 
         window.extractToFund = () => {
@@ -355,7 +490,38 @@
             }
         };
 
+        // HIỂN THỊ CÁC LẦN CHỈNH SỬA
+        window.showEditLogs = (id) => {
+            const item = window.rawItemsMap[id];
+            if (!item || !item.editLogs) return;
+
+            const formatLoaiName = (loai) => {
+                if (loai === 'thu') return 'Thu';
+                if (loai === 'chi') return 'Chi';
+                if (loai === 'trich_quy') return 'Trích Quỹ';
+                if (loai === 'nap_tu_quy') return 'Nạp từ Quỹ';
+                return loai;
+            };
+
+            let html = "";
+            item.editLogs.slice().reverse().forEach((log, idx) => {
+                html += `<div class="log-item">
+                    <div class="log-time">Lần sửa ${item.editLogs.length - idx}: ${log.editedAt}</div>
+                    <div style="color:var(--ios-red)"><b>Trước:</b> ${formatLoaiName(log.oldData.loai)} - ${log.oldData.ngay.split('-').reverse().join('/')} - ${log.oldData.sotien.toLocaleString('vi-VN')}đ (${log.oldData.chitiet || 'Không có ghi chú'})</div>
+                    <div style="color:var(--ios-green)"><b>Sau:</b> ${formatLoaiName(log.newData.loai)} - ${log.newData.ngay.split('-').reverse().join('/')} - ${log.newData.sotien.toLocaleString('vi-VN')}đ (${log.newData.chitiet || 'Không có ghi chú'})</div>
+                </div>`;
+            });
+
+            document.getElementById("logsContent").innerHTML = html;
+            document.getElementById("editLogsOverlay").classList.add("show");
+        };
+
+        window.closeLogsOverlay = () => {
+            document.getElementById("editLogsOverlay").classList.remove("show");
+        };
+
         window.showDayDetail = (date) => {
+            currentDetailDate = date;
             const items = window.fullDataStore[date] || [];
             const container = document.getElementById("detailContent");
             document.getElementById("detailDateTitle").innerText = date.split('-').reverse().join('/');
@@ -370,9 +536,20 @@
                 else if (item.loai === 'trich_quy') { label = 'Trích Quỹ (Ra)'; color = 'var(--ios-red)'; prefix = '-'; }
                 else if (item.loai === 'nap_tu_quy') { label = 'Nạp từ Quỹ (Vào)'; color = 'var(--ios-green)'; prefix = '+'; }
 
+                const hasLogs = item.editLogs && item.editLogs.length > 0;
+
                 html += `<div class="detail-row">
-                    <div><div style="font-weight:700">${label}</div><div style="font-size:13px; color:gray">${item.chitiet || '...'}</div></div>
-                    <div style="font-weight:700; color:${color}">${prefix}${item.sotien.toLocaleString('vi-VN')}</div>
+                    <div>
+                        <div style="font-weight:700">${label}</div>
+                        <div style="font-size:13px; color:gray">${item.chitiet || '...'}</div>
+                        ${hasLogs ? `<div class="edited-badge" onclick="showEditLogs('${item.id}')">Đã chỉnh sửa (${item.editLogs.length})</div>` : ''}
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-weight:700; color:${color}">${prefix}${item.sotien.toLocaleString('vi-VN')}</div>
+                        <button class="btn-edit-item" onclick="openEditForm('${item.id}')">
+                            <i data-lucide="edit-3" style="width:14px; height:14px;"></i> Sửa
+                        </button>
+                    </div>
                 </div>`;
             });
             container.innerHTML = html;
@@ -387,12 +564,18 @@
             
             let totalRevenue = 0, totalExpense = 0, totalFund = 0;
             window.fullDataStore = {};
+            window.rawItemsMap = {};
             let fundItems = [];
 
             if (data) {
-                const sortedRaw = Object.values(data).sort((a,b) => a.time - b.time);
+                // Duyệt qua dữ liệu có kèm Key ID từ Firebase
+                const sortedRaw = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                })).sort((a,b) => a.time - b.time);
                 
                 sortedRaw.forEach(item => {
+                    window.rawItemsMap[item.id] = item;
                     if (!window.fullDataStore[item.ngay]) window.fullDataStore[item.ngay] = [];
                     window.fullDataStore[item.ngay].push(item);
                     
@@ -474,6 +657,11 @@
                 </div>`;
             });
             fundHistoryContent.innerHTML = fundHtml || "<p style='text-align:center; color:gray; font-size:14px; margin-top:15px;'>Chưa có biến động quỹ</p>";
+
+            // Nút cập nhật lại trang chi tiết đang mở (nếu có)
+            if (currentDetailDate && window.fullDataStore[currentDetailDate]) {
+                window.showDayDetail(currentDetailDate);
+            }
 
             lucide.createIcons();
         });
