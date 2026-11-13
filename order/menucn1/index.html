@@ -488,6 +488,14 @@
                 <label>Tên Món (EN)</label>
                 <input type="text" id="new-item-name-en" placeholder="Milk Coffee">
             </div>
+            <div class="input-group">
+                <label>Ghi Chú (VI)</label>
+                <input type="text" id="new-item-note-vi" placeholder="Ví dụ: Ít ngọt, nhiều đá...">
+            </div>
+            <div class="input-group">
+                <label>Ghi Chú (EN)</label>
+                <input type="text" id="new-item-note-en" placeholder="Ví dụ: Less sweet, extra ice...">
+            </div>
         </div>
         <button class="btn btn-primary" onclick="addItem()">+ Thêm Món Vào Menu</button>
     </div>
@@ -529,6 +537,14 @@
             <div class="input-group">
                 <label>Tên Món (English)</label>
                 <input type="text" id="edit-name-en">
+            </div>
+            <div class="input-group">
+                <label>Ghi Chú (Tiếng Việt)</label>
+                <input type="text" id="edit-note-vi" placeholder="Nhập ghi chú tiếng Việt...">
+            </div>
+            <div class="input-group">
+                <label>Ghi Chú (English)</label>
+                <input type="text" id="edit-note-en" placeholder="Nhập ghi chú tiếng Anh...">
             </div>
         </div>
 
@@ -642,6 +658,7 @@
                             <div class="item-info">
                                 <span class="item-name">${dVI.name}</span>
                                 <span class="item-subtext">EN: ${dEN.name || '---'} • ID: ${dVI.id}</span>
+                                ${dVI.note || dEN.note ? `<span class="item-subtext">📝 ${dVI.note || '---'} / ${dEN.note || '---'}</span>` : ''}
                                 <span class="item-price">${dVI.price.toLocaleString('vi-VN')} đ</span>
                             </div>
                             <div class="item-actions">
@@ -698,6 +715,8 @@
         const price = parseInt(document.getElementById('new-item-price').value);
         const nameVI = document.getElementById('new-item-name-vi').value.trim();
         const nameEN = document.getElementById('new-item-name-en').value.trim();
+        const noteVI = document.getElementById('new-item-note-vi').value.trim();
+        const noteEN = document.getElementById('new-item-note-en').value.trim();
 
         if (!targetVal) return alert('Vui lòng chọn Danh mục!');
         if (!id || isNaN(price) || !nameVI || !nameEN) return alert('Vui lòng điền đầy đủ các trường thông tin!');
@@ -712,14 +731,16 @@
             return alert('Mã ID này đã được sử dụng!');
         }
 
-        rawMenuData.vi[type][catIdx].drinks.push({ id, name: nameVI, price });
-        rawMenuData.en[type][catIdx].drinks.push({ id, name: nameEN, price });
+        rawMenuData.vi[type][catIdx].drinks.push({ id, name: nameVI, price, note: noteVI });
+        rawMenuData.en[type][catIdx].drinks.push({ id, name: nameEN, price, note: noteEN });
 
         saveToFirebase(() => {
             document.getElementById('new-item-id').value = '';
             document.getElementById('new-item-price').value = '';
             document.getElementById('new-item-name-vi').value = '';
             document.getElementById('new-item-name-en').value = '';
+            document.getElementById('new-item-note-vi').value = '';
+            document.getElementById('new-item-note-en').value = '';
             document.getElementById('card-add-item').classList.remove('active');
         });
     }
@@ -735,7 +756,7 @@
 
     function openEditModal(type, catIdx, itemIdx) {
         const itemVI = rawMenuData.vi[type][catIdx].drinks[itemIdx];
-        const itemEN = rawMenuData.en[type][catIdx].drinks.find(d => d.id === itemVI.id) || { name: '' };
+        const itemEN = rawMenuData.en[type][catIdx].drinks.find(d => d.id === itemVI.id) || { name: '', note: '' };
 
         document.getElementById('edit-type').value = type;
         document.getElementById('edit-cat-index').value = catIdx;
@@ -744,6 +765,8 @@
         document.getElementById('edit-price').value = itemVI.price;
         document.getElementById('edit-name-vi').value = itemVI.name;
         document.getElementById('edit-name-en').value = itemEN.name;
+        document.getElementById('edit-note-vi').value = itemVI.note || '';
+        document.getElementById('edit-note-en').value = itemEN.note || '';
 
         document.getElementById('edit-modal').classList.add('active');
     }
@@ -760,6 +783,8 @@
         const newPrice = parseInt(document.getElementById('edit-price').value);
         const newNameVI = document.getElementById('edit-name-vi').value.trim();
         const newNameEN = document.getElementById('edit-name-en').value.trim();
+        const newNoteVI = document.getElementById('edit-note-vi').value.trim();
+        const newNoteEN = document.getElementById('edit-note-en').value.trim();
 
         if (isNaN(newPrice) || !newNameVI || !newNameEN) return alert('Vui lòng nhập đầy đủ thông tin!');
 
@@ -768,10 +793,12 @@
 
         targetVI.name = newNameVI;
         targetVI.price = newPrice;
+        targetVI.note = newNoteVI;
 
         if (targetEN) {
             targetEN.name = newNameEN;
             targetEN.price = newPrice;
+            targetEN.note = newNoteEN;
         }
 
         saveToFirebase(() => {
