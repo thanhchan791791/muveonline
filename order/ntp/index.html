@@ -76,10 +76,11 @@
         .category-item.active .category-header { background:#fff0f3; color:#ff758f; }
         .category-item.active .category-header::after { transform:rotate(-180deg); }
         .category-content { display:none; background:#fff; padding:5px 10px; border-top:1px solid #ffe5ec; max-height:250px; overflow-y:auto; }
-        .drink-search-item { display:flex; justify-content:space-between; align-items:center; padding:10px 8px; border-bottom:1px solid #fff0f3; background:#fff; }
+        .drink-search-item { display:flex; justify-content:space-between; align-items:center; padding:10px 8px; border-bottom:1px solid #fff0f3; background:#fff; gap:8px; }
         .drink-search-item:last-child { border-bottom:none; }
         .drink-search-name { font-size:14px; font-weight:700; color:#4a4e69; }
         .drink-search-price { font-size:13px; color:#ff758f; font-weight:700; margin-left:5px; }
+        .drink-search-note { font-size:11.5px; color:#8d99ae; font-weight:500; margin-top:2px; line-height:1.3; }
         .selected-drinks-cart { margin-top:15px; background:#fdf2f4; border-radius:16px; padding:12px; display:none; }
         .cart-title { font-size:13px; font-weight:800; color:#ff758f; margin-bottom:8px; border-bottom:1px dashed #ffccd5; padding-bottom:4px; }
         .price-sticky-bar { background:#fff0f3; border:2px solid #ffccd5; border-radius:18px; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-weight:800; }
@@ -462,8 +463,12 @@
         document.getElementById(containerId).innerHTML = categoriesData.map((cat, catIdx) => {
             const itemsHtml = (cat.drinks || []).map(drink => {
                 const qty = orderState.drinks[drink.id] || 0;
+                const noteHtml = drink.note ? `<div class="drink-search-note">${drink.note}</div>` : '';
                 return `<div class="drink-search-item">
-                    <div><span class="drink-search-name">${drink.name}</span><span class="drink-search-price">${drink.price/1000}k</span></div>
+                    <div style="flex:1; padding-right:8px;">
+                        <div><span class="drink-search-name">${drink.name}</span><span class="drink-search-price">${drink.price/1000}k</span></div>
+                        ${noteHtml}
+                    </div>
                     <div class="quantity-selector">
                         <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', -1, event)">-</button>
                         <input type="number" id="qty-${drink.id}" class="qty-input" value="${qty}" min="0" readonly>
