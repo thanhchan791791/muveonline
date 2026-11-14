@@ -189,30 +189,13 @@
                 <span class="ticket-price" id="txt-ticket-red-price">110.000đ / vé</span>
                 <p class="ticket-description" id="txt-ticket-red-desc">Trải nghiệm: Đầy đủ khu vực Vé Xanh + Được vào khu "bộ trưởng ngoại giao" Capybara, lạc đà alpaca và cho các bé Gấu Mèo (Raccoon) tinh nghịch ăn!</p>
                 <div class="included-animals">
-                    <span class="animal-tag" id="tag-dog2">Chó</span><span class="animal-tag" id="tag-cat2">Mèo</span><span class="animal-tag">Capybara</span><span class="animal-tag" id="tag-raccoon">Gấu Mèo</span><span class="animal-tag" id="tag-raccoon">Lạc đà alpaca</span>
+                    <span class="animal-tag" id="tag-dog2">Chó</span><span class="animal-tag" id="tag-cat2">Mèo</span><span class="animal-tag">Capybara</span><span class="animal-tag" id="tag-raccoon">Gấu Mèo</span><span class="animal-tag" id="tag-alpaca">Lạc đà alpaca</span>
                 </div>
             </div>
             <div class="quantity-selector">
                 <button class="qty-btn" onclick="changeTicketQty('red', -1)">-</button>
                 <input type="number" id="qty-red" class="qty-input" value="0" min="0" readonly>
                 <button class="qty-btn" onclick="changeTicketQty('red', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="ticket-option purple animate__animated animate__fadeInLeft">
-            <div class="badge-combo">COMBO</div>
-            <div class="ticket-info purple">
-                <h3 id="txt-ticket-purple-title">Combo Chi Nhánh 1 + Chi Nhánh 2</h3>
-                <span class="ticket-price" id="txt-ticket-purple-price">180.000đ / vé</span>
-                <p class="ticket-description" id="txt-ticket-purple-desc">Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat, Lạc đà Alpaca)!</p>
-                <div class="included-animals">
-                    <span class="animal-tag" id="tag-dog3">Chó</span><span class="animal-tag" id="tag-cat3">Mèo</span><span class="animal-tag" id="tag-raccoon2">Gấu Mèo</span><span class="animal-tag">Capybara</span><span class="animal-tag" id="tag-parrot">Vẹt</span><span class="animal-tag" id="tag-meerkat">Cầy Meerkat</span><span class="animal-tag" id="tag-alpaca">Lạc đà Alpaca</span>
-                </div>
-            </div>
-            <div class="quantity-selector">
-                <button class="qty-btn" onclick="changeTicketQty('purple', -1)">-</button>
-                <input type="number" id="qty-purple" class="qty-input" value="0" min="0" readonly>
-                <button class="qty-btn" onclick="changeTicketQty('purple', 1)">+</button>
             </div>
         </div>
 
@@ -342,9 +325,8 @@
             btnStep1Next: "Tiếp tục nhận vé ->", step2Title: "Nội Quy Quán Nhỏ", rulesZoomNote: "Bấm vào ảnh để xem lưu ý rõ hơn", agreeRules: "TÔI ĐÃ ĐỌC VÀ HIỂU NỘI QUY",
             btnRuleNext: "Đồng ý & Tiếp tục ->", step3Title: "Chọn Vé & Gọi Món", menuZoomNote: "Bấm vào ảnh để xem toàn màn hình", noticeBox: "Vé vào cửa BẮT BUỘC mua trước.<br>Nước uống KHÔNG BẮT BUỘC, bạn tùy ý lựa chọn nhé!",
             ticketGreenTitle: "Vé Xanh (Combo 1)", ticketGreenPrice: "80.000đ / vé", ticketGreenDesc: "Trải nghiệm: Tham quan tự do, vuốt ve và chơi đùa thoải mái cùng các bé Chó, bé Mèo siêu thân thiện tại sảnh chính của quán.",
-            tagDog: "Chó", tagCat: "Mèo", tagRaccoon: "Gấu Mèo", tagParrot: "Vẹt", tagMeerkat: "Cầy Meerkat", tagAlpaca: "Lạc đà Alpaca",
+            tagDog: "Chó", tagCat: "Mèo", tagRaccoon: "Gấu Mèo", tagAlpaca: "Lạc đà Alpaca",
             ticketRedTitle: "Vé Đỏ (Combo 2)", ticketRedPrice: "110.000đ / vé", ticketRedDesc: "Trải nghiệm: Đầy đủ khu vực Vé Xanh + Được vào ôm ấp \"bộ trưởng ngoại giao\" Capybara ,lạc đà Alpaca và cho các bé Gấu Mèo (Raccoon) tinh nghịch ăn!",
-            ticketPurpleTitle: "Combo Chi Nhánh 1 + Chi Nhánh 2", ticketPurplePrice: "180.000đ / vé", ticketPurpleDesc: "Trải nghiệm cả 2 chi nhánh: Chi nhánh 1 (Chó, Mèo, Gấu Mèo, Capybara, lạc đà Alpaca) & Chi nhánh 2 (Chó, Mèo, Vẹt, Cầy Meerkat)!",
             selectDrink: "Chọn danh mục món bên dưới:", tabFood: "🍖 THỨC ĂN THÚ", tabDrinks: "🍹 NƯỚC UỐNG", cartTitle: "Món bạn đã chọn:", totalLabel: "TỔNG CỘNG:",
             stickyConfirm: "Xác nhận đơn hàng ->", successTitle: "Đặt Vé Thành Công!", sumName: "Khách hàng:", sumPhone: "Thông tin liên hệ:", sumTime: "Thời gian đặt vé:",
             billTitle: "CHI TIẾT HÓA ĐƠN", sumGrandTotal: "Tổng tiền thanh toán:", staffPin: "Nhân viên nhập mã PIN để xác nhận món:", pinPlaceholder: "Nhập số PIN...",
@@ -352,7 +334,7 @@
             tcheckTitle: "Bạn ơi lưu ý nha!", tcheckDesc: "Bạn có chắc chắn là mình đã mua vé chưa? Nhấn \"Đúng vậy\" nếu bạn đã mua vé trước đó, hoặc muốn vào trong rồi order thêm sau nha!",
             tcheckNo: "Quay lại", tcheckYes: "Đúng vậy", riskTitle: "Một chút lưu ý nhỏ bạn nha!", riskDesc: "Các bé thú cưng đôi lúc sẽ vô tình cào nhẹ hoặc phản ứng tự vệ nếu chúng ta tương tác sai cách (không đúng nội quy). Để đảm bảo an toàn, bạn vui lòng tự lưu ý và đồng ý chịu trách nhiệm cho các rủi ro va quẹt, trầy xước ngoài ý muốn trong quá trình vui chơi nhé.",
             riskNo: "Hủy bỏ", riskYes: "Tớ đồng ý", alertFillInfo: "Bạn vui lòng nhập đầy đủ Họ tên và Thông tin liên hệ nhé!", alertPhoneFormat: "Số điện thoại không đúng cấu trúc rồi ạ (Bắt đầu bằng số 0 và từ 10 số trở lên)!", alertEmailFormat: "Địa chỉ Email / Gmail không đúng định dạng rồi ạ!",
-            ticketGreenBillName: "Vé Xanh (Combo 1)", ticketRedBillName: "Vé Đỏ (Combo 2)", ticketPurpleBillName: "Combo Chi Nhánh 1 + Chi Nhánh 2", noTicketBillNote: "Chưa chọn vé & món (Sẽ gọi thêm khi vào trong)",
+            ticketGreenBillName: "Vé Xanh (Combo 1)", ticketRedBillName: "Vé Đỏ (Combo 2)", noTicketBillNote: "Chưa chọn vé & món (Sẽ gọi thêm khi vào trong)",
             pinSuccess: "Mã PIN chính xác! Đơn hàng đã được xác nhận.", pinError: "Mã PIN không đúng, vui lòng thử lại."
         },
         en: {
@@ -364,9 +346,8 @@
             btnStep1Next: "Continue to Tickets ->", step2Title: "House Rules", rulesZoomNote: "Tap on the image to enlarge guidelines", agreeRules: "I HAVE READ & AGREE TO THE RULES",
             btnRuleNext: "Agree & Continue ->", step3Title: "Select Tickets & Drinks", menuZoomNote: "Tap on the image to view full screen menu", noticeBox: "Entrance tickets are REQUIRED in advance.<br>Drinks are OPTIONAL, feel free to choose!",
             ticketGreenTitle: "Green Ticket (Combo 1)", ticketGreenPrice: "80,000 VND / ticket", ticketGreenDesc: "Experience: Free walk-through, pet and play with friendly Dogs and Cats in the main lobby.",
-            tagDog: "Dog", tagCat: "Cat", tagRaccoon: "Raccoon", tagParrot: "Parrot", tagMeerkat: "Meerkat", tagAlpaca: "Alpaca",
+            tagDog: "Dog", tagCat: "Cat", tagRaccoon: "Raccoon", tagAlpaca: "Alpaca",
             ticketRedTitle: "Red Ticket (Combo 2)", ticketRedPrice: "110,000 VND / ticket", ticketRedDesc: "Experience: Includes all Green Ticket areas, plus access to hug Capybaras, meet Alpacas, and feed Raccoons!",
-            ticketPurpleTitle: "Combo location 1 + location 2", ticketPurplePrice: "180,000 VND / ticket", ticketPurpleDesc: "Experience both locations: Location 1 (Here: Dog, Cat, Raccoon, Capybara, Alpaca) & Location 2: 285/94B CMT8: Dog, Cat, Parrot, Meerkat)!",
             selectDrink: "Select item category below:", tabFood: "🍖 PET FOOD", tabDrinks: "🍹 DRINKS", cartTitle: "Selected Items:", totalLabel: "TOTAL:",
             stickyConfirm: "Confirm Order ->", successTitle: "Booking Successful!", sumName: "Customer:", sumPhone: "Contact Info:", sumTime: "Booking Time:",
             billTitle: "BILL DETAILS", sumGrandTotal: "Total Amount Due:", staffPin: "Staff PIN verification:", pinPlaceholder: "Enter PIN...",
@@ -374,12 +355,12 @@
             tcheckTitle: "Friendly Reminder!", tcheckDesc: "Are you sure you haven't selected any tickets? Tap \"Yes\" if you bought tickets earlier or wish to order inside later!",
             tcheckNo: "Go Back", tcheckYes: "Yes, I understand", riskTitle: "Important Safety Note!", riskDesc: "Our pets may accidentally scratch or react defensively if handled incorrectly. For safety, please be careful and accept personal responsibility for any accidental scratches during playtime.",
             riskNo: "Cancel", riskYes: "I Agree", alertFillInfo: "Please enter your full Name and Contact info!", alertPhoneFormat: "Invalid phone number format (Must start with 0 and have at least 10 digits)!", alertEmailFormat: "Invalid Email format!",
-            ticketGreenBillName: "Green Ticket (Combo 1)", ticketRedBillName: "Red Ticket (Combo 2)", ticketPurpleBillName: "Combo Branch 1 + Branch 2", noTicketBillNote: "No ticket/drink selected (Will order inside)",
+            ticketGreenBillName: "Green Ticket (Combo 1)", ticketRedBillName: "Red Ticket (Combo 2)", noTicketBillNote: "No ticket/drink selected (Will order inside)",
             pinSuccess: "Correct PIN! Order verified successfully.", pinError: "Incorrect PIN, please try again."
         }
     };
 
-    let orderState = { name: '', phone: '', contactType: 'phone', ticketGreen: 0, ticketRed: 0, ticketPurple: 0, drinks: {} };
+    let orderState = { name: '', phone: '', contactType: 'phone', ticketGreen: 0, ticketRed: 0, drinks: {} };
 
     function setElText(id, text, isHTML = false) {
         const el = document.getElementById(id);
@@ -435,10 +416,8 @@
         setElText('txt-menu-zoom-note', t.menuZoomNote); setElText('txt-notice-box', t.noticeBox, true);
         
         setElText('txt-ticket-green-title', t.ticketGreenTitle); setElText('txt-ticket-green-price', t.ticketGreenPrice); setElText('txt-ticket-green-desc', t.ticketGreenDesc);
-        setElText('tag-dog', t.tagDog); setElText('tag-cat', t.tagCat); setElText('tag-dog2', t.tagDog); setElText('tag-cat2', t.tagCat); setElText('tag-raccoon', t.tagRaccoon);
+        setElText('tag-dog', t.tagDog); setElText('tag-cat', t.tagCat); setElText('tag-dog2', t.tagDog); setElText('tag-cat2', t.tagCat); setElText('tag-raccoon', t.tagRaccoon); setElText('tag-alpaca', t.tagAlpaca);
         setElText('txt-ticket-red-title', t.ticketRedTitle); setElText('txt-ticket-red-price', t.ticketRedPrice); setElText('txt-ticket-red-desc', t.ticketRedDesc);
-        setElText('txt-ticket-purple-title', t.ticketPurpleTitle); setElText('txt-ticket-purple-price', t.ticketPurplePrice); setElText('txt-ticket-purple-desc', t.ticketPurpleDesc);
-        setElText('tag-dog3', t.tagDog); setElText('tag-cat3', t.tagCat); setElText('tag-raccoon2', t.tagRaccoon); setElText('tag-parrot', t.tagParrot); setElText('tag-meerkat', t.tagMeerkat); setElText('tag-alpaca', t.tagAlpaca);
         
         setElText('lbl-select-drink', t.selectDrink); setElText('txt-tab-food', t.tabFood); setElText('txt-tab-drinks', t.tabDrinks);
         setElText('txt-cart-title', t.cartTitle); setElText('txt-total-label', t.totalLabel); setElText('btn-sticky-confirm', t.stickyConfirm);
@@ -517,7 +496,7 @@
 
     function updateSelectedCart() {
         const activeIds = Object.keys(orderState.drinks);
-        let totalCount = orderState.ticketGreen + orderState.ticketRed + orderState.ticketPurple + activeIds.reduce((sum, id) => sum + orderState.drinks[id], 0);
+        let totalCount = orderState.ticketGreen + orderState.ticketRed + activeIds.reduce((sum, id) => sum + orderState.drinks[id], 0);
 
         const fCart = document.getElementById('floating-cart');
         fCart.style.display = totalCount > 0 ? 'flex' : 'none';
@@ -548,13 +527,12 @@
         inp.value = qty;
         if (type === 'green') orderState.ticketGreen = qty;
         if (type === 'red') orderState.ticketRed = qty;
-        if (type === 'purple') orderState.ticketPurple = qty;
         updateSelectedCart();
         updateTotalCost();
     }
 
     function calculateTotal() {
-        let total = orderState.ticketGreen * 80000 + orderState.ticketRed * 110000 + orderState.ticketPurple * 180000;
+        let total = orderState.ticketGreen * 80000 + orderState.ticketRed * 110000;
         allDrinks = getAllDrinksList();
         for (const [id, qty] of Object.entries(orderState.drinks)) {
             const d = allDrinks.find(item => item.id === id);
@@ -627,7 +605,7 @@
     function closeRulesModal() { document.getElementById('rules-modal').style.display = 'none'; }
 
     function handleOrderConfirmation() {
-        if (!orderState.ticketGreen && !orderState.ticketRed && !orderState.ticketPurple) {
+        if (!orderState.ticketGreen && !orderState.ticketRed) {
             document.getElementById('ticket-check-modal').style.display = 'flex';
         } else triggerRiskModal();
     }
@@ -649,7 +627,6 @@
         let html = '';
         if (orderState.ticketGreen > 0) html += `<div class="bill-row"><span>${t.ticketGreenBillName} x ${orderState.ticketGreen}</span><span>${(orderState.ticketGreen * 80000).toLocaleString('vi-VN')}đ</span></div>`;
         if (orderState.ticketRed > 0) html += `<div class="bill-row"><span>${t.ticketRedBillName} x ${orderState.ticketRed}</span><span>${(orderState.ticketRed * 110000).toLocaleString('vi-VN')}đ</span></div>`;
-        if (orderState.ticketPurple > 0) html += `<div class="bill-row"><span>${t.ticketPurpleBillName} x ${orderState.ticketPurple}</span><span>${(orderState.ticketPurple * 180000).toLocaleString('vi-VN')}đ</span></div>`;
 
         allDrinks = getAllDrinksList();
         for (const [id, qty] of Object.entries(orderState.drinks)) {
@@ -679,7 +656,7 @@
             customerName: orderState.name, 
             customerPhone: orderState.phone,
             contactType: orderState.contactType,
-            ticketGreenQty: orderState.ticketGreen, ticketRedQty: orderState.ticketRed, ticketPurpleQty: orderState.ticketPurple,
+            ticketGreenQty: orderState.ticketGreen, ticketRedQty: orderState.ticketRed,
             drinks: orderedDrinks, totalAmount: calculateTotal(), createdAt: now.toLocaleString('vi-VN'),
             timestamp: now.getTime(), language: currentLang,
             confirmedBy: staffInfo ? staffInfo.name : "N/A", confirmedByCode: staffInfo ? staffInfo.code : "N/A"
