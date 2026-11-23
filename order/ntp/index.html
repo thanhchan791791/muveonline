@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Đặt Vé Trải Nghiệm & Gọi Món</title>
+    <title>Đặt Lịch Trải Nghiệm</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         :root { --pink:#ff8fa3; --pink-h:#ff758f; --bg:#fff0f3; --dark:#4a4e69; --green:#a7c957; --red:#f35b04; --purple:#7209b7; --rad:24px; }
         * { box-sizing:border-box; margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
         body { background:linear-gradient(135deg, #ffe5ec, #ffc2d1); color:var(--dark); display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px 15px; overflow-x:hidden; }
         .container { background:rgba(255,255,255,0.95); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); width:100%; max-width:480px; border-radius:var(--rad); box-shadow:0 20px 40px rgba(255,117,143,0.2); padding:30px 20px; position:relative; border:4px solid #fff; }
-        .container.has-sticky-btn { padding-bottom:110px; }
+        .container.has-sticky-rules { padding-bottom:175px; }
         .logo-wrapper { display:flex; justify-content:center; align-items:center; margin-bottom:15px; }
         .shop-logo { width:90px; height:90px; object-fit:contain; border-radius:50%; background:#fff; padding:4px; box-shadow:0 8px 16px rgba(255,117,143,0.15); border:2px solid #fff0f3; animation:pulse 3s infinite; }
         @keyframes pulse { 0%,100%{transform:scale(1) rotate(0)} 50%{transform:scale(1.04) rotate(3deg)} }
@@ -20,94 +20,30 @@
         .lang-option-btn:hover { border-color:var(--pink); background:#fff0f3; transform:translateY(-2px); box-shadow:0 8px 20px rgba(255,117,143,0.2); }
         .form-group { margin-bottom:18px; }
         label { display:block; margin-bottom:6px; font-weight:700; font-size:14px; color:#6d6875; padding-left:4px; }
-        input[type="text"], input[type="tel"], input[type="email"], input[type="password"].pin-input { width:100%; padding:14px 18px; border:2px solid #ffe5ec; border-radius:18px; font-size:16px; outline:none; background:#fffafb; color:var(--dark); transition:all .3s; font-weight:600; }
+        input[type="text"], input[type="tel"], input[type="email"], input[type="number"] { width:100%; padding:14px 18px; border:2px solid #ffe5ec; border-radius:18px; font-size:16px; outline:none; background:#fffafb; color:var(--dark); transition:all .3s; font-weight:600; }
         input:focus { border-color:var(--pink); background:#fff; box-shadow:0 0 0 4px rgba(255,143,163,0.15); }
         .contact-type-selector { display:flex; gap:8px; margin-bottom:12px; background:#fff0f3; padding:4px; border-radius:16px; border:1px solid #ffe5ec; }
         .contact-type-btn { flex:1; padding:8px 12px; border:none; border-radius:12px; font-size:13px; font-weight:700; color:#6d6875; background:transparent; cursor:pointer; transition:all .2s; }
         .contact-type-btn.active { background:#fff; color:var(--pink-h); box-shadow:0 2px 8px rgba(255,117,143,0.2); }
+        .rules-warning-banner { background:#fff1f2; border:2.5px solid #f43f5e; border-radius:18px; padding:18px 16px; margin-bottom:22px; text-align:center; box-shadow:0 6px 16px rgba(244,63,94,0.15); }
+        .rules-warning-banner .warn-title { color:#be123c; font-size:17px; font-weight:900; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.3px; }
+        .rules-warning-banner .warn-text { color:#881337; font-size:15.5px; font-weight:700; line-height:1.55; }
         .rules-img-container { width:100%; border-radius:18px; overflow:hidden; border:2px dashed #ffb3c1; padding:6px; background:#fff5f6; margin-bottom:22px; cursor:zoom-in; text-align:center; }
         .rules-img { width:100%; height:auto; border-radius:12px; display:block; }
-        .checkbox-container { display:flex; align-items:center; gap:12px; margin-bottom:25px; cursor:pointer; font-size:15px; font-weight:700; color:#ff758f; background:#fff0f3; padding:12px 16px; border-radius:16px; }
-        .checkbox-container input { width:22px; height:22px; accent-color:var(--pink); cursor:pointer; }
-        .btn { display:block; width:100%; padding:16px; background:linear-gradient(135deg, #ff8fa3, #ff758f); color:#fff; border:none; border-radius:20px; font-size:17px; font-weight:800; cursor:pointer; box-shadow:0 8px 20px rgba(255,117,143,0.3); transition:all .3s; text-align:center; }
+        .sticky-rules-footer { position:fixed; bottom:0; left:0; width:100%; background:linear-gradient(0deg, #fff 82%, rgba(255,255,255,0.92) 92%, rgba(255,255,255,0) 100%); padding:14px 15px 18px; z-index:999; display:flex; justify-content:center; box-shadow:0 -10px 25px rgba(255,117,143,0.12); }
+        .sticky-rules-inner { width:100%; max-width:440px; }
+        .checkbox-container { display:flex; align-items:center; gap:12px; margin-bottom:10px; cursor:pointer; font-size:14.5px; font-weight:800; color:#ff758f; background:#fff0f3; padding:10px 14px; border-radius:16px; border:1.5px solid #ffc2d1; }
+        .checkbox-container input { width:22px; height:22px; accent-color:var(--pink); cursor:pointer; flex-shrink:0; }
+        .btn { display:block; width:100%; padding:15px; background:linear-gradient(135deg, #ff8fa3, #ff758f); color:#fff; border:none; border-radius:20px; font-size:17px; font-weight:800; cursor:pointer; box-shadow:0 8px 20px rgba(255,117,143,0.3); transition:all .3s; text-align:center; }
         .btn:hover { transform:translateY(-2px); box-shadow:0 12px 24px rgba(255,117,143,0.4); }
         .btn:active { transform:translateY(1px) scale(0.98); }
         .btn:disabled { background:#e0e0e0; color:#a1a1a1; box-shadow:none; cursor:not-allowed; }
-        .sticky-confirm-wrapper { position:fixed; bottom:0; left:0; width:100%; background:linear-gradient(0deg, #fff 70%, rgba(255,255,255,0) 100%); padding:20px 15px 25px; z-index:999; display:flex; justify-content:center; }
-        .sticky-confirm-wrapper .btn-sticky { width:100%; max-width:440px; background:linear-gradient(135deg, #4ef084, #10b981); box-shadow:0 8px 25px rgba(16,185,129,0.4); }
-        .notice-box { background:#fff3cd; border:1px solid #ffeeba; color:#856404; padding:12px 14px; border-radius:16px; font-size:13.5px; font-weight:700; margin-bottom:15px; line-height:1.4; text-align:center; }
-        .ticket-option { background:#fff; border:3px solid #f0f0f0; border-radius:22px; padding:18px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; position:relative; box-shadow:0 6px 15px rgba(0,0,0,0.03); }
-        .ticket-option::before { content:''; position:absolute; left:0; top:0; bottom:0; width:8px; }
-        .ticket-option.green { border-color:#e2f0d9; } .ticket-option.green::before { background:var(--green); }
-        .ticket-option.red { border-color:#ffdad3; background:linear-gradient(180deg, #fff, #fff5f3); } .ticket-option.red::before { background:var(--red); }
-        .ticket-option.purple { border-color:#e2d9f0; background:linear-gradient(180deg, #fff, #f8f3ff); } .ticket-option.purple::before { background:var(--purple); }
-        .badge-hot, .badge-combo { position:absolute; top:0; right:0; color:#fff; font-size:10px; font-weight:800; padding:4px 12px; border-bottom-left-radius:12px; }
-        .badge-hot { background:linear-gradient(135deg, #ff4d6d, #ff758f); }
-        .badge-combo { background:linear-gradient(135deg, #7209b7, #3f37c9); }
-        .ticket-info { flex:1; padding-right:10px; }
-        .ticket-info h3 { font-size:18px; font-weight:800; margin-bottom:4px; }
-        .ticket-info.green h3 { color:#52796f; } .ticket-info.red h3 { color:#d90429; } .ticket-info.purple h3 { color:#7209b7; }
-        .ticket-price { font-size:14px; font-weight:700; color:#6d6875; }
-        .ticket-description { font-size:12px; margin-top:6px; font-weight:600; line-height:1.4; }
-        .ticket-option.green .ticket-description { color:#52796f; }
-        .ticket-option.red .ticket-description { color:#b7094c; }
-        .ticket-option.purple .ticket-description { color:#5c0099; }
-        .included-animals { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
-        .animal-tag { font-size:11px; padding:2px 8px; border-radius:10px; font-weight:700; background:#f1f5f9; }
-        .ticket-option.green .animal-tag { background:#e8f5e9; color:#2e7d32; }
-        .ticket-option.red .animal-tag { background:#ffebee; color:#c62828; }
-        .ticket-option.purple .animal-tag { background:#f3e5f5; color:#6a1b9a; }
-        .quantity-selector { display:flex; align-items:center; gap:10px; background:#f8f9fa; padding:4px 8px; border-radius:30px; border:1px solid #e9ecef; flex-shrink:0; }
-        .qty-btn { width:32px; height:32px; border-radius:50%; border:none; background:#fff; font-size:18px; font-weight:bold; cursor:pointer; display:flex; justify-content:center; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
-        .qty-input { width:26px; text-align:center; border:none; font-size:16px; font-weight:800; background:transparent; }
-        .menu-top-section { background:#fff8f9; border:2px solid #ffe5ec; border-radius:20px; padding:12px; margin-bottom:18px; text-align:center; }
-        .menu-img-container { width:100%; border-radius:14px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05); cursor:zoom-in; }
-        .menu-img { width:100%; height:auto; display:block; }
-        .search-drink-box { background:#fff; border:2px solid #ffe5ec; border-radius:20px; padding:18px 15px 15px; margin:28px 0 20px; border-top:2px dashed #ffccd5; }
-        .menu-tabs { display:flex; gap:10px; margin-bottom:15px; background:#ffe5ec; padding:6px; border-radius:18px; }
-        .menu-tab-btn { flex:1; padding:14px 12px; border:none; border-radius:14px; background:transparent; font-size:16px; font-weight:900; color:#6d6875; cursor:pointer; transition:all .25s; display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:.5px; }
-        .menu-tab-btn.active { background:linear-gradient(135deg, #ff758f, #ff4d6d); color:#fff; box-shadow:0 6px 16px rgba(255,77,109,0.35); transform:scale(1.02); }
-        .menu-tab-content { display:none; } .menu-tab-content.active { display:block; }
-        .category-item { margin-bottom:10px; border:1.5px solid #ffe5ec; border-radius:14px; overflow:hidden; transition:all .3s; }
-        .category-header { background:#fffafb; padding:12px 16px; font-weight:800; font-size:15px; color:#4a4e69; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; transition:background .3s; }
-        .category-header:hover { background:#fff0f3; }
-        .category-header::after { content:'▾'; font-size:16px; color:#ff758f; transition:transform .3s; }
-        .category-item.active { border-color:#ff8fa3; box-shadow:0 4px 12px rgba(255,143,163,0.1); }
-        .category-item.active .category-header { background:#fff0f3; color:#ff758f; }
-        .category-item.active .category-header::after { transform:rotate(-180deg); }
-        .category-content { display:none; background:#fff; padding:5px 10px; border-top:1px solid #ffe5ec; max-height:250px; overflow-y:auto; }
-        .drink-search-item { display:flex; justify-content:space-between; align-items:center; padding:10px 8px; border-bottom:1px solid #fff0f3; background:#fff; gap:8px; }
-        .drink-search-item:last-child { border-bottom:none; }
-        .drink-search-name { font-size:14px; font-weight:700; color:#4a4e69; }
-        .drink-search-price { font-size:13px; color:#ff758f; font-weight:700; margin-left:5px; }
-        .drink-search-note { font-size:11.5px; color:#8d99ae; font-weight:500; margin-top:2px; line-height:1.3; }
-        .selected-drinks-cart { margin-top:15px; background:#fdf2f4; border-radius:16px; padding:12px; display:none; }
-        .cart-title { font-size:13px; font-weight:800; color:#ff758f; margin-bottom:8px; border-bottom:1px dashed #ffccd5; padding-bottom:4px; }
-        .price-sticky-bar { background:#fff0f3; border:2px solid #ffccd5; border-radius:18px; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-weight:800; }
-        .price-sticky-bar span { color:#ff4d6d; font-size:20px; }
-        .floating-cart-btn { position:fixed; bottom:90px; right:20px; width:56px; height:56px; background:linear-gradient(135deg, #ff4d6d, #ff758f); border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow:0 8px 20px rgba(255,77,109,0.4); z-index:1000; cursor:pointer; transition:all .3s; border:3px solid #fff; }
-        .floating-cart-btn:active { transform:scale(0.9); }
-        .floating-cart-btn svg { width:26px; height:26px; fill:#fff; }
-        .floating-cart-badge { position:absolute; top:-4px; right:-4px; background:#10b981; color:#fff; font-size:12px; font-weight:900; width:22px; height:22px; border-radius:50%; display:flex; justify-content:center; align-items:center; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
         .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; }
         .modal-overlay.zoom-mode { cursor:zoom-out; }
         .modal-overlay img { max-width:95%; max-height:90%; border-radius:12px; }
-        .confirm-alert-box { background:#fff; width:85%; max-width:380px; border-radius:24px; padding:25px 20px; text-align:center; box-shadow:0 15px 30px rgba(0,0,0,0.3); border:3px solid var(--pink); }
-        .confirm-alert-box h3 { font-size:20px; color:#d90429; margin-bottom:12px; font-weight:800; }
-        .confirm-alert-box p { font-size:15px; line-height:1.5; color:#4a4e69; margin-bottom:20px; font-weight:600; }
-        .confirm-buttons { display:flex; gap:10px; }
-        .btn-confirm-yes, .btn-confirm-no { flex:1; padding:12px; color:#fff; border:none; border-radius:14px; font-weight:800; font-size:15px; cursor:pointer; }
-        .btn-confirm-yes { background:linear-gradient(135deg, #4ef084, #10b981); }
-        .btn-confirm-no { background:#6d6875; }
         .success-card { text-align:center; }
-        .customer-summary { background:#fdf0f2; padding:16px; border-radius:20px; margin:15px 0; font-size:14px; text-align:left; border:1px solid #ffe3e8; line-height:1.6; }
-        .bill-details { background:#fff; border:2px dashed #ffccd5; border-radius:20px; padding:16px; margin:18px 0; text-align:left; }
-        .bill-title { font-size:15px; font-weight:800; color:#ff758f; border-bottom:1px solid #ffe5ec; padding-bottom:8px; margin-bottom:10px; text-align:center; }
-        .bill-row { display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:6px; color:#6d6875; }
-        .bill-total-row { display:flex; justify-content:space-between; font-size:18px; font-weight:800; color:#d90429; border-top:2px dashed #ffccd5; padding-top:10px; margin-top:10px; }
+        .customer-summary { background:#fdf0f2; padding:16px; border-radius:20px; margin:15px 0; font-size:14px; text-align:left; border:1px solid #ffe3e8; line-height:1.8; }
         .note-staff { font-size:13px; color:#8d99ae; margin-top:15px; font-style:italic; }
-        .staff-pin-box { background:#fff8f9; border:2px solid #ffccd5; border-radius:20px; padding:15px; margin-top:20px; }
-        .pin-wrapper { display:flex; gap:10px; margin-top:8px; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -133,6 +69,10 @@
             <input type="text" id="fullname" placeholder="Ví dụ: Nguyễn Văn A" autocomplete="off">
         </div>
         <div class="form-group">
+            <label for="guest-count" id="lbl-guest-count">Số lượng khách</label>
+            <input type="number" id="guest-count" placeholder="Ví dụ: 2" min="1" value="1" inputmode="numeric" autocomplete="off">
+        </div>
+        <div class="form-group">
             <div class="contact-type-selector">
                 <button type="button" class="contact-type-btn active" id="btn-type-phone" onclick="switchContactType('phone')">📱 Số điện thoại</button>
                 <button type="button" class="contact-type-btn" id="btn-type-email" onclick="switchContactType('email')">✉️ Email / Gmail</button>
@@ -140,7 +80,16 @@
             <label for="contact-input" id="lbl-contact">Số điện thoại (Nhập đúng từ 10 số trở lên)</label>
             <input type="tel" id="contact-input" placeholder="Ví dụ: 0912345678" autocomplete="off">
         </div>
-        <button class="btn" id="btn-step1-next" onclick="goToStep2()">Tiếp tục nhận vé -></button>
+        <button class="btn" id="btn-step1-next" onclick="goToStepWarning()">Tiếp tục -></button>
+    </div>
+
+    <div id="step-warning" class="step">
+        <h2 id="txt-warning-step-title">Lưu Ý Trước Khi Vào Chơi</h2>
+        <div class="rules-warning-banner">
+            <div class="warn-title" id="txt-warn-title">⚠️ LƯU Ý QUAN TRỌNG TRƯỚC KHI VÀO CHƠI</div>
+            <div class="warn-text" id="txt-warn-desc">Trong lúc vui đùa quá khích, các bé thú cưng có thể vô tình cào nhẹ hoặc cắn trúng bạn. quán xin phép không hoàn tiền và không chịu trách nhiệm đối với các sự cố ngoài ý muốn này.</div>
+        </div>
+        <button class="btn" id="btn-warning-next" onclick="goToStep2()">Tiếp tục qua bảng nội quy -></button>
     </div>
 
     <div id="step-2" class="step">
@@ -149,138 +98,33 @@
             <img id="rules-img-element" src="luuy.png" class="rules-img" alt="Lưu ý" onerror="this.src='luuy.jpg'">
             <p id="txt-rules-zoom-note" style="font-size:11px; color:#a1a1a1; margin-top:5px; font-weight:bold;">Bấm vào ảnh để xem lưu ý rõ hơn</p>
         </div>
+    </div>
+
+    <div id="step-success" class="step success-card">
+        <h2 id="txt-success-title">Xác Nhận Thành Công!</h2>
+        <div class="customer-summary">
+            <p><strong id="lbl-sum-name">Khách hàng:</strong> <span id="summary-name" style="color:#ff758f; font-weight:700;"></span></p>
+            <p><strong id="lbl-sum-guests">Số lượng khách:</strong> <span id="summary-guests" style="color:#ff4d6d; font-weight:700;"></span></p>
+            <p><strong id="lbl-sum-phone">Thông tin liên hệ:</strong> <span id="summary-phone" style="font-weight:600;"></span></p>
+            <p><strong id="lbl-sum-time">Thời gian xác nhận:</strong> <span id="summary-time" style="color:#4f46e5; font-weight:700;"></span></p>
+            <p><strong id="lbl-sum-rules">Trạng thái nội quy:</strong> <span id="summary-rules" style="color:#2e7d32; font-weight:700;">Đã đọc & Đồng ý nội quy</span></p>
+        </div>
+        <button class="btn" id="btn-back-info" style="background:linear-gradient(135deg, #6c757d, #495057); margin-top:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15);" onclick="goBackToInfo()">Quay lại chỉnh sửa thông tin</button>
+        <p class="note-staff" id="txt-note-staff">Hãy xuất trình màn hình xác nhận này cho nhân viên quầy để đối chiếu nha!</p>
+    </div>
+</div>
+
+<div id="sticky-rules-bar" class="sticky-rules-footer" style="display:none;">
+    <div class="sticky-rules-inner">
         <label class="checkbox-container">
             <input type="checkbox" id="agree-checkbox" onchange="toggleRuleBtn()">
             <span id="txt-agree-rules">TÔI ĐÃ ĐỌC VÀ HIỂU NỘI QUY</span>
         </label>
-        <button class="btn" id="btn-rule-next" disabled onclick="goToStep3()">Đồng ý & Tiếp tục -></button>
-    </div>
-
-    <div id="step-3" class="step">
-        <h2 id="txt-step3-title">Chọn Vé & Gọi Món</h2>
-        <div class="menu-top-section">
-            <div class="menu-img-container" onclick="openMenuModal()">
-                <img id="menu-img-element" src="menu.png" class="menu-img" alt="Menu" onerror="this.src='menu.jpg'">
-                <p id="txt-menu-zoom-note" style="font-size:11px; color:#a1a1a1; margin-top:5px; font-weight:bold;">Bấm vào ảnh để xem toàn màn hình</p>
-            </div>
-        </div>
-        <div class="notice-box" id="txt-notice-box">
-            Vé vào cửa BẮT BUỘC mua trước.<br>Nước uống KHÔNG BẮT BUỘC, bạn tùy ý lựa chọn nhé!
-        </div>
-
-        <div class="ticket-option green animate__animated animate__fadeInLeft">
-            <div class="ticket-info green">
-                <h3 id="txt-ticket-green-title">Vé Xanh (Combo 1)</h3>
-                <span class="ticket-price" id="txt-ticket-green-price">80.000đ / vé</span>
-                <p class="ticket-description" id="txt-ticket-green-desc">Trải nghiệm: Tham quan tự do, vuốt ve và chơi đùa thoải mái cùng các bé Chó, bé Mèo siêu thân thiện tại sảnh chính của quán.</p>
-                <div class="included-animals"><span class="animal-tag" id="tag-dog">Chó</span><span class="animal-tag" id="tag-cat">Mèo</span></div>
-            </div>
-            <div class="quantity-selector">
-                <button class="qty-btn" onclick="changeTicketQty('green', -1)">-</button>
-                <input type="number" id="qty-green" class="qty-input" value="0" min="0" readonly>
-                <button class="qty-btn" onclick="changeTicketQty('green', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="ticket-option red animate__animated animate__fadeInRight">
-            <div class="badge-hot">HOT</div>
-            <div class="ticket-info red">
-                <h3 id="txt-ticket-red-title">Vé Đỏ (Combo 2)</h3>
-                <span class="ticket-price" id="txt-ticket-red-price">110.000đ / vé</span>
-                <p class="ticket-description" id="txt-ticket-red-desc">Trải nghiệm: Đầy đủ khu vực Vé Xanh + Được vào khu "bộ trưởng ngoại giao" Capybara, lạc đà alpaca và cho các bé Gấu Mèo (Raccoon) tinh nghịch ăn!</p>
-                <div class="included-animals">
-                    <span class="animal-tag" id="tag-dog2">Chó</span><span class="animal-tag" id="tag-cat2">Mèo</span><span class="animal-tag">Capybara</span><span class="animal-tag" id="tag-raccoon">Gấu Mèo</span><span class="animal-tag" id="tag-alpaca">Lạc đà alpaca</span>
-                </div>
-            </div>
-            <div class="quantity-selector">
-                <button class="qty-btn" onclick="changeTicketQty('red', -1)">-</button>
-                <input type="number" id="qty-red" class="qty-input" value="0" min="0" readonly>
-                <button class="qty-btn" onclick="changeTicketQty('red', 1)">+</button>
-            </div>
-        </div>
-
-        <div class="search-drink-box">
-            <label style="color:#ff758f; margin-bottom:12px; display:block; font-weight:800;" id="lbl-select-drink">Chọn danh mục món bên dưới:</label>
-            <div class="menu-tabs">
-                <button class="menu-tab-btn active" id="tab-btn-drinks" onclick="switchMenuTab('drinks')"><span id="txt-tab-drinks">🍹 NƯỚC UỐNG</span></button>
-                <button class="menu-tab-btn" id="tab-btn-food" onclick="switchMenuTab('food')"><span id="txt-tab-food">🍖 THỨC ĂN THÚ</span></button>
-            </div>
-
-            <div id="tab-content-drinks" class="menu-tab-content active"><div id="drinks-categories-container"></div></div>
-            <div id="tab-content-food" class="menu-tab-content"><div id="food-categories-container"></div></div>
-
-            <div class="selected-drinks-cart" id="selected-cart">
-                <div class="cart-title" id="txt-cart-title">Món bạn đã chọn:</div>
-                <div id="cart-items-list"></div>
-            </div>
-        </div>
-
-        <div class="price-sticky-bar">
-            <span id="txt-total-label">TỔNG CỘNG:</span>
-            <span id="realtime-total">0đ</span>
-        </div>
-    </div>
-
-    <div id="step-success" class="step success-card">
-        <h2 id="txt-success-title">Đặt Vé Thành Công!</h2>
-        <div class="customer-summary">
-            <p><strong id="lbl-sum-name">Khách hàng:</strong> <span id="summary-name" style="color:#ff758f; font-weight:700;"></span></p>
-            <p><strong id="lbl-sum-phone">Thông tin liên hệ:</strong> <span id="summary-phone" style="font-weight:600;"></span></p>
-            <p><strong id="lbl-sum-time">Thời gian đặt vé:</strong> <span id="summary-time" style="color:#4f46e5; font-weight:700;"></span></p>
-        </div>
-        <div class="bill-details">
-            <div class="bill-title" id="txt-bill-title">CHI TIẾT HÓA ĐƠN</div>
-            <div id="bill-items-container"></div>
-            <div class="bill-total-row">
-                <span id="lbl-sum-grand-total">Tổng tiền thanh toán:</span>
-                <span id="summary-grand-total">0đ</span>
-            </div>
-        </div>
-        <div class="staff-pin-box" id="pin-area">
-            <label for="staff-pin" style="color:#ff4d6d; text-align:left; display:block;" id="lbl-staff-pin">Nhân viên nhập mã PIN để xác nhận món:</label>
-            <div class="pin-wrapper">
-                <input type="password" id="staff-pin" class="pin-input" placeholder="Nhập số PIN..." pattern="[0-9]*" inputmode="numeric" oninput="checkStaffPin()">
-            </div>
-            <p id="pin-message" style="font-size:13px; font-weight:700; margin-top:6px; text-align:left; display:none;"></p>
-            <button class="btn" id="btn-back-order" style="background:linear-gradient(135deg, #6c757d, #495057); margin-top:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15);" onclick="goBackToOrder()">Quay lại chọn thêm vé/món</button>
-        </div>
-        <p class="note-staff" id="txt-note-staff">Hãy xuất trình màn hình hóa đơn này cho nhân viên quầy để đối chiếu và nhận vòng tay nha!</p>
+        <button class="btn" id="btn-rule-next" disabled onclick="handleRulesConfirmation()">Đồng ý & Xác nhận -></button>
     </div>
 </div>
 
-<div id="floating-cart" class="floating-cart-btn" onclick="scrollToCart()" style="display:none;">
-    <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-    <div id="floating-cart-count" class="floating-cart-badge">0</div>
-</div>
-
-<div id="sticky-confirm-bar" class="sticky-confirm-wrapper" style="display:none;">
-    <button class="btn btn-sticky" id="btn-sticky-confirm" onclick="handleOrderConfirmation()">Xác nhận đơn hàng -></button>
-</div>
-
-<div id="menu-modal" class="modal-overlay zoom-mode" onclick="closeMenuModal()"><img id="modal-menu-img" src="menu.png" alt="Menu Phóng To" onerror="this.src='menu.jpg'"></div>
 <div id="rules-modal" class="modal-overlay zoom-mode" onclick="closeRulesModal()"><img id="modal-rules-img" src="luuy.png" alt="Lưu ý Phóng To" onerror="this.src='luuy.jpg'"></div>
-
-<div id="ticket-check-modal" class="modal-overlay" style="background:rgba(0,0,0,0.6);">
-    <div class="confirm-alert-box animate__animated animate__bounceIn">
-        <h3 id="txt-modal-tcheck-title">Bạn ơi lưu ý nha!</h3>
-        <p id="txt-modal-tcheck-desc">Bạn có chắc chắn là mình đã mua vé chưa? Nhấn "Đúng vậy" nếu bạn đã mua vé trước đó, hoặc muốn vào trong rồi order thêm sau nha!</p>
-        <div class="confirm-buttons">
-            <button class="btn-confirm-no" id="btn-tcheck-no" onclick="closeTicketCheckModal()">Quay lại</button>
-            <button class="btn-confirm-yes" id="btn-tcheck-yes" onclick="acceptNoTicketAndContinue()">Đúng vậy</button>
-        </div>
-    </div>
-</div>
-
-<div id="risk-confirm-modal" class="modal-overlay" style="background:rgba(0,0,0,0.6);">
-    <div class="confirm-alert-box animate__animated animate__bounceIn">
-        <h3 id="txt-modal-risk-title">Một chút lưu ý nhỏ bạn nha!</h3>
-        <p id="txt-modal-risk-desc">Các bé thú cưng đôi lúc sẽ vô tình cào nhẹ hoặc phản ứng tự vệ nếu chúng ta tương tác sai cách (không đúng nội quy). Để đảm bảo an toàn, bạn vui lòng tự lưu ý và đồng ý chịu trách nhiệm cho các rủi ro va quẹt, trầy xước ngoài ý muốn trong quá trình vui chơi nhé.</p>
-        <div class="confirm-buttons">
-            <button class="btn-confirm-no" id="btn-risk-no" onclick="closeRiskModal()">Hủy bỏ</button>
-            <button class="btn-confirm-yes" id="btn-risk-yes" onclick="confirmRiskAndSubmit()">Tớ đồng ý</button>
-        </div>
-    </div>
-</div>
 
 <script>
     firebase.initializeApp({
@@ -294,73 +138,59 @@
         measurementId: "G-FDLZXR2X8P"
     });
     const database = firebase.database();
-    let staffCodes = {}, currentLang = 'vi', allDrinks = [];
+    let currentLang = 'vi';
     let currentContactType = 'phone';
-    let menuDataByLang = { vi: { food: [], drinks: [] }, en: { food: [], drinks: [] } };
-
-    database.ref('staff_codes').on('value', snap => { staffCodes = snap.val() || {}; });
-
-    // Đồng bộ Realtime Menu từ Firebase Node `menu_branch_1`
-    database.ref('menu_branch_1').on('value', snap => {
-        const val = snap.val();
-        if (val) {
-            menuDataByLang = {
-                vi: { food: val.vi?.food || [], drinks: val.vi?.drinks || [] },
-                en: { food: val.en?.food || [], drinks: val.en?.drinks || [] }
-            };
-            allDrinks = getAllDrinksList();
-            initDrinkCategories();
-            updateSelectedCart();
-            updateTotalCost();
-        }
-    });
 
     const translations = {
         vi: {
-            rulesImg: "luuy.png", menuImg: "menu.png", step1Title: "Chào Bạn Nhỏ!", step1Sub: "Điền thông tin đặt lịch hẹn với các bé thú cưng nha!",
+            rulesImg: "luuy.png", step1Title: "Chào Bạn Nhỏ!", step1Sub: "Điền thông tin đặt lịch hẹn với các bé thú cưng nha!",
             lblFullname: "Họ tên của bạn", placeholderName: "Ví dụ: Nguyễn Văn A",
+            lblGuestCount: "Số lượng khách", placeholderGuestCount: "Ví dụ: 2",
             btnTypePhone: "📱 Số điện thoại", btnTypeEmail: "✉️ Email / Gmail",
             lblPhone: "Số điện thoại (Nhập đúng từ 10 số trở lên)", placeholderPhone: "Ví dụ: 0912345678",
             lblEmail: "Địa chỉ Gmail / Email", placeholderEmail: "Ví dụ: name@gmail.com",
-            btnStep1Next: "Tiếp tục nhận vé ->", step2Title: "Nội Quy Quán Nhỏ", rulesZoomNote: "Bấm vào ảnh để xem lưu ý rõ hơn", agreeRules: "TÔI ĐÃ ĐỌC VÀ HIỂU NỘI QUY",
-            btnRuleNext: "Đồng ý & Tiếp tục ->", step3Title: "Chọn Vé & Gọi Món", menuZoomNote: "Bấm vào ảnh để xem toàn màn hình", noticeBox: "Vé vào cửa BẮT BUỘC mua trước.<br>Nước uống KHÔNG BẮT BUỘC, bạn tùy ý lựa chọn nhé!",
-            ticketGreenTitle: "Vé Xanh (Combo 1)", ticketGreenPrice: "80.000đ / vé", ticketGreenDesc: "Trải nghiệm: Tham quan tự do, vuốt ve và chơi đùa thoải mái cùng các bé Chó, bé Mèo siêu thân thiện tại sảnh chính của quán.",
-            tagDog: "Chó", tagCat: "Mèo", tagRaccoon: "Gấu Mèo", tagAlpaca: "Lạc đà Alpaca",
-            ticketRedTitle: "Vé Đỏ (Combo 2)", ticketRedPrice: "110.000đ / vé", ticketRedDesc: "Trải nghiệm: Đầy đủ khu vực Vé Xanh + Được vào ôm ấp \"bộ trưởng ngoại giao\" Capybara ,lạc đà Alpaca và cho các bé Gấu Mèo (Raccoon) tinh nghịch ăn!",
-            selectDrink: "Chọn danh mục món bên dưới:", tabFood: "🍖 THỨC ĂN THÚ", tabDrinks: "🍹 NƯỚC UỐNG", cartTitle: "Món bạn đã chọn:", totalLabel: "TỔNG CỘNG:",
-            stickyConfirm: "Xác nhận đơn hàng ->", successTitle: "Đặt Vé Thành Công!", sumName: "Khách hàng:", sumPhone: "Thông tin liên hệ:", sumTime: "Thời gian đặt vé:",
-            billTitle: "CHI TIẾT HÓA ĐƠN", sumGrandTotal: "Tổng tiền thanh toán:", staffPin: "Nhân viên nhập mã PIN để xác nhận món:", pinPlaceholder: "Nhập số PIN...",
-            btnBackOrder: "Quay lại chọn thêm vé/món", noteStaff: "Hãy xuất trình màn hình hóa đơn này cho nhân viên quầy để đối chiếu và nhận vòng tay nha!",
-            tcheckTitle: "Bạn ơi lưu ý nha!", tcheckDesc: "Bạn có chắc chắn là mình đã mua vé chưa? Nhấn \"Đúng vậy\" nếu bạn đã mua vé trước đó, hoặc muốn vào trong rồi order thêm sau nha!",
-            tcheckNo: "Quay lại", tcheckYes: "Đúng vậy", riskTitle: "Một chút lưu ý nhỏ bạn nha!", riskDesc: "Các bé thú cưng đôi lúc sẽ vô tình cào nhẹ hoặc phản ứng tự vệ nếu chúng ta tương tác sai cách (không đúng nội quy). Để đảm bảo an toàn, bạn vui lòng tự lưu ý và đồng ý chịu trách nhiệm cho các rủi ro va quẹt, trầy xước ngoài ý muốn trong quá trình vui chơi nhé.",
-            riskNo: "Hủy bỏ", riskYes: "Tớ đồng ý", alertFillInfo: "Bạn vui lòng nhập đầy đủ Họ tên và Thông tin liên hệ nhé!", alertPhoneFormat: "Số điện thoại không đúng cấu trúc rồi ạ (Bắt đầu bằng số 0 và từ 10 số trở lên)!", alertEmailFormat: "Địa chỉ Email / Gmail không đúng định dạng rồi ạ!",
-            ticketGreenBillName: "Vé Xanh (Combo 1)", ticketRedBillName: "Vé Đỏ (Combo 2)", noTicketBillNote: "Chưa chọn vé & món (Sẽ gọi thêm khi vào trong)",
-            pinSuccess: "Mã PIN chính xác! Đơn hàng đã được xác nhận.", pinError: "Mã PIN không đúng, vui lòng thử lại."
+            btnStep1Next: "Tiếp tục ->",
+            warningStepTitle: "Lưu Ý Trước Khi Vào Chơi",
+            warnTitle: "⚠️ LƯU Ý QUAN TRỌNG TRƯỚC KHI VÀO CHƠI",
+            warnDesc: "Trong lúc vui đùa quá khích, các bé thú cưng có thể vô tình cào nhẹ hoặc cắn trúng bạn.Quán xin phép không hoàn tiền và không chịu trách nhiệm đối với các sự cố ngoài ý muốn này.",
+            btnWarningNext: "Tiếp tục qua bảng nội quy ->",
+            step2Title: "Nội Quy Quán Nhỏ",
+            rulesZoomNote: "Bấm vào ảnh để xem lưu ý rõ hơn", agreeRules: "TÔI ĐÃ ĐỌC VÀ HIỂU NỘI QUY",
+            btnRuleNext: "Đồng ý & Xác nhận ->",
+            successTitle: "Xác Nhận Thành Công!", sumName: "Khách hàng:", sumGuests: "Số lượng khách:", guestUnit: "khách", sumPhone: "Thông tin liên hệ:", sumTime: "Thời gian xác nhận:",
+            sumRulesLabel: "Trạng thái nội quy:", sumRulesVal: "Đã đọc & Đồng ý nội quy",
+            btnBackInfo: "Quay lại chỉnh sửa thông tin", noteStaff: "Hãy xuất trình màn hình xác nhận này cho nhân viên quầy để đối chiếu nha!",
+            alertFillInfo: "Bạn vui lòng nhập đầy đủ Họ tên và Thông tin liên hệ nhé!",
+            alertGuestCount: "Vui lòng nhập số lượng khách hợp lệ (từ 1 khách trở lên)!",
+            alertPhoneFormat: "Số điện thoại không đúng cấu trúc rồi ạ (Bắt đầu bằng số 0 và từ 10 số trở lên)!",
+            alertEmailFormat: "Địa chỉ Email / Gmail không đúng định dạng rồi ạ!"
         },
         en: {
-            rulesImg: "luuy2.png", menuImg: "menu2.png", step1Title: "Welcome Friend!", step1Sub: "Please fill in your information to book a date with our pets!",
+            rulesImg: "luuy2.png", step1Title: "Welcome Friend!", step1Sub: "Please fill in your information to book a date with our pets!",
             lblFullname: "Your Full Name", placeholderName: "Example: John Doe",
+            lblGuestCount: "Number of Guests", placeholderGuestCount: "Example: 2",
             btnTypePhone: "📱 Phone Number", btnTypeEmail: "✉️ Email / Gmail",
             lblPhone: "Phone Number (10+ digits)", placeholderPhone: "Example: 0912345678",
             lblEmail: "Gmail / Email Address", placeholderEmail: "Example: name@gmail.com",
-            btnStep1Next: "Continue to Tickets ->", step2Title: "House Rules", rulesZoomNote: "Tap on the image to enlarge guidelines", agreeRules: "I HAVE READ & AGREE TO THE RULES",
-            btnRuleNext: "Agree & Continue ->", step3Title: "Select Tickets & Drinks", menuZoomNote: "Tap on the image to view full screen menu", noticeBox: "Entrance tickets are REQUIRED in advance.<br>Drinks are OPTIONAL, feel free to choose!",
-            ticketGreenTitle: "Green Ticket (Combo 1)", ticketGreenPrice: "80,000 VND / ticket", ticketGreenDesc: "Experience: Free walk-through, pet and play with friendly Dogs and Cats in the main lobby.",
-            tagDog: "Dog", tagCat: "Cat", tagRaccoon: "Raccoon", tagAlpaca: "Alpaca",
-            ticketRedTitle: "Red Ticket (Combo 2)", ticketRedPrice: "110,000 VND / ticket", ticketRedDesc: "Experience: Includes all Green Ticket areas, plus access to hug Capybaras, meet Alpacas, and feed Raccoons!",
-            selectDrink: "Select item category below:", tabFood: "🍖 PET FOOD", tabDrinks: "🍹 DRINKS", cartTitle: "Selected Items:", totalLabel: "TOTAL:",
-            stickyConfirm: "Confirm Order ->", successTitle: "Booking Successful!", sumName: "Customer:", sumPhone: "Contact Info:", sumTime: "Booking Time:",
-            billTitle: "BILL DETAILS", sumGrandTotal: "Total Amount Due:", staffPin: "Staff PIN verification:", pinPlaceholder: "Enter PIN...",
-            btnBackOrder: "Go back to modify order", noteStaff: "Please present this invoice screen to our staff at the counter to get your wristband!",
-            tcheckTitle: "Friendly Reminder!", tcheckDesc: "Are you sure you haven't selected any tickets? Tap \"Yes\" if you bought tickets earlier or wish to order inside later!",
-            tcheckNo: "Go Back", tcheckYes: "Yes, I understand", riskTitle: "Important Safety Note!", riskDesc: "Our pets may accidentally scratch or react defensively if handled incorrectly. For safety, please be careful and accept personal responsibility for any accidental scratches during playtime.",
-            riskNo: "Cancel", riskYes: "I Agree", alertFillInfo: "Please enter your full Name and Contact info!", alertPhoneFormat: "Invalid phone number format (Must start with 0 and have at least 10 digits)!", alertEmailFormat: "Invalid Email format!",
-            ticketGreenBillName: "Green Ticket (Combo 1)", ticketRedBillName: "Red Ticket (Combo 2)", noTicketBillNote: "No ticket/drink selected (Will order inside)",
-            pinSuccess: "Correct PIN! Order verified successfully.", pinError: "Incorrect PIN, please try again."
+            btnStep1Next: "Continue ->",
+            warningStepTitle: "Notice Before Entering",
+            warnTitle: "⚠️ IMPORTANT NOTICE BEFORE ENTERING",
+            warnDesc: "When playing excitedly, our pets may accidentally scratch or nip you.We do not offer refunds and assume no liability for any accidental injuries during your visit.",
+            btnWarningNext: "Continue to House Rules ->",
+            step2Title: "House Rules",
+            rulesZoomNote: "Tap on the image to enlarge guidelines", agreeRules: "I HAVE READ & AGREE TO THE RULES",
+            btnRuleNext: "Agree & Confirm ->",
+            successTitle: "Confirmation Successful!", sumName: "Customer:", sumGuests: "Number of Guests:", guestUnit: "guest(s)", sumPhone: "Contact Info:", sumTime: "Confirmation Time:",
+            sumRulesLabel: "Rules Status:", sumRulesVal: "Read & Agreed to House Rules",
+            btnBackInfo: "Go back to edit info", noteStaff: "Please present this confirmation screen to our staff at the counter!",
+            alertFillInfo: "Please enter your full Name and Contact info!",
+            alertGuestCount: "Please enter a valid number of guests (at least 1)!",
+            alertPhoneFormat: "Invalid phone number format (Must start with 0 and have at least 10 digits)!",
+            alertEmailFormat: "Invalid Email format!"
         }
     };
 
-    let orderState = { name: '', phone: '', contactType: 'phone', ticketGreen: 0, ticketRed: 0, drinks: {} };
+    let orderState = { name: '', guestCount: 1, phone: '', contactType: 'phone', agreedRules: false };
 
     function setElText(id, text, isHTML = false) {
         const el = document.getElementById(id);
@@ -389,160 +219,32 @@
         }
     }
 
-    function getAllDrinksList() {
-        const data = menuDataByLang[currentLang] || { food: [], drinks: [] };
-        const foodList = (data.food || []).flatMap(c => c.drinks || []);
-        const drinksList = (data.drinks || []).flatMap(c => c.drinks || []);
-        return [...foodList, ...drinksList];
-    }
-
     function selectLanguage(lang) {
         currentLang = lang;
         const t = translations[lang];
-        allDrinks = getAllDrinksList();
 
         ['rules-img-element', 'modal-rules-img'].forEach(id => document.getElementById(id).src = t.rulesImg);
-        ['menu-img-element', 'modal-menu-img'].forEach(id => document.getElementById(id).src = t.menuImg);
 
         setElText('txt-step1-title', t.step1Title); setElText('txt-step1-sub', t.step1Sub);
         setElText('lbl-fullname', t.lblFullname); document.getElementById('fullname').placeholder = t.placeholderName;
+        setElText('lbl-guest-count', t.lblGuestCount); document.getElementById('guest-count').placeholder = t.placeholderGuestCount;
         setElText('btn-type-phone', t.btnTypePhone); setElText('btn-type-email', t.btnTypeEmail);
         
         switchContactType(currentContactType);
 
-        setElText('btn-step1-next', t.btnStep1Next); setElText('txt-step2-title', t.step2Title);
+        setElText('btn-step1-next', t.btnStep1Next);
+        setElText('txt-warning-step-title', t.warningStepTitle);
+        setElText('txt-warn-title', t.warnTitle); setElText('txt-warn-desc', t.warnDesc);
+        setElText('btn-warning-next', t.btnWarningNext);
+        setElText('txt-step2-title', t.step2Title);
         setElText('txt-rules-zoom-note', t.rulesZoomNote); setElText('txt-agree-rules', t.agreeRules);
-        setElText('btn-rule-next', t.btnRuleNext); setElText('txt-step3-title', t.step3Title);
-        setElText('txt-menu-zoom-note', t.menuZoomNote); setElText('txt-notice-box', t.noticeBox, true);
+        setElText('btn-rule-next', t.btnRuleNext);
         
-        setElText('txt-ticket-green-title', t.ticketGreenTitle); setElText('txt-ticket-green-price', t.ticketGreenPrice); setElText('txt-ticket-green-desc', t.ticketGreenDesc);
-        setElText('tag-dog', t.tagDog); setElText('tag-cat', t.tagCat); setElText('tag-dog2', t.tagDog); setElText('tag-cat2', t.tagCat); setElText('tag-raccoon', t.tagRaccoon); setElText('tag-alpaca', t.tagAlpaca);
-        setElText('txt-ticket-red-title', t.ticketRedTitle); setElText('txt-ticket-red-price', t.ticketRedPrice); setElText('txt-ticket-red-desc', t.ticketRedDesc);
-        
-        setElText('lbl-select-drink', t.selectDrink); setElText('txt-tab-food', t.tabFood); setElText('txt-tab-drinks', t.tabDrinks);
-        setElText('txt-cart-title', t.cartTitle); setElText('txt-total-label', t.totalLabel); setElText('btn-sticky-confirm', t.stickyConfirm);
-        
-        setElText('txt-success-title', t.successTitle); setElText('lbl-sum-name', t.sumName); setElText('lbl-sum-phone', t.sumPhone); setElText('lbl-sum-time', t.sumTime);
-        setElText('txt-bill-title', t.billTitle); setElText('lbl-sum-grand-total', t.sumGrandTotal); setElText('lbl-staff-pin', t.staffPin);
-        document.getElementById('staff-pin').placeholder = t.pinPlaceholder; setElText('btn-back-order', t.btnBackOrder); setElText('txt-note-staff', t.noteStaff);
-        
-        setElText('txt-modal-tcheck-title', t.tcheckTitle); setElText('txt-modal-tcheck-desc', t.tcheckDesc); setElText('btn-tcheck-no', t.tcheckNo); setElText('btn-tcheck-yes', t.tcheckYes);
-        setElText('txt-modal-risk-title', t.riskTitle); setElText('txt-modal-risk-desc', t.riskDesc); setElText('btn-risk-no', t.riskNo); setElText('btn-risk-yes', t.riskYes);
+        setElText('txt-success-title', t.successTitle); setElText('lbl-sum-name', t.sumName); setElText('lbl-sum-guests', t.sumGuests); setElText('lbl-sum-phone', t.sumPhone); setElText('lbl-sum-time', t.sumTime);
+        setElText('lbl-sum-rules', t.sumRulesLabel); setElText('summary-rules', t.sumRulesVal);
+        setElText('btn-back-info', t.btnBackInfo); setElText('txt-note-staff', t.noteStaff);
 
-        initDrinkCategories();
-        updateSelectedCart();
         switchStep('step-0', 'step-1');
-    }
-
-    function renderCategoryList(containerId, categoriesData, prefixKey) {
-        if (!categoriesData || categoriesData.length === 0) {
-            document.getElementById(containerId).innerHTML = '<div style="padding:15px; text-align:center; color:#8d99ae;">Đang tải menu...</div>';
-            return;
-        }
-        document.getElementById(containerId).innerHTML = categoriesData.map((cat, catIdx) => {
-            const itemsHtml = (cat.drinks || []).map(drink => {
-                const qty = orderState.drinks[drink.id] || 0;
-                const noteHtml = drink.note ? `<div class="drink-search-note">${drink.note}</div>` : '';
-                return `<div class="drink-search-item">
-                    <div style="flex:1; padding-right:8px;">
-                        <div><span class="drink-search-name">${drink.name}</span><span class="drink-search-price">${drink.price/1000}k</span></div>
-                        ${noteHtml}
-                    </div>
-                    <div class="quantity-selector">
-                        <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', -1, event)">-</button>
-                        <input type="number" id="qty-${drink.id}" class="qty-input" value="${qty}" min="0" readonly>
-                        <button class="qty-btn" onclick="changeDrinkQty('${drink.id}', 1, event)">+</button>
-                    </div>
-                </div>`;
-            }).join('');
-            const uId = `${prefixKey}-${catIdx}`;
-            return `<div class="category-item" id="cat-item-${uId}">
-                <div class="category-header" onclick="toggleCategory('${uId}')"><span>${cat.categoryName}</span></div>
-                <div class="category-content" id="cat-content-${uId}">${itemsHtml}</div>
-            </div>`;
-        }).join('');
-    }
-
-    function initDrinkCategories() {
-        const data = menuDataByLang[currentLang] || { food: [], drinks: [] };
-        renderCategoryList('food-categories-container', data.food, 'food');
-        renderCategoryList('drinks-categories-container', data.drinks, 'drink');
-    }
-
-    function switchMenuTab(type) {
-        ['food', 'drinks'].forEach(t => {
-            document.getElementById(`tab-btn-${t}`).classList.toggle('active', t === type);
-            document.getElementById(`tab-content-${t}`).classList.toggle('active', t === type);
-        });
-    }
-
-    function toggleCategory(uId) {
-        const item = document.getElementById(`cat-item-${uId}`);
-        const content = document.getElementById(`cat-content-${uId}`);
-        const isActive = item.classList.contains('active');
-        document.querySelectorAll('.category-item').forEach(e => e.classList.remove('active'));
-        document.querySelectorAll('.category-content').forEach(e => e.style.display = 'none');
-        if (!isActive) { item.classList.add('active'); content.style.display = 'block'; }
-    }
-
-    function changeDrinkQty(id, val, ev) {
-        if (ev) ev.stopPropagation();
-        let qty = (orderState.drinks[id] || 0) + val;
-        qty <= 0 ? delete orderState.drinks[id] : orderState.drinks[id] = qty;
-        document.querySelectorAll(`#qty-${id}`).forEach(i => i.value = Math.max(0, qty));
-        updateSelectedCart();
-        updateTotalCost();
-    }
-
-    function updateSelectedCart() {
-        const activeIds = Object.keys(orderState.drinks);
-        let totalCount = orderState.ticketGreen + orderState.ticketRed + activeIds.reduce((sum, id) => sum + orderState.drinks[id], 0);
-
-        const fCart = document.getElementById('floating-cart');
-        fCart.style.display = totalCount > 0 ? 'flex' : 'none';
-        document.getElementById('floating-cart-count').innerText = totalCount;
-
-        const cartBox = document.getElementById('selected-cart');
-        if (activeIds.length === 0) { cartBox.style.display = 'none'; return; }
-        
-        cartBox.style.display = 'block';
-        allDrinks = getAllDrinksList();
-        document.getElementById('cart-items-list').innerHTML = activeIds.map(id => {
-            const drink = allDrinks.find(d => d.id === id);
-            return drink ? `<div style="display:flex; justify-content:space-between; font-size:13.5px; margin-top:5px; color:#5c5552;">
-                <span><strong>${drink.name}</strong> (x${orderState.drinks[id]})</span>
-                <span style="font-weight:700; color:#ff758f;">${(drink.price * orderState.drinks[id]).toLocaleString('vi-VN')}đ</span>
-            </div>` : '';
-        }).join('');
-    }
-
-    function scrollToCart() {
-        const cart = document.getElementById('selected-cart');
-        (cart && cart.style.display !== 'none' ? cart : document.querySelector('.search-drink-box')).scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    function changeTicketQty(type, val) {
-        const inp = document.getElementById(`qty-${type}`);
-        let qty = Math.max(0, (parseInt(inp.value) || 0) + val);
-        inp.value = qty;
-        if (type === 'green') orderState.ticketGreen = qty;
-        if (type === 'red') orderState.ticketRed = qty;
-        updateSelectedCart();
-        updateTotalCost();
-    }
-
-    function calculateTotal() {
-        let total = orderState.ticketGreen * 80000 + orderState.ticketRed * 110000;
-        allDrinks = getAllDrinksList();
-        for (const [id, qty] of Object.entries(orderState.drinks)) {
-            const d = allDrinks.find(item => item.id === id);
-            if (d) total += d.price * qty;
-        }
-        return total;
-    }
-
-    function updateTotalCost() {
-        document.getElementById('realtime-total').innerText = calculateTotal().toLocaleString('vi-VN') + 'đ';
     }
 
     function switchStep(currId, nextId, anim = 'animate__fadeInRight') {
@@ -550,11 +252,9 @@
         curr.style.display = 'none'; curr.classList.remove('active');
         next.style.display = 'block'; next.classList.add('active', 'animate__animated', anim);
 
-        const isStep3 = nextId === 'step-3';
-        document.getElementById('sticky-confirm-bar').style.display = isStep3 ? 'flex' : 'none';
-        document.getElementById('main-container').classList.toggle('has-sticky-btn', isStep3);
-        if (!isStep3) document.getElementById('floating-cart').style.display = 'none';
-        else updateSelectedCart();
+        const isStep2 = nextId === 'step-2';
+        document.getElementById('sticky-rules-bar').style.display = isStep2 ? 'flex' : 'none';
+        document.getElementById('main-container').classList.toggle('has-sticky-rules', isStep2);
 
         setTimeout(() => next.classList.remove('animate__animated', anim), 600);
     }
@@ -565,12 +265,15 @@
         setTimeout(() => c.classList.remove('animate__animated', 'animate__shakeX'), 600);
     }
 
-    function goToStep2() {
+    function goToStepWarning() {
         const t = translations[currentLang];
         const name = document.getElementById('fullname').value.trim();
+        const guestCount = parseInt(document.getElementById('guest-count').value, 10);
         const contactVal = document.getElementById('contact-input').value.trim();
         
         if (!name || !contactVal) { triggerErrorShake(); alert(t.alertFillInfo); return; }
+
+        if (isNaN(guestCount) || guestCount < 1) { triggerErrorShake(); alert(t.alertGuestCount); return; }
 
         if (currentContactType === 'phone') {
             if (!/^[0-9]+$/.test(contactVal) || contactVal.length < 10) { triggerErrorShake(); alert(t.alertPhoneFormat); return; }
@@ -579,11 +282,16 @@
             if (!emailRegex.test(contactVal)) { triggerErrorShake(); alert(t.alertEmailFormat); return; }
         }
 
-        orderState.name = name; 
+        orderState.name = name;
+        orderState.guestCount = guestCount;
         orderState.phone = contactVal;
         orderState.contactType = currentContactType;
 
-        switchStep('step-1', 'step-2');
+        switchStep('step-1', 'step-warning');
+    }
+
+    function goToStep2() {
+        switchStep('step-warning', 'step-2');
     }
 
     function toggleRuleBtn() {
@@ -598,101 +306,45 @@
         lastTouch = now;
     }, false);
 
-    function goToStep3() { switchStep('step-2', 'step-3'); }
-    function openMenuModal() { document.getElementById('menu-modal').style.display = 'flex'; }
-    function closeMenuModal() { document.getElementById('menu-modal').style.display = 'none'; }
     function openRulesModal() { document.getElementById('rules-modal').style.display = 'flex'; }
     function closeRulesModal() { document.getElementById('rules-modal').style.display = 'none'; }
 
-    function handleOrderConfirmation() {
-        if (!orderState.ticketGreen && !orderState.ticketRed) {
-            document.getElementById('ticket-check-modal').style.display = 'flex';
-        } else triggerRiskModal();
+    function handleRulesConfirmation() {
+        if (!document.getElementById('agree-checkbox').checked) return;
+        orderState.agreedRules = true;
+        showConfirmation();
     }
-
-    function closeTicketCheckModal() { document.getElementById('ticket-check-modal').style.display = 'none'; }
-    function acceptNoTicketAndContinue() { closeTicketCheckModal(); triggerRiskModal(); }
-    function triggerRiskModal() { document.getElementById('risk-confirm-modal').style.display = 'flex'; }
-    function closeRiskModal() { document.getElementById('risk-confirm-modal').style.display = 'none'; }
-    function confirmRiskAndSubmit() { closeRiskModal(); showConfirmation(); }
 
     function showConfirmation() {
         const t = translations[currentLang];
         const now = new Date();
         const loc = currentLang === 'vi' ? 'vi-VN' : 'en-US';
         document.getElementById('summary-name').innerText = orderState.name;
+        document.getElementById('summary-guests').innerText = `${orderState.guestCount} ${t.guestUnit}`;
         document.getElementById('summary-phone').innerText = `${orderState.phone} (${orderState.contactType === 'email' ? 'Email' : 'SĐT'})`;
         document.getElementById('summary-time').innerText = `${now.toLocaleTimeString(loc, {hour:'2-digit', minute:'2-digit'})} - ${now.toLocaleDateString(loc)}`;
+        document.getElementById('summary-rules').innerText = t.sumRulesVal;
 
-        let html = '';
-        if (orderState.ticketGreen > 0) html += `<div class="bill-row"><span>${t.ticketGreenBillName} x ${orderState.ticketGreen}</span><span>${(orderState.ticketGreen * 80000).toLocaleString('vi-VN')}đ</span></div>`;
-        if (orderState.ticketRed > 0) html += `<div class="bill-row"><span>${t.ticketRedBillName} x ${orderState.ticketRed}</span><span>${(orderState.ticketRed * 110000).toLocaleString('vi-VN')}đ</span></div>`;
-
-        allDrinks = getAllDrinksList();
-        for (const [id, qty] of Object.entries(orderState.drinks)) {
-            const d = allDrinks.find(item => item.id === id);
-            if (d) html += `<div class="bill-row"><span>${d.name} x ${qty}</span><span>${(d.price * qty).toLocaleString('vi-VN')}đ</span></div>`;
-        }
-
-        document.getElementById('bill-items-container').innerHTML = html || `<div class="bill-row" style="justify-content:center; font-style:italic;">${t.noTicketBillNote}</div>`;
-        document.getElementById('summary-grand-total').innerText = calculateTotal().toLocaleString('vi-VN') + 'đ';
-
-        const pinInp = document.getElementById('staff-pin');
-        pinInp.value = ''; pinInp.disabled = false;
-        document.getElementById('pin-message').style.display = 'none';
-        switchStep('step-3', 'step-success', 'animate__zoomIn');
+        saveOrderToFirebase();
+        switchStep('step-2', 'step-success', 'animate__zoomIn');
     }
 
-    function saveOrderToFirebase(staffInfo = null) {
+    function saveOrderToFirebase() {
         const now = new Date();
-        let orderedDrinks = {};
-        allDrinks = getAllDrinksList();
-        for (const [id, qty] of Object.entries(orderState.drinks)) {
-            const d = allDrinks.find(item => item.id === id);
-            if (d) orderedDrinks[id] = { name: d.name, quantity: qty, price: d.price, subtotal: d.price * qty };
-        }
 
         database.ref('orders').push({
-            customerName: orderState.name, 
+            customerName: orderState.name,
+            guestCount: orderState.guestCount,
             customerPhone: orderState.phone,
             contactType: orderState.contactType,
-            ticketGreenQty: orderState.ticketGreen, ticketRedQty: orderState.ticketRed,
-            drinks: orderedDrinks, totalAmount: calculateTotal(), createdAt: now.toLocaleString('vi-VN'),
-            timestamp: now.getTime(), language: currentLang,
-            confirmedBy: staffInfo ? staffInfo.name : "N/A", confirmedByCode: staffInfo ? staffInfo.code : "N/A"
-        }).then(() => console.log("Đơn hàng đã đồng bộ Firebase!")).catch(e => console.error("Lỗi Firebase:", e));
+            agreedRules: orderState.agreedRules,
+            createdAt: now.toLocaleString('vi-VN'),
+            timestamp: now.getTime(),
+            language: currentLang
+        }).then(() => console.log("Thông tin xác nhận đã đồng bộ Firebase!")).catch(e => console.error("Lỗi Firebase:", e));
     }
 
-    function checkStaffPin() {
-        const t = translations[currentLang];
-        const pinInp = document.getElementById('staff-pin');
-        const pinMsg = document.getElementById('pin-message');
-        const code = pinInp.value.trim();
-        
-        let found = staffCodes[code];
-        if (!found && typeof staffCodes === 'object') {
-            const key = Object.keys(staffCodes).find(k => staffCodes[k] && staffCodes[k].code === code);
-            if (key) found = staffCodes[key];
-        }
-
-        if (found) {
-            const sName = found.name || "Nhân viên", sCode = found.code || code;
-            pinMsg.style.display = 'block'; pinMsg.style.color = '#2e7d32';
-            pinMsg.innerText = `${t.pinSuccess} (NV: ${sName})`;
-            pinInp.disabled = true;
-            saveOrderToFirebase({ name: sName, code: sCode });
-        } else if (code.length >= 3) {
-            pinMsg.style.display = 'block'; pinMsg.style.color = '#d90429';
-            pinMsg.innerText = t.pinError;
-        } else pinMsg.style.display = 'none';
-    }
-
-    function goBackToOrder() { switchStep('step-success', 'step-3', 'animate__fadeInLeft'); }
-
-    window.onload = function() {
-        allDrinks = getAllDrinksList();
-        initDrinkCategories();
-    };
+    function goBackToInfo() { switchStep('step-success', 'step-1', 'animate__fadeInLeft'); }
 </script>
 </body>
 </html>
