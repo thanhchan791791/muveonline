@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cho Bẻo Chăm nè 💖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            overflow: hidden;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .box {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            max-width: 420px;
+            width: 100%;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .heart {
+            font-size: 4rem;
+            display: inline-block;
+            animation: heartbeat 1.2s infinite;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #d6336c;
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size: 1.15rem;
+            color: #333;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="heart">💖</div>
+        <h1>Bẻo Chăm cố lên nha!</h1>
+        <p>Làm mệt rồi thì nghỉ xíu nha Bẻo Chăm, Cần gì hay thèm gì nói tui nhaa tui tiếp năng lượng choa 🥰</p>
+    </div>
+</body>
+</html>
