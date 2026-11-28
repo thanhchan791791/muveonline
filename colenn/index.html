@@ -1,15 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cho Bẻo Chăm nè 💖</title>
+    <title>Thương Bẻo Chăm 🌸</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: 'Quicksand', sans-serif;
         }
 
         body {
@@ -17,58 +19,128 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            background: linear-gradient(160deg, #ffeef4 0%, #fff6e5 50%, #e8f6ff 100%);
             overflow: hidden;
             text-align: center;
             padding: 20px;
+            position: relative;
         }
 
-        .box {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 40px 30px;
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            max-width: 420px;
+        /* Tim bay nhẹ nhàng trên nền */
+        .bg-hearts span {
+            position: absolute;
+            bottom: -40px;
+            font-size: 1.4rem;
+            opacity: 0.55;
+            animation: floatHeart linear infinite;
+            pointer-events: none;
+        }
+
+        .bg-hearts span:nth-child(1) { left: 10%; animation-duration: 7s; animation-delay: 0s; }
+        .bg-hearts span:nth-child(2) { left: 25%; animation-duration: 9s; animation-delay: 2s; font-size: 1.1rem; }
+        .bg-hearts span:nth-child(3) { left: 45%; animation-duration: 6.5s; animation-delay: 1s; font-size: 1.6rem; }
+        .bg-hearts span:nth-child(4) { left: 65%; animation-duration: 8.5s; animation-delay: 3s; }
+        .bg-hearts span:nth-child(5) { left: 80%; animation-duration: 7.5s; animation-delay: 1.5s; font-size: 1.2rem; }
+        .bg-hearts span:nth-child(6) { left: 92%; animation-duration: 9.5s; animation-delay: 4s; }
+
+        @keyframes floatHeart {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(0.9);
+                opacity: 0;
+            }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% {
+                transform: translateY(-108vh) rotate(25deg) scale(1.15);
+                opacity: 0;
+            }
+        }
+
+        .card {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.86);
+            backdrop-filter: blur(10px);
+            border: 3px solid #fff;
+            padding: 38px 28px;
+            border-radius: 32px;
+            box-shadow: 0 18px 40px rgba(255, 143, 177, 0.22);
+            max-width: 390px;
             width: 100%;
-            animation: fadeIn 0.8s ease;
+            animation: popIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .heart {
-            font-size: 4rem;
+        .pet {
+            font-size: 4.3rem;
             display: inline-block;
-            animation: heartbeat 1.2s infinite;
-            margin-bottom: 15px;
+            animation: wiggle 2.2s ease-in-out infinite;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 8px 12px rgba(255, 120, 160, 0.2));
         }
 
         h1 {
-            font-size: 1.5rem;
-            color: #d6336c;
-            margin-bottom: 12px;
+            font-size: 1.45rem;
+            color: #ff5c8a;
+            margin-bottom: 10px;
+            font-weight: 700;
         }
 
         p {
-            font-size: 1.15rem;
-            color: #333;
-            line-height: 1.6;
-            font-weight: 500;
+            font-size: 1.1rem;
+            color: #554952;
+            line-height: 1.65;
+            font-weight: 600;
+            animation: gentleFloat 3s ease-in-out infinite;
         }
 
-        @keyframes heartbeat {
+        .badge {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 8px 18px;
+            border-radius: 999px;
+            background: #fff0f5;
+            color: #ff5c8a;
+            font-size: 0.92rem;
+            font-weight: 700;
+            border: 1.5px dashed #ff9ebb;
+            animation: softPulse 2s infinite;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.82) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: translateY(0) rotate(-4deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes softPulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+            50% { transform: scale(1.04); }
         }
     </style>
 </head>
 <body>
-    <div class="box">
-        <div class="heart">💖</div>
-        <h1>Bẻo Chăm cố lên nha!</h1>
-        <p>Làm mệt rồi thì nghỉ xíu nha Bẻo Chăm, Cần gì hay thèm gì nói tui nhaa tui tiếp năng lượng choa 🥰</p>
+    <div class="bg-hearts">
+        <span>🌸</span>
+        <span>💗</span>
+        <span>✨</span>
+        <span>🌷</span>
+        <span>💕</span>
+        <span>☁️</span>
+    </div>
+
+    <div class="card">
+        <div class="pet">🧸</div>
+        <h1>Bẻo Chăm ơi cố lên nè!</h1>
+        <p>Làm mệt rồi thì nghỉ xíu nha Bẻo Chăm, Cần gì hay thèm gì nói tui nha tui tiếp năng lượng choa 🥰</p>
     </div>
 </body>
 </html>
